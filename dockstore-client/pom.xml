@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.dockstore</groupId>
-        <artifactId>dockstore</artifactId>
+        <artifactId>dockstore-cli</artifactId>
         <version>1.7.0-rc.2-SNAPSHOT</version>
     </parent>
     <artifactId>dockstore-client</artifactId>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-common</artifactId>
-            <version>1.7.0-rc.2-SNAPSHOT</version>
+            <version>${dockstore-core.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.postgresql</groupId>

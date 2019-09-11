@@ -25,7 +25,7 @@
     <name>openapi-java-wes-client</name>
 
     <parent>
-        <artifactId>dockstore</artifactId>
+        <artifactId>dockstore-cli</artifactId>
         <groupId>io.dockstore</groupId>
         <version>1.7.0-rc.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import io.dockstore.webservice.DockstoreWebserviceConfiguration;
@@ -154,8 +155,30 @@ public final class CommonTestUtilities {
         Application<DockstoreWebserviceConfiguration> application = support.getApplication();
         application.run("db", "drop-all", "--confirm-delete-everything", configPath);
 
-        List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency", "test.confidential1", "1.4.0", "1.5.0", "test.confidential1_1.5.0", "1.6.0", "1.7.0");
+        List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
         runMigration(migrationList, application, configPath);
+
+        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1.xml");
+        runExternalMigration(migrationList, application, configPath);
+
+        migrationList = Arrays.asList("1.4.0", "1.5.0");
+        runMigration(migrationList, application, configPath);
+
+        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml");
+        runExternalMigration(migrationList, application, configPath);
+
+        migrationList = Arrays.asList("1.6.0", "1.7.0");
+        runMigration(migrationList, application, configPath);
+    }
+
+    public static void runExternalMigration(List<String> migrationList, Application<DockstoreWebserviceConfiguration> application, String configPath) {
+        migrationList.forEach(migration -> {
+            try {
+                application.run("db", "migrate", configPath, "--migrations", migration);
+            } catch (Exception e) {
+                Assert.fail();
+            }
+        });
     }
 
     public static void runMigration(List<String> migrationList, Application<DockstoreWebserviceConfiguration> application, String configPath) {
@@ -196,7 +219,19 @@ public final class CommonTestUtilities {
         }
         application.run("db", "drop-all", "--confirm-delete-everything", configPath);
 
-        List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency", "test.confidential2", "1.4.0", "1.5.0", "test.confidential2_1.5.0", "1.6.0", "1.7.0");
+        List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
+        runMigration(migrationList, application, configPath);
+
+        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2.xml");
+        runExternalMigration(migrationList, application, configPath);
+
+        migrationList = Arrays.asList("1.4.0", "1.5.0");
+        runMigration(migrationList, application, configPath);
+
+        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml");
+        runExternalMigration(migrationList, application, configPath);
+
+        migrationList = Arrays.asList("1.6.0", "1.7.0");
         runMigration(migrationList, application, configPath);
     }
 

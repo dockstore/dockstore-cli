@@ -19,11 +19,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.dockstore</groupId>
-        <artifactId>dockstore</artifactId>
+        <artifactId>dockstore-cli</artifactId>
         <version>1.7.0-rc.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>dockstore-integration-testing</artifactId>
+    <artifactId>dockstore-cli-integration-testing</artifactId>
     <packaging>jar</packaging>
 
     <properties>
@@ -50,12 +50,12 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-common</artifactId>
-            <version>1.7.0-rc.2-SNAPSHOT</version>
+            <version>${dockstore-core.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-webservice</artifactId>
-            <version>1.7.0-rc.2-SNAPSHOT</version>
+            <version>${dockstore-core.version}</version>
         </dependency>
 
         <dependency>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-common</artifactId>
-            <version>1.7.0-rc.2-SNAPSHOT</version>
+            <version>${dockstore-core.version}</version>
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>

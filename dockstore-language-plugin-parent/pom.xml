@@ -20,7 +20,7 @@
     <parent>
         <version>1.7.0-rc.2-SNAPSHOT</version>
         <groupId>io.dockstore</groupId>
-        <artifactId>dockstore</artifactId>
+        <artifactId>dockstore-cli</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-common</artifactId>
-            <version>1.7.0-rc.2-SNAPSHOT</version>
+            <version>${dockstore-core.version}</version>
         </dependency>
         <dependency>
             <groupId>ro.fortsoft.pf4j</groupId>
