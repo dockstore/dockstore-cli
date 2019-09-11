@@ -53,7 +53,7 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>swagger-java-client</artifactId>
-            <version>1.7.0-rc.2-SNAPSHOT</version>
+            <version>${dockstore-core.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>

@@ -150,8 +150,6 @@
 
     <modules>
         <module>dockstore-file-plugin-parent</module>
-        <module>swagger-java-client</module>
-        <module>openapi-java-client</module>
         <module>dockstore-client</module>
         <module>dockstore-cli-integration-testing</module>
         <module>reports</module>
