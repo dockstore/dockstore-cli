@@ -18,7 +18,7 @@ mkdir -p /tmp/$CUSTOM_DIR_NAME
 
 cp $GIT_DIR/scripts/decrypt.template.mustache /tmp/$CUSTOM_DIR_NAME
 cd /tmp/$CUSTOM_DIR_NAME
-ENCRYPT_FILE_CONTENTS=`travis encrypt-file $GIT_DIR/secrets.tar -r dockstore/dockstore`
+ENCRYPT_FILE_CONTENTS=`travis encrypt-file $GIT_DIR/secrets.tar -r dockstore/dockstore-cli`
 
 if [[ $ENCRYPT_FILE_CONTENTS =~ $regex ]]
     then
