@@ -64,18 +64,6 @@ public class CromwellIT {
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
     @Test
-    public void testWDL2Json() {
-        File sourceFile = new File(ResourceHelpers.resourceFilePath("wdl.wdl"));
-        WdlBridge wdlBridge = new WdlBridge();
-        try {
-            String inputs = wdlBridge.getParameterFile(sourceFile.getAbsolutePath());
-            Assert.assertTrue(inputs.contains("three_step.cgrep.pattern"));
-        } catch (WdlParser.SyntaxError ex) {
-            Assert.fail("There should not be any parsing errors");
-        }
-    }
-
-    @Test
     public void runWDLWorkflow() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
@@ -142,28 +130,6 @@ public class CromwellIT {
         Assert.assertEquals(2, files.size());
     }
 
-    @Test
-    public void testWDLResolver() {
-        // If resolver works, this should throw no errors
-        File sourceFile = new File(ResourceHelpers.resourceFilePath("wdl-sanger-workflow.wdl"));
-        WdlBridge wdlBridge = new WdlBridge();
-        HashMap<String, String> secondaryFiles = new HashMap<>();
-        secondaryFiles.put("wdl.wdl",
-                "task ps {\n" + "  command {\n" + "    ps\n" + "  }\n" + "  output {\n" + "    File procs = stdout()\n" + "  }\n" + "}\n"
-                        + "\n" + "task cgrep {\n" + "  String pattern\n" + "  File in_file\n" + "  command {\n"
-                        + "    grep '${pattern}' ${in_file} | wc -l\n" + "  }\n" + "  output {\n" + "    Int count = read_int(stdout())\n"
-                        + "  }\n" + "}\n" + "\n" + "task wc {\n" + "  File in_file\n" + "  command {\n" + "    cat ${in_file} | wc -l\n"
-                        + "  }\n" + "  output {\n" + "    Int count = read_int(stdout())\n" + "  }\n" + "}\n" + "\n"
-                        + "workflow three_step {\n" + "  call ps\n" + "  call cgrep {\n" + "    input: in_file=ps.procs\n" + "  }\n"
-                        + "  call wc {\n" + "    input: in_file=ps.procs\n" + "  }\n" + "}\n");
-        wdlBridge.setSecondaryFiles(secondaryFiles);
-        try {
-            wdlBridge.validateWorkflow(sourceFile.getAbsolutePath());
-        } catch (WdlParser.SyntaxError ex) {
-            Assert.fail("Should not fail parsing file");
-        }
-    }
-
     /**
      * This tests compatibility with Cromwell 30.2 by running a workflow (https://github.com/dockstore/dockstore/issues/1211)
      */
@@ -179,31 +145,5 @@ public class CromwellIT {
         // run a workflow
         final long run = wdlClient.launch(workflowFile.getAbsolutePath(), true, null, parameterFile.getAbsolutePath(), null, null);
         Assert.assertEquals(0, run);
-    }
-
-    /**
-     * This tests compatibility with Cromwell 30.2 by converting to JSON (https://github.com/dockstore/dockstore/issues/1211)
-     */
-    @Test
-    public void testWDL2JsonIssue() {
-        File sourceFile = new File(ResourceHelpers.resourceFilePath("hello_world.wdl"));
-        WdlBridge wdlBridge = new WdlBridge();
-        try {
-            String inputs = wdlBridge.getParameterFile(sourceFile.getAbsolutePath());
-            Assert.assertTrue(inputs.contains("wf.hello_world.hello_input"));
-        } catch (WdlParser.SyntaxError ex) {
-            Assert.fail("Should properly parse document");
-        }
-    }
-
-    /**
-     * Tests that we can generate a DAG for https://staging.dockstore.org/workflows/github.com/HumanCellAtlas/skylab/Snap-ATAC:gl_576?tab=info
-     */
-    @Test
-    public void testSnapAtacDag() {
-        final File file = new File(ResourceHelpers.resourceFilePath("snap_atac.wdl"));
-        final WdlBridge wdlBridge = new WdlBridge();
-        final LinkedHashMap<String, List<String>> callsToDependencies = wdlBridge.getCallsToDependencies(file.getAbsolutePath());
-        Assert.assertEquals(5, callsToDependencies.size());
     }
 }

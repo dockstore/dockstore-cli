@@ -19,7 +19,7 @@
 
     <groupId>io.dockstore</groupId>
     <artifactId>dockstore-cli</artifactId>
-    <version>1.7.0-rc.2-SNAPSHOT</version>
+    <version>1.8.0-alpha.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>dockstore</name>
@@ -58,7 +58,6 @@
         <cromwell.version>41</cromwell.version>
 
         <skipTests>false</skipTests>
-        <skipClientITs>true</skipClientITs>
         <skipITs>true</skipITs>
     </properties>
 
@@ -1286,37 +1285,15 @@
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <skipClientITs>true</skipClientITs>
                 <groups>io.dockstore.common.RegressionTest</groups>
             </properties>
         </profile>
         <profile>
-            <id>workflow-integration-tests</id>
-            <!-- Only run integration tests for workflows -->
+            <id>integration-tests</id>
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <groups>io.dockstore.common.WorkflowTest</groups>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.NonConfidentialTest</excludeGroups>
-            </properties>
-        </profile>
-        <profile>
-            <id>tool-integration-tests</id>
-            <!-- Only run integration tests for tools -->
-            <properties>
-                <skipTests>true</skipTests>
-                <skipITs>false</skipITs>
-                <groups>io.dockstore.common.ToolTest</groups>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.NonConfidentialTest</excludeGroups>
-            </properties>
-        </profile>
-        <profile>
-            <id>other-integration-tests</id>
-            <!-- Only run integration tests not related to only tools or workflows. This is a catch all. -->
-            <properties>
-                <skipTests>true</skipTests>
-                <skipITs>false</skipITs>
-                <excludeGroups>io.dockstore.common.ToolTest,io.dockstore.common.WorkflowTest,io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.NonConfidentialTest</excludeGroups>
+                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest</excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -1334,7 +1311,6 @@
             <properties>
                 <skipTests>false</skipTests>
                 <skipITs>true</skipITs>
-                <skipClientITs>true</skipClientITs>
             </properties>
             <build>
                 <plugins>
@@ -1354,16 +1330,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>integration-tests</id>
-            <!-- run all integration tests -->
-            <properties>
-                <skipTests>true</skipTests>
-                <skipITs>false</skipITs>
-                <skipClientITs>false</skipClientITs>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest,io.dockstore.common.NonConfidentialTest</excludeGroups>
-            </properties>
         </profile>
         <profile>
             <id>coverage</id>
