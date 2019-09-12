@@ -1247,7 +1247,7 @@
             </activation>
             <properties>
                 <excludeGroups>io.dockstore.common.RegressionTest, io.dockstore.common.ConfidentialTest,io.dockstore.common.SlowTest,
-                    io.dockstore.common.BenchmarkTest,io.dockstore.common.ToilOnlyTest, io.dockstore.common.NonConfidentialTest
+                    io.dockstore.common.BenchmarkTest,io.dockstore.common.ToilOnlyTest
                 </excludeGroups>
             </properties>
 
@@ -1294,15 +1294,6 @@
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
                 <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest</excludeGroups>
-            </properties>
-        </profile>
-        <profile>
-            <id>non-confidential-tests</id>
-            <properties>
-                <skipTests>true</skipTests>
-                <skipITs>false</skipITs>
-                <argLine>-Xmx2048m -Xms2048m</argLine>
-                <groups>io.dockstore.common.NonConfidentialTest</groups>
             </properties>
         </profile>
         <profile>
