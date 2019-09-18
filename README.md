@@ -2,10 +2,11 @@
 [![Build Status](https://travis-ci.org/dockstore/dockstore-cli.svg?branch=develop)](https://travis-ci.org/dockstore/dockstore-cli)
 [![codecov](https://codecov.io/gh/dockstore/dockstore-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/dockstore/dockstore-cli)
 [![Website](https://img.shields.io/website/https/dockstore.org.svg)](https://dockstore.org)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dockstore/dockstore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ga4gh/dockstore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2630727.svg)](https://doi.org/10.5281/zenodo.2630727)
 [![license](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](LICENSE)
 [![CircleCI](https://circleci.com/gh/dockstore/dockstore-cli/tree/develop.svg?style=svg)](https://circleci.com/gh/dockstore/dockstore-cli/tree/develop)
+[![Documentation Status](https://readthedocs.org/projects/dockstore/badge/?version=develop)](https://dockstore.readthedocs.io/en/develop/?badge=develop)
 
 
 # Dockstore
