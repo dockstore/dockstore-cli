@@ -34,7 +34,7 @@ import org.junit.experimental.categories.Category;
  *
  * @author aduncan
  */
-@Category( { ConfidentialTest.class, ToolTest.class })
+@Category({ ConfidentialTest.class, ToolTest.class })
 public class GeneralIT extends BaseIT {
 
     @Rule

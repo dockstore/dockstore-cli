@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.google.common.io.Files;
@@ -139,7 +137,7 @@ public class CromwellIT {
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
         LanguageClientInterface wdlClient = LanguageClientFactory.createLanguageCLient(main, DescriptorLanguage.WDL)
-                .orElseThrow(RuntimeException::new);
+            .orElseThrow(RuntimeException::new);
         File workflowFile = new File(ResourceHelpers.resourceFilePath("hello_world.wdl"));
         File parameterFile = new File(ResourceHelpers.resourceFilePath("hello_world.json"));
         // run a workflow
