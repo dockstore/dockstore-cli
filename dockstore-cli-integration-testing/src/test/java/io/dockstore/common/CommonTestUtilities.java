@@ -112,7 +112,7 @@ public final class CommonTestUtilities {
 
         List<String> migrationList = Arrays
             .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0");
-        runExternalMigration(migrationList, application, dropwizardConfigurationFile);
+        runMigration(migrationList, application, dropwizardConfigurationFile);
     }
 
     /**
@@ -159,19 +159,19 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", configPath);
 
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
-        runExternalMigration(migrationList, application, configPath);
+        runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1.xml");
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
-        runExternalMigration(migrationList, application, configPath);
+        runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml");
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.6.0", "1.7.0");
-        runExternalMigration(migrationList, application, configPath);
+        runMigration(migrationList, application, configPath);
     }
 
     private static void runExternalMigration(List<String> migrationList, Application<DockstoreWebserviceConfiguration> application,
@@ -185,8 +185,18 @@ public final class CommonTestUtilities {
         });
     }
 
+    public static void runMigration(List<String> migrationList, Application<DockstoreWebserviceConfiguration> application, String configPath) {
+        migrationList.forEach(migration -> {
+            try {
+                application.run("db", "migrate", configPath, "--include", migration);
+            } catch (Exception e) {
+                Assert.fail();
+            }
+        });
+    }
+
     /**
-     * Wrapper fir dropping and recreating database from migrations for test confidential 2
+     * Wrapper for dropping and recreating database from migrations for test confidential 2
      *
      * @param support reference to testing instance of the dockstore web service
      * @throws Exception
@@ -217,19 +227,19 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", configPath);
 
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
-        runExternalMigration(migrationList, application, configPath);
+        runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2.xml");
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
-        runExternalMigration(migrationList, application, configPath);
+        runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml");
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.6.0", "1.7.0");
-        runExternalMigration(migrationList, application, configPath);
+        runMigration(migrationList, application, configPath);
     }
 
     /**
@@ -262,7 +272,7 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", CONFIDENTIAL_CONFIG_PATH);
         List<String> migrationList = Arrays
             .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "testworkflow", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0");
-        runExternalMigration(migrationList, application, CONFIDENTIAL_CONFIG_PATH);
+        runMigration(migrationList, application, CONFIDENTIAL_CONFIG_PATH);
     }
 
     public static ImmutablePair<String, String> runOldDockstoreClient(File dockstore, String[] commandArray) throws RuntimeException {
