@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.dockstore</groupId>
-        <artifactId>dockstore</artifactId>
+        <artifactId>dockstore-cli</artifactId>
         <version>1.8.0-alpha.0-SNAPSHOT</version>
     </parent>
     <artifactId>dockstore-client</artifactId>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-common</artifactId>
-            <version>1.8.0-alpha.0-SNAPSHOT</version>
+            <version>${dockstore-core.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.postgresql</groupId>
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>swagger-java-client</artifactId>
-            <version>1.8.0-alpha.0-SNAPSHOT</version>
+            <version>${dockstore-core.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
@@ -391,11 +391,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <skipTests>${skipITs}</skipTests>
                     <excludedGroups>${excludeGroups}</excludedGroups>
-		    <!-- this is weird, but I needed to wire both skipTests and skipITs here, otherwise this is skipped if tests in dockstore-integration-tests
-			 are skipped with skipITs -->
-                    <skipTests>${skipClientITs}</skipTests>
-                    <skipITs>${skipClientITs}</skipITs>
                 </configuration>
             </plugin>
         </plugins>
