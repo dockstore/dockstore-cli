@@ -38,11 +38,11 @@ public class UpgradeTestIT {
      * @return
      */
 
-    public static String decideOutput(String upCommand, String current, String latestStable, String latestUnstable) {
+    private static String decideOutput(String upCommand, String current, String latestStable, String latestUnstable) {
         //upCommand = the command being used (i.e --upgrade-stable or --upgrade or --upgrade-unstable)
 
         if (current.equals(latestStable)) {   //current is the latest stable version
-            if (upCommand.equals("unstable")) {   // downgrade or upgrade to latest unstable version
+            if ("unstable".equals(upCommand)) {   // downgrade or upgrade to latest unstable version
                 return latestUnstable;
             } else {
                 return "upgrade-unstable";
@@ -80,8 +80,7 @@ public class UpgradeTestIT {
         this.objectMapper = mock(ObjectMapper.class);
         Client.setObjectMapper(objectMapper);
 
-
-        /**
+        /*
          URL latest = new URL("https://api.github.com/repos/dockstore/dockstore/releases/latest");
          URL all = new URL("https://api.github.com/repos/dockstore/dockstore/releases");
 

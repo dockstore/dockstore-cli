@@ -34,25 +34,21 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
  */
 public class WorkflowInDirectoryTestIT {
 
+    private static File configFile;
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
-
     @Rule
     public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
-
-    private static File configFile;
-
-    @BeforeClass
-    public static void setup() {
-        configFile = new File(ResourceHelpers.resourceFilePath("clientConfig"));
-    }
-
     /**
      * Guard against failing tests killing VM
      */
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
+    @BeforeClass
+    public static void setup() {
+        configFile = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+    }
 
     /**
      * This tests if the workflow could be ran with the client in a much different directory than the descriptor (not in the same directory as the descriptor)
@@ -153,19 +149,19 @@ public class WorkflowInDirectoryTestIT {
     }
 
     private void baseWorkflowTest(File descriptor, File testParameter, boolean script, String entryType) {
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--config");
-            add(configFile.getPath());
-            add(entryType);
-            add("launch");
-            add("--local-entry");
-            add(descriptor.getPath());
-            add("--yaml");
-            add(testParameter.getPath());
-            if (script) {
-                add("--script");
-            }
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--config");
+        args.add(configFile.getPath());
+        args.add(entryType);
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(descriptor.getPath());
+        args.add("--yaml");
+        args.add(testParameter.getPath());
+        if (script) {
+            args.add("--script");
+        }
+
         Client.main(args.toArray(new String[0]));
     }
 }

@@ -33,12 +33,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class SecondaryFilesUtilityIT {
 
-    private static final String imageDescriptorPath = FileUtils
-            .getFile("src", "test", "resources", "gdc/cwl/workflows/dnaseq/transform.cwl").getAbsolutePath();
-    private static final CWL cwlUtil = new CWL();
-    private static final String imageDescriptorContent = cwlUtil.parseCWL(imageDescriptorPath).getLeft();
-    private static final Gson gson = CWL.getTypeSafeCWLToolDocument();
-
+    private static final String IMAGE_DESCRIPTOR_PATH = FileUtils
+        .getFile("src", "test", "resources", "gdc/cwl/workflows/dnaseq/transform.cwl").getAbsolutePath();
+    private static final CWL CWL_UTIL = new CWL();
+    private static final String IMAGE_DESCRIPTOR_CONTENT = CWL_UTIL.parseCWL(IMAGE_DESCRIPTOR_PATH).getLeft();
+    private static final Gson GSON = CWL.getTypeSafeCWLToolDocument();
 
     @Test
     public void modifyWorkflowToIncludeToolSecondaryFiles() {
@@ -46,8 +45,8 @@ public class SecondaryFilesUtilityIT {
     }
 
     private void modifyWorkflow() {
-        Workflow workflow = gson.fromJson(imageDescriptorContent, Workflow.class);
-        SecondaryFilesUtility secondaryFilesUtility = new SecondaryFilesUtility(cwlUtil, gson);
+        Workflow workflow = GSON.fromJson(IMAGE_DESCRIPTOR_CONTENT, Workflow.class);
+        SecondaryFilesUtility secondaryFilesUtility = new SecondaryFilesUtility(CWL_UTIL, GSON);
         secondaryFilesUtility.modifyWorkflowToIncludeToolSecondaryFiles(workflow);
         List<Object> inputParameters = new ArrayList<>();
         workflow.getInputs().forEach(input -> {

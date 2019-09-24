@@ -24,16 +24,16 @@ public class FileProvisionTest {
         ProvisionInterface httpMock = Mockito.mock(ProvisionInterface.class);
         when(httpMock.schemesHandled()).thenReturn(new HashSet<>(Arrays.asList("http")));
 
-        assertEquals(FileProvisioning.findSupportedTargetPath(Arrays.asList(s3Mock, httpMock),
-                Arrays.asList("s3://something", "http://something")),
-                Optional.of(new ImmutablePair<>("s3://something", "s3")));
+        assertEquals(
+            FileProvisioning.findSupportedTargetPath(Arrays.asList(s3Mock, httpMock), Arrays.asList("s3://something", "http://something")),
+            Optional.of(new ImmutablePair<>("s3://something", "s3")));
 
-        assertEquals(FileProvisioning.findSupportedTargetPath(Arrays.asList(s3Mock, httpMock),
-                Arrays.asList("http://something", "s3://something")),
-                Optional.of(new ImmutablePair<>("http://something", "http")));
+        assertEquals(
+            FileProvisioning.findSupportedTargetPath(Arrays.asList(s3Mock, httpMock), Arrays.asList("http://something", "s3://something")),
+            Optional.of(new ImmutablePair<>("http://something", "http")));
 
-        assertEquals(FileProvisioning.findSupportedTargetPath(Arrays.asList(s3Mock, httpMock),
-                Arrays.asList("gcs://something")), Optional.empty());
+        assertEquals(FileProvisioning.findSupportedTargetPath(Arrays.asList(s3Mock, httpMock), Arrays.asList("gcs://something")),
+            Optional.empty());
     }
 
     @Test

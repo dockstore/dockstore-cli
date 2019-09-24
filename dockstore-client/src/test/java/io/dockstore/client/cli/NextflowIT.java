@@ -45,17 +45,16 @@ public class NextflowIT {
         File userDir = new File(System.getProperty("user.dir"));
         File testFileDirectory = FileUtils.getFile("src", "test", "resources", "nextflow_rnatoy");
 
-
         FileUtils.copyDirectory(testFileDirectory, userDir);
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         client.setupClientEnvironment(Lists.newArrayList());
         WorkflowClient workflowClient = client.getWorkflowClient();
-        List<String> strings = Arrays.asList("--local-entry", "nextflow.config", "--json",  "test.json");
+        List<String> strings = Arrays.asList("--local-entry", "nextflow.config", "--json", "test.json");
         workflowClient.launch(strings);
         Assert.assertTrue("nextflow workflow did not run correctly", systemOutRule.getLog().contains("results world!"));
 
-        for(File file : FileUtils.listFiles(testFileDirectory, null, true)) {
+        for (File file : FileUtils.listFiles(testFileDirectory, null, true)) {
             String name = file.getName();
             Files.deleteIfExists(Paths.get(name));
         }

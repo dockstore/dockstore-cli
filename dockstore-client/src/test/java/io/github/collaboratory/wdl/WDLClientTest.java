@@ -33,8 +33,7 @@ public class WDLClientTest {
     @Test
     public void getInputFilesTest() {
         String descriptorPath = ResourceHelpers.resourceFilePath("topmed_freeze3_calling.wdl");
-        Map<String, String> inputFiles = WDLClient
-                .getInputFiles(descriptorPath);
+        Map<String, String> inputFiles = WDLClient.getInputFiles(descriptorPath);
         Assert.assertEquals(63, inputFiles.size());
     }
 }
