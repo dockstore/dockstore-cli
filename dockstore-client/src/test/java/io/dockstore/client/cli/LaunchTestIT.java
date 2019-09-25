@@ -91,11 +91,10 @@ public class LaunchTestIT {
         File helloWDL = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         File helloJSON = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--json");
-            add(helloJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(helloJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -116,11 +115,10 @@ public class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--json");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -135,13 +133,12 @@ public class LaunchTestIT {
         File helloWDL = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         File helloJSON = new File(ResourceHelpers.resourceFilePath("hello.metadata.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--json");
-            add(helloJSON.getAbsolutePath());
-            add("--wdl-output-target");
-            add("noop://nowhere.test");
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(helloJSON.getAbsolutePath());
+        args.add("--wdl-output-target");
+        args.add("noop://nowhere.test");
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -162,11 +159,10 @@ public class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("collab-cwl-noop-job.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--json");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -197,19 +193,19 @@ public class LaunchTestIT {
         File yamlTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
         File jsonTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> yamlFileWithJSONFlag = getLaunchStringList(entryType);
+        List<String> yamlFileWithJSONFlag = getLaunchStringList(entryType);
         yamlFileWithJSONFlag.add("--json");
         yamlFileWithJSONFlag.add(yamlTestParameterFile.getAbsolutePath());
 
-        ArrayList<String> yamlFileWithYAMLFlag = getLaunchStringList(entryType);
+        List<String> yamlFileWithYAMLFlag = getLaunchStringList(entryType);
         yamlFileWithYAMLFlag.add("--yaml");
         yamlFileWithYAMLFlag.add(yamlTestParameterFile.getAbsolutePath());
 
-        ArrayList<String> jsonFileWithJSONFlag = getLaunchStringList(entryType);
+        List<String> jsonFileWithJSONFlag = getLaunchStringList(entryType);
         jsonFileWithJSONFlag.add("--json");
         jsonFileWithJSONFlag.add(jsonTestParameterFile.getAbsolutePath());
 
-        ArrayList<String> jsonFileWithYAMLFlag = getLaunchStringList(entryType);
+        List<String> jsonFileWithYAMLFlag = getLaunchStringList(entryType);
         jsonFileWithYAMLFlag.add("--yaml");
         jsonFileWithYAMLFlag.add(jsonTestParameterFile.getAbsolutePath());
 
@@ -233,7 +229,7 @@ public class LaunchTestIT {
         File yamlTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
         File jsonTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = getLaunchStringList(entryType);
+        List<String> args = getLaunchStringList(entryType);
         args.add("--yaml");
         args.add(yamlTestParameterFile.getAbsolutePath());
         args.add("--json");
@@ -243,17 +239,18 @@ public class LaunchTestIT {
         Client.main(args.toArray(new String[0]));
     }
 
-    private ArrayList<String> getLaunchStringList(String entryType) {
+    private List<String> getLaunchStringList(String entryType) {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
-            return new ArrayList<>() {{
-                add("--script");
-                add("--config");
-                add(ResourceHelpers.resourceFilePath("config"));
-                add(entryType);
-                add("launch");
-                add("--local-entry");
-                add(descriptorFile.getAbsolutePath());
-            }};
+        final List<String> strings = new ArrayList<>();
+        strings.add("--script");
+        strings.add("--config");
+        strings.add(ResourceHelpers.resourceFilePath("config"));
+        strings.add(entryType);
+        strings.add("launch");
+        strings.add("--local-entry");
+        strings.add(descriptorFile.getAbsolutePath());
+
+        return strings;
     }
 
     @Test
@@ -261,11 +258,10 @@ public class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-tool.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("echo-job.yml"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--yaml");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--yaml");
+        args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -279,13 +275,12 @@ public class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("dir6.cwl.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--cwl");
-            add(cwlFile.getAbsolutePath());
-            add("--json");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--cwl");
+        args.add(cwlFile.getAbsolutePath());
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -299,13 +294,12 @@ public class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("dir6.cwl.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--cwl");
-            add(cwlFile.getAbsolutePath());
-            add("--json");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--cwl");
+        args.add(cwlFile.getAbsolutePath());
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -392,7 +386,7 @@ public class LaunchTestIT {
 
     private void checkFileAndThenDeleteIt(String filename) {
         assertTrue("output should provision out to correct locations, could not find " + filename + " in log",
-                systemOutRule.getLog().contains(filename));
+            systemOutRule.getLog().contains(filename));
         assertTrue("file does not actually exist", Files.exists(Paths.get(filename)));
         // cleanup
         FileUtils.deleteQuietly(Paths.get(filename).toFile());
@@ -476,7 +470,8 @@ public class LaunchTestIT {
             thrown.expect(AssertionError.class);
             runTool(cwlFile, cwlJSON);
             final String standardOutput = launcherOutput.toString();
-            assertTrue("Error should occur, caused by Amazon S3 Exception", standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
+            assertTrue("Error should occur, caused by Amazon S3 Exception",
+                standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
         } finally {
             try {
                 if (launcherOutput != null) {
@@ -507,13 +502,12 @@ public class LaunchTestIT {
     }
 
     private void runTool(File cwlFile, File cwlJSON, boolean threaded) {
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--cwl");
-            add(cwlFile.getAbsolutePath());
-            add("--json");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--cwl");
+        args.add(cwlFile.getAbsolutePath());
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -526,6 +520,12 @@ public class LaunchTestIT {
         }
     }
 
+    private void runTool(File cwlFile, ArrayList<String> args, ContainersApi api, UsersApi usersApi, Client client, boolean useCache) {
+        client.setConfigFile(ResourceHelpers.resourceFilePath(useCache ? "config.withCache" : "config"));
+        Client.SCRIPT.set(true);
+        runToolShared(cwlFile, args, api, usersApi, client);
+    }
+
     @Test
     public void runToolWithGlobbedFilesOnOutput() throws IOException {
 
@@ -536,13 +536,12 @@ public class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("splitBlob.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("splitBlob.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--cwl");
-            add(cwlFile.getAbsolutePath());
-            add("--json");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--cwl");
+        args.add(cwlFile.getAbsolutePath());
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -554,7 +553,7 @@ public class LaunchTestIT {
         assertEquals("output should include multiple provision out events, found " + countMatches, 7, countMatches);
         for (char y = 'a'; y <= 'f'; y++) {
             assertTrue("output should provision out to correct locations",
-                    systemOutRule.getLog().contains("/tmp/provision_out_with_files/"));
+                systemOutRule.getLog().contains("/tmp/provision_out_with_files/"));
             assertTrue(new File("/tmp/provision_out_with_files/test.a" + y).exists());
         }
     }
@@ -567,13 +566,12 @@ public class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("split_no_provision_out.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--cwl");
-            add(cwlFile.getAbsolutePath());
-            add("--json");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--cwl");
+        args.add(cwlFile.getAbsolutePath());
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -589,13 +587,13 @@ public class LaunchTestIT {
     public void runToolWithDirectoriesConversion() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("tool");
-            add("convert");
-            add("cwl2json");
-            add("--cwl");
-            add(cwlFile.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("convert");
+        args.add("cwl2json");
+        args.add("--cwl");
+        args.add(cwlFile.getAbsolutePath());
+
         runClientCommand(args);
         final String log = systemOutRule.getLog();
         Gson gson = new Gson();
@@ -608,20 +606,20 @@ public class LaunchTestIT {
     public void runWorkflowConvert() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("smcFusionQuant-INTEGRATE-workflow.cwl"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("workflow");
-            add("convert");
-            add("cwl2json");
-            add("--cwl");
-            add(cwlFile.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("convert");
+        args.add("cwl2json");
+        args.add("--cwl");
+        args.add(cwlFile.getAbsolutePath());
+
         runClientCommand(args);
         final String log = systemOutRule.getLog();
         Gson gson = new Gson();
         final Map<String, Map<String, Object>> map = gson.fromJson(log, Map.class);
         assertEquals(4, map.size());
-        assertTrue(map.containsKey("TUMOR_FASTQ_1") && map.containsKey("TUMOR_FASTQ_2") && map.containsKey("index") && map
-                .containsKey("OUTPUT"));
+        assertTrue(
+            map.containsKey("TUMOR_FASTQ_1") && map.containsKey("TUMOR_FASTQ_2") && map.containsKey("index") && map.containsKey("OUTPUT"));
     }
 
     @Test
@@ -631,11 +629,10 @@ public class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--json");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -673,12 +670,6 @@ public class LaunchTestIT {
         assertTrue("output should include a successful cwltool run", systemOutRule.getLog().contains("Final process status is success"));
     }
 
-    private void runTool(File cwlFile, ArrayList<String> args, ContainersApi api, UsersApi usersApi, Client client, boolean useCache) {
-        client.setConfigFile(ResourceHelpers.resourceFilePath(useCache ? "config.withCache" : "config"));
-        Client.SCRIPT.set(true);
-        runToolShared(cwlFile, args, api, usersApi, client);
-    }
-
     private void runWorkflow(File cwlFile, ArrayList<String> args, WorkflowsApi api, UsersApi usersApi, Client client, boolean useCache) {
         client.setConfigFile(ResourceHelpers.resourceFilePath(useCache ? "config.withCache" : "config"));
         Client.SCRIPT.set(true);
@@ -695,12 +686,11 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("wrongExtcwl.wdl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add(file.getAbsolutePath());
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -711,7 +701,7 @@ public class LaunchTestIT {
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
 
         assertTrue("output should tell user to specify the descriptor", systemOutRule.getLog()
-                .contains("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end"));
+            .contains("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end"));
     }
 
     @Test
@@ -721,14 +711,13 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("wrongExtcwl.wdl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add(file.getAbsolutePath());
-            add("--json");
-            add(json.getAbsolutePath());
-            add("--descriptor");
-            add(CWL.getLowerShortName());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+        args.add("--json");
+        args.add(json.getAbsolutePath());
+        args.add("--descriptor");
+        args.add(CWL.getLowerShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -740,7 +729,7 @@ public class LaunchTestIT {
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getLowerShortName());
 
         assertTrue("output should include a successful cromwell run",
-                systemOutRule.getLog().contains("This is a CWL file.. Please put the correct extension to the entry file name."));
+            systemOutRule.getLog().contains("This is a CWL file.. Please put the correct extension to the entry file name."));
     }
 
     @Test
@@ -750,11 +739,10 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("wrongExtwdl.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -766,7 +754,7 @@ public class LaunchTestIT {
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
 
         assertTrue("output should include a successful cromwell run", systemOutRule.getLog()
-                .contains("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end"));
+            .contains("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end"));
     }
 
     @Test
@@ -775,11 +763,10 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("random.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -791,7 +778,7 @@ public class LaunchTestIT {
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
 
         assertTrue("output should include a successful cromwell run", systemOutRule.getLog()
-                .contains("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end"));
+            .contains("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end"));
     }
 
     @Test
@@ -800,11 +787,10 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("random.wdl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -816,7 +802,7 @@ public class LaunchTestIT {
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
 
         assertTrue("output should include a successful cromwell run", systemOutRule.getLog()
-                .contains("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end"));
+            .contains("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end"));
     }
 
     @Test
@@ -826,15 +812,14 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("wrongExtwdl.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add(file.getAbsolutePath());
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-            add("--descriptor");
-            add(WDL.getLowerShortName());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
+        args.add("--descriptor");
+        args.add(WDL.getLowerShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -846,7 +831,7 @@ public class LaunchTestIT {
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, WDL.getLowerShortName());
 
         assertTrue("output should include a successful cromwell run",
-                systemOutRule.getLog().contains("This is a WDL file.. Please put the correct extension to the entry file name."));
+            systemOutRule.getLog().contains("This is a WDL file.. Please put the correct extension to the entry file name."));
     }
 
     @Test
@@ -856,15 +841,14 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("wrongExtcwl.wdl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add("wrongExtcwl.wdl");
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-            add("--descriptor");
-            add(WDL.getLowerShortName());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add("wrongExtcwl.wdl");
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
+        args.add("--descriptor");
+        args.add(WDL.getLowerShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -885,15 +869,14 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("wrongExtwdl.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add("wrongExtwdl.cwl");
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-            add("--descriptor");
-            add(CWL.getLowerShortName());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add("wrongExtwdl.cwl");
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
+        args.add("--descriptor");
+        args.add(CWL.getLowerShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -914,13 +897,12 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("cwlNoExt"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add("cwlNoExt");
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add("cwlNoExt");
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -931,7 +913,7 @@ public class LaunchTestIT {
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
 
         assertTrue("output should contain a validation issue",
-                systemOutRule.getLog().contains("This is a CWL file.. Please put an extension to the entry file name."));
+            systemOutRule.getLog().contains("This is a CWL file.. Please put an extension to the entry file name."));
     }
 
     @Test
@@ -941,13 +923,12 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("wdlNoExt"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add(file.getAbsolutePath());
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -959,7 +940,7 @@ public class LaunchTestIT {
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
 
         assertTrue("output should include a successful cromwell run",
-                systemOutRule.getLog().contains("This is a WDL file.. Please put an extension to the entry file name."));
+            systemOutRule.getLog().contains("This is a WDL file.. Please put an extension to the entry file name."));
 
     }
 
@@ -970,13 +951,12 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("random"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add(file.getAbsolutePath());
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -985,8 +965,8 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should include an error message of invalid file", systemErrRule.getLog().contains("Entry file is invalid. Please enter a valid workflow file with the correct extension on the file name.")));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message of invalid file", systemErrRule.getLog()
+            .contains("Entry file is invalid. Please enter a valid workflow file with the correct extension on the file name.")));
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
     }
@@ -998,13 +978,12 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("hello.txt"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add(file.getAbsolutePath());
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -1013,8 +992,8 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should include an error message of invalid file", systemErrRule.getLog().contains("Entry file is invalid. Please enter a valid workflow file with the correct extension on the file name.")));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message of invalid file", systemErrRule.getLog()
+            .contains("Entry file is invalid. Please enter a valid workflow file with the correct extension on the file name.")));
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
     }
@@ -1026,13 +1005,12 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("noTask.wdl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add(file.getAbsolutePath());
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -1041,8 +1019,8 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should include an error message and exit", systemErrRule.getLog().contains("Required fields that are missing from WDL file : 'task'")));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message and exit",
+            systemErrRule.getLog().contains("Required fields that are missing from WDL file : 'task'")));
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
     }
@@ -1054,13 +1032,12 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("noCommand.wdl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add(file.getAbsolutePath());
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -1069,8 +1046,8 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should include an error message and exit", systemErrRule.getLog().contains("Required fields that are missing from WDL file : 'command'")));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message and exit",
+            systemErrRule.getLog().contains("Required fields that are missing from WDL file : 'command'")));
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
     }
@@ -1082,13 +1059,12 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("noWfCall.wdl"));
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add(file.getAbsolutePath());
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -1097,8 +1073,8 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should include an error message and exit", systemErrRule.getLog().contains("Required fields that are missing from WDL file : 'workflow' 'call'")));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message and exit",
+            systemErrRule.getLog().contains("Required fields that are missing from WDL file : 'workflow' 'call'")));
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
     }
@@ -1110,13 +1086,12 @@ public class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("noInput.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("--entry");
-            add(file.getAbsolutePath());
-            add("--local-entry");
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -1125,8 +1100,8 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should include an error message and exit", systemErrRule.getLog().contains("Required fields that are missing from CWL file : 'inputs'")));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message and exit",
+            systemErrRule.getLog().contains("Required fields that are missing from CWL file : 'inputs'")));
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
     }
@@ -1137,35 +1112,35 @@ public class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("dir6.cwl.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("workflow");
-            add("launch");
-            add("--local-entry");
-            add(cwlFile.getAbsolutePath());
-            add("--json");
-            add(cwlJSON.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(cwlFile.getAbsolutePath());
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
+
         exit.expectSystemExit();
         exit.checkAssertionAfterwards(
-                () -> assertTrue("Out should suggest to run as tool instead", systemErrRule.getLog().contains("Expected a workflow but the")));
+            () -> assertTrue("Out should suggest to run as tool instead", systemErrRule.getLog().contains("Expected a workflow but the")));
         runClientCommand(args);
     }
 
     @Test
-    public void workflowAsTool(){
+    public void workflowAsTool() {
         File file = new File(ResourceHelpers.resourceFilePath("noInput.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
-        ArrayList<String> args = new ArrayList<>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(file.getAbsolutePath());
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+        args.add("--json");
+        args.add(json.getAbsolutePath());
+
         exit.expectSystemExit();
         exit.checkAssertionAfterwards(
-                () -> assertTrue("Out should suggest to run as workflow instead", systemErrRule.getLog().contains("Expected a tool but the")));
+            () -> assertTrue("Out should suggest to run as workflow instead", systemErrRule.getLog().contains("Expected a tool but the")));
         runClientCommand(args);
     }
 
@@ -1173,18 +1148,17 @@ public class LaunchTestIT {
     public void cwlNoOutput() {
         File file = new File(ResourceHelpers.resourceFilePath("noOutput.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
-        ArrayList<String> args = new ArrayList<>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(file.getAbsolutePath());
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+        args.add("--json");
+        args.add(json.getAbsolutePath());
+
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should include an error message and exit",
-                        systemErrRule.getLog().contains("Required fields that are missing from CWL file : 'outputs'")));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message and exit",
+            systemErrRule.getLog().contains("Required fields that are missing from CWL file : 'outputs'")));
         runClientCommand(args);
     }
 
@@ -1192,14 +1166,13 @@ public class LaunchTestIT {
     public void cwlIncompleteOutput() {
         File file = new File(ResourceHelpers.resourceFilePath("incompleteOutput.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
-        ArrayList<String> args = new ArrayList<>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(file.getAbsolutePath());
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         runClientCommand(args);
 
@@ -1210,18 +1183,17 @@ public class LaunchTestIT {
     public void cwlIdContainsNonWord() {
         File file = new File(ResourceHelpers.resourceFilePath("idNonWord.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
-        ArrayList<String> args = new ArrayList<>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(file.getAbsolutePath());
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+        args.add("--json");
+        args.add(json.getAbsolutePath());
+
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should have started provisioning",
-                        systemOutRule.getLog().contains("Provisioning your input files to your local machine")));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should have started provisioning",
+            systemOutRule.getLog().contains("Provisioning your input files to your local machine")));
         runClientCommand(args);
     }
 
@@ -1229,18 +1201,18 @@ public class LaunchTestIT {
     public void cwlMissingIdParameters() {
         File file = new File(ResourceHelpers.resourceFilePath("missingIdParameters.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
-        ArrayList<String> args = new ArrayList<>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(file.getAbsolutePath());
-            add("--json");
-            add(json.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+        args.add("--json");
+        args.add(json.getAbsolutePath());
 
         runClientCommand(args);
 
-        assertTrue("output should include an error message", systemErrRule.getLog().contains("Syntax error while parsing a block collection"));
+        assertTrue("output should include an error message",
+            systemErrRule.getLog().contains("Syntax error while parsing a block collection"));
     }
 
     @Test
@@ -1274,9 +1246,8 @@ public class LaunchTestIT {
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
 
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should include error message",
-                        systemErrRule.getLog().contains("Cannot use workflow version 'master'")));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include error message",
+            systemErrRule.getLog().contains("Cannot use workflow version 'master'")));
 
         workflowClient.downloadTargetEntry("quay.io/collaboratory/dockstore-tool-linux-sort", ToolDescriptor.TypeEnum.WDL, false);
     }
@@ -1313,88 +1284,84 @@ public class LaunchTestIT {
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
 
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(
-                () -> assertTrue("output should include error messages",
-                        (systemOutRule.getLog().contains("Could not locate workflow with version '2.0.0'") &&
-                                systemErrRule.getLog().contains("Cannot use workflow version '1.0.0'"))));
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include error messages",
+            (systemOutRule.getLog().contains("Could not locate workflow with version '2.0.0'") && systemErrRule.getLog()
+                .contains("Cannot use workflow version '1.0.0'"))));
 
         workflowClient.downloadTargetEntry("quay.io/collaboratory/dockstore-tool-linux-sort:2.0.0", ToolDescriptor.TypeEnum.WDL, false);
     }
-
 
     @Test
     public void cwl2jsonNoOutput() {
         exit.expectSystemExit();
         File file = new File(ResourceHelpers.resourceFilePath("noOutput.cwl"));
-        ArrayList<String> args = new ArrayList<>() {{
-            add("tool");
-            add("convert");
-            add("cwl2json");
-            add("--cwl");
-            add(file.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("convert");
+        args.add("cwl2json");
+        args.add("--cwl");
+        args.add(file.getAbsolutePath());
 
         runClientCommand(args);
-        exit.checkAssertionAfterwards(() ->
-                assertTrue("output should include an error message", systemErrRule.getLog().contains("\"outputs section is not valid\""))
-        );
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message",
+            systemErrRule.getLog().contains("\"outputs section is not valid\"")));
     }
+
     @Test
     public void malJsonWorkflowWdlLocal() {
         //checks if json input has broken syntax for workflows
 
         File helloWdl = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("testInvalidJSON.json"));
-        ArrayList<String> args = new ArrayList<>() {{
-            add("workflow");
-            add("launch");
-            add("--local-entry");
-            add(helloWdl.getAbsolutePath());
-            add("--json");
-            add(jsonFile.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(helloWdl.getAbsolutePath());
+        args.add("--json");
+        args.add(jsonFile.getAbsolutePath());
+
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(() ->
-                assertTrue("output should include an error message", systemErrRule.getLog().contains("Could not launch, syntax error in json file: " + jsonFile))
-        );
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message",
+            systemErrRule.getLog().contains("Could not launch, syntax error in json file: " + jsonFile)));
         File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
         runClientCommandConfig(args, config);
     }
+
     @Test
     public void malJsonToolWdlLocal() {
         //checks if json input has broken syntax for tools
 
         File helloWdl = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("testInvalidJSON.json"));
-        ArrayList<String> args = new ArrayList<>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(helloWdl.getAbsolutePath());
-            add("--json");
-            add(jsonFile.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(helloWdl.getAbsolutePath());
+        args.add("--json");
+        args.add(jsonFile.getAbsolutePath());
+
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(() ->
-                assertTrue("output should include an error message", systemErrRule.getLog().contains("Could not launch, syntax error in json file: " + jsonFile))
-        );
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include an error message",
+            systemErrRule.getLog().contains("Could not launch, syntax error in json file: " + jsonFile)));
         File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
         runClientCommandConfig(args, config);
     }
+
     @Test
     public void provisionInputWithPathSpaces() {
         //Tests if file provisioning can handle a json parameter that specifies a file path containing spaces
         File helloWDL = new File(ResourceHelpers.resourceFilePath("helloSpaces.wdl"));
         File helloJSON = new File(ResourceHelpers.resourceFilePath("helloSpaces.json"));
 
-        ArrayList<String> args = new ArrayList<>() {{
-            add("workflow");
-            add("launch");
-            add("--local-entry");
-            add(helloWDL.getAbsolutePath());
-            add("--json");
-            add(helloJSON.getPath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(helloWDL.getAbsolutePath());
+        args.add("--json");
+        args.add(helloJSON.getPath());
 
         File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
         runClientCommandConfig(args, config);

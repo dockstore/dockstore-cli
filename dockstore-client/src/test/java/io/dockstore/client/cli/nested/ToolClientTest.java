@@ -55,40 +55,37 @@ public class ToolClientTest {
         when(dockstoreTool.getId()).thenReturn(CONTAINER_ID);
         when(containersApi.primaryDescriptor(CONTAINER_ID, MISSING_TAG, DescriptorLanguage.CWL.toString())).thenThrow(apiException);
         when(containersApi.primaryDescriptor(CONTAINER_ID, null, DescriptorLanguage.CWL.toString())).thenThrow(apiException);
-        when(containersApi.primaryDescriptor(CONTAINER_ID, GOOD_TAG, DescriptorLanguage.CWL.toString())).thenReturn(Mockito.mock(SourceFile.class));
-        when(containersApi
-                .getPublishedContainerByToolPath(REPOSITORY, null))
-                .thenReturn(dockstoreTool);
+        when(containersApi.primaryDescriptor(CONTAINER_ID, GOOD_TAG, DescriptorLanguage.CWL.toString()))
+            .thenReturn(Mockito.mock(SourceFile.class));
+        when(containersApi.getPublishedContainerByToolPath(REPOSITORY, null)).thenReturn(dockstoreTool);
     }
 
     @Test
-    public void getDescriptorFromServer_missingTag()  {
+    public void getDescriptorFromServerMissingTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         boolean exceptionThrown = false;
         try {
             toolClient.getDescriptorFromServer(REPOSITORY + ":" + MISSING_TAG, DescriptorLanguage.CWL);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             exceptionThrown = true;
         }
         Assert.assertTrue(exceptionThrown);
     }
 
     @Test
-    public void getDescriptorFromServer_noTag()  {
+    public void getDescriptorFromServerNoTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         boolean exceptionThrown = false;
         try {
-            toolClient.getDescriptorFromServer(REPOSITORY , DescriptorLanguage.CWL);
-        }
-        catch (Exception ex) {
+            toolClient.getDescriptorFromServer(REPOSITORY, DescriptorLanguage.CWL);
+        } catch (Exception ex) {
             exceptionThrown = true;
         }
         Assert.assertTrue(exceptionThrown);
     }
 
     @Test
-    public void getDescriptorFromServer_goodTag() {
+    public void getDescriptorFromServerGoodTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         SourceFile cwl = toolClient.getDescriptorFromServer(REPOSITORY + ":" + GOOD_TAG, DescriptorLanguage.CWL);
         Assert.assertNotNull(cwl);

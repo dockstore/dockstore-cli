@@ -37,7 +37,7 @@ public class ClientTestIT {
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     @Test
-    public void testDependencies(){
+    public void testDependencies() {
         String config = ResourceHelpers.resourceFilePath("config");
         CWLRunnerFactory.setConfig(Utilities.parseConfig(config));
         Assert.assertTrue(!systemErrRule.getLog().contains("Override and run with"));
