@@ -925,11 +925,11 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                         newJSON.put(paramName, exitingArray);
                     } else if (entry2 instanceof ArrayList) {
                         try {
-                            JSONArray exitingArray2 = new JSONArray();
+                            JSONArray exitingArray = new JSONArray();
                             // now add to the new JSON structure
-                            JSONArray exitingArray = (JSONArray)newJSON.get(paramName);
-                            if (exitingArray == null) {
-                                exitingArray = new JSONArray();
+                            JSONArray exitingArray2 = (JSONArray)newJSON.get(paramName);
+                            if (exitingArray2 == null) {
+                                exitingArray2 = new JSONArray();
                             }
                             for (Map linkedHashMap : (ArrayList<LinkedHashMap>)entry2) {
                                 Map<String, Object> param = linkedHashMap;
