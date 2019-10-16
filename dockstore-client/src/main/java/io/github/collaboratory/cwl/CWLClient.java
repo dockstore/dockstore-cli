@@ -924,12 +924,13 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                         exitingArray.add(newRecord);
                         newJSON.put(paramName, exitingArray);
                     } else if (entry2 instanceof ArrayList) {
+                        // This is to handle array of array of files
                         try {
-                            JSONArray exitingArray2 = new JSONArray();
-                            // now add to the new JSON structure
-                            JSONArray exitingArray = (JSONArray)newJSON.get(paramName);
-                            if (exitingArray == null) {
-                                exitingArray = new JSONArray();
+                            JSONArray innerArray = new JSONArray();
+                            // Get outer array if it exists
+                            JSONArray outerArray = (JSONArray)newJSON.get(paramName);
+                            if (outerArray == null) {
+                                outerArray = new JSONArray();
                             }
                             for (Map linkedHashMap : (ArrayList<LinkedHashMap>)entry2) {
                                 Map<String, Object> param = linkedHashMap;
@@ -943,11 +944,11 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                                     LOG.info("NEW FULL PATH: {}", localPath);
                                 }
                                 org.json.simple.JSONObject newRecord = new org.json.simple.JSONObject();
-                                param.entrySet().forEach(paramEntry -> newRecord.put(paramEntry.getKey(), paramEntry.getValue()));
-                                exitingArray.add(newRecord);
+                                param.forEach(newRecord::put);
+                                innerArray.add(newRecord);
                             }
-                            exitingArray2.add(exitingArray);
-                            newJSON.put(paramName, exitingArray2);
+                            outerArray.add(innerArray);
+                            newJSON.put(paramName, outerArray);
                         } catch (ClassCastException e) {
                             LOG.warn("This is not an array of array of files, it may be an array of array of strings");
                             newJSON.put(paramName, currentParam);

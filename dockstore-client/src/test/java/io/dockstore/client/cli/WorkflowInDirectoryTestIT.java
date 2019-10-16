@@ -148,6 +148,16 @@ public class WorkflowInDirectoryTestIT {
         this.baseWorkflowTest(cwlFile, cwlJSON, false, "tool");
     }
 
+    /**
+     * This tests if the workflow could be ran with an input that is an array of array of files where there are 2+ inner arrays
+     */
+    @Test
+    public void testArrayOfArrayOfInputsv2() {
+        File cwlFile = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/arrays.cwl"));
+        File cwlJSON = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/testArrayLocalInputLocalOutput2.json"));
+        this.baseWorkflowTest(cwlFile, cwlJSON, false, "tool");
+    }
+
     private void baseWorkflowTest(File descriptor, File testParameter, boolean script, String entryType) {
         ArrayList<String> args = new ArrayList<>();
         args.add("--config");
