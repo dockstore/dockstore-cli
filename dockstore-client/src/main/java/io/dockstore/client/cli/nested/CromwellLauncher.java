@@ -7,14 +7,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.FileProvisioning;
@@ -23,6 +22,7 @@ import io.dockstore.common.WdlBridge;
 import io.github.collaboratory.cwl.CWLClient;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import wdl.draft3.parser.WdlParser;
 
@@ -35,6 +35,7 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 public class CromwellLauncher extends BaseLauncher {
     protected static final String DEFAULT_CROMWELL_VERSION = "44";
     protected Map<String, List<FileProvisioning.FileInfo>> outputMap;
+    protected String cromwellConfigFile;
 
     public CromwellLauncher(AbstractEntryClient abstractEntryClient, DescriptorLanguage language, boolean script) {
         super(abstractEntryClient, language, script);
@@ -49,6 +50,9 @@ public class CromwellLauncher extends BaseLauncher {
     public void initialize() {
         // initialize cromwell location from ~/.dockstore/config
         INIConfiguration config = Utilities.parseConfig(abstractEntryClient.getConfigFile());
+        cromwellConfigFile = config.getString("cromwell-config-file", "");
+
+
         String cromwellVersion = config.getString("cromwell-version", DEFAULT_CROMWELL_VERSION);
         String cromwellLocation =
                 "https://github.com/broadinstitute/cromwell/releases/download/" + cromwellVersion + "/cromwell-" + cromwellVersion + ".jar";
@@ -81,21 +85,29 @@ public class CromwellLauncher extends BaseLauncher {
 
     @Override
     public List<String> buildRunCommand() {
-        final List<String> cwlSpecificFlags = Arrays.asList("--type", "cwl");
-        final List<String> runCommand;
-        runCommand = Lists.newArrayList(primaryDescriptor.getAbsolutePath(), "--inputs", provisionedParameterFile.getAbsolutePath());
-        // NOTE: Support for ZIP imports exists, but we decided to comment it out for now as it was causing some issues.
-        //runCommand = Lists.newArrayList(primaryDescriptor.getAbsolutePath(), "--inputs", provisionedParameterFile.getAbsolutePath(), "--imports", zippedEntry.getAbsolutePath());
-        final String[] s = { "java", "-jar", executionFile.getAbsolutePath(), "run" };
         List<String> arguments = new ArrayList<>();
-        arguments.addAll(Arrays.asList(s));
-        arguments.addAll(runCommand);
+        arguments.add("java");
+
+        if (!StringUtils.isEmpty(cromwellConfigFile)) {
+            arguments.add("-Dconfig.file=" + cromwellConfigFile);
+        }
+
+        // Cromwell help specifies the 'run' command line format as: run [options] workflow-source
+        Collections.addAll(arguments, "-jar", executionFile.getAbsolutePath(), "run", "--inputs", provisionedParameterFile.getAbsolutePath());
+
+        // NOTE: Support for ZIP imports exists, but we decided to comment it out for now as it was causing some issues.
+        //Collections.addAll(arguments, "--imports", zippedEntry.getAbsolutePath());
+
         // There are currently issues with Cromwell 44 automatic type detection.  If it's CWL, the flag must be added.
         // https://github.com/broadinstitute/cromwell/issues/5085
         // Remove these 3 lines once the type can be detected again.
         if (languageType == DescriptorLanguage.CWL) {
-            arguments.addAll(cwlSpecificFlags);
+            Collections.addAll(arguments, "--type", "cwl");
         }
+
+        // Add workflow source file
+        arguments.add(primaryDescriptor.getAbsolutePath());
+
         return arguments;
     }
 
