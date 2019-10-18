@@ -92,7 +92,8 @@ public class CromwellLauncher extends BaseLauncher {
         arguments.add("java");
 
         if (cromwellVmOptions.size() > 0) {
-            List<String> cromwellVmOptionsParsed = cromwellVmOptions.stream().map(string -> string.split(",")).flatMap(Arrays::stream).map(this::trimAndPrintInput)
+            List<String> cromwellVmOptionsParsed = cromwellVmOptions.stream().map(string -> string.split(","))
+                    .flatMap(Arrays::stream).map(String::trim)
                     .collect(Collectors.toList());
             arguments.addAll(cromwellVmOptionsParsed);
         }
@@ -111,7 +112,8 @@ public class CromwellLauncher extends BaseLauncher {
         }
 
         if (cromwellExtraParameters.size() > 0) {
-            List<String> cromwellExtraParametersParsed = cromwellExtraParameters.stream().map(string -> string.split(",")).flatMap(Arrays::stream).map(this::trimAndPrintInput)
+            List<String> cromwellExtraParametersParsed = cromwellExtraParameters.stream().map(string -> string.split(","))
+                    .flatMap(Arrays::stream).map(String::trim)
                     .collect(Collectors.toList());
             arguments.addAll(cromwellExtraParametersParsed);
         }
@@ -120,12 +122,6 @@ public class CromwellLauncher extends BaseLauncher {
         arguments.add(primaryDescriptor.getAbsolutePath());
 
         return arguments;
-    }
-
-    private String trimAndPrintInput(String input) {
-        String trimmedInput = input.trim();
-        System.out.println(trimmedInput);
-        return trimmedInput;
     }
 
     @Override
