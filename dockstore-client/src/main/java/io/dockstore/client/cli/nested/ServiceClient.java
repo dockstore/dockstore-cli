@@ -100,7 +100,8 @@ public class ServiceClient extends WorkflowClient {
             switch (activeCommand) {
             case "stop":
                 stop(args);
-                break;
+                return true;
+            default:
             }
         }
         return false;
@@ -125,15 +126,13 @@ public class ServiceClient extends WorkflowClient {
                 if (entry != null) {
                     // TODO: Verify directory is empty?
                     downloadTargetEntry(entry, ToolDescriptor.TypeEnum.SERVICE, true, new File("."));
-                } else {
-
                 }
                 final DockstoreServiceYaml dockstoreYaml = getAndValidateDockstoreYml();
                 final Optional<Map<String, Object>> inputParameterJson = getInputParameterJson(dockstoreYaml, jsonRun);
 
                 runScripts(dockstoreYaml, inputParameterJson, PRE_PROVISION_SCRIPTS);
 
-                fileProvisioning.provisionInputFiles("", calculateInputs(dockstoreYaml.service.data, inputParameterJson));
+                fileProvisioning.provisionInputFiles("", calculateInputs(Optional.ofNullable(dockstoreYaml.service.data), inputParameterJson));
 
                 runScripts(dockstoreYaml, inputParameterJson, POST_PROVISION_SCRIPTS);
 
@@ -178,7 +177,9 @@ public class ServiceClient extends WorkflowClient {
             return Optional.empty();
         }
         final Map<String, Object> inputParameterJson = new Gson().fromJson(fileToJSON(jsonFile), HashMap.class);
-        validateDatasets(dockstoreYaml.service.data, inputParameterJson);
+        if (dockstoreYaml.service.data != null) {
+            validateDatasets(dockstoreYaml.service.data, inputParameterJson);
+        }
         return Optional.of(inputParameterJson);
     }
 
@@ -211,7 +212,7 @@ public class ServiceClient extends WorkflowClient {
     }
 
     private Map<String, String> environment(DockstoreServiceYaml dockstoreYaml, Optional<Map<String, Object>> map) {
-        if (map.isPresent()) {
+        if (map.isPresent() && dockstoreYaml.service.environment != null) {
             final Map<String, String> env = new HashMap();
             final Map<String, Object> theMap = map.get();
             env.putAll(dockstoreYaml.service.environment.entrySet().stream()
@@ -238,9 +239,10 @@ public class ServiceClient extends WorkflowClient {
         return Optional.empty();
     }
 
-    private List<Pair<String, Path>> calculateInputs(Map<String, Dataset> schema, Optional<Map<String, Object>> params) {
-        if (params.isPresent()) {
-            final Map<String, Object> jsonParameters = params.get();
+    private List<Pair<String, Path>> calculateInputs(Optional<Map<String, Dataset>> maybeSchema, Optional<Map<String, Object>> maybeParams) {
+        if (maybeParams.isPresent() && maybeSchema.isPresent()) {
+            final Map<String, Dataset> schema = maybeSchema.get();
+            final Map<String, Object> jsonParameters = maybeParams.get();
             final List<String> datasetParameterNames = schema.entrySet().stream().map(e -> e.getKey()).collect(Collectors.toList());
             final Map<String, Object> data = (Map<String, Object>)jsonParameters.get("data");
             return datasetParameterNames.stream().flatMap(datasetParamName -> {

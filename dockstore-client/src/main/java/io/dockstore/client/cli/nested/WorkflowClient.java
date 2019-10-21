@@ -291,7 +291,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         return languageCLient.generateInputJson(entry, json);
     }
 
-    private Workflow getDockstoreWorkflowByPath(String path) {return getDockstoreWorkflowByPath(path, false);}
+    private Workflow getDockstoreWorkflowByPath(String path) {
+        return getDockstoreWorkflowByPath(path, false);
+    }
 
     private Workflow getDockstoreWorkflowByPath(String path, boolean service) {
         // simply getting published descriptors does not require permissions
@@ -364,7 +366,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     + " workflow version that is recognized as valid by Dockstore.", CLIENT_ERROR);
             }
             Long versionId = first.get().getId();
-            downloadZip(workflowsApi.getApiClient(), "/workflows/" + workflow.getId() + "/zip/" + versionId, directory, zipFilename(workflow), unzip );
+            downloadZip(workflowsApi.getApiClient(), "/workflows/" + workflow.getId() + "/zip/" + versionId, directory, zipFilename(workflow), unzip);
             return new File(directory, first.get().getWorkflowPath());
         } else {
             throw new RuntimeException("version not found");
