@@ -9,12 +9,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.FileProvisioning;
@@ -35,6 +36,8 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 public class CromwellLauncher extends BaseLauncher {
     protected static final String DEFAULT_CROMWELL_VERSION = "44";
     protected Map<String, List<FileProvisioning.FileInfo>> outputMap;
+    protected List<String>  cromwellExtraParameters;
+    protected List<String>  cromwellVmOptions;
 
     public CromwellLauncher(AbstractEntryClient abstractEntryClient, DescriptorLanguage language, boolean script) {
         super(abstractEntryClient, language, script);
@@ -49,6 +52,10 @@ public class CromwellLauncher extends BaseLauncher {
     public void initialize() {
         // initialize cromwell location from ~/.dockstore/config
         INIConfiguration config = Utilities.parseConfig(abstractEntryClient.getConfigFile());
+        cromwellVmOptions = (List)(config.getList("cromwell-vm-options"));
+        cromwellExtraParameters = (List)(config.getList("cromwell-extra-parameters"));
+
+
         String cromwellVersion = config.getString("cromwell-version", DEFAULT_CROMWELL_VERSION);
         String cromwellLocation =
                 "https://github.com/broadinstitute/cromwell/releases/download/" + cromwellVersion + "/cromwell-" + cromwellVersion + ".jar";
@@ -81,21 +88,39 @@ public class CromwellLauncher extends BaseLauncher {
 
     @Override
     public List<String> buildRunCommand() {
-        final List<String> cwlSpecificFlags = Arrays.asList("--type", "cwl");
-        final List<String> runCommand;
-        runCommand = Lists.newArrayList(primaryDescriptor.getAbsolutePath(), "--inputs", provisionedParameterFile.getAbsolutePath());
-        // NOTE: Support for ZIP imports exists, but we decided to comment it out for now as it was causing some issues.
-        //runCommand = Lists.newArrayList(primaryDescriptor.getAbsolutePath(), "--inputs", provisionedParameterFile.getAbsolutePath(), "--imports", zippedEntry.getAbsolutePath());
-        final String[] s = { "java", "-jar", executionFile.getAbsolutePath(), "run" };
         List<String> arguments = new ArrayList<>();
-        arguments.addAll(Arrays.asList(s));
-        arguments.addAll(runCommand);
+        arguments.add("java");
+
+        if (cromwellVmOptions.size() > 0) {
+            List<String> cromwellVmOptionsParsed = cromwellVmOptions.stream().map(string -> string.split(","))
+                    .flatMap(Arrays::stream).map(String::trim)
+                    .collect(Collectors.toList());
+            arguments.addAll(cromwellVmOptionsParsed);
+        }
+
+        // Cromwell help specifies the 'run' command line format as: run [options] workflow-source
+        Collections.addAll(arguments, "-jar", executionFile.getAbsolutePath(), "run", "--inputs", provisionedParameterFile.getAbsolutePath());
+
+        // NOTE: Support for ZIP imports exists, but we decided to comment it out for now as it was causing some issues.
+        //Collections.addAll(arguments, "--imports", zippedEntry.getAbsolutePath());
+
         // There are currently issues with Cromwell 44 automatic type detection.  If it's CWL, the flag must be added.
         // https://github.com/broadinstitute/cromwell/issues/5085
         // Remove these 3 lines once the type can be detected again.
         if (languageType == DescriptorLanguage.CWL) {
-            arguments.addAll(cwlSpecificFlags);
+            Collections.addAll(arguments, "--type", "cwl");
         }
+
+        if (cromwellExtraParameters.size() > 0) {
+            List<String> cromwellExtraParametersParsed = cromwellExtraParameters.stream().map(string -> string.split(","))
+                    .flatMap(Arrays::stream).map(String::trim)
+                    .collect(Collectors.toList());
+            arguments.addAll(cromwellExtraParametersParsed);
+        }
+
+        // Add workflow source file
+        arguments.add(primaryDescriptor.getAbsolutePath());
+
         return arguments;
     }
 
