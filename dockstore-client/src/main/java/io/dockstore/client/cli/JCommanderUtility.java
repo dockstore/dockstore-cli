@@ -60,6 +60,21 @@ public final class JCommanderUtility {
         printJCommanderHelpFooter();
     }
 
+    public static void printJCommanderHelpServiceLaunch(JCommander jc, String programName, String commandName) {
+        DefaultUsageFormatter formatter = new DefaultUsageFormatter(jc);
+        String description = formatter.getCommandDescription(commandName);
+        printHelpHeader();
+        printJCommanderHelpUsage(programName, commandName, jc);
+        printJCommanderHelpDescription(description);
+        out("Required parameters:\n"
+                + "  --entry <entry>                     Complete service path in the Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)\n"
+                + "   OR\n"
+                + "  --local-entry <local-entry>         Allows you to specify a full path to a local descriptor instead of an entry path\n");
+        out("Optional parameters:\n"
+                + "  --json <json file>                  Parameters to the entry in the dockstore, one map for one run, an array of maps for multiple runs\n");
+        printJCommanderHelpFooter();
+    }
+
     public static void printJCommanderHelp(JCommander jc, String programName, String commandName) {
         JCommander commander = jc.getCommands().get(commandName);
         DefaultUsageFormatter formatter = new DefaultUsageFormatter(jc);

@@ -27,8 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.GenericType;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -50,7 +48,6 @@ import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.User;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.http.HttpStatus;
@@ -294,11 +291,13 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         return languageCLient.generateInputJson(entry, json);
     }
 
-    private Workflow getDockstoreWorkflowByPath(String path) {
+    private Workflow getDockstoreWorkflowByPath(String path) {return getDockstoreWorkflowByPath(path, false);}
+
+    private Workflow getDockstoreWorkflowByPath(String path, boolean service) {
         // simply getting published descriptors does not require permissions
         Workflow workflow = null;
         try {
-            workflow = workflowsApi.getPublishedWorkflowByPath(path, null, false);
+            workflow = workflowsApi.getPublishedWorkflowByPath(path, null, service);
         } catch (ApiException e) {
             if (e.getResponseBody().contains("Entry not found")) {
                 LOG.info("Unable to locate entry without credentials, trying again as authenticated user");
@@ -347,7 +346,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String path = parts[0];
         // match behaviour from getDescriptorFromServer, use master if no version is provided
         String tag = (parts.length > 1) ? parts[1] : "master";
-        Workflow workflow = getDockstoreWorkflowByPath(path);
+        Workflow workflow = getDockstoreWorkflowByPath(path, type == ToolDescriptor.TypeEnum.SERVICE);
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(tag))
             .findFirst();
         // if no master is present (for example, for hosted workflows), fail over to the latest descriptor
@@ -365,17 +364,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     + " workflow version that is recognized as valid by Dockstore.", CLIENT_ERROR);
             }
             Long versionId = first.get().getId();
-            // https://github.com/dockstore/dockstore/issues/1712 client seems to use jersey logging which is not controlled from logback
-            workflowsApi.getApiClient().setDebugging(false);
-            byte[] arbitraryURL = SwaggerUtility
-                .getArbitraryURL("/workflows/" + workflow.getId() + "/zip/" + versionId, new GenericType<byte[]>() {
-                }, workflowsApi.getApiClient());
-            workflowsApi.getApiClient().setDebugging(Client.DEBUG.get());
-            File zipFile = new File(directory, zipFilename(workflow));
-            FileUtils.writeByteArrayToFile(zipFile, arbitraryURL, false);
-            if (unzip) {
-                SwaggerUtility.unzipFile(zipFile, directory);
-            }
+            downloadZip(workflowsApi.getApiClient(), "/workflows/" + workflow.getId() + "/zip/" + versionId, directory, zipFilename(workflow), unzip );
             return new File(directory, first.get().getWorkflowPath());
         } else {
             throw new RuntimeException("version not found");

@@ -46,6 +46,7 @@ import com.google.gson.JsonParseException;
 import io.cwl.avro.CWL;
 import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.DepCommand;
+import io.dockstore.client.cli.nested.ServiceClient;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.GeneratedConstants;
@@ -119,6 +120,7 @@ public class Client {
     private ToolClient toolClient;
     private WorkflowClient workflowClient;
     private CheckerClient checkerClient;
+    private ServiceClient serviceClient;
 
     /*
      * Dockstore Client Functions for CLI
@@ -575,6 +577,7 @@ public class Client {
         out("   tool                Puts dockstore into tool mode.");
         out("   workflow            Puts dockstore into workflow mode.");
         out("   checker             Puts dockstore into checker mode.");
+        out("   service             Puts dockstore into service mode.");
         out("   plugin              Configure and debug plugins.");
         out("   deps                Print tool/workflow runner dependencies.");
         out("");
@@ -699,6 +702,8 @@ public class Client {
                         handled = SearchClient.handleCommand(args, this.extendedGA4GHApi);
                     } else if ("checker".equals(mode)) {
                         targetClient = getCheckerClient();
+                    } else if ("service".equals(mode)) {
+                        targetClient = getServiceClient();
                     } else if ("deps".equals(mode)) {
                         args.add(0, "deps");
                         String[] argsArray = new String[args.size()];
@@ -809,6 +814,7 @@ public class Client {
         this.toolClient = new ToolClient(containersApi, new ContainertagsApi(defaultApiClient), usersApi, this, isAdmin);
         this.workflowClient = new WorkflowClient(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
         this.checkerClient = new CheckerClient(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
+        this.serviceClient = new ServiceClient(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
 
         defaultApiClient.setDebugging(DEBUG.get());
         CWLRunnerFactory.setConfig(config);
@@ -852,4 +858,9 @@ public class Client {
     public CheckerClient getCheckerClient() {
         return checkerClient;
     }
+
+    public ServiceClient getServiceClient() {
+        return serviceClient;
+    }
+
 }

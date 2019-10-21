@@ -35,6 +35,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 
 import com.google.common.base.CharMatcher;
@@ -51,6 +52,7 @@ import com.spotify.docker.client.exceptions.DockerException;
 import io.cwl.avro.CWL;
 import io.dockstore.client.cli.CheckerClient;
 import io.dockstore.client.cli.Client;
+import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
@@ -61,6 +63,7 @@ import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
 import io.openapi.wes.client.model.RunLog;
 import io.openapi.wes.client.model.RunStatus;
+import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.model.Label;
 import io.swagger.client.model.SourceFile;
@@ -1159,6 +1162,19 @@ public abstract class AbstractEntryClient<T> {
                 }
             }
 
+        }
+    }
+
+    protected void downloadZip(ApiClient apiClient, String path, File directory, String filename, boolean unzip) throws IOException {
+        byte[] arbitraryURL = SwaggerUtility
+                .getArbitraryURL(path, new GenericType<byte[]>() {
+                }, apiClient);
+        // https://github.com/dockstore/dockstore/issues/1712 client seems to use jersey logging which is not controlled from logback
+        apiClient.setDebugging(Client.DEBUG.get());
+        File zipFile = new File(directory, filename);
+        FileUtils.writeByteArrayToFile(zipFile, arbitraryURL, false);
+        if (unzip) {
+            SwaggerUtility.unzipFile(zipFile, directory);
         }
     }
 
