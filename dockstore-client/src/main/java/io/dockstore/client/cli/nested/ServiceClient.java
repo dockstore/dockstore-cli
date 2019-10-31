@@ -91,6 +91,7 @@ public class ServiceClient extends WorkflowClient {
         this.jCommander = new JCommander();
         this.commandLaunch = new CommandLaunch();
         this.jCommander.addCommand("launch", commandLaunch);
+        this.jCommander.addCommand("stop", commandLaunch);
         this.fileProvisioning = new FileProvisioning(getConfigFile());
     }
 
@@ -123,18 +124,19 @@ public class ServiceClient extends WorkflowClient {
             JCommanderUtility.printJCommanderHelpServiceLaunch(jCommander, "dockstore service", commandName);
         } else {
             try {
+                final File serviceDirectory = serviceDirectory(entry);
                 if (entry != null) {
                     // TODO: Verify directory is empty?
-                    downloadTargetEntry(entry, ToolDescriptor.TypeEnum.SERVICE, true, new File("."));
+                    downloadTargetEntry(entry, ToolDescriptor.TypeEnum.SERVICE, true, serviceDirectory);
                 }
-                final DockstoreServiceYaml dockstoreYaml = getAndValidateDockstoreYml();
+                final DockstoreServiceYaml dockstoreYaml = getAndValidateDockstoreYml(serviceDirectory);
                 final Optional<Map<String, Object>> inputParameterJson = getInputParameterJson(dockstoreYaml, jsonRun);
 
-                runScripts(dockstoreYaml, inputParameterJson, PRE_PROVISION_SCRIPTS);
+                runScripts(serviceDirectory, dockstoreYaml, inputParameterJson, PRE_PROVISION_SCRIPTS);
 
                 fileProvisioning.provisionInputFiles("", calculateInputs(Optional.ofNullable(dockstoreYaml.service.data), inputParameterJson));
 
-                runScripts(dockstoreYaml, inputParameterJson, POST_PROVISION_SCRIPTS);
+                runScripts(serviceDirectory, dockstoreYaml, inputParameterJson, POST_PROVISION_SCRIPTS);
 
             } catch (IOException e) {
                 LOG.error("Error launching service", e);
@@ -144,11 +146,28 @@ public class ServiceClient extends WorkflowClient {
     }
 
     public void stop(List<String> args) {
-        final DockstoreServiceYaml dockstoreYml = getAndValidateDockstoreYml();
-        runScripts(dockstoreYml, Optional.empty(), new String[] {STOP});
+        String commandName = "stop";
+        String[] argv = args.toArray(new String[0]);
+        String[] argv1 = { commandName };
+        String[] both = ArrayUtils.addAll(argv1, argv);
+        this.jCommander.parse(both);
+        final String entry = commandLaunch.entry;
+        final File workingDir = serviceDirectory(entry);
+        final DockstoreServiceYaml dockstoreYml = getAndValidateDockstoreYml(workingDir);
+        runScripts(workingDir, dockstoreYml, Optional.empty(), new String[] {STOP});
     }
 
-    private DockstoreServiceYaml getAndValidateDockstoreYml() {
+    private File serviceDirectory(String remoteEntry) {
+        if (remoteEntry != null) {
+            final File homeDir = new File(System.getProperty("user.home"));
+            final String subDir = ".dockstore/services/" + remoteEntry.replace('/', '-');
+            return new File(homeDir, subDir);
+        } else {
+            return new File(".");
+        }
+    }
+
+    private DockstoreServiceYaml getAndValidateDockstoreYml(File workingDir) {
         final Constructor constructor = new Constructor(DockstoreServiceYaml.class);
         final PropertyUtils propertyUtils = new PropertyUtils() {
             @Override
@@ -160,7 +179,7 @@ public class ServiceClient extends WorkflowClient {
         constructor.setPropertyUtils(propertyUtils);
         final Yaml yaml = new Yaml(constructor);
         try {
-            final DockstoreServiceYaml dockstoreYaml = yaml.load(new FileInputStream(".dockstore.yml"));
+            final DockstoreServiceYaml dockstoreYaml = yaml.load(new FileInputStream(new File(workingDir, ".dockstore.yml")));
             validateDockstoreYaml(dockstoreYaml);
             return dockstoreYaml;
         } catch (FileNotFoundException e) {
@@ -192,8 +211,7 @@ public class ServiceClient extends WorkflowClient {
         }
     }
 
-    private void runScripts(DockstoreServiceYaml dockstoreYaml, Optional<Map<String, Object>> inputParameterJson, String[] scripts) {
-        final File workingDir = Paths.get("").toAbsolutePath().toFile();
+    private void runScripts(File workingDir, DockstoreServiceYaml dockstoreYaml, Optional<Map<String, Object>> inputParameterJson, String[] scripts) {
         final Map<String, String> environment = environment(dockstoreYaml, inputParameterJson);
         Arrays.stream(scripts)
                 .map(scriptName -> dockstoreYaml.service.scripts.get(scriptName))
