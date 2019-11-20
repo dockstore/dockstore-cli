@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.ws.rs.core.GenericType;
+
 import com.google.common.collect.Lists;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.CommonTestUtilities;
@@ -51,8 +53,6 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
-
-import javax.ws.rs.core.GenericType;
 
 import static io.swagger.client.model.ToolDescriptor.TypeEnum.CWL;
 import static org.junit.Assert.assertEquals;
@@ -94,7 +94,7 @@ public class WorkflowIT extends BaseIT {
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
-            "/checker-workflow-wrapping-workflow.cwl", "test", "cwl", null);
+                "/checker-workflow-wrapping-workflow.cwl", "test", "cwl", null);
         assertEquals("There should be one user of the workflow after manually registering it.", 1, workflow.getUsers().size());
         Workflow refresh = workflowApi.refresh(workflow.getId());
 
@@ -103,14 +103,14 @@ public class WorkflowIT extends BaseIT {
         // should be able to launch properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry", toolpath,
+                        "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
 
         // should not be able to launch properly with incorrect credentials
         systemExit.expectSystemExitWithStatus(Client.ENTRY_NOT_FOUND);
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry", toolpath,
+                        "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
     }
 
     /**
@@ -126,9 +126,8 @@ public class WorkflowIT extends BaseIT {
         Workflow refresh = workflowApi.refresh(workflow.getId());
         workflowApi.publish(refresh.getId(), SwaggerUtility.createPublishRequest(true));
 
-        Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "convert", "entry2json", "--entry",
-                        toolpath + ":Dockstore_Testing", "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "convert", "entry2json",
+                "--entry", toolpath + ":Dockstore_Testing", "--script" });
         List<String> stringList = new ArrayList<>();
         stringList.add("\"SmartSeq2SingleCell.gtf_file\": \"File\"");
         stringList.add("\"SmartSeq2SingleCell.genome_ref_fasta\": \"File\"");
@@ -267,8 +266,8 @@ public class WorkflowIT extends BaseIT {
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi
-            .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
-                "test", "cwl", null);
+                .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
+                        "test", "cwl", null);
         Workflow refresh = workflowApi.refresh(workflow.getId());
         Assert.assertFalse(refresh.isIsPublished());
 
@@ -279,25 +278,25 @@ public class WorkflowIT extends BaseIT {
         // should be able to launch properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "checker", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "checker", "launch", "--entry", toolpath,
+                        "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
 
         // should be able to launch properly with incorrect credentials but the entry is published
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
-                "--script" });
+                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
+                        "--script" });
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "checker", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "checker", "launch", "--entry", toolpath,
+                        "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
 
         // should not be able to launch properly with incorrect credentials
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
-                "--unpub", "--script" });
+                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
+                        "--unpub", "--script" });
         systemExit.expectSystemExitWithStatus(Client.ENTRY_NOT_FOUND);
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "checker", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "checker", "launch", "--entry", toolpath,
+                        "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
     }
 
     @Test
@@ -330,30 +329,30 @@ public class WorkflowIT extends BaseIT {
         source1.setContent("food");
         source2.setContent("food");
         final Workflow updatedHostedWorkflow = hostedApi
-            .editHostedWorkflow(hostedWorkflow.getId(), Lists.newArrayList(source, source1, source2));
+                .editHostedWorkflow(hostedWorkflow.getId(), Lists.newArrayList(source, source1, source2));
         assertNotNull(updatedHostedWorkflow.getLastModifiedDate());
         assertNotNull(updatedHostedWorkflow.getLastUpdated());
 
         // note that this workflow contains metadata defined on the inputs to the workflow in the old (pre-map) CWL way that is still valid v1.0 CWL
         source.setContent(FileUtils
-            .readFileToString(new File(ResourceHelpers.resourceFilePath("hosted_metadata/Dockstore.cwl")), StandardCharsets.UTF_8));
-        source1.setContent(
-            FileUtils.readFileToString(new File(ResourceHelpers.resourceFilePath("hosted_metadata/sorttool.cwl")), StandardCharsets.UTF_8));
-        source2.setContent(
-            FileUtils.readFileToString(new File(ResourceHelpers.resourceFilePath("hosted_metadata/revtool.cwl")), StandardCharsets.UTF_8));
+                .readFileToString(new File(ResourceHelpers.resourceFilePath("hosted_metadata/Dockstore.cwl")), StandardCharsets.UTF_8));
+        source1.setContent(FileUtils
+                .readFileToString(new File(ResourceHelpers.resourceFilePath("hosted_metadata/sorttool.cwl")), StandardCharsets.UTF_8));
+        source2.setContent(FileUtils
+                .readFileToString(new File(ResourceHelpers.resourceFilePath("hosted_metadata/revtool.cwl")), StandardCharsets.UTF_8));
         Workflow workflow = hostedApi.editHostedWorkflow(hostedWorkflow.getId(), Lists.newArrayList(source, source1, source2));
         assertFalse(workflow.getInputFileFormats().isEmpty());
         assertFalse(workflow.getOutputFileFormats().isEmpty());
 
         // launch the workflow, note that the latest version of the workflow should launch (i.e. the working one)
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), "--script" });
+                workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), "--script" });
 
         WorkflowsApi workflowsApi = new WorkflowsApi(webClient);
         workflowsApi.publish(workflow.getId(), SwaggerUtility.createPublishRequest(true));
         // should also launch successfully with the wrong credentials when published
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry",
-            workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), "--script" });
+                workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), "--script" });
     }
 
     /**
@@ -369,16 +368,16 @@ public class WorkflowIT extends BaseIT {
         final ApiClient userApiClient = getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi userWorkflowsApi = new WorkflowsApi(userApiClient);
         userWorkflowsApi.manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/metadata.cwl", "metadata", "cwl",
-            "/cwl/v1.1/cat-job.json");
+                "/cwl/v1.1/cat-job.json");
         final Workflow workflowByPathGithub = userWorkflowsApi
-            .getWorkflowByPath("github.com/dockstore-testing/Workflows-For-CI/metadata", null, false);
+                .getWorkflowByPath("github.com/dockstore-testing/Workflows-For-CI/metadata", null, false);
         final Workflow workflow = userWorkflowsApi.refresh(workflowByPathGithub.getId());
         Assert.assertEquals("Print the contents of a file to stdout using 'cat' running in a docker container.", workflow.getDescription());
         Assert.assertEquals("Peter Amstutz", workflow.getAuthor());
         Assert.assertEquals("peter.amstutz@curoverse.com", workflow.getEmail());
         Assert.assertTrue(workflow.getWorkflowVersions().stream().anyMatch(versions -> "master".equals(versions.getName())));
         Optional<WorkflowVersion> optionalWorkflowVersion = workflow.getWorkflowVersions().stream()
-            .filter(version -> "master".equalsIgnoreCase(version.getName())).findFirst();
+                .filter(version -> "master".equalsIgnoreCase(version.getName())).findFirst();
         assertTrue(optionalWorkflowVersion.isPresent());
         WorkflowVersion workflowVersion = optionalWorkflowVersion.get();
         List<SourceFile> sourceFiles = workflowVersion.getSourceFiles();
@@ -389,14 +388,14 @@ public class WorkflowIT extends BaseIT {
         Assert.assertFalse(workflowVersion.isValid());
 
         userWorkflowsApi
-            .manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/count-lines1-wf.cwl", "count-lines1-wf", "cwl",
-                "/cwl/v1.1/wc-job.json");
+                .manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/count-lines1-wf.cwl", "count-lines1-wf", "cwl",
+                        "/cwl/v1.1/wc-job.json");
         final Workflow workflowByPathGithub2 = userWorkflowsApi
-            .getWorkflowByPath("github.com/dockstore-testing/Workflows-For-CI/count-lines1-wf", null, false);
+                .getWorkflowByPath("github.com/dockstore-testing/Workflows-For-CI/count-lines1-wf", null, false);
         final Workflow workflow2 = userWorkflowsApi.refresh(workflowByPathGithub2.getId());
         Assert.assertTrue(workflow.getWorkflowVersions().stream().anyMatch(versions -> "master".equals(versions.getName())));
         Optional<WorkflowVersion> optionalWorkflowVersion2 = workflow2.getWorkflowVersions().stream()
-            .filter(version -> "master".equalsIgnoreCase(version.getName())).findFirst();
+                .filter(version -> "master".equalsIgnoreCase(version.getName())).findFirst();
         assertTrue(optionalWorkflowVersion2.isPresent());
         WorkflowVersion workflowVersion2 = optionalWorkflowVersion2.get();
         // Check validation works.  It should be valid
