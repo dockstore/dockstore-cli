@@ -169,7 +169,8 @@ public class WorkflowIT extends BaseIT {
         workflowApi.getWorkflowZip(workflowId, versionId);
         byte[] arbitraryURL = SwaggerUtility.getArbitraryURL("/workflows/" + workflowId + "/zip/" + versionId, new GenericType<byte[]>() {
         }, webClient);
-        Path write = Files.write(File.createTempFile("temp", "zip").toPath(), arbitraryURL);
+        File tempZip = File.createTempFile("temp", "zip");
+        Path write = Files.write(tempZip.toPath(), arbitraryURL);
         ZipFile zipFile = new ZipFile(write.toFile());
         assertTrue("zip file seems incorrect",
             zipFile.stream().map(ZipEntry::getName).collect(Collectors.toList()).contains("md5sum/md5sum-workflow.cwl"));
@@ -183,6 +184,7 @@ public class WorkflowIT extends BaseIT {
             thrownException = true;
         }
         assertTrue(thrownException);
+        tempZip.deleteOnExit();
 
         // Download published workflow version
         Client.main(
@@ -190,10 +192,13 @@ public class WorkflowIT extends BaseIT {
                 "--script" });
         arbitraryURL = SwaggerUtility.getArbitraryURL("/workflows/" + workflowId + "/zip/" + versionId, new GenericType<byte[]>() {
         }, CommonTestUtilities.getWebClient(false, null, testingPostgres));
-        write = Files.write(File.createTempFile("temp", "zip").toPath(), arbitraryURL);
+        File tempZip2 = File.createTempFile("temp", "zip");
+        write = Files.write(tempZip2.toPath(), arbitraryURL);
         zipFile = new ZipFile(write.toFile());
         assertTrue("zip file seems incorrect",
             zipFile.stream().map(ZipEntry::getName).collect(Collectors.toList()).contains("md5sum/md5sum-workflow.cwl"));
+
+        tempZip2.deleteOnExit();
 
         // download and unzip via CLI
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "download", "--entry",
