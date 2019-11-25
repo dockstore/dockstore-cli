@@ -31,6 +31,7 @@ import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.SourceControl;
+import io.dockstore.common.WorkflowTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;
 import io.swagger.client.api.UsersApi;
@@ -57,7 +58,7 @@ import org.junit.rules.ExpectedException;
  *
  * @author dyuen
  */
-@Category(ConfidentialTest.class)
+@Category({ConfidentialTest.class, WorkflowTest.class })
 public class WDLWorkflowIT extends BaseIT {
 
     // TODO: Remove extra tags and branches on skylab workflows which are not needed

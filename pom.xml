@@ -1313,6 +1313,23 @@
             </properties>
         </profile>
         <profile>
+            <id>integration-tests-1</id>
+            <properties>
+                <skipTests>true</skipTests>
+                <skipITs>false</skipITs>
+                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.WorkflowTest</excludeGroups>
+                <groups></groups>
+            </properties>
+        </profile>
+        <profile>
+            <id>integration-tests-2</id>
+            <properties>
+                <skipTests>true</skipTests>
+                <skipITs>false</skipITs>
+                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.ToolTest</excludeGroups>
+            </properties>
+        </profile>
+        <profile>
             <id>unit-tests</id>
             <!-- run all non-integration tests -->
             <properties>

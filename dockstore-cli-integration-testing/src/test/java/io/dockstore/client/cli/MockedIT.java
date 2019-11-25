@@ -24,6 +24,7 @@ import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.TestUtility;
+import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
@@ -64,7 +65,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
     "com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*", "org.apache.http.*" })
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Client.class, ToolClient.class, UsersApi.class })
-@Category(ConfidentialTest.class)
+@Category({ConfidentialTest.class, ToolTest.class })
 public class MockedIT {
 
     @Rule
