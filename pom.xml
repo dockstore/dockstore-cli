@@ -1318,7 +1318,6 @@
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
                 <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.WorkflowTest</excludeGroups>
-                <groups></groups>
             </properties>
         </profile>
         <profile>
