@@ -392,17 +392,6 @@ public abstract class AbstractEntryClient<T> {
      * @param unstarRequest true to star, false to unstar
      */
     protected abstract void handleStarUnstar(String entryPath, boolean unstarRequest);
-    /**
-     * Verify/Unverify an entry
-     *
-     * @param entry           a unique identifier for an entry, called a path for workflows and tools
-     * @param versionName     the name of the version
-     * @param verifySource    source of entry verification
-     * @param unverifyRequest true to unverify, false to verify
-     * @param isScript        true if called by script, false otherwise
-     */
-    protected abstract void handleVerifyUnverify(String entry, String versionName, String verifySource, boolean unverifyRequest,
-            boolean isScript);
 
     /**
      * Adds/removes supplied test parameter paths for a given entry version
