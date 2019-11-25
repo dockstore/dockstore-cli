@@ -176,7 +176,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  Update certain fields for a given " + getEntryType().toLowerCase() + " version.");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                      Complete " + getEntryType().toLowerCase() + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  --entry <entry>                                      Complete " + getEntryType().toLowerCase()
+            + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --name <name>                                        Name of the " + getEntryType().toLowerCase() + " version.");
         out("");
         out("Optional Parameters");
@@ -335,8 +336,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     /**
      * Disturbingly similar to WorkflowClient#downloadTargetEntry, could use cleanup refactoring
-     * @param toolpath a unique identifier for an entry, called a path for workflows and tools
-     * @param unzip unzip the entry after downloading
+     *
+     * @param toolpath  a unique identifier for an entry, called a path for workflows and tools
+     * @param unzip     unzip the entry after downloading
      * @param directory directory to unzip descriptors into
      * @return path to the primary descriptor
      */
@@ -351,15 +353,16 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         // if no master is present (for example, for hosted workflows), fail over to the latest descriptor
         if (first.isEmpty()) {
             first = workflow.getWorkflowVersions().stream().max(Comparator.comparing(WorkflowVersion::getLastModified));
-            first.ifPresent(workflowVersion -> System.out.println("Could not locate workflow with version '" + tag + "'. Using last modified version '"
-                    + workflowVersion.getName() + "' instead."));
+            first.ifPresent(workflowVersion -> System.out.println(
+                "Could not locate workflow with version '" + tag + "'. Using last modified version '" + workflowVersion.getName()
+                    + "' instead."));
         }
 
         if (first.isPresent()) {
             boolean isValid = first.get().isValid();
             if (!isValid) {
                 errorMessage("Cannot use workflow version '" + first.get().getName() + "' because it is not valid. Please pick a"
-                        + " workflow version that is recognized as valid by Dockstore.", CLIENT_ERROR);
+                    + " workflow version that is recognized as valid by Dockstore.", CLIENT_ERROR);
             }
             Long versionId = first.get().getId();
             // https://github.com/dockstore/dockstore/issues/1712 client seems to use jersey logging which is not controlled from logback
@@ -401,7 +404,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String yamlRun = commandLaunch.yaml;
         String wdlOutputTarget = commandLaunch.wdlOutputTarget;
         String uuid = commandLaunch.uuid;
-
 
         // trim the final slash on output if it is present, probably an error ( https://github.com/aws/aws-cli/issues/421 ) causes a double slash which can fail
         wdlOutputTarget = wdlOutputTarget != null ? wdlOutputTarget.replaceAll("/$", "") : null;
@@ -483,10 +485,11 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
         if (!file.exists() || file.isDirectory()) {
             errorMessage("The workflow file " + file.getPath() + " does not exist. Did you mean to launch a remote workflow?",
-                    ENTRY_NOT_FOUND);
+                ENTRY_NOT_FOUND);
         }
         Optional<LanguageClientInterface> languageCLientOptional = LanguageClientFactory.createLanguageCLient(this, optExt.get());
-        LanguageClientInterface languageCLient = languageCLientOptional.orElseThrow(() -> new UnsupportedOperationException("language not supported yet"));
+        LanguageClientInterface languageCLient = languageCLientOptional
+            .orElseThrow(() -> new UnsupportedOperationException("language not supported yet"));
         // TODO: limitations of merged but non-cleaned up interface are apparent here
         try {
             DescriptorLanguage ext = optExt.get();
@@ -520,7 +523,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     break;
                 default:
                     errorMessage("Entry file is invalid. Please enter a valid CWL/WDL file with the correct extension on the file name.",
-                            CLIENT_ERROR);
+                        CLIENT_ERROR);
                 }
             }
         } catch (ApiException e) {
@@ -646,7 +649,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 }
             } else {
                 //for workflows method currently doesn't work with --entryname flag
-                errorMessage("Parameter '--entryname' not valid for workflows. See `workflow publish --help` for more information.", CLIENT_ERROR);
+                errorMessage("Parameter '--entryname' not valid for workflows. See `workflow publish --help` for more information.",
+                    CLIENT_ERROR);
             }
         }
     }
@@ -664,7 +668,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  No arguments will list the current and potential " + getEntryType() + "s to share.");
         out("Required Parameters:");
         out("  --entry <entry>             Complete " + getEntryType()
-                + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+            + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         //TODO add support for optional parameter '--entryname'
         printHelpFooter();
     }
@@ -730,8 +734,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             if (user == null) {
                 errorMessage("User not found", Client.CLIENT_ERROR);
             }
-            List<Workflow> workflows = usersApi.userWorkflows(user.getId()).stream().filter(workflow ->
-                workflow.getMode() != Workflow.ModeEnum.STUB).collect(Collectors.toList());
+            List<Workflow> workflows = usersApi.userWorkflows(user.getId()).stream()
+                .filter(workflow -> workflow.getMode() != Workflow.ModeEnum.STUB).collect(Collectors.toList());
 
             out("YOUR AVAILABLE WORKFLOWS");
             printLineBreak();
@@ -869,7 +873,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             if (!workflowPath.endsWith(descriptorType)) {
                 errorMessage("Please ensure that the given workflow path '" + workflowPath + "' is of type " + descriptorType
-                        + " and has the file extension " + descriptorType, Client.CLIENT_ERROR);
+                    + " and has the file extension " + descriptorType, Client.CLIENT_ERROR);
             }
 
             String workflowname = optVal(args, "--workflow-name", null);
@@ -890,7 +894,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             // Try and register
             try {
                 workflow = workflowsApi
-                        .manualRegister(gitVersionControl, organization + "/" + repository, workflowPath, workflowname, descriptorType, testParameterFile);
+                    .manualRegister(gitVersionControl, organization + "/" + repository, workflowPath, workflowname, descriptorType,
+                        testParameterFile);
                 if (workflow != null) {
                     workflow = workflowsApi.refresh(workflow.getId());
                 } else {
@@ -953,13 +958,12 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     workflow.setDescriptorType(Workflow.DescriptorTypeEnum.fromValue(descriptorType.toUpperCase()));
                 } else if (!descriptorType.equalsIgnoreCase(workflow.getDescriptorType().getValue())) {
                     errorMessage(
-                            "You cannot change the descriptor type of a FULL workflow. Revert it to a STUB if you wish to change descriptor type.",
-                            Client.CLIENT_ERROR);
+                        "You cannot change the descriptor type of a FULL workflow. Revert it to a STUB if you wish to change descriptor type.",
+                        Client.CLIENT_ERROR);
                 }
 
                 workflow.setWorkflowPath(workflowDescriptorPath);
                 workflow.setDefaultTestParameterFilePath(defaultTestJsonPath);
-
 
                 if (!EnumUtils.isValidEnum(SourceControl.class, workflow.getSourceControlProvider())) {
                     errorMessage("The source control type is not valid.", Client.CLIENT_ERROR);
@@ -997,7 +1001,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     }
 
     @Override
-    protected void handleTestParameter(String entry, String versionName, List<String> adds, List<String> removes, String descriptorType, String parentEntry) {
+    protected void handleTestParameter(String entry, String versionName, List<String> adds, List<String> removes, String descriptorType,
+        String parentEntry) {
         try {
             Workflow workflow = workflowsApi.getWorkflowByPath(entry, null, false);
             long workflowId = workflow.getId();
@@ -1012,14 +1017,15 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             if (adds.size() > 0 || removes.size() > 0) {
                 workflowsApi.refresh(workflow.getId());
-                out("The test parameter files for version " + versionName + " of " + getEntryType().toLowerCase() + " " + parentEntry + " have been updated.");
+                out("The test parameter files for version " + versionName + " of " + getEntryType().toLowerCase() + " " + parentEntry
+                    + " have been updated.");
             } else {
                 out("Please provide at least one test parameter file to add or remove.");
             }
 
         } catch (ApiException ex) {
             exceptionMessage(ex, "There was an error updating the test parameter files for " + parentEntry + " version " + versionName,
-                    Client.API_ERROR);
+                Client.API_ERROR);
         }
     }
 
@@ -1042,7 +1048,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         // Check that workflow path matches with the workflow descriptor type
                         if (!workflowPath.toLowerCase().endsWith(workflow.getDescriptorType().getValue().toLowerCase())) {
                             errorMessage("Please ensure that the workflow path uses the file extension " + workflow.getDescriptorType(),
-                                    Client.CLIENT_ERROR);
+                                Client.CLIENT_ERROR);
                         }
 
                         workflowVersion.setHidden(hidden);
