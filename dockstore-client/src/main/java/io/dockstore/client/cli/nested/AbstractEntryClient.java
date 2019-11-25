@@ -704,20 +704,10 @@ public abstract class AbstractEntryClient<T> {
 
     private void verify(List<String> args) {
         if (isAdmin) {
-            if (containsHelpRequest(args) || args.isEmpty()) {
-                verifyHelp();
-            } else {
-                /*
-                String entry = reqVal(args, "--entry");
-                String version = reqVal(args, "--version");
-                String verifySource = optVal(args, "--verified-source", null);
-
-                final boolean unverifyRequest = args.contains("--unverify");
-                final boolean isScript = SCRIPT.get();
-                handleVerifyUnverify(entry, version, verifySource, unverifyRequest, isScript);
-                 */
-                out("This command is currently deprecated. Use the extended TRS webservice endpoint instead.");
-            }
+            args.add(0, "verify");
+            String[] argsArray = new String[args.size()];
+            argsArray = args.toArray(argsArray);
+            Verify.handleVerifyCommand(argsArray);
         } else {
             out("This command is only accessible to Admins.");
         }
