@@ -80,8 +80,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testRefreshAndPublish() {
-        // Set up DB
-
         // refresh all
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
 
@@ -174,8 +172,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testRefreshAndPublishInvalid() {
-        // Set up DB
-
         // refresh all
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
 
@@ -210,8 +206,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testLabelEditing() {
-        // Set up DB
-
         // Set up workflow
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -273,8 +267,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testUpdateWorkflowVersion() {
-        // Set up DB
-
         // Update workflow
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -295,8 +287,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testRestub() {
-        // Set up DB
-
         // Refresh and then restub
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -330,8 +320,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testDescriptorTypes() {
-        // Set up DB
-
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
@@ -353,8 +341,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testWorkflowVersionIncorrectPath() {
-        // Set up DB
-
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
@@ -393,7 +379,6 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "convert", "entry2json", "--entry",
                 SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow:testCWL", "--script" });
-
     }
 
     /**
@@ -401,7 +386,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testRefreshAndConvertWithImportsWDL() {
-
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
@@ -417,7 +401,6 @@ public class GeneralWorkflowIT extends BaseIT {
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "convert", "entry2json", "--entry",
                 SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow:wdl_import", "--script" });
         assertTrue(systemOutRule.getLog().contains("\"three_step.cgrep.pattern\": \"String\""));
-
     }
 
     /**
@@ -516,155 +499,11 @@ public class GeneralWorkflowIT extends BaseIT {
             ResourceHelpers.resourceFilePath("wdlincorrecthttp.wdl"), "--json", ResourceHelpers.resourceFilePath("wdl.json"), "--script" });
     }
 
-    @Test
-    public void testUpdateWorkflowPath() throws ApiException {
-        // Set up webservice
-        ApiClient webClient = WorkflowIT.getWebClient(USER_2_USERNAME, testingPostgres);
-        WorkflowsApi workflowApi = new WorkflowsApi(webClient);
-
-        UsersApi usersApi = new UsersApi(webClient);
-        final Long userId = usersApi.getUser().getId();
-
-        // Make publish request (true)
-        final PublishRequest publishRequest = SwaggerUtility.createPublishRequest(true);
-
-        // Get workflows
-        usersApi.refreshWorkflows(userId);
-
-        Workflow githubWorkflow = workflowApi
-            .manualRegister("github", "DockstoreTestUser2/test_lastmodified", "/Dockstore.cwl", "test-update-workflow", "cwl",
-                "/test.json");
-
-        // Publish github workflow
-        Workflow workflow = workflowApi.refresh(githubWorkflow.getId());
-
-        //update the default workflow path to be hello.cwl , the workflow path in workflow versions should also be changes
-        workflow.setWorkflowPath("/hello.cwl");
-        workflowApi.updateWorkflowPath(githubWorkflow.getId(), workflow);
-        workflowApi.refresh(githubWorkflow.getId());
-
-        // Set up DB
-
-        //check if the workflow versions have the same workflow path or not in the database
-        final String masterpath = testingPostgres
-            .runSelectStatement("select workflowpath from workflowversion where name = 'testWorkflowPath'", String.class);
-        final String testpath = testingPostgres
-            .runSelectStatement("select workflowpath from workflowversion where name = 'testWorkflowPath'", String.class);
-        assertEquals("master workflow path should be the same as default workflow path, it is " + masterpath, "/Dockstore.cwl", masterpath);
-        assertEquals("test workflow path should be the same as default workflow path, it is " + testpath, "/Dockstore.cwl", testpath);
-    }
-
-    @Test
-    public void testWorkflowFreezingWithNoFiles() {
-        ApiClient webClient = WorkflowIT.getWebClient(USER_2_USERNAME, testingPostgres);
-        WorkflowsApi workflowApi = new WorkflowsApi(webClient);
-
-        UsersApi usersApi = new UsersApi(webClient);
-        final Long userId = usersApi.getUser().getId();
-
-        // Get workflows
-        usersApi.refreshWorkflows(userId);
-
-        Workflow githubWorkflow = workflowApi
-            .manualRegister("github", "DockstoreTestUser2/test_lastmodified", "/wrongpath.wdl", "test-update-workflow", "wdl",
-                "/wrong-test.json");
-
-        Workflow workflowBeforeFreezing = workflowApi.refresh(githubWorkflow.getId());
-        WorkflowVersion master = workflowBeforeFreezing.getWorkflowVersions().stream().filter(v -> v.getName().equals("master")).findFirst()
-            .get();
-        master.setFrozen(true);
-        try {
-            List<WorkflowVersion> workflowVersions = workflowApi
-                .updateWorkflowVersion(workflowBeforeFreezing.getId(), Lists.newArrayList(master));
-        } catch (ApiException e) {
-            // should exception
-            assertTrue("missing error message", e.getMessage().contains(CANNOT_FREEZE_VERSIONS_WITH_NO_FILES));
-            return;
-        }
-        fail("should be unreachable");
-    }
-
-    @Test
-    public void testWorkflowFreezing() throws ApiException {
-        // Set up webservice
-        ApiClient webClient = WorkflowIT.getWebClient(USER_2_USERNAME, testingPostgres);
-        WorkflowsApi workflowApi = new WorkflowsApi(webClient);
-
-        UsersApi usersApi = new UsersApi(webClient);
-        final Long userId = usersApi.getUser().getId();
-
-        // Get workflows
-        usersApi.refreshWorkflows(userId);
-
-        Workflow githubWorkflow = workflowApi
-            .manualRegister("github", "DockstoreTestUser2/test_lastmodified", "/hello.wdl", "test-update-workflow", "wdl", "/test.json");
-
-        // Publish github workflow
-        Workflow workflowBeforeFreezing = workflowApi.refresh(githubWorkflow.getId());
-        WorkflowVersion master = workflowBeforeFreezing.getWorkflowVersions().stream().filter(v -> v.getName().equals("master")).findFirst()
-            .get();
-        master.setFrozen(true);
-        final List<WorkflowVersion> workflowVersions1 = workflowApi
-            .updateWorkflowVersion(workflowBeforeFreezing.getId(), Lists.newArrayList(master));
-        master = workflowVersions1.stream().filter(v -> v.getName().equals("master")).findFirst().get();
-        assertTrue(master.isFrozen());
-
-        // try various operations that should be disallowed
-
-        // cannot modify version properties, like unfreezing for now
-        workflowBeforeFreezing = workflowApi.refresh(githubWorkflow.getId());
-        master = workflowBeforeFreezing.getWorkflowVersions().stream().filter(v -> v.getName().equals("master")).findFirst().get();
-        master.setFrozen(false);
-        List<WorkflowVersion> workflowVersions = workflowApi
-            .updateWorkflowVersion(workflowBeforeFreezing.getId(), Lists.newArrayList(master));
-        master = workflowVersions.stream().filter(v -> v.getName().equals("master")).findFirst().get();
-        assertTrue(master.isFrozen());
-
-        // but should be able to change doi stuff
-        master.setFrozen(true);
-        master.setDoiStatus(WorkflowVersion.DoiStatusEnum.REQUESTED);
-        master.setDoiURL("foo");
-        workflowVersions = workflowApi.updateWorkflowVersion(workflowBeforeFreezing.getId(), Lists.newArrayList(master));
-        master = workflowVersions.stream().filter(v -> v.getName().equals("master")).findFirst().get();
-        assertEquals("foo", master.getDoiURL());
-        assertEquals(WorkflowVersion.DoiStatusEnum.REQUESTED, master.getDoiStatus());
-
-        // refresh should skip over the frozen version
-        final Workflow refresh = workflowApi.refresh(githubWorkflow.getId());
-        master = refresh.getWorkflowVersions().stream().filter(v -> v.getName().equals("master")).findFirst().get();
-
-        // cannot modify sourcefiles for a frozen version
-        assertFalse(master.getSourceFiles().isEmpty());
-        master.getSourceFiles().forEach(s -> {
-            assertTrue(s.isFrozen());
-            testingPostgres.runUpdateStatement("update sourcefile set content = 'foo' where id = " + s.getId());
-            final String content = testingPostgres
-                .runSelectStatement("select content from sourcefile where id = " + s.getId(), String.class);
-            assertNotEquals("foo", content);
-        });
-
-        // cannot add or delete test files for frozen versions
-        try {
-            workflowApi.deleteTestParameterFiles(githubWorkflow.getId(), Lists.newArrayList("foo"), "master");
-            fail("could delete test parameter file");
-        } catch (ApiException e) {
-            assertTrue(e.getMessage().contains(CANNOT_MODIFY_FROZEN_VERSIONS_THIS_WAY));
-        }
-        try {
-            workflowApi.addTestParameterFiles(githubWorkflow.getId(), Lists.newArrayList("foo"), "", "master");
-            fail("could add test parameter file");
-        } catch (ApiException e) {
-            assertTrue(e.getMessage().contains(CANNOT_MODIFY_FROZEN_VERSIONS_THIS_WAY));
-        }
-    }
-
     /**
      * This tests that a workflow can be updated to have default version, and that metadata is set related to the default version
      */
     @Test
     public void testUpdateWorkflowDefaultVersion() {
-        // Set up DB
-
         // Setup workflow
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -722,8 +561,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testRefreshRelatedConcepts() {
-        // Set up DB
-
         // refresh all
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
 
@@ -786,8 +623,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testGithubDirtyBit() {
-        // Setup DB
-
         // refresh all
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
 
@@ -826,8 +661,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testBitbucketDirtyBit() {
-        // Setup DB
-
         // refresh all
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
 
@@ -869,8 +702,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testGitlab() {
-        // Setup DB
-
         // Refresh workflow
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -962,8 +793,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testManualPublishBitbucket() {
-        // Setup DB
-
         // manual publish
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -990,8 +819,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testManualPublishGitlab() {
-        // Setup DB
-
         // manual publish
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -1017,8 +844,6 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     @Category(SlowTest.class)
     public void testGitLabTagAndBranchTracking() {
-        // Setup DB
-
         // manual publish
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -1040,8 +865,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testWDLWithImports() {
-        // Setup DB
-
         // Refresh all
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
 
@@ -1062,8 +885,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testTestParameterFile() {
-        // Setup DB
-
         // Refresh all
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
 
@@ -1128,8 +949,6 @@ public class GeneralWorkflowIT extends BaseIT {
     @Ignore("Deprecated. CLI needs to be changed to use new Extended TRS verification endpoint")
     @Test
     public void testVerify() {
-        // Setup DB
-
         // Versions should be unverified
         final long count = testingPostgres
             .runSelectStatement("select count(*) from workflowversion wv, version_metadata vm where vm.verified='true' and wv.id = vm.id",
@@ -1196,8 +1015,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testRefreshingUserMetadata() {
-        // Setup database
-
         // Refresh all workflows
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
 
