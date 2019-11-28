@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import com.google.common.collect.Lists;
 import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.Registry;
 import io.dockstore.common.TestUtility;
 import io.dockstore.common.ToilCompatibleTest;
@@ -43,7 +44,7 @@ import static io.dockstore.common.CommonTestUtilities.checkToolList;
 /**
  * @author dyuen
  */
-@Category({ ToolTest.class })
+@Category({ ToolTest.class, ConfidentialTest.class })
 public class ClientIT extends BaseIT {
 
     private static final String FIRST_TOOL = ResourceHelpers.resourceFilePath("dockstore-tool-helloworld.cwl");
