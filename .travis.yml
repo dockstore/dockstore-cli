@@ -43,15 +43,15 @@ jobs:
       script: mvn --batch-mode clean install jacoco:report jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage
     - stage: coverage
       env:
-        - TESTING_PROFILE=integration-tests-1
+        - TESTING_PROFILE=confidential-tool-tests
       script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
     - stage: coverage
       env:
-        - TESTING_PROFILE=integration-tests-2
+        - TESTING_PROFILE=confidential-workflow-tests
       script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
     - stage: coverage
       env:
-        - TESTING_PROFILE=integration-tests-3
+        - TESTING_PROFILE=non-confidential-tests
       script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
 
 # not feeling the bang-for-the-buck for these, running only in release branch
