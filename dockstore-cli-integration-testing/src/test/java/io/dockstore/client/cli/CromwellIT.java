@@ -51,7 +51,7 @@ import wdl.draft3.parser.WdlParser;
  *
  * @author dyuen
  */
-@Category(ToolTest.class)
+@Category({ToolTest.class, ConfidentialTest.class})
 public class CromwellIT {
 
     @Rule
@@ -93,7 +93,6 @@ public class CromwellIT {
     }
 
     @Test
-    @Category(ConfidentialTest.class)
     public void fileProvisioning() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
