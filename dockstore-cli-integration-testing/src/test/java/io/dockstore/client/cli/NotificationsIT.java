@@ -17,6 +17,7 @@ package io.dockstore.client.cli;
 
 import java.io.IOException;
 
+import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.TestUtility;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
@@ -33,7 +34,7 @@ import org.junit.experimental.categories.Category;
  * @author gluu
  * @since 16/01/18
  */
-@Category({ ToolTest.class })
+@Category({ ToolTest.class, ConfidentialTest.class })
 public class NotificationsIT extends BaseIT {
     private static final String SAMPLE_CWL_DESCRIPTOR = ResourceHelpers.resourceFilePath("dockstore-tool-helloworld.cwl");
     private static final String SAMPLE_WDL_DESCRIPTOR = ResourceHelpers.resourceFilePath("wdl.wdl");
