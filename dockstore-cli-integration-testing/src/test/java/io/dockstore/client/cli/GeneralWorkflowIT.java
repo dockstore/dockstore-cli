@@ -941,7 +941,6 @@ public class GeneralWorkflowIT extends BaseIT {
     /**
      * This tests that you can verify and unverify a workflow
      */
-    @Ignore("Deprecated. CLI needs to be changed to use new Extended TRS verification endpoint")
     @Test
     public void testVerify() {
         // Versions should be unverified
@@ -951,39 +950,51 @@ public class GeneralWorkflowIT extends BaseIT {
 
         assertEquals("there should be no verified workflowversions, there are " + count, 0, count);
 
-        // Refresh workflows
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+                "parameter_test_workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-path",
+                "/Dockstore.cwl", "--descriptor-type", "cwl", "--script" });
 
-        // Refresh workflow
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--add",
+            "/test.wdl.json", "--entry", SourceControl.GITHUB.toString() + "/DockstoreTestUser2/parameter_test_workflow", "--version",
+            "wdltest", "--script" });
+
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--add",
+            "/test.cwl.json", "--entry", SourceControl.GITHUB.toString() + "/DockstoreTestUser2/parameter_test_workflow", "--version",
+            "master", "--script" });
+
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/parameter_test_workflow", "--script" });
 
         // Verify workflowversion
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--entry",
-            SourceControl.GITHUB.toString() + "/DockstoreTestUser2/parameter_test_workflow", "--verified-source", "Docker testing group",
-            "--version", "master", "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
+            "#workflow/github.com/DockstoreTestUser2/parameter_test_workflow", "--version-id", "wdltest", "--file-path", "test.wdl.json",
+            "--descriptor-type", "cwl", "--platform", "Docker testing group", "--platform-version", "thing", "--metadata", "metadataThing",
+            "--script" });
 
         // Version should be verified
         final long count2 = testingPostgres.runSelectStatement(
-            "select count(*) from workflowversion wv, version_metadata vm where vm.verified='true' and vm.verifiedSource='Docker testing group' and wv.id = vm.id",
+            "select count(*) from workflowversion wv, version_metadata vm where vm.verified='true' and vm.verifiedSource='[\"Docker testing group\"]' and wv.id = vm.id",
             long.class);
         assertEquals("there should be one verified workflowversion, there are " + count2, 1, count2);
 
-        // Update workflowversion to have new verified source
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--entry",
-            SourceControl.GITHUB.toString() + "/DockstoreTestUser2/parameter_test_workflow", "--verified-source", "Docker testing group2",
-            "--version", "master", "--script" });
+        // Update workflowversion to have another verified source
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
+            "#workflow/github.com/DockstoreTestUser2/parameter_test_workflow", "--version-id", "wdltest", "--file-path", "test.wdl.json",
+            "--descriptor-type", "cwl", "--platform", "Docker testing group2", "--platform-version", "thing", "--metadata", "metadataThing",
+            "--script" });
 
         // Version should have new verified source
         final long count3 = testingPostgres.runSelectStatement(
-            "select count(*) from workflowversion wv, version_metadata vm where vm.verified='true' and vm.verifiedSource='Docker testing group2' and wv.id = vm.id",
+            "select count(*) from workflowversion wv, version_metadata vm where vm.verified='true' and vm.verifiedSource='[\"Docker testing group\",\"Docker testing group2\"]' and wv.id = vm.id",
             long.class);
         assertEquals("there should be one verified workflowversion, there are " + count3, 1, count3);
 
         // Verify another version
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--entry",
-            SourceControl.GITHUB.toString() + "/DockstoreTestUser2/parameter_test_workflow", "--verified-source", "Docker testing group",
-            "--version", "wdltest", "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
+            "#workflow/github.com/DockstoreTestUser2/parameter_test_workflow", "--version-id", "master", "--file-path", "test.cwl.json",
+            "--descriptor-type", "cwl", "--platform", "Docker testing group", "--platform-version", "thing", "--metadata", "metadataThing",
+            "--script" });
 
         // Version should be verified
         final long count4 = testingPostgres
@@ -992,9 +1003,10 @@ public class GeneralWorkflowIT extends BaseIT {
         assertEquals("there should be two verified workflowversions, there are " + count4, 2, count4);
 
         // Unverify workflowversion
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--entry",
-            SourceControl.GITHUB.toString() + "/DockstoreTestUser2/parameter_test_workflow", "--unverify", "--version", "master",
-            "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
+            "#workflow/github.com/DockstoreTestUser2/parameter_test_workflow", "--version-id", "master", "--file-path", "test.cwl.json",
+            "--descriptor-type", "cwl", "--platform", "Docker testing group", "--platform-version", "thing", "--unverify", "--metadata",
+            "metadataThing", "--script" });
 
         // Workflowversion should be unverified
         final long count5 = testingPostgres

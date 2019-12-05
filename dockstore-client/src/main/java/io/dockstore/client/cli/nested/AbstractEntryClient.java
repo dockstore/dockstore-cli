@@ -392,17 +392,6 @@ public abstract class AbstractEntryClient<T> {
      * @param unstarRequest true to star, false to unstar
      */
     protected abstract void handleStarUnstar(String entryPath, boolean unstarRequest);
-    /**
-     * Verify/Unverify an entry
-     *
-     * @param entry           a unique identifier for an entry, called a path for workflows and tools
-     * @param versionName     the name of the version
-     * @param verifySource    source of entry verification
-     * @param unverifyRequest true to unverify, false to verify
-     * @param isScript        true if called by script, false otherwise
-     */
-    protected abstract void handleVerifyUnverify(String entry, String versionName, String verifySource, boolean unverifyRequest,
-            boolean isScript);
 
     /**
      * Adds/removes supplied test parameter paths for a given entry version
@@ -704,20 +693,10 @@ public abstract class AbstractEntryClient<T> {
 
     private void verify(List<String> args) {
         if (isAdmin) {
-            if (containsHelpRequest(args) || args.isEmpty()) {
-                verifyHelp();
-            } else {
-                /*
-                String entry = reqVal(args, "--entry");
-                String version = reqVal(args, "--version");
-                String verifySource = optVal(args, "--verified-source", null);
-
-                final boolean unverifyRequest = args.contains("--unverify");
-                final boolean isScript = SCRIPT.get();
-                handleVerifyUnverify(entry, version, verifySource, unverifyRequest, isScript);
-                 */
-                out("This command is currently deprecated. Use the extended TRS webservice endpoint instead.");
-            }
+            args.add(0, "verify");
+            String[] argsArray = new String[args.size()];
+            argsArray = args.toArray(argsArray);
+            Verify.handleVerifyCommand(argsArray);
         } else {
             out("This command is only accessible to Admins.");
         }
