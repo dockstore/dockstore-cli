@@ -34,7 +34,7 @@
         <dropwizard-annotations.version>4.0.5</dropwizard-annotations.version>
         <swagger-annotations-version>1.5.23</swagger-annotations-version>
         <openapi-annotations-version>2.0.9</openapi-annotations-version>
-        <dockstore-core.version>1.7.2</dockstore-core.version>
+        <dockstore-core.version>1.8.0-beta.0</dockstore-core.version>
         <assertj.version>3.9.1</assertj.version>
         <jackson.version>2.9.9.20190807</jackson.version>
         <jackson.major.version>2.9.9</jackson.major.version>
