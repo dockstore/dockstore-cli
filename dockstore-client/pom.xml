@@ -132,7 +132,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-base</artifactId>
-            <version>${jackson.major.version}</version>
         </dependency>
         <dependency>
             <groupId>io.cwl</groupId>

@@ -36,8 +36,6 @@
         <openapi-annotations-version>2.0.9</openapi-annotations-version>
         <dockstore-core.version>1.8.0-beta.0</dockstore-core.version>
         <assertj.version>3.9.1</assertj.version>
-        <jackson.version>2.9.10.20191020</jackson.version>
-        <jackson.major.version>2.9.10</jackson.major.version>
         <jersey-version>2.25.1</jersey-version>
         <junit-version>4.12</junit-version>
         <logback.version>1.2.3</logback.version>
@@ -239,20 +237,6 @@
                 <artifactId>commons-codec</artifactId>
                 <version>1.11</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson/jackson-bom -->
-            <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>${jackson.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${jackson.major.version}</version>
-            </dependency>
-
 
             <dependency>
                 <groupId>com.github.jsonld-java</groupId>
