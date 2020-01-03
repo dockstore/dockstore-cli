@@ -85,7 +85,7 @@ public final class CommonTestUtilities {
         Application<DockstoreWebserviceConfiguration> application = support.newApplication();
         application.run("db", "drop-all", "--confirm-delete-everything", dropwizardConfigurationFile);
         application
-            .run("db", "migrate", dropwizardConfigurationFile, "--include", "1.3.0.generated,1.3.1.consistency,1.4.0,1.5.0,1.6.0,1.7.0");
+            .run("db", "migrate", dropwizardConfigurationFile, "--include", "1.3.0.generated,1.3.1.consistency,1.4.0,1.5.0,1.6.0,1.7.0,1.8.0");
     }
 
     /**
@@ -111,7 +111,7 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", dropwizardConfigurationFile);
 
         List<String> migrationList = Arrays
-            .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0");
+            .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0", "1.8.0");
         runMigration(migrationList, application, dropwizardConfigurationFile);
     }
 
@@ -170,7 +170,7 @@ public final class CommonTestUtilities {
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml");
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0");
         runMigration(migrationList, application, configPath);
     }
 
@@ -238,41 +238,8 @@ public final class CommonTestUtilities {
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml");
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0");
         runMigration(migrationList, application, configPath);
-    }
-
-    /**
-     * Loads up a specific set of workflows into the database
-     * Specifically for tests toolsIdGet4Workflows() in GA4GHV1IT.java and toolsIdGet4Workflows() in GA4GHV2IT.java
-     *
-     * @param support reference to testing instance of the dockstore web service
-     * @throws Exception
-     */
-    public static void setupSamePathsTest(DropwizardTestSupport<DockstoreWebserviceConfiguration> support) throws Exception {
-        LOG.info("Migrating samepaths migrations");
-        Application<DockstoreWebserviceConfiguration> application = support.newApplication();
-        application.run("db", "drop-all", "--confirm-delete-everything", CONFIDENTIAL_CONFIG_PATH);
-        application
-            .run("db", "migrate", CONFIDENTIAL_CONFIG_PATH, "--include", "1.3.0.generated,1.3.1.consistency,1.4.0,1.5.0,1.6.0,samepaths");
-        application.run("db", "migrate", CONFIDENTIAL_CONFIG_PATH, "--include", "1.7.0");
-
-    }
-
-    /**
-     * Loads up a specific set of workflows into the database
-     * Specifically for tests cwlrunnerWorkflowRelativePathNotEncodedAdditionalFiles in GA4GHV2IT.java
-     *
-     * @param support reference to testing instance of the dockstore web service
-     * @throws Exception
-     */
-    public static void setupTestWorkflow(DropwizardTestSupport<DockstoreWebserviceConfiguration> support) throws Exception {
-        LOG.info("Migrating testworkflow migrations");
-        Application<DockstoreWebserviceConfiguration> application = support.getApplication();
-        application.run("db", "drop-all", "--confirm-delete-everything", CONFIDENTIAL_CONFIG_PATH);
-        List<String> migrationList = Arrays
-            .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "testworkflow", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0");
-        runMigration(migrationList, application, CONFIDENTIAL_CONFIG_PATH);
     }
 
     public static ImmutablePair<String, String> runOldDockstoreClient(File dockstore, String[] commandArray) throws RuntimeException {

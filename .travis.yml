@@ -23,21 +23,6 @@ jobs:
   include:
     - stage: unit-tests
       script: mvn --batch-mode clean install -P$TESTING_PROFILE
-# moved to CircleCI (may move back if build speed improves)
-#    - stage: unit-tests
-#      jdk: openjdk11
-#      env:
-#      - TESTING_PROFILE=unit-tests
-#      script: mvn --batch-mode clean install -P$TESTING_PROFILE
-
-# moved to CircleCI (may move back if build speed improves)
-#    - stage: automated-review
-#      jdk: openjdk11
-#      env:
-#      - TESTING_PROFILE=automated-review
-#      script:
-#      - mvn --batch-mode clean install -DskipTests -P$TESTING_PROFILE
-#      - scripts/check_migrations.sh
 
     - stage: coverage
       script: mvn --batch-mode clean install jacoco:report jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage
@@ -80,8 +65,6 @@ before_install:
 #- npm install -g swagger2openapi@2.11.16
 # decrypt migration before initial build
 - scripts/decrypt.sh
-# turn this back on with updates to swagger (particularly swagger-maven-plugin), current implementation is too non-deterministic
-#- scripts/check-swagger.sh
 # codacy hookup
 - sudo apt-get install jq
 - wget --no-verbose -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
