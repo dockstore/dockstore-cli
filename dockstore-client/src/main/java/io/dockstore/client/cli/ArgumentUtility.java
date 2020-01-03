@@ -149,6 +149,10 @@ public final class ArgumentUtility {
         int[] maxWidths = { NAME_HEADER.length(), DESCRIPTION_HEADER.length(), GIT_HEADER.length() };
 
         for (DockstoreTool container : containers) {
+            // see below, workflow equialent going null pointer exception like crazy
+            if (container == null) {
+                continue;
+            }
             final String toolPath = container.getToolPath();
             if (toolPath != null && toolPath.length() > maxWidths[0]) {
                 maxWidths[0] = toolPath.length();
@@ -163,7 +167,7 @@ public final class ArgumentUtility {
             }
         }
 
-        maxWidths[1] = (maxWidths[1] > MAX_DESCRIPTION) ? MAX_DESCRIPTION : maxWidths[1];
+        maxWidths[1] = Math.min(maxWidths[1], MAX_DESCRIPTION);
 
         return maxWidths;
     }
@@ -172,6 +176,10 @@ public final class ArgumentUtility {
         int[] maxWidths = { NAME_HEADER.length(), DESCRIPTION_HEADER.length(), GIT_HEADER.length() };
 
         for (Workflow workflow : workflows) {
+            // not sure why, but this is going null pointer exception like crazy
+            if (workflow == null) {
+                continue;
+            }
             final String workflowGitPath = workflow.getPath();
             if (workflowGitPath != null && workflowGitPath.length() > maxWidths[0]) {
                 maxWidths[0] = workflowGitPath.length();
@@ -186,7 +194,7 @@ public final class ArgumentUtility {
             }
         }
 
-        maxWidths[1] = (maxWidths[1] > MAX_DESCRIPTION) ? MAX_DESCRIPTION : maxWidths[1];
+        maxWidths[1] = Math.min(maxWidths[1], MAX_DESCRIPTION);
 
         return maxWidths;
     }
