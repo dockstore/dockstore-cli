@@ -63,7 +63,15 @@ public class ServiceClient extends WorkflowClient {
      */
     private static final String POST_START = "poststart";
 
+    /**
+     * Stop a service
+     */
     private static final String STOP = "stop";
+
+    /**
+     * Get service's exposed port
+     */
+    private static final String PORT = "port";
 
     /**
      * After files have been provisioned and service has been started
@@ -91,7 +99,8 @@ public class ServiceClient extends WorkflowClient {
         this.jCommander = new JCommander();
         this.commandLaunch = new CommandLaunch();
         this.jCommander.addCommand("launch", commandLaunch);
-        this.jCommander.addCommand("stop", commandLaunch);
+        this.jCommander.addCommand(STOP, commandLaunch);
+        this.jCommander.addCommand(PORT, commandLaunch);
         this.fileProvisioning = new FileProvisioning(getConfigFile());
     }
 
@@ -99,8 +108,11 @@ public class ServiceClient extends WorkflowClient {
     public boolean processEntrySpecificCommands(List<String> args, String activeCommand) {
         if (activeCommand != null) {
             switch (activeCommand) {
-            case "stop":
+            case STOP:
                 stop(args);
+                return true;
+            case PORT:
+                port(args);
                 return true;
             default:
             }
@@ -110,19 +122,11 @@ public class ServiceClient extends WorkflowClient {
 
     @Override
     public void launch(List<String> args) {
-        String commandName = "launch";
-        preValidateLaunchArguments(args);
-        String[] argv = args.toArray(new String[0]);
-        String[] argv1 = { commandName };
-        String[] both = ArrayUtils.addAll(argv1, argv);
-        this.jCommander.parse(both);
-        String jsonRun = commandLaunch.json;
-        final String entry = commandLaunch.entry;
-        final String localEntry = commandLaunch.localEntry;
-        if (entry == null && localEntry == null) {
-            ArgumentUtility.out("Missing --entry or --local-entry.");
-            JCommanderUtility.printJCommanderHelpServiceLaunch(jCommander, "dockstore service", commandName);
-        } else {
+        final String commandName = "launch";
+        if (parse(args, commandName)) {
+            String jsonRun = commandLaunch.json;
+            final String entry = commandLaunch.entry;
+            final String localEntry = commandLaunch.localEntry;
             try {
                 final File serviceDirectory = serviceDirectory(entry);
                 if (entry != null) {
@@ -146,15 +150,36 @@ public class ServiceClient extends WorkflowClient {
     }
 
     public void stop(List<String> args) {
-        String commandName = "stop";
+        if (parse(args, STOP)) {
+            final String entry = commandLaunch.entry;
+            final File workingDir = serviceDirectory(entry);
+            final DockstoreServiceYaml dockstoreYml = getAndValidateDockstoreYml(workingDir);
+            runScripts(workingDir, dockstoreYml, Optional.empty(), new String[] {STOP});
+        }
+    }
+
+    public void port(List<String> args) {
+        if (parse(args, PORT)) {
+            final String entry = commandLaunch.entry;
+            final File workingDir = serviceDirectory(entry);
+            final DockstoreServiceYaml dockstoreYml = getAndValidateDockstoreYml(workingDir);
+            runScripts(workingDir, dockstoreYml, Optional.empty(), new String[] {PORT});
+        }
+    }
+
+    private boolean parse(List<String> args, String commandName) {
         String[] argv = args.toArray(new String[0]);
         String[] argv1 = { commandName };
         String[] both = ArrayUtils.addAll(argv1, argv);
         this.jCommander.parse(both);
         final String entry = commandLaunch.entry;
-        final File workingDir = serviceDirectory(entry);
-        final DockstoreServiceYaml dockstoreYml = getAndValidateDockstoreYml(workingDir);
-        runScripts(workingDir, dockstoreYml, Optional.empty(), new String[] {STOP});
+        final String localEntry = commandLaunch.localEntry;
+        if (entry == null && localEntry == null) {
+            ArgumentUtility.out("Missing --entry or --local-entry.");
+            JCommanderUtility.printJCommanderHelpServiceLaunch(jCommander, "dockstore service", commandName);
+            return false;
+        }
+        return true;
     }
 
     private File serviceDirectory(String remoteEntry) {
