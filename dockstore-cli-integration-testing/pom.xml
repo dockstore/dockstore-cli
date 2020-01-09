@@ -76,7 +76,6 @@
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-testing</artifactId>
-            <version>${dropwizard.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -89,7 +88,6 @@
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-jdbi3</artifactId>
-            <version>${dropwizard.version}</version>
         </dependency>
 
         <dependency>
