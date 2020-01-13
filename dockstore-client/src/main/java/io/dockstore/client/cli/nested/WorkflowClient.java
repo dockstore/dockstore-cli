@@ -132,7 +132,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("       dockstore " + getEntryType().toLowerCase() + " manual_publish [parameters]");
         out("");
         out("Description:");
-        out("  Manually register an workflow in the dockstore. If this is successful and the workflow is valid, then publish.");
+        out("  Manually register a workflow in dockstore. If this is successful and the workflow is valid, then publish.");
         out("");
         out("Required parameters:");
         out("  --repository <repository>                            Name for the git repository");
@@ -157,7 +157,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  Update certain fields for a given workflow.");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                              Complete workflow path in the Dockstore (ex. github.com/collaboratory/seqware-bwa-workflow)");
+        out("  --entry <entry>                                              Complete workflow path in Dockstore (ex. github.com/collaboratory/seqware-bwa-workflow)");
         out("");
         out("Optional Parameters");
         out("  --descriptor-type <descriptor-type>                          Descriptor type of the given workflow.  Can only be altered if workflow is a STUB.");
@@ -177,7 +177,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("");
         out("Required Parameters:");
         out("  --entry <entry>                                      Complete " + getEntryType().toLowerCase()
-            + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+            + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --name <name>                                        Name of the " + getEntryType().toLowerCase() + " version.");
         out("");
         out("Optional Parameters");
@@ -226,7 +226,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     @Override
     protected void printClientSpecificHelp() {
         out("");
-        out("  manual_publish   :  registers a Github, Gitlab or Bitbucket workflow in the dockstore and then attempts to publish");
+        out("  manual_publish   :  registers a Github, Gitlab or Bitbucket workflow in Dockstore and then attempts to publish");
         out("");
         out("  " + UPDATE_WORKFLOW + "  :  updates certain fields of a workflow");
         out("");
@@ -668,7 +668,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  No arguments will list the current and potential " + getEntryType() + "s to share.");
         out("Required Parameters:");
         out("  --entry <entry>             Complete " + getEntryType()
-            + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+            + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         //TODO add support for optional parameter '--entryname'
         printHelpFooter();
     }
@@ -1050,7 +1050,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  Converts a full, unpublished workflow back to a stub.");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                       Complete workflow path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  --entry <entry>                       Complete workflow path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("");
         printHelpFooter();
     }
@@ -1092,7 +1092,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     @Parameters(separators = "=", commandDescription = "Spit out a json run file for a given entry.")
     private static class CommandEntry2json {
-        @Parameter(names = "--entry", description = "Complete workflow path in the Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
+        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
         @Parameter(names = "--help", description = "Prints help for entry2json command", help = true)
         private boolean help = false;
@@ -1100,7 +1100,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     @Parameters(separators = "=", commandDescription = "Spit out a tsv run file for a given entry.")
     private static class CommandEntry2tsv {
-        @Parameter(names = "--entry", description = "Complete workflow path in the Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
+        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
         @Parameter(names = "--help", description = "Prints help for entry2json command", help = true)
         private boolean help = false;
@@ -1110,11 +1110,11 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     private static class CommandLaunch {
         @Parameter(names = "--local-entry", description = "Allows you to specify a full path to a local descriptor instead of an entry path")
         private String localEntry;
-        @Parameter(names = "--entry", description = "Complete workflow path in the Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)")
+        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)")
         private String entry;
-        @Parameter(names = "--json", description = "Parameters to the entry in the dockstore, one map for one run, an array of maps for multiple runs")
+        @Parameter(names = "--json", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
         private String json;
-        @Parameter(names = "--yaml", description = "Parameters to the entry in the dockstore, one map for one run, an array of maps for multiple runs")
+        @Parameter(names = "--yaml", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
         private String yaml;
         @Parameter(names = "--wdl-output-target", description = "Allows you to specify a remote path to provision outputs files to (ex: s3://oicr.temp/testing-launcher/")
         private String wdlOutputTarget;

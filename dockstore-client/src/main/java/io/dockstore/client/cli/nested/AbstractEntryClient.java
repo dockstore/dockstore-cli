@@ -175,7 +175,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("  search           :  allows a user to search for all published " + getEntryType() + "s that match the criteria");
         out("");
-        out("  publish          :  publish/unpublish a " + getEntryType() + " in the dockstore");
+        out("  publish          :  publish/unpublish a " + getEntryType() + " in Dockstore");
         out("");
         out("  info             :  print detailed information about a particular published " + getEntryType());
         out("");
@@ -188,7 +188,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("  label            :  updates labels for an individual " + getEntryType() + "");
         out("");
-        out("  star             :  star/unstar a " + getEntryType() + " in the dockstore");
+        out("  star             :  star/unstar a " + getEntryType() + " in Dockstore");
         out("");
         out("  test_parameter   :  updates test parameter files for a version of a " + getEntryType() + "");
         out("");
@@ -1361,7 +1361,7 @@ public abstract class AbstractEntryClient<T> {
         out("  No arguments will list the current and potential " + getEntryType() + "s to share.");
         out("Required Parameters:");
         out("  --entry <" + getEntryType() + ">             Complete " + getEntryType()
-                + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         printHelpFooter();
     }
 
@@ -1384,7 +1384,7 @@ public abstract class AbstractEntryClient<T> {
         out("  Add or remove labels from a given Dockstore " + getEntryType());
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                             Complete " + getEntryType() + " path in the Dockstore");
+        out("  --entry <entry>                             Complete " + getEntryType() + " path in Dockstore");
         out("");
         out("Optional Parameters:");
         out("  --add <label> (--add <label>)               Add given label(s)");
@@ -1402,7 +1402,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Required Parameters:");
         out("  --entry <entry>                                                          Complete " + getEntryType()
-                + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --version <version>                                                      " + getEntryType() + " version name");
         if (getEntryType().equalsIgnoreCase("tool")) {
             out("  --descriptor-type <descriptor-type>                                      CWL/WDL");
@@ -1424,7 +1424,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Required Parameters:");
         out("  --entry <entry>     The complete " + getEntryType()
-                + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         printHelpFooter();
     }
 
@@ -1438,7 +1438,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Required parameters:");
         out("  --entry <entry>              Complete " + getEntryType()
-                + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
+                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         printHelpFooter();
     }
 
@@ -1452,7 +1452,7 @@ public abstract class AbstractEntryClient<T> {
         out("  Refresh an individual " + getEntryType() + " or all your " + getEntryType() + ".");
         out("");
         out("Optional Parameters:");
-        out("  --entry <entry>         Complete tool path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  --entry <entry>         Complete tool path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         printHelpFooter();
     }
 
@@ -1532,7 +1532,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Required parameters:");
         out("  --entry <entry>                Complete " + getEntryType().toLowerCase()
-                + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
+                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         printHelpFooter();
     }
 
@@ -1546,7 +1546,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Required parameters:");
         out("  --entry <entry>                Complete " + getEntryType().toLowerCase()
-                + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
+                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         out("  --descriptor <descriptor>      Type of descriptor language used. Defaults to cwl");
         printHelpFooter();
     }
@@ -1560,7 +1560,7 @@ public abstract class AbstractEntryClient<T> {
         out("  Download an entry to the working directory.");
         out("");
         out("Required parameters:");
-        out("  --entry <entry>          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
+        out("  --entry <entry>          Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         out("");
         out("Optional parameters:");
         out("  --zip               Keep the zip file rather than uncompress the files within");
@@ -1573,15 +1573,15 @@ public abstract class AbstractEntryClient<T> {
         out("  Launch an entry locally.");
         out("");
         out("Required parameters:");
-        out("  --entry <entry>                     Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
+        out("  --entry <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         if (!(this instanceof CheckerClient)) {
             out("   OR");
             out("  --local-entry <local-entry>         Allows you to specify a full path to a local descriptor instead of an entry path");
         }
         out("");
         out("Optional parameters:");
-        out("  --json <json file>                  Parameters to the entry in the dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --yaml <yaml file>                  Parameters to the entry in the dockstore, one map for one run, an array of maps for multiple runs");
+        out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
+        out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.getLowerShortName());
         if (!(this instanceof CheckerClient)) {
             out("  --local-entry                       Allows you to specify a full path to a local descriptor for --entry instead of an entry path");
@@ -1609,7 +1609,7 @@ public abstract class AbstractEntryClient<T> {
         out("  Verify/unverify a version.");
         out("");
         out("Required parameters:");
-        out("  --entry <entry>                              Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  --entry <entry>                              Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --version <version>                          Version name");
         out("");
         out("Optional Parameters:");
