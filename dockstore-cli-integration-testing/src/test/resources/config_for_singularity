@@ -1,0 +1,3 @@
+token: 238e064a9e43328b75023263d9439d880fac5829223fe7a918be69b48484f34d
+server-url: https://dockstore.org/api
+cwltool-extra-parameters: --singularity
