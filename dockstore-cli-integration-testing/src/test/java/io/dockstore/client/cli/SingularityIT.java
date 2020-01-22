@@ -1,6 +1,6 @@
 package io.dockstore.client.cli;
 
-import io.dockstore.common.SingularityTest;
+import io.dockstore.client.cli.nested.SingularityTest;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
