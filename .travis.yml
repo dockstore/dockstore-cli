@@ -78,6 +78,7 @@ before_install:
 install:
 - docker version
 - scripts/install-tests.sh
+- scripts/install-singularity.sh
 
 before_script:
 - psql -c "create user dockstore with password 'dockstore' createdb;" -U postgres
