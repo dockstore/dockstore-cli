@@ -19,6 +19,13 @@ else
     pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.7.0/requirements3.txt
 fi
 
+if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
+    wget -O- http://neuro.debian.net/lists/xenial.us-ca.full | tee /etc/apt/sources.list.d/neurodebian.sources.list && \
+    apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 && \
+    apt-get update
+    apt-get install -y singularity-container
+fi
+
 # hook up integration tests with elastic search
 docker pull elasticsearch:5.6.3
 docker run -p 9200:9200 -d elasticsearch:5.6.3
