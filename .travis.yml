@@ -21,8 +21,8 @@ env:
 
 jobs:
   include:
-    - stage: unit-tests
-      script: mvn --batch-mode clean install -P$TESTING_PROFILE
+#    - stage: unit-tests
+#      script: mvn --batch-mode clean install -P$TESTING_PROFILE
 
 #    - stage: coverage
 #      script: mvn --batch-mode clean install jacoco:report jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage
