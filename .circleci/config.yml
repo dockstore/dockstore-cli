@@ -2,7 +2,7 @@ version: 2
 jobs:
   build: # runs not using Workflows must have a `build` job as entry point
     docker: # run the steps with Docker
-      - image: circleci/openjdk:10.0.2-13
+      - image: circleci/openjdk:11.0.4-jdk-stretch
         environment:
           PGHOST: 127.0.0.1
       - image: circleci/postgres:9.6.5-alpine-ram
@@ -23,9 +23,14 @@ jobs:
           name: Wait for db
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
+          name: Install postgresql client
+          command: |
+            sudo rm -rf /var/lib/apt/lists/*
+            sudo apt update
+            sudo apt install -y postgresql-client
+      - run:
           name: setup postgres
           command: |
-            sudo apt-get update && sudo apt-get install -y postgresql-client 
             psql -c "create user dockstore with password 'dockstore' createdb;" -U postgres
             psql -c "ALTER USER dockstore WITH superuser;" -U postgres
             psql -c 'create database webservice_test with owner = dockstore;' -U postgres
@@ -33,12 +38,6 @@ jobs:
           name: run the actual tests
           command: |
             mvn --batch-mode clean install -Punit-tests
-      - run:
-          name: check that JPA classes are consistent with migrations
-          command: |
-            scripts/check_migrations.sh
-          environment:
-            TESTING_PROFILE: automated-review
       - run:
           name: clean the cache
           command: |

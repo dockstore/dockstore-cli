@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.dockstore.common.Utilities;
 import io.dropwizard.testing.ResourceHelpers;
@@ -19,6 +20,8 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.ExpectedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
 
@@ -31,7 +34,12 @@ import static org.junit.Assert.assertTrue;
  * @since 1.6.0
  */
 public class LaunchNoInternetTestIT {
-    private static String DOCKER_IMAGE_DIRECTORY;
+    private static final Logger LOG = LoggerFactory.getLogger(LaunchNoInternetTestIT.class);
+    private static final File DESCRIPTOR_FILE = new File(ResourceHelpers.resourceFilePath("nonexistent_image/CWL/nonexistent_image.cwl"));
+    private static final File YAML_FILE = new File(ResourceHelpers.resourceFilePath("echo-job.yml"));
+    private static final File DOCKERFILE = new File(ResourceHelpers.resourceFilePath("nonexistent_image/Dockerfile"));
+    private static final String FAKE_IMAGE_NAME = "dockstore.org/bashwithbinbash:0118999881999119725...3";
+    private static String dockerImageDirectory;
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
     @Rule
@@ -40,22 +48,18 @@ public class LaunchNoInternetTestIT {
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-    private static final File DESCRIPTOR_FILE = new File(ResourceHelpers.resourceFilePath("nonexistent_image/CWL/nonexistent_image.cwl"));
-    private static final File YAML_FILE = new File(ResourceHelpers.resourceFilePath("echo-job.yml"));
-    private static final File DOCKERFILE = new File(ResourceHelpers.resourceFilePath("nonexistent_image/Dockerfile"));
-    private static final String FAKE_IMAGE_NAME = "dockstore.org/bashwithbinbash:0118999881999119725...3";
 
     /**
      * Downloading an image with bash (Nextflow needs it) and saving it on the filesystem as something weird that is unlikely to be on the internet
      * to make sure that the Dockstore CLI only uses the image from the filesystem
      *
-     * @throws IOException  Something has gone terribly wrong with preparing the fake docker image
+     * @throws IOException Something has gone terribly wrong with preparing the fake docker image
      */
     @BeforeClass
     public static void downloadCustomDockerImage() throws IOException {
         Utilities.executeCommand("docker build -f " + DOCKERFILE + " . -t " + FAKE_IMAGE_NAME, System.out, System.err);
-        DOCKER_IMAGE_DIRECTORY = Files.createTempDirectory("docker_images").toAbsolutePath().toString();
-        Utilities.executeCommand("docker save -o " + DOCKER_IMAGE_DIRECTORY + "/fakeImage " + FAKE_IMAGE_NAME, System.out, System.err);
+        dockerImageDirectory = Files.createTempDirectory("docker_images").toAbsolutePath().toString();
+        Utilities.executeCommand("docker save -o " + dockerImageDirectory + "/fakeImage " + FAKE_IMAGE_NAME, System.out, System.err);
     }
 
     @Before
@@ -63,7 +67,7 @@ public class LaunchNoInternetTestIT {
         try {
             Utilities.executeCommand("docker rmi " + FAKE_IMAGE_NAME);
         } catch (Exception e) {
-            // Don't care that it failed, it probably just didn't have the image loaded before
+            LOG.debug("Don't care that it failed, it probably just didn't have the image loaded before");
         }
     }
 
@@ -74,17 +78,17 @@ public class LaunchNoInternetTestIT {
     public void directoryNotSpecified() {
         checkFailed();
 
-        ArrayList<String> args = new ArrayList<String>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(DESCRIPTOR_FILE.getAbsolutePath());
-            add("--yaml");
-            add(YAML_FILE.getAbsolutePath());
-            add("--config");
-            add(ResourceHelpers.resourceFilePath("config"));
-            add("--script");
-        }};
+        List<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(DESCRIPTOR_FILE.getAbsolutePath());
+        args.add("--yaml");
+        args.add(YAML_FILE.getAbsolutePath());
+        args.add("--config");
+        args.add(ResourceHelpers.resourceFilePath("config"));
+        args.add("--script");
+
         Client.main(args.toArray(new String[0]));
     }
 
@@ -102,17 +106,17 @@ public class LaunchNoInternetTestIT {
             Assert.fail("Could create temp config file");
         }
 
-        ArrayList<String> args = new ArrayList<String>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(DESCRIPTOR_FILE.getAbsolutePath());
-            add("--yaml");
-            add(YAML_FILE.getAbsolutePath());
-            add("--config");
-            add(configPath.getAbsolutePath());
-            add("--script");
-        }};
+        List<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(DESCRIPTOR_FILE.getAbsolutePath());
+        args.add("--yaml");
+        args.add(YAML_FILE.getAbsolutePath());
+        args.add("--config");
+        args.add(configPath.getAbsolutePath());
+        args.add("--script");
+
         Client.main(args.toArray(new String[0]));
     }
 
@@ -124,22 +128,22 @@ public class LaunchNoInternetTestIT {
         checkFailed();
         exit.checkAssertionAfterwards(() -> assertTrue(systemOutRule.getLog().contains("The specified Docker image directory is a file:")));
 
-        String toWrite = "docker-images = " + DOCKER_IMAGE_DIRECTORY + "/fakeImage";
+        String toWrite = "docker-images = " + dockerImageDirectory + "/fakeImage";
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
             Assert.fail("Could create temp config file");
         }
-        ArrayList<String> args = new ArrayList<String>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(DESCRIPTOR_FILE.getAbsolutePath());
-            add("--yaml");
-            add(YAML_FILE.getAbsolutePath());
-            add("--config");
-            add(configPath.getAbsolutePath());
-            add("--script");
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(DESCRIPTOR_FILE.getAbsolutePath());
+        args.add("--yaml");
+        args.add(YAML_FILE.getAbsolutePath());
+        args.add("--config");
+        args.add(configPath.getAbsolutePath());
+        args.add("--script");
+
         Client.main(args.toArray(new String[0]));
     }
 
@@ -150,7 +154,7 @@ public class LaunchNoInternetTestIT {
     public void directorySpecifiedButNoImages() throws IOException {
         checkFailed();
         exit.checkAssertionAfterwards(
-                () -> assertTrue(systemOutRule.getLog().contains("There are no files in the docker image directory")));
+            () -> assertTrue(systemOutRule.getLog().contains("There are no files in the docker image directory")));
 
         Path emptyTestDirectory = createEmptyTestDirectory();
         if (emptyTestDirectory == null) {
@@ -161,17 +165,17 @@ public class LaunchNoInternetTestIT {
         if (configPath == null) {
             Assert.fail("Could not create temp config file");
         }
-        ArrayList<String> args = new ArrayList<String>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(DESCRIPTOR_FILE.getAbsolutePath());
-            add("--yaml");
-            add(YAML_FILE.getAbsolutePath());
-            add("--config");
-            add(configPath.getAbsolutePath());
-            add("--script");
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(DESCRIPTOR_FILE.getAbsolutePath());
+        args.add("--yaml");
+        args.add(YAML_FILE.getAbsolutePath());
+        args.add("--config");
+        args.add(configPath.getAbsolutePath());
+        args.add("--script");
+
         Client.main(args.toArray(new String[0]));
     }
 
@@ -181,22 +185,22 @@ public class LaunchNoInternetTestIT {
     @Test
     public void correctCWL() throws IOException {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/CWL/nonexistent_image.cwl"));
-        String toWrite = "docker-images = " + DOCKER_IMAGE_DIRECTORY;
+        String toWrite = "docker-images = " + dockerImageDirectory;
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
             Assert.fail("Could create temp config file");
         }
-        ArrayList<String> args = new ArrayList<String>() {{
-            add("tool");
-            add("launch");
-            add("--local-entry");
-            add(descriptorFile.getAbsolutePath());
-            add("--yaml");
-            add(YAML_FILE.getAbsolutePath());
-            add("--config");
-            add(configPath.getAbsolutePath());
-            add("--script");
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("tool");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(descriptorFile.getAbsolutePath());
+        args.add("--yaml");
+        args.add(YAML_FILE.getAbsolutePath());
+        args.add("--config");
+        args.add(configPath.getAbsolutePath());
+        args.add("--script");
+
         Client.main(args.toArray(new String[0]));
         Assert.assertTrue("Final process status was not success", systemOutRule.getLog().contains("Final process status is success"));
     }
@@ -209,23 +213,23 @@ public class LaunchNoInternetTestIT {
         copyNFLFiles();
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/NFL/nextflow.config"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("nextflow_rnatoy/test.json"));
-        String toWrite = "docker-images = " + DOCKER_IMAGE_DIRECTORY;
+        String toWrite = "docker-images = " + dockerImageDirectory;
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
             Assert.fail("Could create temp config file");
         }
-        ArrayList<String> args = new ArrayList<String>() {{
-            add("workflow");
-            add("launch");
-            add("--local-entry");
-            add(descriptorFile.getAbsolutePath());
-            add("--json");
-            add(jsonFile.getAbsolutePath());
-            add("--config");
-            add(configPath.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(descriptorFile.getAbsolutePath());
+        args.add("--json");
+        args.add(jsonFile.getAbsolutePath());
+        args.add("--config");
+        args.add(configPath.getAbsolutePath());
+
         Client.main(args.toArray(new String[0]));
-        Assert.assertTrue("Final process status was not success", systemOutRule.getLog().contains("Saving copy of NextFlow stdout to: "));
+        Assert.assertTrue("Final process status was not success", systemOutRule.getLog().contains("Saving copy of Nextflow stdout to: "));
     }
 
     /**
@@ -235,21 +239,21 @@ public class LaunchNoInternetTestIT {
     public void correctWDL() throws IOException {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/WDL/nonexistent_image.wdl"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/WDL/test.json"));
-        String toWrite = "docker-images = " + DOCKER_IMAGE_DIRECTORY;
+        String toWrite = "docker-images = " + dockerImageDirectory;
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
             Assert.fail("Could create temp config file");
         }
-        ArrayList<String> args = new ArrayList<String>() {{
-            add("workflow");
-            add("launch");
-            add("--local-entry");
-            add(descriptorFile.getAbsolutePath());
-            add("--json");
-            add(jsonFile.getAbsolutePath());
-            add("--config");
-            add(configPath.getAbsolutePath());
-        }};
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(descriptorFile.getAbsolutePath());
+        args.add("--json");
+        args.add(jsonFile.getAbsolutePath());
+        args.add("--config");
+        args.add(configPath.getAbsolutePath());
+
         Client.main(args.toArray(new String[0]));
         Assert.assertTrue("Final process status was not success", systemOutRule.getLog().contains("Output files left in place"));
     }
@@ -282,14 +286,14 @@ public class LaunchNoInternetTestIT {
     private void checkFailed() {
         exit.expectSystemExit();
         exit.checkAssertionAfterwards(() -> assertTrue(systemErrRule.getLog().contains(
-                "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
-                        + "']' returned non-zero exit status 1")));
+            "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
+                + "']' returned non-zero exit status 1")));
     }
 
     /**
      * Nextflow with Dockstore CLI requires main.nf to be at same directory of execution, copying file over
      *
-     * @throws IOException  Something has gone terribly wrong with copying the Nextflow files
+     * @throws IOException Something has gone terribly wrong with copying the Nextflow files
      */
     private void copyNFLFiles() throws IOException {
         File userDir = new File(System.getProperty("user.dir"));

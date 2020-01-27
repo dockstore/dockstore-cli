@@ -19,12 +19,10 @@ package io.dockstore.client.cli.nested;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -35,6 +33,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import io.dockstore.client.cli.Client;
 import io.dockstore.client.cli.SwaggerUtility;
+import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Registry;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.ContainersApi;
@@ -48,7 +47,6 @@ import io.swagger.client.model.StarRequest;
 import io.swagger.client.model.Tag;
 import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.User;
-import io.swagger.client.model.VerifyRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
@@ -70,8 +68,6 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
-import static io.dockstore.common.DescriptorLanguage.CWL_STRING;
-import static io.dockstore.common.DescriptorLanguage.WDL_STRING;
 import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
 
 /**
@@ -125,7 +121,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     private static void printToolList(List<DockstoreTool> containers) {
-        containers.sort(new ToolComparator());
+        containers.sort((c1, c2) -> c1.getPath().compareToIgnoreCase(c2.getPath()));
 
         int[] maxWidths = columnWidthsTool(containers);
 
@@ -160,7 +156,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     private static void printPublishedList(List<DockstoreTool> containers) {
-        containers.sort(new ToolComparator());
+        containers.sort((c1, c2) -> c1.getPath().compareToIgnoreCase(c2.getPath()));
 
         int[] maxWidths = columnWidthsTool(containers);
 
@@ -461,7 +457,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             // Swagger does not fully copy the enum (leaves out properties), so we need to map Registry enum to RegistryEnum in DockstoreTool
             Optional<Registry> regEnum = getRegistryEnum(registry);
 
-            if (!regEnum.isPresent()) {
+            if (regEnum.isEmpty()) {
                 errorMessage("The registry that you entered does not exist. Run \'dockstore tool manual_publish\' to see valid registries.",
                         Client.CLIENT_ERROR);
             }
@@ -482,7 +478,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 registryPath = getRegistryPath(registry);
             }
 
-            if (!registryPath.isPresent()) {
+            if (registryPath.isEmpty()) {
                 if (hasCustomDockerPath) {
                     errorMessage("The registry path is unavailable.", Client.CLIENT_ERROR);
                 } else {
@@ -522,7 +518,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 tag.setName(versionName);
                 List<Tag> tagList = new ArrayList<>();
                 tagList.add(tag);
-                tool.setTags(tagList);
+                tool.setWorkflowVersions(tagList);
             }
 
             // Register new tool
@@ -540,20 +536,18 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             }
 
             // If registration is successful then attempt to publish it
-            if (tool != null) {
-                PublishRequest pub = SwaggerUtility.createPublishRequest(true);
-                DockstoreTool publishedTool;
-                try {
-                    publishedTool = containersApi.publish(tool.getId(), pub);
-                    if (publishedTool.isIsPublished()) {
-                        out("Successfully published " + fullName);
-                    } else {
-                        out("Successfully registered " + fullName + ", however it is not valid to publish."); // Should this throw an
-                        // error?
-                    }
-                } catch (ApiException ex) {
-                    exceptionMessage(ex, "Successfully registered " + fullName + ", however it is not valid to publish.", Client.API_ERROR);
+            PublishRequest pub = SwaggerUtility.createPublishRequest(true);
+            DockstoreTool publishedTool;
+            try {
+                publishedTool = containersApi.publish(tool.getId(), pub);
+                if (publishedTool.isIsPublished()) {
+                    out("Successfully published " + fullName);
+                } else {
+                    out("Successfully registered " + fullName + ", however it is not valid to publish."); // Should this throw an
+                    // error?
                 }
+            } catch (ApiException ex) {
+                exceptionMessage(ex, "Successfully registered " + fullName + ", however it is not valid to publish.", Client.API_ERROR);
             }
         }
     }
@@ -656,10 +650,10 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         }
 
         final String fixTag = tag;
-        Optional<Tag> first = container.getTags().stream().filter(foo -> foo.getName().equalsIgnoreCase(fixTag)).findFirst();
+        Optional<Tag> first = container.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(fixTag)).findFirst();
         if (first.isPresent()) {
             Long versionId = first.get().getId();
-            // https://github.com/ga4gh/dockstore/issues/1712 client seems to use jersey logging which is not controlled from logback
+            // https://github.com/dockstore/dockstore/issues/1712 client seems to use jersey logging which is not controlled from logback
             containersApi.getApiClient().setDebugging(false);
             byte[] arbitraryURL = SwaggerUtility
                 .getArbitraryURL("/containers/" + container.getId() + "/zip/" + versionId, new GenericType<byte[]>() {
@@ -712,53 +706,6 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     @Override
-    protected void handleVerifyUnverify(String entry, String versionName, String verifySource, boolean unverifyRequest, boolean isScript) {
-        boolean toOverwrite = true;
-
-        try {
-            DockstoreTool tool = containersApi.getContainerByToolPath(entry, null);
-            List<Tag> tags = Optional.ofNullable(tool.getTags()).orElse(new ArrayList<>());
-            final Optional<Tag> first = tags.stream().filter((Tag u) -> u.getName().equals(versionName)).findFirst();
-
-            if (!first.isPresent()) {
-                errorMessage(versionName + " is not a valid tag for " + entry, Client.CLIENT_ERROR);
-            }
-            Tag tagToUpdate = first.get();
-
-            VerifyRequest verifyRequest = new VerifyRequest();
-            if (unverifyRequest) {
-                verifyRequest = SwaggerUtility.createVerifyRequest(false, null);
-            } else {
-                // Check if already has been verified
-                if (tagToUpdate.isVerified() && !isScript) {
-                    Scanner scanner = new Scanner(System.in, "utf-8");
-                    out("The tag " + versionName + " has already been verified by \'" + tagToUpdate.getVerifiedSource() + "\'");
-                    out("Would you like to overwrite this with \'" + verifySource + "\'? (y/n)");
-                    String overwrite = scanner.nextLine();
-                    if ("y".equalsIgnoreCase(overwrite)) {
-                        verifyRequest = SwaggerUtility.createVerifyRequest(true, verifySource);
-                    } else {
-                        toOverwrite = false;
-                    }
-                } else {
-                    verifyRequest = SwaggerUtility.createVerifyRequest(true, verifySource);
-                }
-            }
-
-            if (toOverwrite) {
-                containerTagsApi.verifyToolTag(tool.getId(), tagToUpdate.getId(), verifyRequest);
-                if (unverifyRequest) {
-                    out("Tag " + versionName + " has been unverified.");
-                } else {
-                    out("Tag " + versionName + " has been verified by \'" + verifySource + "\'");
-                }
-            }
-        } catch (ApiException ex) {
-            exceptionMessage(ex, "Unable to " + (unverifyRequest ? "unverify" : "verify") + " tag " + versionName, Client.API_ERROR);
-        }
-    }
-
-    @Override
     public void handleInfo(String entryPath) {
         try {
             DockstoreTool container = containersApi.getPublishedContainerByToolPath(entryPath, null);
@@ -797,7 +744,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 }
                 out("TAGS");
 
-                List<Tag> tags = container.getTags();
+                List<Tag> tags = container.getWorkflowVersions();
                 int tagSize = tags.size();
                 StringBuilder builder = new StringBuilder();
                 if (tagSize > 0) {
@@ -892,8 +839,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                         versionTagUpdateHelp();
                     } else {
                         final String tagName = reqVal(args, "--name");
-                        List<Tag> tags = Optional.ofNullable(container.getTags()).orElse(new ArrayList<>());
-                        Boolean updated = false;
+                        List<Tag> tags = Optional.ofNullable(container.getWorkflowVersions()).orElse(new ArrayList<>());
+                        boolean updated = false;
 
                         for (Tag tag : tags) {
                             if (tag.getName().equals(tagName)) {
@@ -934,7 +881,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                         final String tagName = reqVal(args, "--name");
                         List<Tag> tags = containerTagsApi.getTagsByPath(containerId);
                         long tagId;
-                        Boolean removed = false;
+                        boolean removed = false;
 
                         for (Tag tag : tags) {
                             if (tag.getName().equals(tagName)) {
@@ -1060,7 +1007,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 // if valid version
                 boolean updateVersionSuccess = false;
 
-                for (Tag tag : Optional.ofNullable(tool.getTags()).orElse(new ArrayList<>())) {
+                for (Tag tag : Optional.ofNullable(tool.getWorkflowVersions()).orElse(new ArrayList<>())) {
                     if (tag.getName().equals(defaultTag)) {
                         tool.setDefaultVersion(defaultTag);
                         updateVersionSuccess = true;
@@ -1071,7 +1018,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 if (!updateVersionSuccess && defaultTag != null) {
                     out("Not a valid version.");
                     out("Valid versions include:");
-                    for (Tag tag : Optional.ofNullable(tool.getTags()).orElse(new ArrayList<>())) {
+                    for (Tag tag : Optional.ofNullable(tool.getWorkflowVersions()).orElse(new ArrayList<>())) {
                         out(tag.getReference());
                     }
                     errorMessage("Please enter a valid version.", Client.CLIENT_ERROR);
@@ -1086,7 +1033,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         }
     }
 
-    public SourceFile getDescriptorFromServer(String entry, String descriptorType) throws ApiException {
+    public SourceFile getDescriptorFromServer(String entry, DescriptorLanguage descriptorType) throws ApiException {
         String[] parts = entry.split(":");
 
         String path = parts[0];
@@ -1100,13 +1047,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         }
 
         if (container != null) {
-            if (descriptorType.equals(CWL_STRING)) {
-                file = containersApi.cwl(container.getId(), tag);
-            } else if (descriptorType.equals(WDL_STRING)) {
-                file = containersApi.wdl(container.getId(), tag);
-            } else {
-                throw new UnsupportedOperationException("other languages not supported yet");
-            }
+            file = containersApi.primaryDescriptor(container.getId(), tag, descriptorType.toString());
         } else {
             errorMessage("No tool found with path " + entry, Client.API_ERROR);
         }
@@ -1289,16 +1230,6 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             } else {
                 out(" *" + r.name() + " (Custom)");
             }
-        }
-    }
-
-    private static class ToolComparator implements Comparator<DockstoreTool> {
-        @Override
-        public int compare(DockstoreTool c1, DockstoreTool c2) {
-            String path1 = c1.getPath();
-            String path2 = c2.getPath();
-
-            return path1.compareToIgnoreCase(path2);
         }
     }
 }

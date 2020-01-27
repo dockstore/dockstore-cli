@@ -40,26 +40,25 @@ public class NextflowIT {
     public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
 
     @Test
-    public void demoNextFlowLaunch() throws IOException {
+    public void demoNextflowLaunch() throws IOException {
         // looks like this has to run from the current working directory, which sucks
         File userDir = new File(System.getProperty("user.dir"));
         File testFileDirectory = FileUtils.getFile("src", "test", "resources", "nextflow_rnatoy");
-
 
         FileUtils.copyDirectory(testFileDirectory, userDir);
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         client.setupClientEnvironment(Lists.newArrayList());
         WorkflowClient workflowClient = client.getWorkflowClient();
-        List<String> strings = Arrays.asList("--local-entry", "nextflow.config", "--json",  "test.json");
+        List<String> strings = Arrays.asList("--local-entry", "nextflow.config", "--json", "test.json");
         workflowClient.launch(strings);
         Assert.assertTrue("nextflow workflow did not run correctly", systemOutRule.getLog().contains("results world!"));
 
-        for(File file : FileUtils.listFiles(testFileDirectory, null, true)) {
+        for (File file : FileUtils.listFiles(testFileDirectory, null, true)) {
             String name = file.getName();
             Files.deleteIfExists(Paths.get(name));
         }
-        Files.deleteIfExists(Paths.get("NextFlow.stderr.txt"));
-        Files.deleteIfExists(Paths.get("NextFlow.stdout.txt"));
+        Files.deleteIfExists(Paths.get("Nextflow.stderr.txt"));
+        Files.deleteIfExists(Paths.get("Nextflow.stdout.txt"));
     }
 }

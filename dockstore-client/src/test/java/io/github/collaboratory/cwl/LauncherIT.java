@@ -91,12 +91,14 @@ public abstract class LauncherIT {
             expectedEx.expectMessage("Unexpected call of System.exit(1)");
         }
 
-        Client.main(new String[] { "--config", getConfigFile(), "tool", "launch", "--local-entry",
-                cwlFile.getAbsolutePath(), "--json", jobFile.getAbsolutePath(), "--script" });
+        Client.SCRIPT.set(true);
+        Client.main(new String[] { "--config", getConfigFile(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
+            jobFile.getAbsolutePath(), "--script" });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
             final String standardOutput = launcherOutput.toString();
-            assertTrue("Error should occur, caused by Amazon S3 Exception", standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
+            assertTrue("Error should occur, caused by Amazon S3 Exception",
+                standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
         }
 
     }
@@ -113,12 +115,15 @@ public abstract class LauncherIT {
             expectedEx.expectMessage("Unexpected call of System.exit(1)");
         }
 
-        Client.main(new String[] { "--config", getConfigFileWithExtraParameters(), "tool", "launch", "--local-entry",
-                cwlFile.getAbsolutePath(), "--json", jobFile.getAbsolutePath(), "--script" });
+        Client.SCRIPT.set(true);
+        Client.main(
+            new String[] { "--config", getConfigFileWithExtraParameters(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(),
+                "--json", jobFile.getAbsolutePath(), "--script" });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
             final String standardOutput = launcherOutput.toString();
-            assertTrue("Error should occur, caused by Amazon S3 Exception", standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
+            assertTrue("Error should occur, caused by Amazon S3 Exception",
+                standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
         }
     }
 
@@ -133,12 +138,15 @@ public abstract class LauncherIT {
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
             expectedEx.expectMessage("Unexpected call of System.exit(1)");
         }
-        Client.main(new String[] { "--config", getConfigFile(), "tool", "launch", "--local-entry",
-                cwlFile.getAbsolutePath(), "--json", jobFile.getAbsolutePath(), "--script" });
+
+        Client.SCRIPT.set(true);
+        Client.main(new String[] { "--config", getConfigFile(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
+            jobFile.getAbsolutePath(), "--script" });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
             final String standardOutput = launcherOutput.toString();
-            assertTrue("Error should occur, caused by Amazon S3 Exception", standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
+            assertTrue("Error should occur, caused by Amazon S3 Exception",
+                standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
         }
     }
 
@@ -153,12 +161,15 @@ public abstract class LauncherIT {
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
             expectedEx.expectMessage("Unexpected call of System.exit(1)");
         }
-        Client.main(new String[] { "--config", getConfigFile(), "workflow", "launch", "--local-entry",
-                cwlFile.getAbsolutePath(), "--json", jobFile.getAbsolutePath(), "--script" });
+
+        Client.SCRIPT.set(true);
+        Client.main(new String[] { "--config", getConfigFile(), "workflow", "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
+            jobFile.getAbsolutePath(), "--script" });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
             final String standardOutput = launcherOutput.toString();
-            assertTrue("Error should occur, caused by Amazon S3 Exception", standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
+            assertTrue("Error should occur, caused by Amazon S3 Exception",
+                standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
         }
     }
 
@@ -166,7 +177,8 @@ public abstract class LauncherIT {
     public void testBCBIOOutput() throws Exception {
         // mimicking the bcbio provision out process to replicate a bug
         Gson gson = new Gson();
-        String outputObjectString = FileUtils.readFileToString(FileUtils.getFile("src", "test", "resources", "bcbio.output.json"), StandardCharsets.UTF_8);
+        String outputObjectString = FileUtils
+            .readFileToString(FileUtils.getFile("src", "test", "resources", "bcbio.output.json"), StandardCharsets.UTF_8);
         Map<String, Object> outputObject = gson.fromJson(outputObjectString, Map.class);
 
         Map<String, List<FileProvisioning.FileInfo>> fileMap = new HashMap<>();

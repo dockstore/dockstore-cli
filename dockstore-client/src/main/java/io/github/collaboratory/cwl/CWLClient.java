@@ -57,8 +57,8 @@ import io.dockstore.client.cli.nested.LauncherFiles;
 import io.dockstore.client.cli.nested.WESLauncher;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.client.cli.nested.notificationsclients.NotificationsClient;
+import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.FileProvisioning;
-import io.dockstore.common.LanguageType;
 import io.dockstore.common.Utilities;
 import io.swagger.client.ApiException;
 import io.swagger.client.model.ToolDescriptor;
@@ -124,15 +124,15 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         BaseLauncher launcher;
         switch (cwlLauncherType) {
         case WES:
-            launcher = new WESLauncher(abstractEntryClient, LanguageType.CWL, SCRIPT.get());
+            launcher = new WESLauncher(abstractEntryClient, DescriptorLanguage.CWL, SCRIPT.get());
             break;
         case CROMWELL:
-            launcher = new CromwellLauncher(abstractEntryClient, LanguageType.CWL, SCRIPT.get());
+            launcher = new CromwellLauncher(abstractEntryClient, DescriptorLanguage.CWL, SCRIPT.get());
             LOG.info("Cromwell is currently in beta for CWL tools and workflows.");
             break;
         case CWL_TOOL:
         default:
-            launcher = new CwltoolLauncher(abstractEntryClient, LanguageType.CWL, SCRIPT.get());
+            launcher = new CwltoolLauncher(abstractEntryClient, DescriptorLanguage.CWL, SCRIPT.get());
             break;
         }
         this.setLauncher(launcher);
@@ -210,7 +210,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
             if (cwlObject instanceof Workflow) {
                 Workflow workflow = (Workflow)cwlObject;
                 // this complex code is to handle the case where secondary files from tools define
-                // additional files that need to be provisioned also see https://github.com/ga4gh/dockstore/issues/563
+                // additional files that need to be provisioned also see https://github.com/dockstore/dockstore/issues/563
                 SecondaryFilesUtility secondaryFilesUtility = new SecondaryFilesUtility(cwlUtil, this.gson);
                 secondaryFilesUtility.modifyWorkflowToIncludeToolSecondaryFiles(workflow);
 
@@ -523,10 +523,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                 // trim quotes or starting '#' if necessary
                 cwlInputFileID = CharMatcher.is('#').trimLeadingFrom(cwlInputFileID);
                 // split on # if needed
-                cwlInputFileID = cwlInputFileID.contains("#") ? cwlInputFileID.split("#")[1] : cwlInputFileID;
-                // remove extra namespace if needed
-                cwlInputFileID = cwlInputFileID.contains("/") ? cwlInputFileID.split("/")[1] : cwlInputFileID;
-                LOG.info("ID: {}", cwlInputFileID);
+                cwlInputFileID = cleanFileId(cwlInputFileID);
                 // to be clear, these are secondary files as defined by CWL, not secondary descriptors
                 List<String> secondaryFiles = getSecondaryFileStrings(file);
                 pairs.addAll(pullFilesHelper(inputsOutputs, fileMap, cwlInputFileID, secondaryFiles));
@@ -537,6 +534,15 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
             throw new RuntimeException();
         }
         return fileMap;
+    }
+
+    private String cleanFileId(String fileId) {
+        // split on # if needed
+        String cleanFileId = fileId.contains("#") ? fileId.split("#")[1] : fileId;
+        // remove extra namespace if needed
+        cleanFileId = cleanFileId.contains("/") ? cleanFileId.split("/")[1] : cleanFileId;
+        LOG.info("ID: {}", fileId);
+        return cleanFileId;
     }
 
     /**
@@ -614,10 +620,9 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         try {
             ArrayList<Map> filesArray = (ArrayList)entry;
             for (Map file : filesArray) {
-                Map lhm = file;
-                if ((lhm.containsKey("path") && lhm.get("path") instanceof String) || (lhm.containsKey("location") && lhm
+                if ((file.containsKey("path") && file.get("path") instanceof String) || (file.containsKey("location") && file
                         .get("location") instanceof String)) {
-                    String path = getPathOrLocation(lhm);
+                    String path = getPathOrLocation(file);
                     // notice I'm putting key:path together so they are unique in the hash
                     if (stringObjectEntry.getKey().equals(cwlInputFileID)) {
                         inputSet.addAll(
@@ -718,6 +723,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
 
         LOG.info("PREPPING UPLOADS...");
 
+
         final List<CommandOutputParameter> outputs = cwl.getOutputs();
 
         // for each file input from the CWL
@@ -747,9 +753,8 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     private void handleParameter(Map<String, Object> inputsOutputs, Map<String, List<FileProvisioning.FileInfo>> fileMap,
             String fileIdString) {
         // pull back the name of the input from the CWL
-        String cwlID = fileIdString.contains("#") ? fileIdString.split("#")[1] : fileIdString;
-        LOG.info("ID: {}", cwlID);
-        prepUploadsHelper(inputsOutputs, fileMap, cwlID);
+        fileIdString = cleanFileId(fileIdString);
+        prepUploadsHelper(inputsOutputs, fileMap, fileIdString);
     }
 
     /**
@@ -919,12 +924,13 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                         exitingArray.add(newRecord);
                         newJSON.put(paramName, exitingArray);
                     } else if (entry2 instanceof ArrayList) {
+                        // This is to handle array of array of files
                         try {
-                            JSONArray exitingArray2 = new JSONArray();
-                            // now add to the new JSON structure
-                            JSONArray exitingArray = (JSONArray)newJSON.get(paramName);
-                            if (exitingArray == null) {
-                                exitingArray = new JSONArray();
+                            JSONArray innerArray = new JSONArray();
+                            // Get outer array if it exists
+                            JSONArray outerArray = (JSONArray)newJSON.get(paramName);
+                            if (outerArray == null) {
+                                outerArray = new JSONArray();
                             }
                             for (Map linkedHashMap : (ArrayList<LinkedHashMap>)entry2) {
                                 Map<String, Object> param = linkedHashMap;
@@ -938,11 +944,11 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                                     LOG.info("NEW FULL PATH: {}", localPath);
                                 }
                                 org.json.simple.JSONObject newRecord = new org.json.simple.JSONObject();
-                                param.entrySet().forEach(paramEntry -> newRecord.put(paramEntry.getKey(), paramEntry.getValue()));
-                                exitingArray.add(newRecord);
+                                param.forEach(newRecord::put);
+                                innerArray.add(newRecord);
                             }
-                            exitingArray2.add(exitingArray);
-                            newJSON.put(paramName, exitingArray2);
+                            outerArray.add(innerArray);
+                            newJSON.put(paramName, outerArray);
                         } catch (ClassCastException e) {
                             LOG.warn("This is not an array of array of files, it may be an array of array of strings");
                             newJSON.put(paramName, currentParam);
@@ -1035,8 +1041,20 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
             } else {
                 assert (files.size() == 1);
                 FileProvisioning.FileInfo file = files.get(0);
-                final Map<String, Object> fileMapDataStructure = (Map)(outputObject).get(key);
-                outputSet.addAll(provisionOutputFile(key, file, fileMapDataStructure));
+                Object o = outputObject.get(key);
+                if (o instanceof Map) {
+                    final Map<String, Object> fileMapDataStructure = (Map)(outputObject).get(key);
+                    outputSet.addAll(provisionOutputFile(key, file, fileMapDataStructure));
+                } else {
+                    if (o instanceof Integer) {
+                        // This integer appears to be the result of the workflow execution.
+                        // For example, if the workflow is supposed to count the number of lines in the file,
+                        // o would be the number of lines (this is printed out already)
+                        LOG.info("There are no output files found for this workflow.");
+                    } else {
+                        LOG.info("Unhandled type");
+                    }
+                }
             }
         }
         return outputSet;

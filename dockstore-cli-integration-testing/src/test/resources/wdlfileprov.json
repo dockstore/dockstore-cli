@@ -1,0 +1,4 @@
+{
+  "two_steps.catS3.in_file": "https://raw.githubusercontent.com/dockstore/dockstore-ui2/develop/README.md",
+  "two_steps.catHTTP.in_file": "https://raw.githubusercontent.com/dockstore/dockstore/develop/README.md"
+}

@@ -19,7 +19,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 import io.dropwizard.testing.ResourceHelpers;
+import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -32,25 +34,21 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
  */
 public class WorkflowInDirectoryTestIT {
 
+    private static File configFile;
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
-
     @Rule
     public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
-
-    private static File configFile;
-
-    @BeforeClass
-    public static void setup() {
-        configFile = new File(ResourceHelpers.resourceFilePath("clientConfig"));
-    }
-
     /**
      * Guard against failing tests killing VM
      */
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
+    @BeforeClass
+    public static void setup() {
+        configFile = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+    }
 
     /**
      * This tests if the workflow could be ran with the client in a much different directory than the descriptor (not in the same directory as the descriptor)
@@ -60,6 +58,17 @@ public class WorkflowInDirectoryTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow-job.yml"));
         this.baseWorkflowTest(cwlFile, cwlJSON, false, "workflow");
+    }
+
+    /**
+     * This tests whether cwltool can execute a workflow that contains an empty array hints property
+     */
+    @Ignore("cwltool 1.0.20190621234233 does not seem able to do this anymore")
+    @Test
+    public void testWorkflowWithEmptyHints() {
+        File cwlFile = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow-empty-hints.cwl"));
+        File cwlJSON = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow-job.yml"));
+        this.baseWorkflowTest(cwlFile, cwlJSON, true, "workflow");
     }
 
     /**
@@ -89,12 +98,15 @@ public class WorkflowInDirectoryTestIT {
      * the file id described in the parameter file is different than described in the tool descriptor even though they are the same
      * example: 1st-workflow-job.json says "reference__fasta__base", prep_samples_to_rec.cwl says "un_reference__fasta__base"
      * Tests if there are some secondary files in the workflow and some in the tool
+     * This test is obsolete because cwltool from Dockstore 1.7.0 will not run without the secondary files present
      */
     @Test
     public void testWorkflowMissingFilesToCopy() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow-job.json"));
+        exit.expectSystemExitWithStatus(Client.IO_ERROR);
         this.baseWorkflowTest(cwlFile, cwlJSON, true, "workflow");
+        systemErrRule.getLog().contains("Missing required secondary file");
     }
 
     /**
@@ -104,7 +116,9 @@ public class WorkflowInDirectoryTestIT {
     public void testNullCase() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow-no-secondary-in-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow-job.json"));
+        exit.expectSystemExitWithStatus(3);
         this.baseWorkflowTest(cwlFile, cwlJSON, true, "workflow");
+        Assert.assertTrue(systemErrRule.getLog().contains("Missing required secondary file"));
     }
 
     @Test
@@ -134,20 +148,30 @@ public class WorkflowInDirectoryTestIT {
         this.baseWorkflowTest(cwlFile, cwlJSON, false, "tool");
     }
 
+    /**
+     * This tests if the workflow could be ran with an input that is an array of array of files where there are 2+ inner arrays
+     */
+    @Test
+    public void testArrayOfArrayOfInputsv2() {
+        File cwlFile = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/arrays.cwl"));
+        File cwlJSON = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/testArrayLocalInputLocalOutput2.json"));
+        this.baseWorkflowTest(cwlFile, cwlJSON, false, "tool");
+    }
+
     private void baseWorkflowTest(File descriptor, File testParameter, boolean script, String entryType) {
-        ArrayList<String> args = new ArrayList<String>() {{
-            add("--config");
-            add(configFile.getPath());
-            add(entryType);
-            add("launch");
-            add("--local-entry");
-            add(descriptor.getPath());
-            add("--yaml");
-            add(testParameter.getPath());
-            if (script) {
-                add("--script");
-            }
-        }};
-        Client.main(args.toArray(new String[args.size()]));
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--config");
+        args.add(configFile.getPath());
+        args.add(entryType);
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(descriptor.getPath());
+        args.add("--yaml");
+        args.add(testParameter.getPath());
+        if (script) {
+            args.add("--script");
+        }
+
+        Client.main(args.toArray(new String[0]));
     }
 }

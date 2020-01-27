@@ -9,21 +9,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import io.dockstore.common.Bridge;
+import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.FileProvisioning;
-import io.dockstore.common.LanguageType;
 import io.dockstore.common.Utilities;
+import io.dockstore.common.WdlBridge;
 import io.github.collaboratory.cwl.CWLClient;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import wdl.draft3.parser.WdlParser;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.Client.IO_ERROR;
@@ -32,11 +34,12 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
  * This is a base class for clients that launch workflows with Cromwell
  */
 public class CromwellLauncher extends BaseLauncher {
-    protected static final String DEFAULT_CROMWELL_VERSION = "36";
-
+    protected static final String DEFAULT_CROMWELL_VERSION = "44";
     protected Map<String, List<FileProvisioning.FileInfo>> outputMap;
+    protected List<String>  cromwellExtraParameters;
+    protected List<String>  cromwellVmOptions;
 
-    public CromwellLauncher(AbstractEntryClient abstractEntryClient, LanguageType language, boolean script) {
+    public CromwellLauncher(AbstractEntryClient abstractEntryClient, DescriptorLanguage language, boolean script) {
         super(abstractEntryClient, language, script);
         setLauncherName("Cromwell");
     }
@@ -49,6 +52,10 @@ public class CromwellLauncher extends BaseLauncher {
     public void initialize() {
         // initialize cromwell location from ~/.dockstore/config
         INIConfiguration config = Utilities.parseConfig(abstractEntryClient.getConfigFile());
+        cromwellVmOptions = (List)(config.getList("cromwell-vm-options"));
+        cromwellExtraParameters = (List)(config.getList("cromwell-extra-parameters"));
+
+
         String cromwellVersion = config.getString("cromwell-version", DEFAULT_CROMWELL_VERSION);
         String cromwellLocation =
                 "https://github.com/broadinstitute/cromwell/releases/download/" + cromwellVersion + "/cromwell-" + cromwellVersion + ".jar";
@@ -81,27 +88,47 @@ public class CromwellLauncher extends BaseLauncher {
 
     @Override
     public List<String> buildRunCommand() {
-        final List<String> runCommand;
-        // Don't use imports option for WDL, only for CWL
-        if (zippedEntry == null || abstractEntryClient instanceof ToolClient || Objects.equals(languageType, LanguageType.WDL)) {
-            runCommand = Lists.newArrayList(primaryDescriptor.getAbsolutePath(), "--inputs", provisionedParameterFile.getAbsolutePath());
-        } else {
-            runCommand = Lists.newArrayList(primaryDescriptor.getAbsolutePath(), "--inputs", provisionedParameterFile.getAbsolutePath(), "--imports", zippedEntry
-                    .getAbsolutePath());
+        List<String> arguments = new ArrayList<>();
+        arguments.add("java");
+
+        if (cromwellVmOptions.size() > 0) {
+            List<String> cromwellVmOptionsParsed = cromwellVmOptions.stream().map(string -> string.split(","))
+                    .flatMap(Arrays::stream).map(String::trim)
+                    .collect(Collectors.toList());
+            arguments.addAll(cromwellVmOptionsParsed);
         }
 
-        final String[] s = { "java", "-jar", executionFile.getAbsolutePath(), "run" };
-        List<String> arguments = new ArrayList<>();
-        arguments.addAll(Arrays.asList(s));
-        arguments.addAll(runCommand);
+        // Cromwell help specifies the 'run' command line format as: run [options] workflow-source
+        Collections.addAll(arguments, "-jar", executionFile.getAbsolutePath(), "run", "--inputs", provisionedParameterFile.getAbsolutePath());
+
+        // NOTE: Support for ZIP imports exists, but we decided to comment it out for now as it was causing some issues.
+        //Collections.addAll(arguments, "--imports", zippedEntry.getAbsolutePath());
+
+        // There are currently issues with Cromwell 44 automatic type detection.  If it's CWL, the flag must be added.
+        // https://github.com/broadinstitute/cromwell/issues/5085
+        // Remove these 3 lines once the type can be detected again.
+        if (languageType == DescriptorLanguage.CWL) {
+            Collections.addAll(arguments, "--type", "cwl");
+        }
+
+        if (cromwellExtraParameters.size() > 0) {
+            List<String> cromwellExtraParametersParsed = cromwellExtraParameters.stream().map(string -> string.split(","))
+                    .flatMap(Arrays::stream).map(String::trim)
+                    .collect(Collectors.toList());
+            arguments.addAll(cromwellExtraParametersParsed);
+        }
+
+        // Add workflow source file
+        arguments.add(primaryDescriptor.getAbsolutePath());
+
         return arguments;
     }
 
     @Override
     public void provisionOutputFiles(String stdout, String stderr, String wdlOutputTarget) {
-        if (Objects.equals(languageType, LanguageType.WDL)) {
+        if (Objects.equals(languageType, DescriptorLanguage.WDL)) {
             handleWDLOutputProvisioning(stdout, stderr, wdlOutputTarget);
-        } else if (Objects.equals(languageType, LanguageType.CWL)) {
+        } else if (Objects.equals(languageType, DescriptorLanguage.CWL)) {
             handleCWLOutputProvisioning(stdout, stderr);
         }
     }
@@ -132,8 +159,13 @@ public class CromwellLauncher extends BaseLauncher {
             Map<String, String> outputJson = parseOutputObjectFromCromwellStdout(alteredStdout, new Gson());
 
             System.out.println("Provisioning your output files to their final destinations");
-            Bridge bridge = new Bridge(primaryDescriptor.getParent());
-            final List<String> outputFiles = bridge.getOutputFiles(primaryDescriptor);
+            List<String> outputFiles = null;
+            try {
+                WdlBridge wdlBridge = new WdlBridge();
+                outputFiles = wdlBridge.getOutputFiles(primaryDescriptor.getAbsolutePath());
+            } catch (WdlParser.SyntaxError ex) {
+                errorMessage(ex.getMessage(), IO_ERROR);
+            }
             List<ImmutablePair<String, FileProvisioning.FileInfo>> outputList = new ArrayList<>();
             for (String outFile : outputFiles) {
                 // find file path from output
@@ -161,7 +193,7 @@ public class CromwellLauncher extends BaseLauncher {
      */
     private void handleCWLOutputProvisioning(String stdout, String stderr) {
         // Display output information
-        outputIntegrationOutput(zippedEntry.getParentFile().getAbsolutePath(), stdout,
+        outputIntegrationOutput(workingDirectory, stdout,
                 stderr, launcherName);
 
         // Grab outputs object from Cromwell output (TODO: This is incredibly fragile)
