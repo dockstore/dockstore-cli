@@ -21,6 +21,7 @@ fi
 
 if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     # Install singularity from source
+    # need singularity > 3.0.0, which is not available as an ubuntu package
     sudo apt-get update && sudo apt-get install -y \
     build-essential \
     libssl-dev \
@@ -36,6 +37,7 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
+    source ~/.bashrc
     echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
     echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
     source ~/.bashrc
