@@ -357,12 +357,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         }
         try {
             DockstoreTool container = containersApi.getPublishedContainerByToolPath(entry, null);
-            if (star) {
-                StarRequest request = SwaggerUtility.createStarRequest(true);
-                containersApi.starEntry(container.getId(), request);
-            } else {
-                containersApi.unstarEntry(container.getId());
-            }
+            StarRequest request = SwaggerUtility.createStarRequest(star);
+            containersApi.starEntry(container.getId(), request);
             out("Successfully " + action + "red  " + entry);
         } catch (ApiException ex) {
             exceptionMessage(ex, "Unable to " + action + " container " + entry, Client.API_ERROR);
