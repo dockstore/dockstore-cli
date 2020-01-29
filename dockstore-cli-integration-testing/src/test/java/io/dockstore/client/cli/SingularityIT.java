@@ -53,13 +53,13 @@ public class SingularityIT extends BaseIT {
         System.out.println(ResourceHelpers.resourceFilePath("cromwell_singularity.conf"));
 
         Client.main(new String[] {
-                "--config",
-                ResourceHelpers.resourceFilePath("config_for_singularity"),
-                "workflow",
-                "launch",
-                "--entry",
-                SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
-                "--json", ResourceHelpers.resourceFilePath("md5sum_wdl.json")
+            "--config",
+            ResourceHelpers.resourceFilePath("config_for_singularity"),
+            "workflow",
+            "launch",
+            "--entry",
+            SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
+            "--json", ResourceHelpers.resourceFilePath("md5sum_wdl.json")
         });
     }
 }
