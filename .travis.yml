@@ -17,9 +17,10 @@ language: java
 jdk: openjdk12
 
 env:
-  - TESTING_PROFILE=unit-tests
   global:
     - PS1="$"
+  matrix:
+    - TESTING_PROFILE=unit-tests
 
 jobs:
   include:
