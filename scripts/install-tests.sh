@@ -36,13 +36,14 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
     sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
-    
+
     PS1="$"
 
-    source ~/.bashrc
     echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
     echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
     source ~/.bashrc
+
+    cat ~/.bashrc
 
     # Download and install singularity from a release
     export VERSION=3.0.3 && # adjust this as necessary \
