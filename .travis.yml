@@ -17,8 +17,7 @@ language: java
 jdk: openjdk12
 
 env:
-  - TESTING_PROFILE=unit-tests
-  - PS1=$
+  - TESTING_PROFILE=unit-tests PS1=$
 
 jobs:
   include:
