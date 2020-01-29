@@ -37,7 +37,30 @@ public class SingularityIT extends BaseIT {
             "launch",
             "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
-            "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json")
+            "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json")
+        });
+    }
+
+    @Test
+    public void runWDLWorkflow() {
+        testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
+        final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
+        WorkflowsApi workflowApi = new WorkflowsApi(webClient);
+        Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
+                "/checker-workflow-wrapping-workflow.wdl", "test", "wdl", null);
+
+        Workflow refresh = workflowApi.refresh(workflow.getId());
+        System.out.println(ResourceHelpers.resourceFilePath("cromwell_singularity.conf"));
+
+        Client.main(new String[] {
+                "--config",
+                ResourceHelpers.resourceFilePath("config_for_singularity"),
+                "workflow",
+                "launch",
+                "--entry",
+                SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
+                "--json", ResourceHelpers.resourceFilePath("md5sum_wdl.json")
         });
     }
 }
+

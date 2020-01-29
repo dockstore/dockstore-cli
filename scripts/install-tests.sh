@@ -37,12 +37,6 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
-
-#    echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
-#    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
-#    source ~/.bashrc
-
-
     # Download and install singularity from a release
     export VERSION=3.0.3 && # adjust this as necessary \
     mkdir -p $GOPATH/src/github.com/sylabs && \
