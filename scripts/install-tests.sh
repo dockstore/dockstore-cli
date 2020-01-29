@@ -36,6 +36,8 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
     sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
+    
+    PS1="$"
 
     source ~/.bashrc
     echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
