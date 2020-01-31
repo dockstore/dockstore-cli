@@ -2,5 +2,4 @@ token: 238e064a9e43328b75023263d9439d880fac5829223fe7a918be69b48484f34d
 server-url: http://127.0.0.1:8080
 cwltool-extra-parameters: --singularity
 
-cromwell-vm-options: -Dconfig.file=~/dockstore-cli/dockstore-cli-integration-testing/target/test-classes/cromwell_singularity.conf
 cromwell-extra-parameters: -t WDL
