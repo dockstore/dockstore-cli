@@ -1,5 +1,7 @@
 package io.dockstore.client.cli;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import io.dockstore.client.cli.nested.SingularityTest;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.SourceControl;
@@ -10,8 +12,6 @@ import io.swagger.client.model.Workflow;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import java.io.FileWriter;
-import java.io.IOException;
 
 @Category(SingularityTest.class)
 public class SingularityIT extends BaseIT {
@@ -24,16 +24,17 @@ public class SingularityIT extends BaseIT {
 
     @Test
     public void runCwlWorkflow() {
+        // manually register the CWL version of the md5sum-checker workflow locally
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
                 "/checker-workflow-wrapping-workflow.cwl", "test", "cwl", null);
+        workflowApi.refresh(workflow.getId());
 
-        Workflow refresh = workflowApi.refresh(workflow.getId());
-
+        // run the md5sum-checker workflow
         Client.main(new String[] {
-            "--config",
+            "--config",  // this config file passes the --singularity option to cwltool
             ResourceHelpers.resourceFilePath("config_for_singularity"),
             "workflow",
             "launch",
@@ -51,8 +52,7 @@ public class SingularityIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
                 "/checker-workflow-wrapping-workflow.wdl", "test", "wdl", null);
-
-        Workflow refresh = workflowApi.refresh(workflow.getId());
+        workflowApi.refresh(workflow.getId());
 
         // add a line to the dockstore config with the location of the cromwell conf file
         generateCromwellConfig();  // this is done in the test because the location varies
@@ -71,10 +71,13 @@ public class SingularityIT extends BaseIT {
 
     private void generateCromwellConfig() {
         // get the path to the cromwell conf file in the current file system
+        // this configures cromwell to run with singularity instead of docker
         String cromwellConfPath = ResourceHelpers.resourceFilePath("cromwell_singularity.conf");
         try {
-            FileWriter f = new FileWriter(ResourceHelpers.resourceFilePath("config_for_singularity"));
+            // append the new cromwell option to the dockstore config
+            FileWriter f = new FileWriter(ResourceHelpers.resourceFilePath("config_for_singularity"), true);
             f.write("cromwell-vm-options: -Dconfig.file=" + cromwellConfPath);
+            f.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
