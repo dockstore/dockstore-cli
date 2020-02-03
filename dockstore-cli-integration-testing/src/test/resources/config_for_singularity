@@ -3,3 +3,4 @@ server-url: http://127.0.0.1:8080
 file-provision-retries = 5
 
 cwltool-extra-parameters: --singularity
+cromwell-extra-parameters: -t WDL

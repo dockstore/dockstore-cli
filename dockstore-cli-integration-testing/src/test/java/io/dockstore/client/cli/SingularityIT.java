@@ -1,7 +1,11 @@
 package io.dockstore.client.cli;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
 import io.dockstore.client.cli.nested.SingularityTest;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.SourceControl;
@@ -56,6 +60,16 @@ public class SingularityIT extends BaseIT {
 
         // add a line to the dockstore config with the location of the cromwell conf file
         generateCromwellConfig();  // this is done in the test because the location varies
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(ResourceHelpers.resourceFilePath("config_for_singularity")));
+            String line;
+            while ((line = br.readLine()) != null) {
+                    System.out.println(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // run the md5sum-checker workflow
         Client.main(new String[] {
