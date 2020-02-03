@@ -76,7 +76,7 @@ public class SingularityIT extends BaseIT {
         try {
             // append the new cromwell option to the dockstore config
             FileWriter f = new FileWriter(ResourceHelpers.resourceFilePath("config_for_singularity"), true);
-            f.write("cromwell-vm-options: -Dconfig.file=" + cromwellConfPath);
+            f.write("\ncromwell-vm-options: -Dconfig.file=" + cromwellConfPath);
             f.close();
         } catch (IOException e) {
             e.printStackTrace();
