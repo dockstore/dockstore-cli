@@ -1,7 +1,6 @@
 package io.dockstore.client.cli;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -65,7 +64,7 @@ public class SingularityIT extends BaseIT {
             BufferedReader br = new BufferedReader(new FileReader(ResourceHelpers.resourceFilePath("config_for_singularity")));
             String line;
             while ((line = br.readLine()) != null) {
-                    System.out.println(line);
+                System.out.println(line);
             }
         } catch (IOException e) {
             e.printStackTrace();
