@@ -10,6 +10,8 @@ import io.swagger.client.model.Workflow;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -64,7 +66,7 @@ public class SingularityIT extends BaseIT {
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
             "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json")
         });
-        System.setOut(null);  // reset the output stream to stdout
+        System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));  // reset the output stream to stdout
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
         Assert.assertTrue(outContent.toString().contains("Creating SIF file"));
@@ -101,7 +103,7 @@ public class SingularityIT extends BaseIT {
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
             "--json", ResourceHelpers.resourceFilePath("md5sum_wdl.json")
         });
-        System.setOut(null);  // reset the output stream to stdout
+        System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));  // reset the output stream to stdout
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
         Assert.assertTrue(outContent.toString().contains("Creating SIF file"));
