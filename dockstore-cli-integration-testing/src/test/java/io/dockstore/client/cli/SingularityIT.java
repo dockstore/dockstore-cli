@@ -109,6 +109,11 @@ public class SingularityIT extends BaseIT {
         Assert.assertTrue(outContent.toString().contains("singularity exec"));
     }
 
+    /**
+     * Makes a tmp file that's a copy of the contents of the config_for_singularity file in resources,
+     * and adds a line setting the cromwell-vm-options to the cromwell_singularity.conf path
+     * @return File object of the tmp file created
+     */
     private File generateCromwellConfig() {
         // get the path to the cromwell conf file in the current file system
         // this configures cromwell to run with singularity instead of docker
