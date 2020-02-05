@@ -102,7 +102,7 @@ public class SingularityIT extends BaseIT {
             FileUtils.copyFile(configTemplate, tmpFile);
 
             // append the new cromwell option to the tmp dockstore config
-            FileUtils.writeStringToFile(tmpFile,"\ncromwell-vm-options: -Dconfig.file=" + cromwellConfPath,
+            FileUtils.writeStringToFile(tmpFile, "\ncromwell-vm-options: -Dconfig.file=" + cromwellConfPath,
                     StandardCharsets.UTF_8, true);
             return tmpFile;
 
