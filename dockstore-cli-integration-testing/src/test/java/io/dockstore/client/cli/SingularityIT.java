@@ -3,7 +3,6 @@ package io.dockstore.client.cli;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -33,7 +32,7 @@ public class SingularityIT extends BaseIT {
         CommonTestUtilities.cleanStatePrivate2(SUPPORT, false);
     }
 
-    //    @Test
+    @Test
     public void runCwlWorkflow() {
         // manually register the CWL version of the md5sum-checker workflow locally
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
