@@ -105,8 +105,8 @@ public class SingularityIT extends BaseIT {
         });
         System.setOut(old);  // reset the output stream to stdout
 
-        // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
-        Assert.assertTrue(outContent.toString().contains("Creating SIF file"));
+        // the phrase "singularity exec" will only be in the output if Singularity is actually being used
+        Assert.assertTrue(outContent.toString().contains("singularity exec"));
     }
 
     private File generateCromwellConfig() {
