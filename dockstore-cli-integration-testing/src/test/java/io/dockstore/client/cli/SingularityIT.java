@@ -1,24 +1,25 @@
 package io.dockstore.client.cli;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
 import io.dockstore.client.cli.nested.SingularityTest;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.SourceControl;
 import io.dropwizard.testing.ResourceHelpers;
-import io.swagger.client.ApiClient;
 import io.swagger.client.api.WorkflowsApi;
+import io.swagger.client.ApiClient;
 import io.swagger.client.model.Workflow;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
+import org.junit.Test;
 
 @Category(SingularityTest.class)
 public class SingularityIT extends BaseIT {
@@ -26,12 +27,17 @@ public class SingularityIT extends BaseIT {
     @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.cleanStatePrivate2(SUPPORT, false);
     }
 
+    /**
+     * Tests that a simple CWL workflow can be run in Singularity instead of Docker
+     */
     @Test
     public void runCwlWorkflow() {
         // manually register the CWL version of the md5sum-checker workflow locally
@@ -41,6 +47,9 @@ public class SingularityIT extends BaseIT {
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
                 "/checker-workflow-wrapping-workflow.cwl", "test", "cwl", null);
         workflowApi.refresh(workflow.getId());
+
+        // start saving the output so as to make sure that Singularity actually runs instead of Docker
+        System.setOut(new PrintStream(outContent));
 
         // run the md5sum-checker workflow
         Client.main(new String[] {
@@ -52,8 +61,15 @@ public class SingularityIT extends BaseIT {
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
             "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json")
         });
+        System.setOut(null);  // reset the output stream to stdout
+
+        // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
+        Assert.assertTrue(outContent.toString().contains("Creating SIF file"));
     }
 
+    /**
+     * Tests that a simple WDL workflow can be run in Singularity instead of Docker
+     */
     @Test
     public void runWDLWorkflow() {
         // manually register the WDL version of the md5sum-checker workflow locally
@@ -67,15 +83,8 @@ public class SingularityIT extends BaseIT {
         // make a tmp copy of the dockstore config and add to it the cromwell conf file option
         File tmpConfig = generateCromwellConfig();  // this is done in the test because the location varies
 
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(tmpConfig));
-            String line;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // start saving the output so as to make sure that Singularity actually runs instead of Docker
+        System.setOut(new PrintStream(outContent));
 
         // run the md5sum-checker workflow
         Client.main(new String[] {
@@ -87,6 +96,10 @@ public class SingularityIT extends BaseIT {
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
             "--json", ResourceHelpers.resourceFilePath("md5sum_wdl.json")
         });
+        System.setOut(null);  // reset the output stream to stdout
+
+        // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
+        Assert.assertTrue(outContent.toString().contains("Creating SIF file"));
     }
 
     private File generateCromwellConfig() {
