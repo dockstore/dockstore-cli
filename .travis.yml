@@ -1,4 +1,4 @@
-sudo: required
+dist: bionic
 services:
 - docker
 
@@ -96,9 +96,4 @@ after_success:
 - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r reports/target/site/jacoco-aggregate/jacoco.xml 
   
 notifications:
-  slack:
-    on_success: never
-    on_failure: always
-    rooms:
-    - oicr:S9k4EowgQv9AnbCfEZHSzCsg
   webhooks: https://coveralls.io/webhook?repo_token=$COVERALLS_REPO_TOKEN

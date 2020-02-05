@@ -739,12 +739,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         }
         try {
             Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entry, null, false);
-            if (star) {
-                StarRequest request = SwaggerUtility.createStarRequest(true);
-                workflowsApi.starEntry(workflow.getId(), request);
-            } else {
-                workflowsApi.unstarEntry(workflow.getId());
-            }
+            StarRequest request = SwaggerUtility.createStarRequest(star);
+            workflowsApi.starEntry(workflow.getId(), request);
             out("Successfully " + action + "red  " + entry);
         } catch (ApiException ex) {
             exceptionMessage(ex, "Unable to " + action + " workflow " + entry, Client.API_ERROR);
