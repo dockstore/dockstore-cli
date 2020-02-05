@@ -52,6 +52,7 @@ public class SingularityIT extends BaseIT {
         workflowApi.refresh(workflow.getId());
 
         // start saving the output so as to make sure that Singularity actually runs instead of Docker
+        PrintStream old = System.out;  // save the regular output stream so it can be reset later
         TeeOutputStream teeOut = new TeeOutputStream(System.out, outContent);
         PrintStream out = new PrintStream(teeOut, true);  // also print it to the screen
         System.setOut(out);
@@ -66,7 +67,7 @@ public class SingularityIT extends BaseIT {
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
             "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json")
         });
-        System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));  // reset the output stream to stdout
+        System.setOut(old);  // reset the output stream to stdout
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
         Assert.assertTrue(outContent.toString().contains("Creating SIF file"));
@@ -89,6 +90,7 @@ public class SingularityIT extends BaseIT {
         File tmpConfig = generateCromwellConfig();  // this is done in the test because the location varies
 
         // start saving the output so as to make sure that Singularity actually runs instead of Docker
+        PrintStream old = System.out;  // save the regular output stream so it can be reset later
         TeeOutputStream teeOut = new TeeOutputStream(System.out, outContent);
         PrintStream out = new PrintStream(teeOut, true);  // also print it to the screen
         System.setOut(out);
@@ -103,7 +105,7 @@ public class SingularityIT extends BaseIT {
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
             "--json", ResourceHelpers.resourceFilePath("md5sum_wdl.json")
         });
-        System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));  // reset the output stream to stdout
+        System.setOut(old);  // reset the output stream to stdout
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
         Assert.assertTrue(outContent.toString().contains("Creating SIF file"));
