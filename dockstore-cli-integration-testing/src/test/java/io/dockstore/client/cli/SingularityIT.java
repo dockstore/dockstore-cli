@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
+import org.bouncycastle.util.io.TeeOutputStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -49,7 +50,9 @@ public class SingularityIT extends BaseIT {
         workflowApi.refresh(workflow.getId());
 
         // start saving the output so as to make sure that Singularity actually runs instead of Docker
-        System.setOut(new PrintStream(outContent));
+        TeeOutputStream teeOut = new TeeOutputStream(System.out, outContent);
+        PrintStream out = new PrintStream(teeOut, true);  // also print it to the screen
+        System.setOut(out);
 
         // run the md5sum-checker workflow
         Client.main(new String[] {
@@ -84,7 +87,9 @@ public class SingularityIT extends BaseIT {
         File tmpConfig = generateCromwellConfig();  // this is done in the test because the location varies
 
         // start saving the output so as to make sure that Singularity actually runs instead of Docker
-        System.setOut(new PrintStream(outContent));
+        TeeOutputStream teeOut = new TeeOutputStream(System.out, outContent);
+        PrintStream out = new PrintStream(teeOut, true);  // also print it to the screen
+        System.setOut(out);
 
         // run the md5sum-checker workflow
         Client.main(new String[] {
