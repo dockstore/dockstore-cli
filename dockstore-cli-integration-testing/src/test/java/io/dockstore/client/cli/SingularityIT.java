@@ -1,28 +1,26 @@
 package io.dockstore.client.cli;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+
 import io.dockstore.client.cli.nested.SingularityTest;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.SourceControl;
 import io.dropwizard.testing.ResourceHelpers;
-import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.ApiClient;
+import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.Workflow;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.io.TeeOutputStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
-import org.junit.Test;
 
 @Category(SingularityTest.class)
 public class SingularityIT extends BaseIT {
