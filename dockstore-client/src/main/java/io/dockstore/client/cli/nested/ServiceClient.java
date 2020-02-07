@@ -21,10 +21,11 @@ import io.dockstore.client.cli.ArgumentUtility;
 import io.dockstore.client.cli.Client;
 import io.dockstore.client.cli.JCommanderUtility;
 import io.dockstore.common.FileProvisioning;
-import io.dockstore.common.Utilities;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.ToolDescriptor;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -243,13 +244,18 @@ public class ServiceClient extends WorkflowClient {
                 .filter(StringUtils::isNotBlank)
                 .forEach(script -> {
                     try {
-                        // Since the entry is downloaded as a zip file, there will be no execute permissions
-                        final ImmutablePair<String, String> output = Utilities
-                                .executeCommand("bash " + script, System.out, System.err, workingDir, environment);
-                        LOG.debug(output.toString());
+                        // TODO: Not Windows-friendly
+                        final CommandLine commandLine = new CommandLine("/bin/sh");
+                        commandLine.addArgument("-c");
+
+                        // Need false for second param or cannot execute script
+                        commandLine.addArgument(script, false);
+                        final DefaultExecutor defaultExecutor = new DefaultExecutor();
+                        defaultExecutor.setWorkingDirectory(workingDir);
+                        final int execute = defaultExecutor.execute(commandLine, environment);
+
                     } catch (Exception e) {
                         LOG.error("Error executing " + script, e);
-                        throw e;
                     }
                 });
     }
