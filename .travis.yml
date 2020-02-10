@@ -12,6 +12,7 @@ cache:
   - $HOME/.m2/repository
   - $HOME/apache-maven-3.6.2
   - $HOME/.singularity
+  - $HOME/.builddir
 
 dist: bionic
 language: java
@@ -22,35 +23,35 @@ env:
 
 jobs:
   include:
-    - stage: unit-tests
-      script: mvn --batch-mode clean install -P$TESTING_PROFILE
-
-    - stage: coverage
-      script: mvn --batch-mode clean install jacoco:report jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage
-    - stage: coverage
-      env:
-        - TESTING_PROFILE=confidential-tool-tests
-      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
-    - stage: coverage
-      env:
-        - TESTING_PROFILE=confidential-workflow-tests
-      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
-    - stage: coverage
-      env:
-        - TESTING_PROFILE=non-confidential-tests
-      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
-
-# not feeling the bang-for-the-buck for these, running only in release branch
+#    - stage: unit-tests
+#      script: mvn --batch-mode clean install -P$TESTING_PROFILE
+#
+#    - stage: coverage
+#      script: mvn --batch-mode clean install jacoco:report jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage
+#    - stage: coverage
+#      env:
+#        - TESTING_PROFILE=confidential-tool-tests
+#      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
+#    - stage: coverage
+#      env:
+#        - TESTING_PROFILE=confidential-workflow-tests
+#      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
+#    - stage: coverage
+#      env:
+#        - TESTING_PROFILE=non-confidential-tests
+#      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
+#
+## not feeling the bang-for-the-buck for these, running only in release branch
+##    - stage: coverage
+##      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipClientITs=true
+##      if: branch = master OR branch =~ /^release.*$/
+##      env:
+##        - TESTING_PROFILE=toil-integration-tests
 #    - stage: coverage
 #      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipClientITs=true
-#      if: branch = master OR branch =~ /^release.*$/
 #      env:
-#        - TESTING_PROFILE=toil-integration-tests
-    - stage: coverage
-      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipClientITs=true
-      env:
-        - TESTING_PROFILE=regression-integration-tests
-      if: branch = master OR branch =~ /^release.*$/
+#        - TESTING_PROFILE=regression-integration-tests
+#      if: branch = master OR branch =~ /^release.*$/
 
     - stage: singularity-tests
       env:
