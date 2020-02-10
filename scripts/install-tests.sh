@@ -19,7 +19,7 @@ else
     pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.7.0/requirements3.txt
 fi
 
-if [[ "${TESTING_PROFILE}" = "singularity-tests" ]] && [[ ! -d $HOME/.singularity ]]; then
+if [[ "${TESTING_PROFILE}" = "singularity-tests" ]] && [[ ! -d $HOME/.builddir ]]; then
     # Install singularity from source
     # need singularity > 3.0.0, which is not available as an ubuntu package
     sudo apt-get update && sudo apt-get install -y \
