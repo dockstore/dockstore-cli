@@ -11,6 +11,7 @@ cache:
   - $HOME/.cache/pip
   - $HOME/.m2/repository
   - $HOME/apache-maven-3.6.2
+  - $HOME/.singularity
 
 dist: bionic
 language: java
