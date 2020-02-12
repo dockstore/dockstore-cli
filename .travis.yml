@@ -11,7 +11,7 @@ cache:
   - $HOME/.cache/pip
   - $HOME/.m2/repository
   - $HOME/apache-maven-3.6.2
-  - /usr/local/bin/singularity
+  - $HOME/singularity
 
 dist: bionic
 language: java
@@ -60,7 +60,6 @@ jobs:
 # build lifecycle is before_install, install, before_script, script, before_cache, after_success/after_failure, after_script
 
 before_install:
-- if [ -d /usr/local/bin/singularity ]; then rm -rm /usr/local/bin/singularity; fi
 - export M2_HOME=$HOME/apache-maven-3.6.2
 - if [ ! -d $M2_HOME/bin ]; then curl https://archive.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz | tar zxf - -C $HOME; fi
 - export PATH=$M2_HOME/bin:$PATH
@@ -81,7 +80,9 @@ before_install:
 install:
 - docker version
 - scripts/install-tests.sh
-- if [ ! -d /usr/local/bin/singularity ]; then ./scripts/install-singularity.sh; fi
+# if the singularity directory was restored from the cache, then copy the executable to /usr/local/bin
+# otherwise run the singularity install script
+- if [ -d $HOME/singularity ]; then cp $HOME/singularity/singularity /usr/local/bin/; else ./scripts/install-singularity.sh; fi
 
 before_script:
 - psql -c "create user dockstore with password 'dockstore' createdb;" -U postgres
@@ -94,6 +95,8 @@ before_script:
 before_cache:
 - rm -rf /home/travis/.m2/repository/io/dockstore
 - rm -rf $HOME/.m2/repository/.cache/download-maven-plugin directory
+- mkdir $HOME/singularity
+- cp /usr/local/bin/singularity $HOME/singularity
 
 after_success:
 - bash <(curl -s https://codecov.io/bash) -F ${TESTING_PROFILE//-} || echo "Codecov did not collect coverage reports"
