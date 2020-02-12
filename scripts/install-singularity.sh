@@ -31,3 +31,4 @@ make -C ./builddir && \
 sudo make -C ./builddir install
 
 singularity --version
+which singularity

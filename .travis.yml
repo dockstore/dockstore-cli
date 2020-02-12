@@ -76,7 +76,7 @@ before_install:
 - sudo apt-get install jq
 - wget --no-verbose -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
 - pyenv global 3.6.9
-- if [ ! -d $HOME/.builddir ]; then ./scripts/install-singularity.sh; fi
+- ./scripts/install-singularity.sh
 
 install:
 - docker version
