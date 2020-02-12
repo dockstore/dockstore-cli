@@ -84,7 +84,8 @@ install:
 - ls $HOME/singularity
 # if the singularity directory was restored from the cache, then copy the executable to /usr/local/bin
 # otherwise run the singularity install script
-- if [ -d $HOME/singularity ]; then sudo cp $HOME/singularity/singularity /usr/local/bin/; else ./scripts/install-singularity.sh; fi
+#- if [ -d $HOME/singularity ]; then sudo cp $HOME/singularity/singularity /usr/local/bin/; else ./scripts/install-singularity.sh; fi
+- ./scripts/install-singularity.sh
 
 before_script:
 - psql -c "create user dockstore with password 'dockstore' createdb;" -U postgres
