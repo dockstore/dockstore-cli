@@ -80,6 +80,8 @@ before_install:
 install:
 - docker version
 - scripts/install-tests.sh
+- ls $HOME/apache-maven-3.6.2
+- ls $HOME/singularity
 # if the singularity directory was restored from the cache, then copy the executable to /usr/local/bin
 # otherwise run the singularity install script
 - if [ -d $HOME/singularity ]; then cp $HOME/singularity/singularity /usr/local/bin/; else ./scripts/install-singularity.sh; fi
