@@ -84,18 +84,18 @@ install:
 - ls $HOME/singularity
 # if the singularity directory was restored from the cache, then copy the singularity files back to their locations,
 # otherwise run the singularity install script
-#- if [ -d $HOME/singularity ];
-#  then sudo cp $HOME/singularity/singularity /usr/local/bin/;
-#  sudo mkdir /usr/local/etc/singularity/;
-#  sudo mkdir -p /usr/local/libexec/singularity/bin/;
-#  sudo mkdir -p /usr/local/var/singularity/mnt/;
-#  sudo cp $HOME/singularity/singularity.conf /usr/local/etc/singularity/;
-#  sudo cp $HOME/singularity/starter /usr/local/libexec/singularity/bin/starter;
-#  sudo cp $HOME/singularity/capability.json /usr/local/etc/singularity/;
-#  sudo cp $HOME/singularity/session /usr/local/var/singularity/mnt/session;
-#  else ./scripts/install-singularity.sh;
-#  fi
-- ./scripts/install-singularity.sh
+- if [ -d $HOME/singularity ];
+  then sudo cp $HOME/singularity/singularity /usr/local/bin/;
+  sudo mkdir /usr/local/etc/singularity/;
+  sudo mkdir -p /usr/local/libexec/singularity/bin/;
+  sudo mkdir -p /usr/local/var/singularity/mnt/;
+  sudo cp $HOME/singularity/singularity.conf /usr/local/etc/singularity/;
+  sudo cp $HOME/singularity/starter /usr/local/libexec/singularity/bin/starter;
+  sudo cp $HOME/singularity/capability.json /usr/local/etc/singularity/;
+  sudo cp $HOME/singularity/session /usr/local/var/singularity/mnt/session;
+  else ./scripts/install-singularity.sh;
+  fi
+#- ./scripts/install-singularity.sh
 
 before_script:
 - psql -c "create user dockstore with password 'dockstore' createdb;" -U postgres
