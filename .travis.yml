@@ -60,6 +60,7 @@ jobs:
 # build lifecycle is before_install, install, before_script, script, before_cache, after_success/after_failure, after_script
 
 before_install:
+- if [ -d /usr/local/bin/singularity ]; then rm -rm /usr/local/bin/singularity; fi
 - export M2_HOME=$HOME/apache-maven-3.6.2
 - if [ ! -d $M2_HOME/bin ]; then curl https://archive.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz | tar zxf - -C $HOME; fi
 - export PATH=$M2_HOME/bin:$PATH
@@ -75,11 +76,12 @@ before_install:
 - sudo apt-get install jq
 - wget --no-verbose -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
 - pyenv global 3.6.9
-- if [ ! -d /usr/local/bin/singularity ]; then ./scripts/install-singularity.sh; fi
+
 
 install:
 - docker version
 - scripts/install-tests.sh
+- if [ ! -d /usr/local/bin/singularity ]; then ./scripts/install-singularity.sh; fi
 
 before_script:
 - psql -c "create user dockstore with password 'dockstore' createdb;" -U postgres
