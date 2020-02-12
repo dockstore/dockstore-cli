@@ -113,7 +113,7 @@ before_cache:
 - cp /usr/local/etc/singularity/singularity.conf $HOME/singularity
 - cp /usr/local/libexec/singularity/bin/starter $HOME/singularity
 - cp /usr/local/etc/singularity/capability.json $HOME/singularity
-- cp /usr/local/var/singularity/mnt/session $HOME/singularity
+- cp -r /usr/local/var/singularity/mnt/session $HOME/singularity
 - ls $HOME/singularity
 
 after_success:
