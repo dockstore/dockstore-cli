@@ -105,6 +105,7 @@ before_cache:
 - mkdir $HOME/singularity
 - cp /usr/local/bin/singularity $HOME/singularity
 - cp /usr/local/etc/singularity/singularity.conf $HOME/singularity
+- cp /usr/local/libexec/singularity/bin/starter $HOME/singularity
 
 after_success:
 - bash <(curl -s https://codecov.io/bash) -F ${TESTING_PROFILE//-} || echo "Codecov did not collect coverage reports"
