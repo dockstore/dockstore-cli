@@ -19,6 +19,10 @@ else
     pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.7.0/requirements3.txt
 fi
 
+if [ "${TESTING_PROFILE}" = "singularity-tests"]; then
+    ./install-singularity.sh
+fi
+
 # hook up integration tests with elastic search
 docker pull elasticsearch:5.6.3
 docker run -p 9200:9200 -d elasticsearch:5.6.3

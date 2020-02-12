@@ -11,7 +11,6 @@ cache:
   - $HOME/.cache/pip
   - $HOME/.m2/repository
   - $HOME/apache-maven-3.6.2
-  - $HOME/singularity
 
 dist: bionic
 language: java
@@ -22,35 +21,35 @@ env:
 
 jobs:
   include:
-#    - stage: unit-tests
-#      script: mvn --batch-mode clean install -P$TESTING_PROFILE
-#
-#    - stage: coverage
-#      script: mvn --batch-mode clean install jacoco:report jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage
-#    - stage: coverage
-#      env:
-#        - TESTING_PROFILE=confidential-tool-tests
-#      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
-#    - stage: coverage
-#      env:
-#        - TESTING_PROFILE=confidential-workflow-tests
-#      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
-#    - stage: coverage
-#      env:
-#        - TESTING_PROFILE=non-confidential-tests
-#      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
-#
-## not feeling the bang-for-the-buck for these, running only in release branch
-##    - stage: coverage
-##      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipClientITs=true
-##      if: branch = master OR branch =~ /^release.*$/
-##      env:
-##        - TESTING_PROFILE=toil-integration-tests
+    - stage: unit-tests
+      script: mvn --batch-mode clean install -P$TESTING_PROFILE
+
+    - stage: coverage
+      script: mvn --batch-mode clean install jacoco:report jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage
+    - stage: coverage
+      env:
+        - TESTING_PROFILE=confidential-tool-tests
+      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
+    - stage: coverage
+      env:
+        - TESTING_PROFILE=confidential-workflow-tests
+      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
+    - stage: coverage
+      env:
+        - TESTING_PROFILE=non-confidential-tests
+      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipITs=false
+
+# not feeling the bang-for-the-buck for these, running only in release branch
 #    - stage: coverage
 #      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipClientITs=true
-#      env:
-#        - TESTING_PROFILE=regression-integration-tests
 #      if: branch = master OR branch =~ /^release.*$/
+#      env:
+#        - TESTING_PROFILE=toil-integration-tests
+    - stage: coverage
+      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipClientITs=true
+      env:
+        - TESTING_PROFILE=regression-integration-tests
+      if: branch = master OR branch =~ /^release.*$/
 
     - stage: singularity-tests
       env:
@@ -80,22 +79,6 @@ before_install:
 install:
 - docker version
 - scripts/install-tests.sh
-- ls $HOME/apache-maven-3.6.2
-- ls $HOME/singularity
-# if the singularity directory was restored from the cache, then copy the singularity files back to their locations,
-# otherwise run the singularity install script
-- if [ -d $HOME/singularity ];
-  then sudo cp $HOME/singularity/singularity /usr/local/bin/;
-  sudo mkdir /usr/local/etc/singularity/;
-  sudo mkdir -p /usr/local/libexec/singularity/bin/;
-  sudo mkdir -p /usr/local/var/singularity/mnt/;
-  sudo cp $HOME/singularity/singularity.conf /usr/local/etc/singularity/;
-  sudo cp $HOME/singularity/starter /usr/local/libexec/singularity/bin/starter;
-  sudo cp $HOME/singularity/capability.json /usr/local/etc/singularity/;
-  sudo cp -r $HOME/singularity/session /usr/local/var/singularity/mnt/session;
-  else ./scripts/install-singularity.sh;
-  fi
-#- ./scripts/install-singularity.sh
 
 before_script:
 - psql -c "create user dockstore with password 'dockstore' createdb;" -U postgres
@@ -108,13 +91,6 @@ before_script:
 before_cache:
 - rm -rf /home/travis/.m2/repository/io/dockstore
 - rm -rf $HOME/.m2/repository/.cache/download-maven-plugin directory
-- mkdir $HOME/singularity
-- cp /usr/local/bin/singularity $HOME/singularity
-- cp /usr/local/etc/singularity/singularity.conf $HOME/singularity
-- cp /usr/local/libexec/singularity/bin/starter $HOME/singularity
-- cp /usr/local/etc/singularity/capability.json $HOME/singularity
-- cp -r /usr/local/var/singularity/mnt/session $HOME/singularity
-- ls $HOME/singularity
 
 after_success:
 - bash <(curl -s https://codecov.io/bash) -F ${TESTING_PROFILE//-} || echo "Codecov did not collect coverage reports"
