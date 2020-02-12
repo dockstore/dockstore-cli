@@ -99,6 +99,7 @@ before_cache:
 - rm -rf $HOME/.m2/repository/.cache/download-maven-plugin directory
 - mkdir $HOME/singularity
 - cp /usr/local/bin/singularity $HOME/singularity
+- cp /usr/local/etc/singularity/singularity.conf $HOME/singularity
 
 after_success:
 - bash <(curl -s https://codecov.io/bash) -F ${TESTING_PROFILE//-} || echo "Codecov did not collect coverage reports"
