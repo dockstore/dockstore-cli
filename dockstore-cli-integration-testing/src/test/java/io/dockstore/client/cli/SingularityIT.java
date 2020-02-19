@@ -54,7 +54,7 @@ public class SingularityIT extends BaseIT {
         // run the md5sum-checker workflow
         Client.main(new String[] {
             "--config",  // this config file passes the --singularity option to cwltool
-                SINGULARITY_CONFIG_TEMPLATE,
+            SINGULARITY_CONFIG_TEMPLATE,
             "workflow",
             "launch",
             "--entry",
