@@ -19,7 +19,7 @@ else
     pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.7.0/requirements3.txt
 fi
 
-if [ "${TESTING_PROFILE}" = "singularity-tests"]; then
+if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     ./install-singularity.sh
 fi
 

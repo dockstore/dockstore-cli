@@ -27,7 +27,7 @@ public class SingularityIT extends BaseIT {
     @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private static final String CONFIG = ResourceHelpers.resourceFilePath("config_for_singularity");
+    private static final String SINGULARITY_CONFIG_TEMPLATE = ResourceHelpers.resourceFilePath("config_for_singularity");
 
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
@@ -54,7 +54,7 @@ public class SingularityIT extends BaseIT {
         // run the md5sum-checker workflow
         Client.main(new String[] {
             "--config",  // this config file passes the --singularity option to cwltool
-            CONFIG,
+                SINGULARITY_CONFIG_TEMPLATE,
             "workflow",
             "launch",
             "--entry",
@@ -112,7 +112,7 @@ public class SingularityIT extends BaseIT {
         // make a new file in the tmp folder for this test
         File tmpFile = temporaryFolder.newFile("config_for_singularity");
         // copy the dockstore config for singularity from the resources directory into the new tmp file
-        File configTemplate = new File(CONFIG);
+        File configTemplate = new File(SINGULARITY_CONFIG_TEMPLATE);
         FileUtils.copyFile(configTemplate, tmpFile);
 
         // append the new cromwell option to the tmp dockstore config
