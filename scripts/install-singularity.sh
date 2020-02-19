@@ -18,8 +18,8 @@ rm go$VERSION.$OS-$ARCH.tar.gz
 
 # Download and install singularity from a release
 export VERSION=3.0.3 && # adjust this as necessary \
-mkdir -p $GOPATH/src/github.com/sylabs && \
-cd $GOPATH/src/github.com/sylabs && \
+mkdir -p "$GOPATH"/src/github.com/sylabs && \
+cd "$GOPATH"/src/github.com/sylabs && \
 wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
 tar -xzf singularity-${VERSION}.tar.gz && \
 cd ./singularity && \
