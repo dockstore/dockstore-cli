@@ -50,7 +50,12 @@ jobs:
       env:
         - TESTING_PROFILE=regression-integration-tests
       if: branch = master OR branch =~ /^release.*$/
-        
+
+    - stage: coverage
+      env:
+        - TESTING_PROFILE=singularity-tests
+      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipClientITs=true
+
 # build lifecycle is before_install, install, before_script, script, before_cache, after_success/after_failure, after_script
 
 before_install:
@@ -69,6 +74,7 @@ before_install:
 - sudo apt-get install jq
 - wget --no-verbose -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
 - pyenv global 3.6.9
+
 
 install:
 - docker version

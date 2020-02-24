@@ -1388,5 +1388,14 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>singularity-tests</id>
+            <!-- run singularity tests -->
+            <properties>
+                <skipTests>true</skipTests>
+                <skipITs>false</skipITs>
+                <groups>io.dockstore.client.cli.nested.SingularityTest</groups>
+            </properties>
+        </profile>
     </profiles>
 </project>
