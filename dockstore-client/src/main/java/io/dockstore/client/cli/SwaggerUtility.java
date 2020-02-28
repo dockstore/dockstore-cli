@@ -28,7 +28,6 @@ import javax.ws.rs.core.GenericType;
 import com.google.gson.Gson;
 import io.swagger.client.ApiClient;
 import io.swagger.client.model.PublishRequest;
-import io.swagger.client.model.StarRequest;
 import org.apache.commons.io.FileUtils;
 
 public final class SwaggerUtility {
