@@ -126,6 +126,7 @@ public class ServiceClient extends WorkflowClient {
         final String commandName = "launch";
         if (parse(args, commandName)) {
             String jsonRun = commandLaunch.json;
+            String yamlRun = commandLaunch.yaml;
             final String entry = commandLaunch.entry;
             final String localEntry = commandLaunch.localEntry;
             try {
@@ -135,13 +136,14 @@ public class ServiceClient extends WorkflowClient {
                     downloadTargetEntry(entry, ToolDescriptor.TypeEnum.SERVICE, true, serviceDirectory);
                 }
                 final DockstoreServiceYaml dockstoreYaml = getAndValidateDockstoreYml(serviceDirectory);
-                final Optional<Map<String, Object>> inputParameterJson = getInputParameterJson(dockstoreYaml, jsonRun);
+                final Optional<Map<String, Object>> inputParameters = getAndValidateInputParameters(dockstoreYaml, jsonRun, yamlRun);
 
-                runScripts(serviceDirectory, dockstoreYaml, inputParameterJson, PRE_PROVISION_SCRIPTS);
 
-                fileProvisioning.provisionInputFiles("", calculateInputs(Optional.ofNullable(dockstoreYaml.service.data), inputParameterJson));
+                runScripts(serviceDirectory, dockstoreYaml, inputParameters, PRE_PROVISION_SCRIPTS);
 
-                runScripts(serviceDirectory, dockstoreYaml, inputParameterJson, POST_PROVISION_SCRIPTS);
+                fileProvisioning.provisionInputFiles("", calculateInputs(Optional.ofNullable(dockstoreYaml.service.data), inputParameters));
+
+                runScripts(serviceDirectory, dockstoreYaml, inputParameters, POST_PROVISION_SCRIPTS);
 
             } catch (IOException e) {
                 LOG.error("Error launching service", e);
@@ -217,15 +219,24 @@ public class ServiceClient extends WorkflowClient {
         }
     }
 
-    private Optional<Map<String, Object>> getInputParameterJson(DockstoreServiceYaml dockstoreYaml, String jsonFile) throws IOException {
-        if (jsonFile == null) {
+    private Optional<Map<String, Object>> getAndValidateInputParameters(DockstoreServiceYaml dockstoreYaml, String jsonFile, String yamlFile) throws IOException {
+        if (jsonFile == null && yamlFile == null) {
             return Optional.empty();
         }
-        final Map<String, Object> inputParameterJson = new Gson().fromJson(fileToJSON(jsonFile), HashMap.class);
+        final Map<String, Object> inputParameterContent = getInputParameterContent(jsonFile, yamlFile);
         if (dockstoreYaml.service.data != null) {
-            validateDatasets(dockstoreYaml.service.data, inputParameterJson);
+            validateDatasets(dockstoreYaml.service.data, inputParameterContent);
         }
-        return Optional.of(inputParameterJson);
+        return Optional.of(inputParameterContent);
+    }
+
+    private Map<String, Object> getInputParameterContent(String jsonFile, String yamlFile) throws IOException {
+        // Give precedence to YAML
+        if (yamlFile != null) {
+            final Yaml yaml = new Yaml();
+            return yaml.load(new FileInputStream(yamlFile));
+        }
+        return new Gson().fromJson(fileToJSON(jsonFile), HashMap.class);
     }
 
     private void validateDockstoreYaml(DockstoreServiceYaml dockstoreYaml) {
@@ -261,29 +272,40 @@ public class ServiceClient extends WorkflowClient {
     }
 
     private Map<String, String> environment(DockstoreServiceYaml dockstoreYaml, Optional<Map<String, Object>> map) {
-        if (map.isPresent() && dockstoreYaml.service.environment != null) {
+        if (dockstoreYaml.service.environment != null) {
             final Map<String, String> env = new HashMap();
-            final Map<String, Object> theMap = map.get();
-            env.putAll(dockstoreYaml.service.environment.entrySet().stream()
-                    .collect(Collectors.toMap(e -> e.getKey(), e -> envValue(e, theMap))));
+            dockstoreYaml.service.environment.entrySet().forEach(entry -> {
+                final String value = envValue(entry, map);
+                if (StringUtils.isNotBlank(value)) {
+                    env.put(entry.getKey(), value);
+                }
+            });
             return env;
         } else {
             return Collections.emptyMap();
         }
     }
 
-    private String envValue(Map.Entry<String, EnvironmentVariable> entry, Map<String, Object> jsonParameter) {
+    private String envValue(Map.Entry<String, EnvironmentVariable> entry, Optional<Map<String, Object>> jsonParameter) {
         return envValue(jsonParameter, entry.getKey()).orElseGet(() -> {
             Object defaultValue = entry.getValue().defaultValue;
             return defaultValue != null ? defaultValue.toString() : "";
         });
     }
 
-    private Optional<String> envValue(Map<String, Object> jsonParameter, String envVarName) {
-        Object environment = jsonParameter.get("environment");
+    private Optional<String> envValue(Optional<Map<String, Object>> jsonParameters, String envVarName) {
+        return jsonParameters
+                .map(map -> envValue(map, envVarName))
+                .orElse(Optional.empty());
+    }
+
+    private Optional<String> envValue(Map<String, Object> jsonParameters, String envVarName) {
+        Object environment = jsonParameters.get("environment");
         if (environment instanceof Map) {
             Object value = ((Map)environment).get(envVarName);
-            return value == null ? Optional.empty() : Optional.of(value.toString());
+            if (value != null) {
+                return Optional.of(value.toString());
+            }
         }
         return Optional.empty();
     }
@@ -378,6 +400,8 @@ public class ServiceClient extends WorkflowClient {
         private String localEntry;
         @com.beust.jcommander.Parameter(names = "--json", description = "Parameters to the entry in the dockstore, one map for one run, an array of maps for multiple runs")
         private String json;
+        @com.beust.jcommander.Parameter(names = "--yaml", description = "Parameters to the entry in the dockstore, one map for one run, an array of maps for multiple runs")
+        private String yaml;
         @com.beust.jcommander.Parameter(names = "--help", description = "Prints help for launch command", help = true)
         private boolean help = false;
     }
