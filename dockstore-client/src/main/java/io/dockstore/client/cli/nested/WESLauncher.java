@@ -76,13 +76,14 @@ public class WESLauncher extends BaseLauncher {
     }
 
     protected void addFilesToWorkflowAttachment(List<File> workflowAttachment, File zippedEntry, File tempDir) {
-        try {
-            SwaggerUtility.unzipFile(zippedEntry, tempDir);
-        } catch (IOException e) {
-            exceptionMessage(e, "Unable to get workflow attachment files from zip file " + zippedEntry.getName()
-                    + " Request not sent.", IO_ERROR);
+        if (zippedEntry != null) {
+            try {
+                SwaggerUtility.unzipFile(zippedEntry, tempDir);
+            } catch (IOException e) {
+                exceptionMessage(e, "Unable to get workflow attachment files from zip file " + zippedEntry.getName() + " Request not sent.",
+                        IO_ERROR);
+            }
         }
-
         try {
 
             // A null fileFilter causes all files to be returned
