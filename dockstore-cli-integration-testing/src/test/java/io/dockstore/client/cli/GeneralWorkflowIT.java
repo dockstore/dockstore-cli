@@ -695,6 +695,7 @@ public class GeneralWorkflowIT extends BaseIT {
     /**
      * This is a high level test to ensure that gitlab basics are working for gitlab as a workflow repo
      */
+    @Ignore
     @Test
     public void testGitlab() {
         // Refresh workflow
@@ -812,6 +813,7 @@ public class GeneralWorkflowIT extends BaseIT {
     /**
      * This tests manually publishing a gitlab workflow
      */
+    @Ignore
     @Test
     public void testManualPublishGitlab() {
         // manual publish
@@ -836,6 +838,7 @@ public class GeneralWorkflowIT extends BaseIT {
     /**
      * This tests getting branches and tags from gitlab repositories
      */
+    @Ignore
     @Test
     @Category(SlowTest.class)
     public void testGitLabTagAndBranchTracking() {
