@@ -80,7 +80,8 @@ public class WESLauncher extends BaseLauncher {
             try {
                 SwaggerUtility.unzipFile(zippedEntry, tempDir);
             } catch (IOException e) {
-                exceptionMessage(e, "Unable to get workflow attachment files from zip file " + zippedEntry.getName() + " Request not sent.",
+                exceptionMessage(e, "Unable to get workflow attachment files from zip file " + zippedEntry.getName()
+                                + " Request not sent.",
                         IO_ERROR);
             }
         }
