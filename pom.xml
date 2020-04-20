@@ -1059,10 +1059,34 @@
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>2.7</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>2.0.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <configuration>
+                    <outputDirectory>${project.basedir}</outputDirectory>
+                    <missingFile>THIRD-PARTY-LICENSES.properties</missingFile>
+                    <thirdPartyFilename>THIRD-PARTY-LICENSES.txt</thirdPartyFilename>
+                    <sortArtifactByName>true</sortArtifactByName>
+                    <failOnMissing>true</failOnMissing>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>aggregate-add-third-party</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
