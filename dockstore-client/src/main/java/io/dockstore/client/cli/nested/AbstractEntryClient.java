@@ -1042,7 +1042,11 @@ public abstract class AbstractEntryClient<T> {
                 if (args.isEmpty() || containsHelpRequest(args)) {
                     wesLaunchHelp();
                 } else {
-                    launch(args);
+                    if (args.contains("--local-entry")) {
+                        errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
+                    } else {
+                        launch(args);
+                    }
                 }
                 break;
             case "status":
