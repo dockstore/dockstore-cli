@@ -25,7 +25,6 @@ public class WESLauncher extends BaseLauncher {
     private static final Logger LOG = LoggerFactory.getLogger(WESLauncher.class);
     private static final String TAGS = "{\"Client\":\"Dockstore\"}";
     private static final String WORKFLOW_TYPE_VERSION = "1.0";
-    private String wesEntryType;
     private WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi;
 
 
@@ -41,7 +40,6 @@ public class WESLauncher extends BaseLauncher {
     public void initialize() {
         String wesUrl = abstractEntryClient.getWesUri();
         String wesAuth = abstractEntryClient.getWesAuth();
-        wesEntryType = abstractEntryClient.getEntryType();
         clientWorkflowExecutionServiceApi = abstractEntryClient.getWorkflowExecutionServiceApi(wesUrl, wesAuth);
     }
 
@@ -134,11 +132,11 @@ public class WESLauncher extends BaseLauncher {
      * help text output
      */
     private void wesCommandSuggestions() {
-        String aWesEntryType = this.wesEntryType.toString().toLowerCase();
+        String wesEntryType = abstractEntryClient.getEntryType().toString().toLowerCase();
         out("Useful commands for working with WES runs:");
         out("");
-        out("To get status for a run: dockstore " + aWesEntryType + " wes status --id <run id> [--verbose][--wes-url <WES URL>][--wes-auth <auth>]");
-        out("To cancel a run: dockstore " + aWesEntryType + " wes cancel --id <run id> [--wes-url <WES URL>][--wes-auth <auth>]");
+        out("To get status for a run: dockstore " + wesEntryType + " wes status --id <run id> [--verbose][--wes-url <WES URL>][--wes-auth <auth>]");
+        out("To cancel a run: dockstore " + wesEntryType + " wes cancel --id <run id> [--wes-url <WES URL>][--wes-auth <auth>]");
     }
 
 }
