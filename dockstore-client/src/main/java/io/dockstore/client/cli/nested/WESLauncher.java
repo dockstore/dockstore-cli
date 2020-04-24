@@ -66,12 +66,12 @@ public class WESLauncher extends BaseLauncher {
     @Override
     public ImmutablePair<String, String> executeEntry(String runCommand, File workingDir) throws RuntimeException {
         runWESCommand(this.originalParameterFile, this.primaryDescriptor, this.zippedEntry);
-
         //TODO return something better than this? or change the return....
         return new ImmutablePair<String, String>("", "");
     }
 
-    protected void addFilesToWorkflowAttachment(List<File> workflowAttachment, File zippedEntry, File tempDir) {
+    protected List<File> addFilesToWorkflowAttachment(File zippedEntry, File tempDir) {
+        List<File> workflowAttachment = new ArrayList<>();
         if (zippedEntry != null) {
             try {
                 SwaggerUtility.unzipFile(zippedEntry, tempDir);
@@ -81,7 +81,6 @@ public class WESLauncher extends BaseLauncher {
             }
         }
         try {
-
             // A null fileFilter causes all files to be returned
             String[] fileFilter = null;
             Iterator it = FileUtils.iterateFiles(tempDir, fileFilter, true);
@@ -93,6 +92,7 @@ public class WESLauncher extends BaseLauncher {
             exceptionMessage(e, "Unable to traverse directory " + tempDir.getName() + " to get workflow "
                     + "attachment files", GENERIC_ERROR);
         }
+        return workflowAttachment;
     }
 
     public void runWESCommand(String jsonInputFilePath, File localPrimaryDescriptorFile, File zippedEntry) {
@@ -109,8 +109,7 @@ public class WESLauncher extends BaseLauncher {
         String workflowURL = localPrimaryDescriptorFile.getName();
 
         final File tempDir = Files.createTempDir();
-        List<File> workflowAttachment = new ArrayList<>();
-        addFilesToWorkflowAttachment(workflowAttachment, zippedEntry, tempDir);
+        List<File> workflowAttachment = addFilesToWorkflowAttachment(zippedEntry, tempDir);
 
         try {
             RunId response = clientWorkflowExecutionServiceApi.runWorkflow(workflowParams, languageType, workflowTypeVersion, TAGS,
