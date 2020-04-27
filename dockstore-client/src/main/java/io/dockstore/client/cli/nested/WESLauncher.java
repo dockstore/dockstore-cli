@@ -116,7 +116,7 @@ public class WESLauncher extends BaseLauncher {
             RunId response = clientWorkflowExecutionServiceApi.runWorkflow(workflowParams, languageType, workflowTypeVersion, TAGS,
                     "{}", workflowURL, workflowAttachment);
             String runID = response.getRunId();
-            System.out.println("Launched WES run with id: " + runID);
+            out("Launched WES run with id: " + runID);
             wesCommandSuggestions(runID);
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error launching WES run", e);

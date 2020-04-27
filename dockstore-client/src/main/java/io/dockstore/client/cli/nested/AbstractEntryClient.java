@@ -1307,7 +1307,7 @@ public abstract class AbstractEntryClient<T> {
     private void printWesLaunchHelpBody() {
         out("");
         out("Description:");
-        out("  Launch an entry locally.");
+        out("  Launch an entry on a WES endpoint.");
         out("");
         out("Required parameters:");
         out("  --entry <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
@@ -1315,7 +1315,7 @@ public abstract class AbstractEntryClient<T> {
         out("Optional parameters:");
         out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.getLowerShortName());
+        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.getShortName());
         out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
         out("");
     }
