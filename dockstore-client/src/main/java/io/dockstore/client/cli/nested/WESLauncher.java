@@ -30,7 +30,7 @@ public class WESLauncher extends BaseLauncher {
 
     public WESLauncher(AbstractEntryClient abstractEntryClient, DescriptorLanguage language, boolean script) {
         super(abstractEntryClient, language, script);
-        setLauncherName("wes");
+        setLauncherName("WES");
     }
 
     /**
@@ -91,7 +91,7 @@ public class WESLauncher extends BaseLauncher {
             }
         } catch (Exception e) {
             exceptionMessage(e, "Unable to traverse directory " + tempDir.getName() + " to get workflow "
-                    + "attachment files", GENERIC_ERROR);
+                    + "attachment files.", GENERIC_ERROR);
         }
         return workflowAttachment;
     }
