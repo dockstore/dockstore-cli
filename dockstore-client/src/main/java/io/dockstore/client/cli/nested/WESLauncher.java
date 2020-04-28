@@ -134,7 +134,6 @@ public class WESLauncher extends BaseLauncher {
      */
     private void wesCommandSuggestions(String runId) {
         String wesEntryType = abstractEntryClient.getEntryType().toString().toLowerCase();
-        out("Useful commands for working with WES runs:");
         out("");
         out("To get status for this run: dockstore " + wesEntryType + " wes status --id " + runId
                 + " [--verbose][--wes-url <WES URL>][--wes-auth <auth>]");
