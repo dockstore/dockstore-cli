@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 
@@ -29,7 +30,7 @@ public class WESLauncher extends BaseLauncher {
 
     public WESLauncher(AbstractEntryClient abstractEntryClient, DescriptorLanguage language, boolean script) {
         super(abstractEntryClient, language, script);
-        setLauncherName("wes");
+        setLauncherName("WES");
     }
 
     /**
@@ -90,7 +91,7 @@ public class WESLauncher extends BaseLauncher {
             }
         } catch (Exception e) {
             exceptionMessage(e, "Unable to traverse directory " + tempDir.getName() + " to get workflow "
-                    + "attachment files", GENERIC_ERROR);
+                    + "attachment files.", GENERIC_ERROR);
         }
         return workflowAttachment;
     }
@@ -114,7 +115,9 @@ public class WESLauncher extends BaseLauncher {
         try {
             RunId response = clientWorkflowExecutionServiceApi.runWorkflow(workflowParams, languageType, workflowTypeVersion, TAGS,
                     "{}", workflowURL, workflowAttachment);
-            System.out.println("Launched WES run with id: " + response.toString());
+            String runID = response.getRunId();
+            out("Launched WES run with id: " + runID);
+            wesCommandSuggestions(runID);
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error launching WES run", e);
         } finally {
@@ -125,4 +128,17 @@ public class WESLauncher extends BaseLauncher {
             }
         }
     }
+
+    /**
+     * help text output
+     */
+    private void wesCommandSuggestions(String runId) {
+        String wesEntryType = abstractEntryClient.getEntryType().toString().toLowerCase();
+        out("");
+        out("To get status for this run: dockstore " + wesEntryType + " wes status --id " + runId
+                + " [--verbose][--wes-url <WES URL>][--wes-auth <auth>]");
+        out("To cancel this run: dockstore " + wesEntryType + " wes cancel --id " + runId
+                + " [--wes-url <WES URL>][--wes-auth <auth>]");
+    }
+
 }
