@@ -19,8 +19,8 @@ public class ApiClientExtended extends ApiClient {
 
     /**
      *
-     * @param key
-     * @return
+     * @param key Multi-part form body name
+     * @return MediaType
      */
     private Optional<MediaType> getMediaType(Optional<String> key) {
         Optional<MediaType> mediaType = Optional.empty();
@@ -46,7 +46,12 @@ public class ApiClientExtended extends ApiClient {
         return mediaType;
     }
 
-
+    /**
+     * ]
+     * @param multiPart Multipart form
+     * @param key Multi part form body name
+     * @param formObject Form object that will be a body part of the multi part form
+     */
     public void createBodyPart(MultiPart multiPart, String key, Object formObject) {
         Optional<MediaType> optMediaType = getMediaType(Optional.ofNullable(key));
         if (formObject instanceof File) {
