@@ -22,25 +22,24 @@ public class ApiClientExtended extends ApiClient {
      * @param key
      * @return
      */
-    private MediaType getMediaType(String key) {
-        Optional<String> optionalKey = Optional.ofNullable(key);
+    private Optional<MediaType> getMediaType(Optional<String> key) {
         // if key happens to be null or we don't recognize the key then return null
-        MediaType mediaType = null;
-        if (optionalKey.isPresent()) {
-            String keyWESParam = key.toLowerCase();
+        Optional<MediaType> mediaType = Optional.empty();
+        if (key.isPresent()) {
+            String keyWESParam = key.get().toLowerCase();
             switch (keyWESParam) {
             case "workflow_params":
             case "tags":
             case "workflow_engine_parameters":
-                mediaType =  MediaType.APPLICATION_JSON_TYPE;
+                mediaType =  Optional.of(MediaType.APPLICATION_JSON_TYPE);
                 break;
             case "workflow_attachment":
-                mediaType =  MediaType.APPLICATION_OCTET_STREAM_TYPE;
+                mediaType =  Optional.of(MediaType.APPLICATION_OCTET_STREAM_TYPE);
                 break;
             case "workflow_url":
             case "workflow_type":
             case "workflow_type_version":
-                mediaType =  MediaType.TEXT_PLAIN_TYPE;
+                mediaType =  Optional.of(MediaType.TEXT_PLAIN_TYPE);
                 break;
             default:
             }
@@ -50,7 +49,7 @@ public class ApiClientExtended extends ApiClient {
 
 
     public void createBodyPart(MultiPart multiPart, String key, Object formObject) {
-        Optional<MediaType> mediaType = Optional.ofNullable(getMediaType(key));
+        Optional<MediaType> mediaType = getMediaType(Optional.ofNullable(key));
         if (formObject instanceof File) {
             File file = (File)formObject;
             FormDataContentDisposition contentDisp = FormDataContentDisposition.name(key)
