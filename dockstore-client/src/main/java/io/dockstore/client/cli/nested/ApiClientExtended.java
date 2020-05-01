@@ -23,7 +23,6 @@ public class ApiClientExtended extends ApiClient {
      * @return
      */
     private Optional<MediaType> getMediaType(Optional<String> key) {
-        // if key happens to be null or we don't recognize the key then return null
         Optional<MediaType> mediaType = Optional.empty();
         if (key.isPresent()) {
             String keyWESParam = key.get().toLowerCase();
@@ -49,23 +48,19 @@ public class ApiClientExtended extends ApiClient {
 
 
     public void createBodyPart(MultiPart multiPart, String key, Object formObject) {
-        Optional<MediaType> mediaType = getMediaType(Optional.ofNullable(key));
+        Optional<MediaType> optMediaType = getMediaType(Optional.ofNullable(key));
         if (formObject instanceof File) {
             File file = (File)formObject;
             FormDataContentDisposition contentDisp = FormDataContentDisposition.name(key)
                     .fileName(file.getName()).size(file.length()).build();
-            if (mediaType.isPresent()) {
-                multiPart.bodyPart(new FormDataBodyPart(contentDisp, file, mediaType.get()));
-            } else {
-                multiPart.bodyPart(new FormDataBodyPart(contentDisp, file, MediaType.APPLICATION_OCTET_STREAM_TYPE));
-            }
+
+            MediaType mediaType = optMediaType.orElse(MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            multiPart.bodyPart(new FormDataBodyPart(contentDisp, file, mediaType));
         } else {
             FormDataContentDisposition contentDisp = FormDataContentDisposition.name(key).build();
-            if (mediaType.isPresent()) {
-                multiPart.bodyPart(new FormDataBodyPart(contentDisp, formObject, mediaType.get()));
-            } else {
-                multiPart.bodyPart(new FormDataBodyPart(contentDisp, parameterToString(formObject)));
-            }
+
+            MediaType mediaType = optMediaType.orElse(MediaType.TEXT_PLAIN_TYPE);
+            multiPart.bodyPart(new FormDataBodyPart(contentDisp, formObject, mediaType));
         }
     }
 
