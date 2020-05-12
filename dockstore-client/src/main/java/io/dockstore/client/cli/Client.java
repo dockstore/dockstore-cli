@@ -104,6 +104,7 @@ public class Client {
     public static final AtomicBoolean INFO = new AtomicBoolean(false);
     public static final AtomicBoolean SCRIPT = new AtomicBoolean(false);
     public static final String DEPRECATED_PORT_MESSAGE = "Dockstore webservice has deprecated port 8443 and may remove it without warning. Please use 'https://dockstore.org/api' via the Dockstore config file (\"~/.dockstore/config\" by default) instead.";
+    public static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
 
     private static final Logger LOG = LoggerFactory.getLogger(Client.class);
     private static ObjectMapper objectMapper;
@@ -193,7 +194,8 @@ public class Client {
         URL url;
         try {
             ObjectMapper mapper = getObjectMapper();
-            url = new URL("https://api.github.com/repos/dockstore/dockstore/releases");
+            //url = new URL("https://api.github.com/repos/dockstore/dockstore/releases");
+            url = new URL(DOCKSTORE_CLI_REPO_URL);
             List<Map<String, Object>> mapRel;
             try {
                 TypeFactory typeFactory = mapper.getTypeFactory();
@@ -236,8 +238,8 @@ public class Client {
     private static Boolean compareVersion(String current) {
         URL urlCurrent, urlLatest;
         try {
-            urlCurrent = new URL("https://api.github.com/repos/dockstore/dockstore/releases/tags/" + current);
-            urlLatest = new URL("https://api.github.com/repos/dockstore/dockstore/releases/latest");
+            urlCurrent = new URL(DOCKSTORE_CLI_REPO_URL + "/tags/" + current);
+            urlLatest = new URL(DOCKSTORE_CLI_REPO_URL + "/latest");
 
             int idCurrent, idLatest;
             String prerelease;
@@ -266,7 +268,7 @@ public class Client {
      */
     static String getLatestVersion() {
         try {
-            URL url = new URL("https://api.github.com/repos/dockstore/dockstore/releases/latest");
+            URL url = new URL(DOCKSTORE_CLI_REPO_URL + "/latest");
             ObjectMapper mapper = getObjectMapper();
             Map<String, Object> map;
             try {
@@ -290,7 +292,7 @@ public class Client {
      */
     private static Boolean checkIfTagExists(String tag) {
         try {
-            URL url = new URL("https://api.github.com/repos/dockstore/dockstore/releases");
+            URL url = new URL(DOCKSTORE_CLI_REPO_URL);
             ObjectMapper mapper = getObjectMapper();
             try {
                 ArrayList<Map<String, String>> arrayMap = mapper.readValue(url, ArrayList.class);
@@ -364,7 +366,7 @@ public class Client {
         // Update if necessary
         URL url;
 
-        String latestPath = "https://api.github.com/repos/dockstore/dockstore/releases/latest";
+        String latestPath = DOCKSTORE_CLI_REPO_URL + "/latest";
         String latestVersion, upgradeURL;
         try {
             url = new URL(latestPath);
@@ -463,7 +465,7 @@ public class Client {
             if (checkIfTagExists(currentVersion)) {
                 URL url = null;
                 try {
-                    url = new URL("https://api.github.com/repos/dockstore/dockstore/releases/tags/" + currentVersion);
+                    url = new URL(DOCKSTORE_CLI_REPO_URL + "/tags/" + currentVersion);
                 } catch (MalformedURLException e) {
                     LOG.debug("Could not read a release of Dockstore from GitHub", e);
                 }
