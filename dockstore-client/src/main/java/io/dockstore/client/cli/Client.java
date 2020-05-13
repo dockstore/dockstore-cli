@@ -194,7 +194,6 @@ public class Client {
         URL url;
         try {
             ObjectMapper mapper = getObjectMapper();
-            //url = new URL("https://api.github.com/repos/dockstore/dockstore/releases");
             url = new URL(DOCKSTORE_CLI_REPO_URL);
             List<Map<String, Object>> mapRel;
             try {
