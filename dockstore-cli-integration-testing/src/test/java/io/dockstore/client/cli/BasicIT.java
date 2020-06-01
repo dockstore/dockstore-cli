@@ -355,7 +355,7 @@ public class BasicIT extends BaseIT {
         final long firstTag = testingPostgres.runSelectStatement("select id from tag where parentid = '" + id + "'", long.class);
 
         // Delete the version that is known
-        testingPostgres.runUpdateStatement("delete from tag where parentid = '" + id + "' and tagid='" + firstTag + "'");
+        testingPostgres.runUpdateStatement("delete from tag where parentid = '" + id + "' and id='" + firstTag + "'");
         testingPostgres.runUpdateStatement("delete from tag where id = '" + firstTag + "'");
 
         // Double check that there is one less tag
