@@ -352,7 +352,7 @@ public class BasicIT extends BaseIT {
         assertTrue("There are no tags for this tool", currentNumberOfTags > 0);
 
         // This grabs the first tag that belongs to the tool
-        final long firstTag = testingPostgres.runSelectStatement("select tagid from tool_tag where toolid = '" + id + "'", long.class);
+        final long firstTag = testingPostgres.runSelectStatement("select id from tag where parentid = '" + id + "'", long.class);
 
         // Delete the version that is known
         testingPostgres.runUpdateStatement("delete from tag where parentid = '" + id + "' and tagid='" + firstTag + "'");
