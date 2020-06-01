@@ -814,6 +814,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests manually publishing a gitlab workflow
      */
     @Test
+    @Ignore("Ignoring for 1.8.6, enable for 1.9.0")
     public void testManualPublishGitlab() {
         // manual publish
         Client.main(
