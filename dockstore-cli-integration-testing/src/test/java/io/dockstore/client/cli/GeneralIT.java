@@ -192,7 +192,7 @@ public class GeneralIT extends BaseIT {
 
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from tag,tool where tool.registry = '" + Registry.QUAY_IO.toString()
-                + "' and tool.namespace = 'dockstoretestuser2' and tool.name = 'quayandgithub' and tool.toolname IS NULL and tool.id=tag.parentid and tag.id=tool_tag.tagid and tag.valid = 'f'",
+                + "' and tool.namespace = 'dockstoretestuser2' and tool.name = 'quayandgithub' and tool.toolname IS NULL and tool.id=tag.parentid and tag.valid = 'f'",
             long.class);
         assertEquals("there should now be an invalid tag, found " + count, 1, count);
 
@@ -202,8 +202,8 @@ public class GeneralIT extends BaseIT {
                 "/Dockstore.wdl", "--dockerfile-path", "/Dockerfile", "--script" });
 
         final long count2 = testingPostgres.runSelectStatement(
-            "select count(*) from tag,tool_tag,tool where tool.registry = '" + Registry.QUAY_IO.toString()
-                + "' and tool.namespace = 'dockstoretestuser2' and tool.name = 'quayandgithub' and tool.toolname IS NULL and tool.id=tool_tag.toolid and tag.id=tool_tag.tagid and valid = 'f'",
+            "select count(*) from tag,tool where tool.registry = '" + Registry.QUAY_IO.toString()
+                + "' and tool.namespace = 'dockstoretestuser2' and tool.name = 'quayandgithub' and tool.toolname IS NULL and tool.id=tag.parentid and tag.valid = 'f'",
             long.class);
         assertEquals("the invalid tag should now be valid, found " + count2, 0, count2);
     }
