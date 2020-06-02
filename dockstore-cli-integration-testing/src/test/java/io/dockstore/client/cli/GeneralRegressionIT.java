@@ -155,7 +155,7 @@ public class GeneralRegressionIT extends BaseIT {
 
         // Select data from DB
         final Long toolID = testingPostgres.runSelectStatement("select id from tool where name = 'testUpdatePath'", long.class);
-        final Long tagID = testingPostgres.runSelectStatement("select tagid from tool_tag where toolid = " + toolID, long.class);
+        final Long tagID = testingPostgres.runSelectStatement("select id from tag where parentid = " + toolID, long.class);
 
         return testingPostgres.runSelectStatement("select " + type + " from tag where id = " + tagID, String.class);
     }
