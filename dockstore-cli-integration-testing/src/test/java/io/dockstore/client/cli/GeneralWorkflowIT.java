@@ -696,7 +696,8 @@ public class GeneralWorkflowIT extends BaseIT {
      * This is a high level test to ensure that gitlab basics are working for gitlab as a workflow repo
      */
     @Test
-    public void testGitlab() {
+    @Ignore("Ignoring for 1.8.6, enable for 1.9.0")
+    public void testGitLab() {
         // Refresh workflow
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -813,6 +814,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests manually publishing a gitlab workflow
      */
     @Test
+    @Ignore("Ignoring for 1.8.6, enable for 1.9.0")
     public void testManualPublishGitlab() {
         // manual publish
         Client.main(
