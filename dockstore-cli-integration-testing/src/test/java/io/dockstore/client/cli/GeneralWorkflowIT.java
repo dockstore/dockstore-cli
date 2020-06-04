@@ -695,7 +695,6 @@ public class GeneralWorkflowIT extends BaseIT {
     /**
      * This is a high level test to ensure that gitlab basics are working for gitlab as a workflow repo
      */
-    @Ignore
     @Test
     @Ignore("Ignoring for 1.8.6, enable for 1.9.0")
     public void testGitLab() {
@@ -814,7 +813,6 @@ public class GeneralWorkflowIT extends BaseIT {
     /**
      * This tests manually publishing a gitlab workflow
      */
-    @Ignore
     @Test
     @Ignore("Ignoring for 1.8.6, enable for 1.9.0")
     public void testManualPublishGitlab() {
