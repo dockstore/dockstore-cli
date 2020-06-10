@@ -18,6 +18,7 @@ package io.dockstore.client.cli.nested;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -53,6 +54,7 @@ import io.swagger.client.model.WorkflowVersion;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +113,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         int descWidth = maxWidths[1] + Client.PADDING;
         int gitWidth = maxWidths[2] + Client.PADDING;
         String format = "%-" + nameWidth + "s%-" + descWidth + "s%-" + gitWidth + "s%-16s";
-        outFormatted(format, NAME_HEADER, DESCRIPTION_HEADER, GIT_HEADER, "ON DOCKSTORE?");
+        outFormatted(format, NAME_HEADER, DESCRIPTION_HEADER, GIT_HEADER, "PUBLISHED");
 
         for (Workflow workflow : workflows) {
             String gitUrl = "";
@@ -595,13 +597,22 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             if (user == null) {
                 throw new RuntimeException("User not found");
             }
-
-            out("Refreshing all workflows...");
-            List<Workflow> workflows = usersApi.refreshWorkflows(user.getId());
-
-            out("YOUR UPDATED WORKFLOWS");
+            final List<Workflow> updatedWorkflows = usersApi.userWorkflows(user.getId()).stream()
+                    // Skip hosted workflows
+                    .filter(workflow -> StringUtils.isNotEmpty(workflow.getGitUrl()))
+                    .map(workflow -> {
+                        out(MessageFormat.format("Refreshing {0}", workflow.getFullWorkflowPath()));
+                        try {
+                            return workflowsApi.refresh(workflow.getId());
+                        } catch (Exception ex) {
+                            exceptionMessage(ex, "", 0);
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
             printLineBreak();
-            printWorkflowList(workflows);
+            printWorkflowList(updatedWorkflows);
         } catch (ApiException ex) {
             exceptionMessage(ex, "", Client.API_ERROR);
         }

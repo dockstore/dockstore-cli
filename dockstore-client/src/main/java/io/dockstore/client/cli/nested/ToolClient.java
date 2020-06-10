@@ -18,12 +18,14 @@ package io.dockstore.client.cli.nested;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.ws.rs.core.GenericType;
@@ -48,6 +50,7 @@ import io.swagger.client.model.Tag;
 import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.User;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,7 +132,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         int descWidth = maxWidths[1] + Client.PADDING;
         int gitWidth = maxWidths[2] + Client.PADDING;
         String format = "%-" + nameWidth + "s%-" + descWidth + "s%-" + gitWidth + "s%-16s%-16s%-10s";
-        outFormatted(format, NAME_HEADER, DESCRIPTION_HEADER, GIT_HEADER, "ON DOCKSTORE?", "DESCRIPTOR", "AUTOMATED");
+        outFormatted(format, NAME_HEADER, DESCRIPTION_HEADER, GIT_HEADER, "PUBLISHED", "DESCRIPTOR", "AUTOMATED");
 
         for (DockstoreTool container : containers) {
             String descriptor = "No";
@@ -590,8 +593,22 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 throw new RuntimeException("User not found");
             }
 
-            out("Refreshing all tools...");
-            List<DockstoreTool> containers = usersApi.refresh(user.getId());
+            out("Getting existing tools");
+            final List<DockstoreTool> dockstoreTools = usersApi.userContainers(user.getId());
+            final List<DockstoreTool> containers = dockstoreTools.stream()
+                    // Skip hosted tools as well as other tools that don't have git url (SEAB-1393)
+                    .filter(dockstoreTool -> StringUtils.isNotEmpty(dockstoreTool.getGitUrl()))
+                    .map(dockstoreTool -> {
+                        out(MessageFormat.format("Refreshing {0}", dockstoreTool.getToolPath()));
+                        try {
+                            return containersApi.refresh(dockstoreTool.getId());
+                        } catch (ApiException ex) {
+                            exceptionMessage(ex, "", 0);
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
 
             out("YOUR UPDATED TOOLS");
             printLineBreak();
