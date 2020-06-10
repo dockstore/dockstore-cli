@@ -527,26 +527,25 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 if (tool != null) {
                     // Refresh to update validity
                     containersApi.refresh(tool.getId());
+                    // If registration is successful then attempt to publish it
+                    PublishRequest pub = SwaggerUtility.createPublishRequest(true);
+                    DockstoreTool publishedTool;
+                    try {
+                        publishedTool = containersApi.publish(tool.getId(), pub);
+                        if (publishedTool.isIsPublished()) {
+                            out("Successfully published " + fullName);
+                        } else {
+                            out("Successfully registered " + fullName + ", however it is not valid to publish."); // Should this throw an
+                            // error?
+                        }
+                    } catch (ApiException ex) {
+                        exceptionMessage(ex, "Successfully registered " + fullName + ", however it is not valid to publish.", Client.API_ERROR);
+                    }
                 } else {
                     errorMessage("Unable to register " + fullName, Client.COMMAND_ERROR);
                 }
             } catch (final ApiException ex) {
                 exceptionMessage(ex, "Unable to register " + fullName, Client.API_ERROR);
-            }
-
-            // If registration is successful then attempt to publish it
-            PublishRequest pub = SwaggerUtility.createPublishRequest(true);
-            DockstoreTool publishedTool;
-            try {
-                publishedTool = containersApi.publish(tool.getId(), pub);
-                if (publishedTool.isIsPublished()) {
-                    out("Successfully published " + fullName);
-                } else {
-                    out("Successfully registered " + fullName + ", however it is not valid to publish."); // Should this throw an
-                    // error?
-                }
-            } catch (ApiException ex) {
-                exceptionMessage(ex, "Successfully registered " + fullName + ", however it is not valid to publish.", Client.API_ERROR);
             }
         }
     }
