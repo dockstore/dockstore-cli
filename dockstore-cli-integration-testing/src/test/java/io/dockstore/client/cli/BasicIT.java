@@ -203,7 +203,7 @@ public class BasicIT extends BaseIT {
             "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular", "--script" });
 
         final long count = testingPostgres.runSelectStatement(
-            "select count(*) from tool where mode != 'MANUAL_IMAGE_PATH' and registry = '" + Registry.QUAY_IO.toString()
+            "select count(*) from tool where mode != 'MANUAL_IMAGE_PATH' and registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and toolname = 'regular'", long.class);
         Assert.assertEquals("the tool should be Auto", 1, count);
     }
@@ -219,7 +219,7 @@ public class BasicIT extends BaseIT {
             "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", "--script" });
 
         final long count = testingPostgres.runSelectStatement(
-            "select count(*) from tool where mode = 'MANUAL_IMAGE_PATH' and registry = '" + Registry.QUAY_IO.toString()
+            "select count(*) from tool where mode = 'MANUAL_IMAGE_PATH' and registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and toolname = 'alternate'", long.class);
         Assert.assertEquals("the tool should be Manual still", 1, count);
     }
@@ -279,7 +279,7 @@ public class BasicIT extends BaseIT {
                 "quay.io/dockstoretestuser/noautobuild", "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git",
                 "--script" });
 
-        final long count = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.toString()
+        final long count = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'noautobuild' and giturl = 'git@github.com:DockstoreTestUser/dockstore-whalesay.git'",
             long.class);
         Assert.assertEquals("the tool should now have an associated git repo", 1, count);
@@ -289,7 +289,7 @@ public class BasicIT extends BaseIT {
                 "quay.io/dockstoretestuser/nobuildsatall", "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git",
                 "--script" });
 
-        final long count2 = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.toString()
+        final long count2 = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'nobuildsatall' and giturl = 'git@github.com:DockstoreTestUser/dockstore-whalesay.git'",
             long.class);
         Assert.assertEquals("the tool should now have an associated git repo", 1, count2);
@@ -480,7 +480,7 @@ public class BasicIT extends BaseIT {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser/quayandgithub", "--script" });
 
-        final long count = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.toString()
+        final long count = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
             + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and ispublished = 't'", long.class);
         Assert.assertEquals("the given entry should be published", 1, count);
     }
@@ -497,7 +497,7 @@ public class BasicIT extends BaseIT {
     public void testQuayBitbucketAutoRegistration() {
 
         final long count = testingPostgres.runSelectStatement(
-            "select count(*) from tool where registry = '" + Registry.QUAY_IO.toString() + "' and giturl like 'git@bitbucket.org%'",
+            "select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath() + "' and giturl like 'git@bitbucket.org%'",
             long.class);
         Assert.assertEquals("there should be 2 registered from Quay and Bitbucket", 2, count);
     }
@@ -586,7 +586,7 @@ public class BasicIT extends BaseIT {
         // Need to add these to the db dump (db dump 1)
 
         final long count = testingPostgres.runSelectStatement(
-            "select count(*) from tool where  registry = '" + Registry.QUAY_IO.toString() + "' and giturl like 'git@gitlab.com%'",
+            "select count(*) from tool where  registry = '" + Registry.QUAY_IO.getDockerPath() + "' and giturl like 'git@gitlab.com%'",
             long.class);
         Assert.assertEquals("there should be 2 registered from Quay and Gitlab", 2, count);
     }
