@@ -465,7 +465,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             tool.setMode(DockstoreTool.ModeEnum.MANUAL_IMAGE_PATH);
             tool.setName(name);
             tool.setNamespace(namespace);
-            tool.setRegistryString(regEnum.get().toString());
+            tool.setRegistryString(regEnum.get().getDockerPath());
 
             // Registry path used (ex. quay.io)
             Optional<String> registryPath;
