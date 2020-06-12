@@ -82,9 +82,6 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
 
-        // refresh all
-        refreshByOrganizationReplacement(USER_2_USERNAME);
-
         // check that valid is valid and full
         final long count = testingPostgres.runSelectStatement("select count(*) from workflow where ispublished='t'", long.class);
         assertEquals("there should be 0 published entries, there are " + count, 0, count);
@@ -897,7 +894,9 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
                 SourceControl.GITHUB.toString() + "/DockstoreTestUser2/parameter_test_workflow", "--version", "master", "--add",
-                "test.cwl.json", "--add", "test2.cwl.json", "--add", "fake.cwl.json", "--remove", "notreal.cwl.json", "--script" });
+                    // Trying to remove a non-existent test parameter file now causes an error. It didn't use to and test was relying
+                    // on that behavior.
+                "test.cwl.json", "--add", "test2.cwl.json", "--add", "fake.cwl.json", /*"--remove", "notreal.cwl.json",*/ "--script" });
         final long count2 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals("there should be two sourcefiles that are test parameter files, there are " + count2, 2, count2);
 
@@ -1021,7 +1020,10 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests that you can refresh user data by refreshing a workflow
      * ONLY WORKS if the current user in the database dump has no metadata, and on Github there is metadata (bio, location)
      * If the user has metadata, test will pass as long as the user's metadata isn't the same as Github already
+     *
+     * Ignoring this one for 1.9, since we don't have the refresh endpoint any more
      */
+    @Ignore
     @Test
     public void testRefreshingUserMetadata() {
         // Refresh all workflows
