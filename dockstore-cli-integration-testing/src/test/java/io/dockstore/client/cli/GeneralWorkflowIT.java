@@ -76,14 +76,14 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testRefreshAndPublish() {
         // refresh all
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // refresh individual that is valid
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
 
         // refresh all
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // check that valid is valid and full
         final long count = testingPostgres.runSelectStatement("select count(*) from workflow where ispublished='t'", long.class);
@@ -168,7 +168,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testRefreshAndPublishInvalid() {
         // refresh all
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // refresh individual
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -283,7 +283,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testRestub() {
         // Refresh and then restub
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "restub", "--entry",
@@ -299,7 +299,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testRestubError() {
         // Refresh and then restub
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
@@ -315,7 +315,7 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testDescriptorTypes() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
                 SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow", "--descriptor-type", "wdl", "--script" });
@@ -336,7 +336,7 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testWorkflowVersionIncorrectPath() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "version_tag", "--entry",
@@ -361,7 +361,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     @Category(ToilCompatibleTest.class)
     public void testRefreshAndConvertWithImportsCWL() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
@@ -381,7 +381,7 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testRefreshAndConvertWithImportsWDL() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
                 SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow", "--descriptor-type", "wdl",
@@ -514,11 +514,11 @@ public class GeneralWorkflowIT extends BaseIT {
                 "--script" });
 
         // Assert default version is updated and no author or email is found
-        final long count = testingPostgres.runSelectStatement("select count(*) from workflow where defaultversion = 'testWDL'", long.class);
+        final long count = testingPostgres.runSelectStatement("select count(*) from workflow w, workflowversion wv where wv.name = 'testWDL' and wv.id = w.actualdefaultversion", long.class);
         assertEquals("there should be 1 matching workflow, there is " + count, 1, count);
 
         final long count2 = testingPostgres
-            .runSelectStatement("select count(*) from workflow where defaultversion = 'testWDL' and author is null and email is null",
+            .runSelectStatement("select count(*) from workflow w, workflowversion wv where wv.id = w.actualdefaultversion and wv.name = 'testWDL' and w.author is null and w.email is null",
                 long.class);
         assertEquals("The given workflow shouldn't have any contact info", 1, count2);
 
@@ -530,11 +530,11 @@ public class GeneralWorkflowIT extends BaseIT {
 
         // Assert default version is updated and author and email are set
         final long count3 = testingPostgres
-            .runSelectStatement("select count(*) from workflow where defaultversion = 'testBoth'", long.class);
+            .runSelectStatement("select count(*) from workflow where actualdefaultversion = 'testBoth'", long.class);
         assertEquals("there should be 1 matching workflow, there is " + count3, 1, count3);
 
         final long count4 = testingPostgres.runSelectStatement(
-            "select count(*) from workflow where defaultversion = 'testBoth' and author = 'testAuthor' and email = 'testEmail'",
+            "select count(*) from workflow w, workflowversion wv where w.actualdefaultversion = wv.id and wv.name = 'testBoth' and w.author = 'testAuthor' and w.email = 'testEmail'",
             long.class);
         assertEquals("The given workflow should have contact info", 1, count4);
 
@@ -557,7 +557,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testRefreshRelatedConcepts() {
         // refresh all
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // refresh individual that is valid
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -619,7 +619,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testGithubDirtyBit() {
         // refresh all
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // refresh individual that is valid
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -656,8 +656,7 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void testBitbucketDirtyBit() {
-        // refresh all
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // refresh individual that is valid
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -699,7 +698,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testGitlab() {
         // Refresh workflow
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITLAB.toString() + "/dockstore.test.user2/dockstore-workflow-example", "--script" });
         final long nullLastModifiedWorkflowVersions = testingPostgres
@@ -760,7 +759,7 @@ public class GeneralWorkflowIT extends BaseIT {
                 "--script" });
 
         final long count7 = testingPostgres.runSelectStatement(
-            "select count(*) from workflow where defaultversion = 'test' and author is null and email is null and description is null",
+            "select count(*) from workflow where actualdefaultversion = 'test' and author is null and email is null and description is null",
             long.class);
         assertEquals("The given workflow should now have contact info and description", 0, count7);
 
@@ -864,7 +863,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testWDLWithImports() {
         // Refresh all
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // Update workflow to be WDL with correct path
         Client.main(
@@ -884,7 +883,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testTestParameterFile() {
         // Refresh all
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // Refresh specific
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -1026,7 +1025,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void testRefreshingUserMetadata() {
         // Refresh all workflows
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--script" });
+        refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // Check that user has been updated
         // TODO: bizarrely, the new GitHub Java API library doesn't seem to handle bio
