@@ -894,8 +894,8 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
                 SourceControl.GITHUB.toString() + "/DockstoreTestUser2/parameter_test_workflow", "--version", "master", "--add",
-                    // Trying to remove a non-existent test parameter file now causes an error. It didn't use to and test was relying
-                    // on that behavior.
+                // Trying to remove a non-existent test parameter file now causes an error. It didn't use to and test was relying
+                // on that behavior.
                 "test.cwl.json", "--add", "test2.cwl.json", "--add", "fake.cwl.json", /*"--remove", "notreal.cwl.json",*/ "--script" });
         final long count2 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals("there should be two sourcefiles that are test parameter files, there are " + count2, 2, count2);
