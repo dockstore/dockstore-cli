@@ -925,6 +925,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
                 // If valid version
                 boolean updateVersionSuccess = false;
+                final boolean newVersion = !Objects.equals(workflow.getDefaultVersion(), defaultVersion);
                 for (WorkflowVersion workflowVersion : workflow.getWorkflowVersions()) {
                     if (workflowVersion.getName().equals(defaultVersion)) {
                         workflow.setDefaultVersion(defaultVersion);
@@ -946,6 +947,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 }
 
                 workflowsApi.updateWorkflow(workflowId, workflow);
+                if (newVersion) { // Update default version separately, see https://github.com/dockstore/dockstore/issues/3563
+                    workflowsApi.updateWorkflowDefaultVersion(workflowId, defaultVersion);
+                }
                 workflowsApi.refresh(workflowId);
                 out("The workflow has been updated.");
             } catch (ApiException ex) {

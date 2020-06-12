@@ -530,7 +530,7 @@ public class GeneralWorkflowIT extends BaseIT {
 
         // Assert default version is updated and author and email are set
         final long count3 = testingPostgres
-            .runSelectStatement("select count(*) from workflow where actualdefaultversion = 'testBoth'", long.class);
+            .runSelectStatement("select count(*) from workflow w, workflowversion wv where wv.name = 'testBoth' and w.id=wv.parentid", long.class);
         assertEquals("there should be 1 matching workflow, there is " + count3, 1, count3);
 
         final long count4 = testingPostgres.runSelectStatement(
