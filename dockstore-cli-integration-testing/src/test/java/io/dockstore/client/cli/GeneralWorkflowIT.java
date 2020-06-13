@@ -382,7 +382,7 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
                 SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow", "--descriptor-type", "wdl",
-                "--workflow-path", "/Dockstore.wdl", "--script" });
+                "--workflow-path", "/Dockstore.wdl", "--default-test-parameter-path", "/foo.json", "--script" });
 
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow", "--script" });
