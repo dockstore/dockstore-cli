@@ -107,7 +107,7 @@ public class BasicIT extends BaseIT {
         //        });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--script" });
         final long thirdToolCount = testingPostgres.runSelectStatement("select count(*) from tool", long.class);
-        Assert.assertEquals("there should be no change in count of tools", secondToolCount, thirdToolCount);
+        assertEquals("there should be no change in count of tools", secondToolCount, thirdToolCount);
     }
 
     /**
