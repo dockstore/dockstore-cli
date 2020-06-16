@@ -145,4 +145,23 @@ public class CromwellIT {
         final long run = wdlClient.launch(workflowFile.getAbsolutePath(), true, null, parameterFile.getAbsolutePath(), null, null);
         Assert.assertEquals(0, run);
     }
+
+    /**
+     * This tests that backslashes are not removed from the input and show up when the input is echoed by the workflow
+     */
+    @Test
+    public void testRunWorkflowWithBackslashInInput() throws IOException, ApiException {
+        Client client = new Client();
+        client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
+        AbstractEntryClient main = new ToolClient(client, false);
+        LanguageClientInterface wdlClient = LanguageClientFactory.createLanguageCLient(main, DescriptorLanguage.WDL)
+                .orElseThrow(RuntimeException::new);
+        File workflowFile = new File(ResourceHelpers.resourceFilePath("pass_escape_in_input.wdl"));
+        File parameterFile = new File(ResourceHelpers.resourceFilePath("pass_escape_in_input.wdl.json"));
+        // run a workflow
+        systemOutRule.clearLog();
+        final long run = wdlClient.launch(workflowFile.getAbsolutePath(), true, null, parameterFile.getAbsolutePath(), null, null);
+        Assert.assertEquals(0, run);
+        Assert.assertTrue(systemOutRule.getLog().contains("\"test_location.find_tools.result\": \"t t\\t\\\\t\""));
+    }
 }
