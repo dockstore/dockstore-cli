@@ -1,9 +1,9 @@
-dist: bionic
 services:
 - docker
+- postgresql
 
 addons:
-  postgresql: "9.6"
+  postgresql: "11"
 
 cache:
   directories:
@@ -12,6 +12,7 @@ cache:
   - $HOME/.m2/repository
   - $HOME/apache-maven-3.6.2
 
+os: linux
 dist: bionic
 language: java
 jdk: openjdk12

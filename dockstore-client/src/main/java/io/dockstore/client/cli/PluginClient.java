@@ -18,11 +18,11 @@ package io.dockstore.client.cli;
 import java.util.Collections;
 import java.util.List;
 
-import avro.shaded.com.google.common.base.Joiner;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Joiner;
 import io.dockstore.common.FileProvisionUtil;
 import io.dockstore.common.TabExpansionUtil;
 import io.dockstore.provision.PreProvisionInterface;

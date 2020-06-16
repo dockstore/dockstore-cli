@@ -1,6 +1,7 @@
 version: 2
 jobs:
   build: # runs not using Workflows must have a `build` job as entry point
+    resource_class: medium+
     docker: # run the steps with Docker
       - image: circleci/openjdk:11.0.4-jdk-stretch
         environment:
