@@ -1,0 +1,4 @@
+{
+  "checkerWorkflow.inputFile": "md5sum.input",
+  "checkerWorkflow.expectedMd5sum": "00579a00e3e7fa0674428ac7049423e2"
+}

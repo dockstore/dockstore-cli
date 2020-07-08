@@ -16,6 +16,7 @@
 package io.dockstore.client.cli;
 
 import java.io.File;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
@@ -23,13 +24,18 @@ import com.codahale.metrics.Gauge;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.Constants;
+import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.SourceControl;
 import io.dockstore.common.TestingPostgres;
 import io.dockstore.common.Utilities;
 import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dockstore.webservice.DockstoreWebserviceConfiguration;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.swagger.client.ApiClient;
+import io.swagger.client.api.UsersApi;
+import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.auth.ApiKeyAuth;
+import io.swagger.client.model.Repository;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -125,6 +131,26 @@ public class BaseIT {
         ApiClient client = new ApiClient();
         client.setBasePath(parseConfig.getString(Constants.WEBSERVICE_BASE_PATH));
         return client;
+    }
+
+    protected void refreshByOrganizationReplacement(final String username) {
+        final ApiClient webClient = getWebClient(username, testingPostgres);
+        final WorkflowsApi workflowsApi = new WorkflowsApi(webClient);
+        refreshByOrganizationReplacement(workflowsApi, webClient);
+    }
+
+    protected void refreshByOrganizationReplacement(WorkflowsApi workflowApi, ApiClient apiClient) {
+        UsersApi openUsersApi = new UsersApi(apiClient);
+        for (SourceControl control : SourceControl.values()) {
+            List<String> userOrganizations = openUsersApi.getUserOrganizations(control.name());
+            for (String org : userOrganizations) {
+                List<Repository> userOrganizationRepositories = openUsersApi.getUserOrganizationRepositories(control.name(), org);
+                for (Repository repo : userOrganizationRepositories) {
+                    workflowApi.manualRegister(control.name(), repo.getPath(), "/Dockstore.cwl", "",
+                            DescriptorLanguage.CWL.getLowerShortName(), "");
+                }
+            }
+        }
     }
 
     @After

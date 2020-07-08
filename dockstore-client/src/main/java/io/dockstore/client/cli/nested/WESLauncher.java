@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 
@@ -24,16 +25,12 @@ public class WESLauncher extends BaseLauncher {
     private static final Logger LOG = LoggerFactory.getLogger(WESLauncher.class);
     private static final String TAGS = "{\"Client\":\"Dockstore\"}";
     private static final String WORKFLOW_TYPE_VERSION = "1.0";
-
-    // Cromwell currently supports draft-2 of the WDL specification
-    // https://cromwell.readthedocs.io/en/stable/LanguageSupport/
-    private static final String WDL_WORKFLOW_TYPE_VERSION = "draft-2";
     private WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi;
 
 
     public WESLauncher(AbstractEntryClient abstractEntryClient, DescriptorLanguage language, boolean script) {
         super(abstractEntryClient, language, script);
-        setLauncherName("wes");
+        setLauncherName("WES");
     }
 
     /**
@@ -70,30 +67,23 @@ public class WESLauncher extends BaseLauncher {
     @Override
     public ImmutablePair<String, String> executeEntry(String runCommand, File workingDir) throws RuntimeException {
         runWESCommand(this.originalParameterFile, this.primaryDescriptor, this.zippedEntry);
-
         //TODO return something better than this? or change the return....
         return new ImmutablePair<String, String>("", "");
     }
 
-    protected void addFilesToWorkflowAttachment(List<File> workflowAttachment, File zippedEntry, File tempDir) {
-        try {
-            SwaggerUtility.unzipFile(zippedEntry, tempDir);
-        } catch (IOException e) {
-            exceptionMessage(e, "Unable to get workflow attachment files from zip file " + zippedEntry.getName()
-                    + " Request not sent.", IO_ERROR);
+    protected List<File> addFilesToWorkflowAttachment(File zippedEntry, File tempDir) {
+        List<File> workflowAttachment = new ArrayList<>();
+        if (zippedEntry != null) {
+            try {
+                SwaggerUtility.unzipFile(zippedEntry, tempDir);
+            } catch (IOException e) {
+                exceptionMessage(e, "Unable to get workflow attachment files from zip file " + zippedEntry.getName()
+                                + " Request not sent.", IO_ERROR);
+            }
         }
-
         try {
-
             // A null fileFilter causes all files to be returned
             String[] fileFilter = null;
-            // For a local entry restrict the kinds of files that can be added to the workflow attachment. CWL can import many
-            // file types but there may be confidential or large files in a local directory that should
-            // not be sent to a remote endpoint.
-            // TODO Locate code that grabs all imports for a non local entry and use that instead of checking extension
-            if (abstractEntryClient.isLocalEntry()) {
-                fileFilter = new String[]{"yml", "yaml", "json", this.languageType.toString().toLowerCase()};
-            }
             Iterator it = FileUtils.iterateFiles(tempDir, fileFilter, true);
             while (it.hasNext()) {
                 File afile = (File) it.next();
@@ -101,37 +91,13 @@ public class WESLauncher extends BaseLauncher {
             }
         } catch (Exception e) {
             exceptionMessage(e, "Unable to traverse directory " + tempDir.getName() + " to get workflow "
-                    + "attachment files", GENERIC_ERROR);
+                    + "attachment files.", GENERIC_ERROR);
         }
+        return workflowAttachment;
     }
 
     public void runWESCommand(String jsonInputFilePath, File localPrimaryDescriptorFile, File zippedEntry) {
-        String workflowURL = localPrimaryDescriptorFile.getName();
-        final File tempDir = Files.createTempDir();
-
-        List<File> workflowAttachment = new ArrayList<>();
-
-        // Our current Cromwell WES endpoint requires that the first workflow attachment item be the source
-        // for the primary descriptor
-        // add it as the first item in the workflow attachement even though it may again
-        // be added as an attachment in addFilesToWorkflowAttachment
-        // Including it twice should not cause a problem
-        workflowAttachment.add(localPrimaryDescriptorFile);
-
-
-        addFilesToWorkflowAttachment(workflowAttachment, zippedEntry, tempDir);
-
-        // add the input file so the endpoint has it; not sure if this is needed
-        File jsonInputFile = new File(jsonInputFilePath);
-        workflowAttachment.add(jsonInputFile);
-
-        String jsonString = null;
-        try {
-            jsonString = abstractEntryClient.fileToJSON(jsonInputFilePath);
-        } catch (IOException ex) {
-            exceptionMessage(ex, "Could not construct JSON from " + jsonInputFilePath + ". Request will not be sent to WES "
-                    + "endpoint. Please check that the input file is proper JSON.", IO_ERROR);
-        }
+        File workflowParams = new File(jsonInputFilePath);
 
         String languageType = this.languageType.toString().toUpperCase();
 
@@ -139,14 +105,19 @@ public class WESLauncher extends BaseLauncher {
         String workflowTypeVersion = WORKFLOW_TYPE_VERSION;
         if ("CWL".equalsIgnoreCase(languageType)) {
             workflowTypeVersion = "v" + WORKFLOW_TYPE_VERSION;
-        } else if ("WDL".equalsIgnoreCase(languageType)) {
-            workflowTypeVersion = WDL_WORKFLOW_TYPE_VERSION;
         }
 
+        String workflowURL = localPrimaryDescriptorFile.getName();
+
+        final File tempDir = Files.createTempDir();
+        List<File> workflowAttachment = addFilesToWorkflowAttachment(zippedEntry, tempDir);
+
         try {
-            RunId response = clientWorkflowExecutionServiceApi.runWorkflow(jsonString, languageType, workflowTypeVersion, TAGS,
+            RunId response = clientWorkflowExecutionServiceApi.runWorkflow(workflowParams, languageType, workflowTypeVersion, TAGS,
                     "{}", workflowURL, workflowAttachment);
-            System.out.println("Launched WES run with id: " + response.toString());
+            String runID = response.getRunId();
+            out("Launched WES run with id: " + runID);
+            wesCommandSuggestions(runID);
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error launching WES run", e);
         } finally {
@@ -157,4 +128,17 @@ public class WESLauncher extends BaseLauncher {
             }
         }
     }
+
+    /**
+     * help text output
+     */
+    private void wesCommandSuggestions(String runId) {
+        String wesEntryType = abstractEntryClient.getEntryType().toString().toLowerCase();
+        out("");
+        out("To get status for this run: dockstore " + wesEntryType + " wes status --id " + runId
+                + " [--verbose][--wes-url <WES URL>][--wes-auth <auth>]");
+        out("To cancel this run: dockstore " + wesEntryType + " wes cancel --id " + runId
+                + " [--wes-url <WES URL>][--wes-auth <auth>]");
+    }
+
 }
