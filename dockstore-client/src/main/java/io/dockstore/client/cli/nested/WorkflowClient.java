@@ -65,6 +65,7 @@ import static io.dockstore.client.cli.ArgumentUtility.NAME_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.boolWord;
 import static io.dockstore.client.cli.ArgumentUtility.columnWidthsWorkflow;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
+import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
@@ -604,6 +605,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         out(MessageFormat.format("Refreshing {0}", workflow.getFullWorkflowPath()));
                         try {
                             return workflowsApi.refresh(workflow.getId());
+                        } catch (ApiException ex) {
+                            err(ex.getMessage());
+                            return null;
                         } catch (Exception ex) {
                             exceptionMessage(ex, "", 0);
                             return null;
@@ -631,7 +635,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             printLineBreak();
             printWorkflowList(workflowList);
         } catch (ApiException ex) {
-            exceptionMessage(ex, "", Client.API_ERROR);
+            errorMessage(ex.getMessage(), Client.API_ERROR);
         }
     }
 
