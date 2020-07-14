@@ -56,7 +56,7 @@ public final class ArgumentUtility {
         System.out.println(arg);
     }
 
-    static void err(String arg) {
+    public static void err(String arg) {
         LOG.error(arg);
     }
 
