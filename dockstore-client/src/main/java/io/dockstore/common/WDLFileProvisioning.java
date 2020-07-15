@@ -191,9 +191,7 @@ public class WDLFileProvisioning {
     private Path writeJob(JSONObject newJson) {
         try {
             final Path tempFile = Files.createTempFile("foo", "json");
-            //TODO: investigate, why is this replacement occurring?
-            final String replace = newJson.toString().replace("\\", "");
-            FileUtils.writeStringToFile(tempFile.toFile(), replace, StandardCharsets.UTF_8);
+            FileUtils.writeStringToFile(tempFile.toFile(), newJson.toString(), StandardCharsets.UTF_8);
             return tempFile;
         } catch (IOException e) {
             throw new RuntimeException("Could not write job ", e);

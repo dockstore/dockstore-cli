@@ -3,6 +3,7 @@ package io.dockstore.client.cli.nested;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
@@ -16,16 +17,55 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 
 public class ApiClientExtended extends ApiClient {
 
+    /**
+     *
+     * @param key Multi-part form body name
+     * @return MediaType
+     */
+    private Optional<MediaType> getMediaType(Optional<String> key) {
+        Optional<MediaType> mediaType = Optional.empty();
+        if (key.isPresent()) {
+            String keyWESParam = key.get().toLowerCase();
+            switch (keyWESParam) {
+            case "workflow_params":
+            case "tags":
+            case "workflow_engine_parameters":
+                mediaType =  Optional.of(MediaType.APPLICATION_JSON_TYPE);
+                break;
+            case "workflow_attachment":
+                mediaType =  Optional.of(MediaType.APPLICATION_OCTET_STREAM_TYPE);
+                break;
+            case "workflow_url":
+            case "workflow_type":
+            case "workflow_type_version":
+                mediaType =  Optional.of(MediaType.TEXT_PLAIN_TYPE);
+                break;
+            default:
+            }
+        }
+        return mediaType;
+    }
 
+    /**
+     * ]
+     * @param multiPart Multipart form
+     * @param key Multi part form body name
+     * @param formObject Form object that will be a body part of the multi part form
+     */
     public void createBodyPart(MultiPart multiPart, String key, Object formObject) {
+        Optional<MediaType> optMediaType = getMediaType(Optional.ofNullable(key));
         if (formObject instanceof File) {
             File file = (File)formObject;
             FormDataContentDisposition contentDisp = FormDataContentDisposition.name(key)
                     .fileName(file.getName()).size(file.length()).build();
-            multiPart.bodyPart(new FormDataBodyPart(contentDisp, file, MediaType.APPLICATION_OCTET_STREAM_TYPE));
+
+            MediaType mediaType = optMediaType.orElse(MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            multiPart.bodyPart(new FormDataBodyPart(contentDisp, file, mediaType));
         } else {
             FormDataContentDisposition contentDisp = FormDataContentDisposition.name(key).build();
-            multiPart.bodyPart(new FormDataBodyPart(contentDisp, parameterToString(formObject)));
+
+            MediaType mediaType = optMediaType.orElse(MediaType.TEXT_PLAIN_TYPE);
+            multiPart.bodyPart(new FormDataBodyPart(contentDisp, formObject, mediaType));
         }
     }
 

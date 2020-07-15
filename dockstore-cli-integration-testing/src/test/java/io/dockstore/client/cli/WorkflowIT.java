@@ -104,13 +104,13 @@ public class WorkflowIT extends BaseIT {
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
 
         // should not be able to launch properly with incorrect credentials
         systemExit.expectSystemExitWithStatus(Client.ENTRY_NOT_FOUND);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
     }
 
     /**
@@ -251,7 +251,7 @@ public class WorkflowIT extends BaseIT {
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "checker", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
 
         // should be able to launch properly with incorrect credentials but the entry is published
         Client.main(
@@ -259,7 +259,7 @@ public class WorkflowIT extends BaseIT {
                 "--script" });
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "checker", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
 
         // should not be able to launch properly with incorrect credentials
         Client.main(
@@ -268,7 +268,7 @@ public class WorkflowIT extends BaseIT {
         systemExit.expectSystemExitWithStatus(Client.ENTRY_NOT_FOUND);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "checker", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum-wrapper-tool.json"), "--script" });
+                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
     }
 
     @Test

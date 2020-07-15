@@ -1042,7 +1042,11 @@ public abstract class AbstractEntryClient<T> {
                 if (args.isEmpty() || containsHelpRequest(args)) {
                     wesLaunchHelp();
                 } else {
-                    launch(args);
+                    if (args.contains("--local-entry")) {
+                        errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
+                    } else {
+                        launch(args);
+                    }
                 }
                 break;
             case "status":
@@ -1300,11 +1304,27 @@ public abstract class AbstractEntryClient<T> {
         printHelpFooter();
     }
 
+    private void printWesLaunchHelpBody() {
+        out("");
+        out("Description:");
+        out("  Launch an entry on a WES endpoint.");
+        out("");
+        out("Required parameters:");
+        out("  --entry <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
+        out("");
+        out("Optional parameters:");
+        out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
+        out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
+        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.getShortName());
+        out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
+        out("");
+    }
+
     private void wesLaunchHelp() {
         printHelpHeader();
         out("Usage: dockstore " + getEntryType().toLowerCase() + " wes launch --help");
         out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
-        printLaunchHelpBody();
+        printWesLaunchHelpBody();
         printWesHelpFooter();
         printHelpFooter();
     }

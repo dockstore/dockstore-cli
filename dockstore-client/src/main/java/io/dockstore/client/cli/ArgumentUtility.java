@@ -39,7 +39,7 @@ public final class ArgumentUtility {
     public static final String DOWNLOAD = "download";
     public static final String NAME_HEADER = "NAME";
     public static final String DESCRIPTION_HEADER = "DESCRIPTION";
-    public static final String GIT_HEADER = "Git Repo";
+    public static final String GIT_HEADER = "GIT REPO";
     public static final int MAX_DESCRIPTION = 50;
 
     private static final Logger LOG = LoggerFactory.getLogger(ArgumentUtility.class);
@@ -56,7 +56,7 @@ public final class ArgumentUtility {
         System.out.println(arg);
     }
 
-    static void err(String arg) {
+    public static void err(String arg) {
         LOG.error(arg);
     }
 
@@ -69,13 +69,21 @@ public final class ArgumentUtility {
         throw new Kill();
     }
 
+    /**
+     * Prints an exception message. Exits the program if exitCode is not 0.
+     * @param exception
+     * @param message
+     * @param exitCode
+     */
     public static void exceptionMessage(Exception exception, String message, int exitCode) {
         if (!"".equals(message)) {
             err(message);
         }
         err(ExceptionUtils.getStackTrace(exception));
 
-        System.exit(exitCode);
+        if (exitCode != 0) {
+            System.exit(exitCode);
+        }
     }
 
     public static void errorMessage(String message, int exitCode) {

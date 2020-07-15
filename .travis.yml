@@ -1,9 +1,9 @@
-dist: bionic
 services:
 - docker
+- postgresql
 
 addons:
-  postgresql: "9.6"
+  postgresql: "11"
 
 cache:
   directories:
@@ -12,6 +12,7 @@ cache:
   - $HOME/.m2/repository
   - $HOME/apache-maven-3.6.2
 
+os: linux
 dist: bionic
 language: java
 jdk: openjdk12
@@ -50,7 +51,12 @@ jobs:
       env:
         - TESTING_PROFILE=regression-integration-tests
       if: branch = master OR branch =~ /^release.*$/
-        
+
+    - stage: coverage
+      env:
+        - TESTING_PROFILE=singularity-tests
+      script: mvn --batch-mode clean install jacoco:report-integration jacoco:report-aggregate coveralls:report -P$TESTING_PROFILE,coverage -DskipClientITs=true
+
 # build lifecycle is before_install, install, before_script, script, before_cache, after_success/after_failure, after_script
 
 before_install:
