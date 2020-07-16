@@ -28,7 +28,6 @@ import javax.ws.rs.core.GenericType;
 import com.google.gson.Gson;
 import io.swagger.client.ApiClient;
 import io.swagger.client.model.PublishRequest;
-import io.swagger.client.model.StarRequest;
 import org.apache.commons.io.FileUtils;
 
 public final class SwaggerUtility {
@@ -71,6 +70,7 @@ public final class SwaggerUtility {
     /**
      * These serialization/deserialization hacks should not be necessary.
      * Why does this version of codegen remove the setters?
+     * Probably because someone dun goof'd the restful implementation of publish
      * @param bool
      * @return
      */
@@ -81,13 +81,4 @@ public final class SwaggerUtility {
         String s = gson.toJson(publishRequest);
         return gson.fromJson(s, PublishRequest.class);
     }
-
-    public static StarRequest createStarRequest(Boolean bool) {
-        Map<String, Object> starRequest = new HashMap<>();
-        starRequest.put("star", bool);
-        Gson gson = new Gson();
-        String s = gson.toJson(starRequest);
-        return gson.fromJson(s, StarRequest.class);
-    }
-
 }
