@@ -180,7 +180,7 @@ public final class ArgumentUtility {
         int[] maxWidths = { NAME_HEADER.length(), DESCRIPTION_HEADER.length(), GIT_HEADER.length() };
 
         for (Workflow workflow : workflows) {
-            final String workflowGitPath = workflow.getPath();
+            final String workflowGitPath = workflow.getFullWorkflowPath();
             if (workflowGitPath != null && workflowGitPath.length() > maxWidths[0]) {
                 maxWidths[0] = workflowGitPath.length();
             }

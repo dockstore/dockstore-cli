@@ -125,7 +125,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             String description = getCleanedDescription(workflow.getDescription());
 
-            outFormatted(format, workflow.getPath(), description, gitUrl, boolWord(workflow.isIsPublished()));
+            outFormatted(format, workflow.getFullWorkflowPath(), description, gitUrl, boolWord(workflow.isIsPublished()));
         }
     }
 
