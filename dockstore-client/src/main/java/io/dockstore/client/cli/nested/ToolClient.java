@@ -354,13 +354,11 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
      */
     @Override
     protected void handleStarUnstar(String entry, boolean star) {
-        String action = "star";
-        if (!star) {
-            action = "unstar";
-        }
+        String action = star ? "star" : "unstar";
         try {
             DockstoreTool container = containersApi.getPublishedContainerByToolPath(entry, null);
-            StarRequest request = SwaggerUtility.createStarRequest(star);
+            StarRequest request = new StarRequest();
+            request.setStar(star);
             containersApi.starEntry(container.getId(), request);
             out("Successfully " + action + "red  " + entry);
         } catch (ApiException ex) {
