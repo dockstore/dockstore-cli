@@ -462,8 +462,8 @@ public abstract class AbstractEntryClient<T> {
             starHelp();
         } else {
             String first = reqVal(args, "--entry");
-            final boolean unstarRequest = args.contains("--unstar");
-            handleStarUnstar(first, unstarRequest);
+            final boolean toStar = !args.contains("--unstar");
+            handleStarUnstar(first, toStar);
         }
     }
 
