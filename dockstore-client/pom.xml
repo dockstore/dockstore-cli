@@ -58,20 +58,12 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>openapi-java-wes-client</artifactId>
-<<<<<<< HEAD
-            <version>1.9.0</version>
-=======
             <version>1.9.1-SNAPSHOT</version>
->>>>>>> 3a7730d0b4d970756d7bd39219957441efb2f0e1
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-file-plugin-parent</artifactId>
-<<<<<<< HEAD
-            <version>1.9.0</version>
-=======
             <version>1.9.1-SNAPSHOT</version>
->>>>>>> 3a7730d0b4d970756d7bd39219957441efb2f0e1
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
