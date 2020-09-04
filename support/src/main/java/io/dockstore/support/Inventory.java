@@ -24,8 +24,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 
 /**
- * You must have installed and configured AWS CLI
- * and your IAM user must be given proper permissions
+ * Configure a credentials file like so https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html before running
+ * This assumes you have permissions to access the relevant AWS APIs
  */
 public final class Inventory {
 
