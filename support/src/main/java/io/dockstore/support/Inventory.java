@@ -1,9 +1,10 @@
 package io.dockstore.support;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
-import io.dockstore.client.cli.Client;
+import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
+import software.amazon.awssdk.services.cloudformation.CloudFormationClient;
 import software.amazon.awssdk.services.config.ConfigClient;
 import software.amazon.awssdk.services.config.model.ListDiscoveredResourcesRequest;
 import software.amazon.awssdk.services.config.model.ListDiscoveredResourcesResponse;
@@ -12,8 +13,15 @@ import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
 import software.amazon.awssdk.services.ec2.model.Instance;
-
-import static io.dockstore.client.cli.ArgumentUtility.outFormatted;
+import software.amazon.awssdk.services.lambda.LambdaClient;
+import software.amazon.awssdk.services.lambda.model.GetFunctionRequest;
+import software.amazon.awssdk.services.lambda.model.GetFunctionResponse;
+import software.amazon.awssdk.services.rds.RdsClient;
+import software.amazon.awssdk.services.rds.model.DBInstance;
+import software.amazon.awssdk.services.rds.model.DescribeDbInstancesRequest;
+import software.amazon.awssdk.services.rds.model.DescribeDbInstancesResponse;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 
 /**
  * You must have installed and configured AWS CLI
@@ -32,40 +40,27 @@ public final class Inventory {
             "AWS::EC2::Subnet", "AWS::EC2::VPC", "AWS::ElasticLoadBalancingV2::LoadBalancer", "AWS::IAM::Group", "AWS::IAM::User",
             "AWS::Lambda::Function", "AWS::RDS::DBInstance", "AWS::S3::Bucket", "AWS::SQS::Queue", "AWS::WAF::WebACL" };
         ConfigClient build = ConfigClient.builder().build();
-        List<List<String>> output = new ArrayList<>();
-        output.add(List.of("Type", "Id", "Name"));
+        Table<String, String, String> outputTable = TreeBasedTable.create();
         for (String type : resourceTypes) {
             ListDiscoveredResourcesRequest build1 = ListDiscoveredResourcesRequest.builder().resourceType(type).build();
             ListDiscoveredResourcesResponse listDiscoveredResourcesResponse = build.listDiscoveredResources(build1);
             for (ResourceIdentifier id : listDiscoveredResourcesResponse.resourceIdentifiers()) {
-
-                List<String> strings = new ArrayList<>();
-                strings.add(id.resourceTypeAsString());
-                strings.add(id.resourceId());
-                strings.add(id.resourceName() == null ? "" : id.resourceName());
-                processDetailedInfo(id, strings);
-                output.add(strings);
+                Map<String, String> row = outputTable.row(id.resourceId());
+                row.put("Type", id.resourceTypeAsString());
+                if (id.resourceName() != null) {
+                    outputTable.put(id.resourceId(), "Name", id.resourceName());
+                }
+                processDetailedInfo(id, row);
             }
         }
 
-        int maxColumns = output.stream().map(List::size).max(Integer::compareTo).get();
-        List<Integer> maxWidths = new ArrayList<>();
-        for (int i = 0; i < maxColumns; i++) {
-            int finalI = i;
-            maxWidths.add(output.stream().map(list -> list.size() > finalI ? list.get(finalI).length() : 0).max(Integer::compare).get()
-                    + Client.PADDING);
-        }
-        StringBuilder format = new StringBuilder();
-        for (List<String> line : output) {
-            for (int i = 0; i < line.size(); i++) {
-                format.append("%-").append(maxWidths.get(i)).append("s");
-            }
-            outFormatted(format.toString(), line.toArray());
-            format.delete(0, format.length());
+        for (Table.Cell<String, String, String> cell : outputTable.cellSet()) {
+            System.out.println("(" + cell.getRowKey() + "," + cell.getColumnKey() + ")=" + cell.getValue());
         }
     }
 
-    private static void processDetailedInfo(ResourceIdentifier id, List<String> strings) {
+    @SuppressWarnings("checkstyle:methodlength")
+    private static void processDetailedInfo(ResourceIdentifier id, Map<String, String> strings) {
         switch (id.resourceType()) {
         case AWS_EC2_CUSTOMER_GATEWAY:
             break;
@@ -74,13 +69,13 @@ public final class Inventory {
         case AWS_EC2_HOST:
             break;
         case AWS_EC2_INSTANCE:
-            Ec2Client build2 = Ec2Client.builder().build();
+            Ec2Client ec2Client = Ec2Client.builder().build();
             DescribeInstancesRequest.Builder builder = DescribeInstancesRequest.builder().instanceIds(id.resourceId());
-            DescribeInstancesResponse describeInstancesResponse = build2.describeInstances(builder.build());
+            DescribeInstancesResponse describeInstancesResponse = ec2Client.describeInstances(builder.build());
             Instance instance = describeInstancesResponse.reservations().get(0).instances().get(0);
             // demo some extra info for EC2 instances
-            strings.add(instance.imageId());
-            strings.add(instance.instanceTypeAsString());
+            strings.put("EC2:ImageID", instance.imageId());
+            strings.put("EC2:InstanceType", instance.instanceTypeAsString());
             break;
         case AWS_EC2_INTERNET_GATEWAY:
             break;
@@ -115,6 +110,13 @@ public final class Inventory {
         case AWS_ACM_CERTIFICATE:
             break;
         case AWS_RDS_DB_INSTANCE:
+            RdsClient rdsClient = RdsClient.builder().build();
+            DescribeDbInstancesRequest.Builder rBuilder = DescribeDbInstancesRequest.builder().dbInstanceIdentifier(id.resourceName());
+            DescribeDbInstancesResponse describeDbInstancesResponse = rdsClient.describeDBInstances(rBuilder.build());
+            DBInstance dbInstance = describeDbInstancesResponse.dbInstances().get(0);
+            // demo some extra info for RDS instances
+            strings.put("RDS:engine", dbInstance.engine());
+            strings.put("RDS:storageType", dbInstance.storageType());
             break;
         case AWS_RDS_DB_SUBNET_GROUP:
             break;
@@ -127,6 +129,14 @@ public final class Inventory {
         case AWS_ELASTIC_LOAD_BALANCING_V2_LOAD_BALANCER:
             break;
         case AWS_S3_BUCKET:
+            S3Client s3Client = S3Client.builder().build();
+            //TODO: this is not filtering right
+            ListBucketsResponse listBucketsResponse = s3Client.listBuckets();
+            //            ListBucketsRequest s3Builder = ListBucketsRequest.builder().build();
+            //            ListBucketsResponse listBucketsResponse = s3Client.listBuckets(s3Builder.toBuilder().build());
+            //            Bucket bucket = listBucketsResponse.buckets().get(0);
+            //            // demo some extra info for RDS instances
+            //            strings.put("S3:creationDate", bucket.creationDate().toString());
             break;
         case AWS_SSM_MANAGED_INSTANCE_INVENTORY:
             break;
@@ -145,6 +155,14 @@ public final class Inventory {
         case AWS_CLOUD_WATCH_ALARM:
             break;
         case AWS_CLOUD_FORMATION_STACK:
+            CloudFormationClient build = CloudFormationClient.builder().build();
+            //TODO: this is not filtering right
+            //            DescribeStackInstanceRequest.Builder builder2 = DescribeStackInstanceRequest.builder().stackSetName(id.resourceName()).stackInstanceRegion("").stackInstanceAccount("");
+            //            DescribeStackInstanceResponse describeStackInstanceResponse = build.describeStackInstance(builder2.build());
+            //            StackInstance stackInstance = describeStackInstanceResponse.stackInstance();
+            //            // demo some extra info for cloudformation instances
+            //            strings.put("CloudFormation:status", stackInstance.status().toString());
+            //            strings.put("CloudFormation:statusreason", stackInstance.statusReason());
             break;
         case AWS_DYNAMO_DB_TABLE:
             break;
@@ -179,6 +197,12 @@ public final class Inventory {
         case AWS_WAF_REGIONAL_RULE_GROUP:
             break;
         case AWS_LAMBDA_FUNCTION:
+            LambdaClient lambdaClient = LambdaClient.builder().build();
+            GetFunctionRequest.Builder builder1 = GetFunctionRequest.builder().functionName(id.resourceName());
+            GetFunctionResponse function = lambdaClient.getFunction(builder1.build());
+            // demo some extra info for lambdas instances
+            strings.put("Lambda:codelocation", function.code().location());
+            strings.put("Lambda:revisionid", function.configuration().revisionId());
             break;
         case AWS_ELASTIC_BEANSTALK_APPLICATION:
             break;

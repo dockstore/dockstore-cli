@@ -118,7 +118,6 @@
             <artifactId>ec2</artifactId>
             <scope>compile</scope>
         </dependency>
-        <!--  later
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
@@ -129,11 +128,13 @@
             <artifactId>lambda</artifactId>
             <scope>compile</scope>
         </dependency>
+        <!-- uncomment if describing sqs
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sqs</artifactId>
             <scope>compile</scope>
         </dependency>
+        -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>cloudformation</artifactId>
@@ -141,30 +142,24 @@
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
-            <artifactId>iam</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
             <artifactId>rds</artifactId>
             <scope>compile</scope>
         </dependency>
+        <!-- uncomment if describing waf
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>waf</artifactId>
             <scope>compile</scope>
         </dependency>
         -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/aws-java-sdk-config -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>config</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.dockstore</groupId>
-            <artifactId>dockstore-client</artifactId>
-            <version>1.9.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
