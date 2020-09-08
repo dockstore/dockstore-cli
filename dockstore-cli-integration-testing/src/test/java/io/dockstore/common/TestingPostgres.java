@@ -40,6 +40,10 @@ public class TestingPostgres {
 
     }
 
+    public int runDeleteStatement(String query) {
+        return jdbi.withHandle(handle -> handle.execute(query));
+    }
+
     public int runUpdateStatement(String query) {
         return jdbi.withHandle(handle -> handle.createUpdate(query).execute());
     }

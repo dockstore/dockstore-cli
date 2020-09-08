@@ -70,6 +70,32 @@ public class GeneralWorkflowIT extends BaseIT {
         CommonTestUtilities.cleanStatePrivate2(SUPPORT, false);
     }
 
+    @Test
+    public void refreshAll() {
+        // refresh all to get a baseline number of workflows (we are testing the cli implementation of this)
+        refreshByOrganizationReplacement(USER_2_USERNAME);
+
+        // get userid
+        long userid = testingPostgres.runSelectStatement(String.format("SELECT id FROM user_profile WHERE username='%s';", USER_2_USERNAME), long.class);
+
+        // initial count of workflows associated with this user
+        int val1 = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), int.class);
+
+        // Delete all user_entry rows associated with this user
+        testingPostgres.runDeleteStatement(String.format("DELETE FROM user_entry WHERE userid = %d", userid));
+
+        // ensure resulting count after delete is 0
+        int val2 = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), int.class);
+        assertEquals("there should be 0 user entries for " + USER_2_USERNAME + ", there are " + val2, 0, val2);
+
+        // run CLI refresh command to refresh all workflows
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh"});
+
+        // final count of workflows associated with this user
+        int val3 = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), int.class);
+        assertEquals("Initially had " + val1 + " entries, resulted with " + val3 + " entries", val1, val3);
+    }
+
     /**
      * This test checks that refresh all workflows (with a mix of stub and full) and refresh individual.  It then tries to publish them
      */
