@@ -72,27 +72,31 @@ public class GeneralWorkflowIT extends BaseIT {
 
     @Test
     public void refreshAll() {
-        // refresh all to get a baseline number of workflows (we are testing the cli implementation of this)
+        // get userid
+        final long userid = testingPostgres.runSelectStatement(String.format("SELECT id FROM user_profile WHERE username='%s';", USER_2_USERNAME), long.class);
+
+        // Make sure there are no entries associated with this user
+        testingPostgres.runDeleteStatement(String.format("DELETE FROM user_entry ue WHERE ue.userid = %d", userid));
+
+        // refresh all by organizations (We are testing the CLI implementation of this refresh functionality, we do the refresh here to give a baseline)
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
-        // get userid
-        long userid = testingPostgres.runSelectStatement(String.format("SELECT id FROM user_profile WHERE username='%s';", USER_2_USERNAME), long.class);
+        // initial count of workflows associated with this user using the standard refresh
+        final long val1 = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), long.class);
 
-        // initial count of workflows associated with this user
-        int val1 = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), int.class);
+        // Delete all user_entry rows associated with repos this user is added to
+        final int deleteResult = testingPostgres.runDeleteStatement(String.format("DELETE FROM user_entry ue WHERE ue.userid = %d", userid));
+        assertEquals("After deletion, there should be 0 rows remaining associated with this user", deleteResult, val1);
 
-        // Delete all user_entry rows associated with this user
-        testingPostgres.runDeleteStatement(String.format("DELETE FROM user_entry WHERE userid = %d", userid));
-
-        // ensure resulting count after delete is 0
-        int val2 = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), int.class);
-        assertEquals("there should be 0 user entries for " + USER_2_USERNAME + ", there are " + val2, 0, val2);
+        // ensure resulting count after delete is less than the original count, otherwise we may not know if the final test is truly successful
+        final long val2 = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), long.class);
+        assertTrue(String.format("There should be fewer entries post-deletion (pre-deletion, the user must be associated with > 0 workflows) pre: %d, post: %d", val1, val2), val1 > val2);
 
         // run CLI refresh command to refresh all workflows
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh"});
 
         // final count of workflows associated with this user
-        int val3 = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), int.class);
+        final long val3 = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), long.class);
         assertEquals("Initially had " + val1 + " entries, resulted with " + val3 + " entries", val1, val3);
     }
 
