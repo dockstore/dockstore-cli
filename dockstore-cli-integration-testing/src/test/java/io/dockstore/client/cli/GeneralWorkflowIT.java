@@ -1075,4 +1075,37 @@ public class GeneralWorkflowIT extends BaseIT {
         }
 
     }
+
+    @Test
+    public void testPublishWithEntryName() {
+
+        // register workflow
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            "test_workflow_wdl", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--descriptor-type", "wdl", "--workflow-path", "/hello.wdl"});
+
+        // count number of workflows for this user with the workflowname 'test_entryname'
+        final long countNonexistantWorkflow = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' AND repository='test_workflow_wdl';", long.class);
+        assertEquals("No workflows should be located", 1, countNonexistantWorkflow);
+
+        // publish workflow with name 'test_entryname'
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+                "--entry", "github.com/DockstoreTestUser/test_workflow_wdl", "--entryname", "test_entryname"});
+
+        // verify count of number of published workflows with the desired name is 1
+        final long countPublishedWorkflowWithCustomName = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
+                + "AND repository='test_workflow_wdl' AND workflowname='test_entryname' AND ispublished='t';", long.class);
+        assertEquals("No workflows should be located", 1, countPublishedWorkflowWithCustomName);
+
+        // unpublish workflow with name 'test_entryname'
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+            "--entry", "github.com/DockstoreTestUser/test_workflow_wdl/test_entryname"});
+
+        // verify count of number of unpublish workflows with the desired name is 1
+        final long countUnpublishedWorkflowWithCustomName = testingPostgres.runSelectStatement(
+            "SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' AND repository='test_workflow_wdl' AND workflowname='test_entryname' AND ispublished='f';", long.class);
+        assertEquals("No workflows should be located", 1, countUnpublishedWorkflowWithCustomName);
+    }
 }

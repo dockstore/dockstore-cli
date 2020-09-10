@@ -664,31 +664,17 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     publish(true, entryPath);
                 }
             } else {
-                //for workflows method currently doesn't work with --entryname flag
-//                errorMessage("Parameter '--entryname' not valid for workflows. See `workflow publish --help` for more information.",
-//                    CLIENT_ERROR);
                 try {
                     final Workflow workflow = workflowsApi.getWorkflowByPath(entryPath, null, false);
-//                    workflow.setWorkflowName(newName);
-//                    Workflow updatedWorkflow = workflowsApi.updateWorkflow(workflow.getId(), workflow);
-//                    final String temp = workflow.getGitUrl();
 
-                    //Workflow newWorkflow = new Workflow();
-                    String registry = getGitRegistry(workflow.getGitUrl());
-
-                    // repository organization and name (ex. dockstore/dockstore-ui2)
-                    String path = workflow.getOrganization() + "/" + workflow.getRepository();
-                    String workflowPath = workflow.getWorkflowPath();
-                    String descriptor = workflow.getDescriptorType().toString();
-                    String testParam = workflow.getDefaultTestParameterFilePath();
-
+                    // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
                     final Workflow newWorkflow = workflowsApi.manualRegister(
-                            registry,
-                            path,
-                            workflowPath,
+                            getGitRegistry(workflow.getGitUrl()),
+                            workflow.getOrganization() + "/" + workflow.getRepository(),
+                            workflow.getWorkflowPath(),
                             newName,
-                            descriptor,
-                            testParam
+                            workflow.getDescriptorType().toString(),
+                            workflow.getDefaultTestParameterFilePath()
                     );
 
                     if (newWorkflow != null) {
