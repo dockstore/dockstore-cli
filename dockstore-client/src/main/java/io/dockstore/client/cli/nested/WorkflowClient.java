@@ -68,6 +68,7 @@ import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.getGitRegistry;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.outFormatted;
@@ -664,8 +665,42 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 }
             } else {
                 //for workflows method currently doesn't work with --entryname flag
-                errorMessage("Parameter '--entryname' not valid for workflows. See `workflow publish --help` for more information.",
-                    CLIENT_ERROR);
+//                errorMessage("Parameter '--entryname' not valid for workflows. See `workflow publish --help` for more information.",
+//                    CLIENT_ERROR);
+                try {
+                    final Workflow workflow = workflowsApi.getWorkflowByPath(entryPath, null, false);
+//                    workflow.setWorkflowName(newName);
+//                    Workflow updatedWorkflow = workflowsApi.updateWorkflow(workflow.getId(), workflow);
+//                    final String temp = workflow.getGitUrl();
+
+                    //Workflow newWorkflow = new Workflow();
+                    String registry = getGitRegistry(workflow.getGitUrl());
+
+                    // repository organization and name (ex. dockstore/dockstore-ui2)
+                    String path = workflow.getOrganization() + "/" + workflow.getRepository();
+                    String workflowPath = workflow.getWorkflowPath();
+                    String descriptor = workflow.getDescriptorType().toString();
+                    String testParam = workflow.getDefaultTestParameterFilePath();
+
+                    final Workflow newWorkflow = workflowsApi.manualRegister(
+                            registry,
+                            path,
+                            workflowPath,
+                            newName,
+                            descriptor,
+                            testParam
+                    );
+
+                    if (newWorkflow != null) {
+                        out("Successfully registered " + entryPath + "/" + newName);
+                        workflowsApi.refresh(newWorkflow.getId());
+                        publish(true, newWorkflow.getPath() + "/" + newName);
+                    } else {
+                        errorMessage("Unable to publish " + newName, COMMAND_ERROR);
+                    }
+                } catch (ApiException ex) {
+                    exceptionMessage(ex, "Unable to publish " + newName, Client.API_ERROR);
+                }
             }
         }
     }
