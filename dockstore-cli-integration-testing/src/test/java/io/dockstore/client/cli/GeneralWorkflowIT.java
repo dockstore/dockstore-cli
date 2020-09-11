@@ -1078,34 +1078,40 @@ public class GeneralWorkflowIT extends BaseIT {
 
     @Test
     public void testPublishWithEntryName() {
-
         // register workflow
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
-            "test_workflow_wdl", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--descriptor-type", "wdl", "--workflow-path", "/hello.wdl"});
+            "parameter_test_workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--script"});
 
         // count number of workflows for this user with the workflowname 'test_entryname'
-        final long countNonexistantWorkflow = testingPostgres
-            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' AND repository='test_workflow_wdl';", long.class);
-        assertEquals("No workflows should be located", 1, countNonexistantWorkflow);
+        final long countInitialWorkflowPublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
+                + "AND repository='parameter_test_workflow' AND workflowname IS NULL;", long.class);
+        assertEquals("The initial workflow should be published without a workflow name", 1, countInitialWorkflowPublish);
 
         // publish workflow with name 'test_entryname'
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
-                "--entry", "github.com/DockstoreTestUser/test_workflow_wdl", "--entryname", "test_entryname"});
+                "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", "--entryname", "test_entryname", "--script"});
 
-        // verify count of number of published workflows with the desired name is 1
+        // verify there are 2 workflows associated with the user
+        final long countTotalPublishedWorkflows = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
+                + "AND repository='parameter_test_workflow' AND ispublished='t';", long.class);
+        assertEquals("Ensure there are 2 published workflows", 2, countTotalPublishedWorkflows);
+
+        // verify count of number of published workflows, with the desired name, is 1
         final long countPublishedWorkflowWithCustomName = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
-                + "AND repository='test_workflow_wdl' AND workflowname='test_entryname' AND ispublished='t';", long.class);
-        assertEquals("No workflows should be located", 1, countPublishedWorkflowWithCustomName);
+                + "AND repository='parameter_test_workflow' AND workflowname='test_entryname' AND ispublished='t';", long.class);
+        assertEquals("Ensure there is a published workflow with the expected workflow name", 1, countPublishedWorkflowWithCustomName);
 
         // unpublish workflow with name 'test_entryname'
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
-            "--entry", "github.com/DockstoreTestUser/test_workflow_wdl/test_entryname"});
+            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", "--script"});
 
         // verify count of number of unpublish workflows with the desired name is 1
         final long countUnpublishedWorkflowWithCustomName = testingPostgres.runSelectStatement(
-            "SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' AND repository='test_workflow_wdl' AND workflowname='test_entryname' AND ispublished='f';", long.class);
-        assertEquals("No workflows should be located", 1, countUnpublishedWorkflowWithCustomName);
+            "SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' AND repository='parameter_test_workflow' AND workflowname='test_entryname' AND ispublished='f';", long.class);
+        assertEquals("The workflow should exist and be unpublished", 1, countUnpublishedWorkflowWithCustomName);
     }
 }
