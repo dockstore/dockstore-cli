@@ -345,11 +345,7 @@ public class Client {
             // Run the dockstore script with the 'self-install' argument so if it needs
             // to download the appropriate CLI JAR file it will do so now
             // and not the next time the user runs the dockstore script
-            try {
-                Runtime.getRuntime().exec(new String[] {file.toPath().toString(), "self-install"});
-            } catch (IOException re) {
-                exceptionMessage(re, "Could not download Dockstore CLI Jar.", IO_ERROR);
-            }
+            Utilities.executeCommand(file.toPath().toString() + " self-install");
         } catch (IOException e) {
             exceptionMessage(e, "Could not connect to Github. You may have reached your rate limit.", IO_ERROR);
         }
