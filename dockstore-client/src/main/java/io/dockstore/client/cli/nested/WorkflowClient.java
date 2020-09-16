@@ -642,50 +642,56 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     @Override
     protected void handlePublishUnpublish(String entryPath, String newName, boolean unpublishRequest) {
-        Workflow existingWorkflow;
+        Workflow existingWorkflow = null;
         boolean isPublished = false;
+
         try {
             existingWorkflow = workflowsApi.getWorkflowByPath(entryPath, null, false);
             isPublished = existingWorkflow.isIsPublished();
         } catch (ApiException ex) {
-            exceptionMessage(ex, "Unable to publish/unpublish " + newName, Client.API_ERROR);
+            exceptionMessage(ex, "Unable to publish/unpublish " + entryPath, Client.API_ERROR);
         }
+
+        if (existingWorkflow == null) {
+            errorMessage("Unable to locate " + entryPath, COMMAND_ERROR);
+        }
+
         if (unpublishRequest) {
             if (isPublished) {
                 publish(false, entryPath);
             } else {
-                out("This workflow is already unpublished.");
+                out("The following workflow is already unpublished: " + entryPath);
             }
         } else {
             if (newName == null) {
                 if (isPublished) {
-                    out("This workflow is already published.");
+                    out("The following workflow is already published: " + entryPath);
                 } else {
                     publish(true, entryPath);
                 }
             } else {
                 try {
-                    final Workflow workflow = workflowsApi.getWorkflowByPath(entryPath, null, false);
-
                     // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
                     final Workflow newWorkflow = workflowsApi.manualRegister(
-                            getGitRegistry(workflow.getGitUrl()),
-                            workflow.getOrganization() + "/" + workflow.getRepository(),
-                            workflow.getWorkflowPath(),
+                            getGitRegistry(existingWorkflow.getGitUrl()),
+                            existingWorkflow.getOrganization() + "/" + existingWorkflow.getRepository(),
+                            existingWorkflow.getWorkflowPath(),
                             newName,
-                            workflow.getDescriptorType().toString(),
-                            workflow.getDefaultTestParameterFilePath()
+                            existingWorkflow.getDescriptorType().toString(),
+                            existingWorkflow.getDefaultTestParameterFilePath()
                     );
 
+                    final String completeEntryPath = entryPath + "/" + newName;
+
                     if (newWorkflow != null) {
-                        out("Successfully registered " + entryPath + "/" + newName);
+                        out("Successfully registered " + completeEntryPath);
                         workflowsApi.refresh(newWorkflow.getId());
-                        publish(true, newWorkflow.getPath() + "/" + newName);
+                        publish(true, completeEntryPath);
                     } else {
-                        errorMessage("Unable to publish " + newName, COMMAND_ERROR);
+                        errorMessage("Unable to publish " + completeEntryPath, COMMAND_ERROR);
                     }
                 } catch (ApiException ex) {
-                    exceptionMessage(ex, "Unable to publish " + newName, Client.API_ERROR);
+                    exceptionMessage(ex, "Unable to publish " + entryPath + "/" + newName, Client.API_ERROR);
                 }
             }
         }
@@ -703,12 +709,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  Publish/unpublish a registered " + getEntryType() + ".");
         out("  No arguments will list the current and potential " + getEntryType() + "s to share.");
         out("Required Parameters:");
-        out("  --entry <entry>             Complete " + getEntryType()
+        out("  --entry <entry>                      Complete " + getEntryType()
             + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("Optional Parameters:");
-        out("  --entryname <entryname>     Extension to the " + getEntryType()
-                + " path in Dockstore, helpful if multiple workflows are published from the same repository (ex. quay.io/collaboratory/seqware-bwa-workflow/entryname)");
-        //TODO add support for optional parameter '--entryname'
+        out("  --entryname <newWorflowName>         New name to give the workflow specified by --entry. This will register and publish a new copy of the workflow with the given name.");
         printHelpFooter();
     }
 

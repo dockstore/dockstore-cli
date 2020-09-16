@@ -451,7 +451,14 @@ public abstract class AbstractEntryClient<T> {
             String first = reqVal(args, "--entry");
             String entryname = optVal(args, "--entryname", null);
             final boolean unpublishRequest = args.contains("--unpub");
-            handlePublishUnpublish(first, entryname, unpublishRequest);
+
+            // prevent specifying --unpub and --entryname together
+            if (unpublishRequest && entryname != null) {
+                out("Unable to specify both --unpub and --entryname together. If trying to unpublish an entry,"
+                    + " provide the entire entry path under the --entry parameter.");
+            } else {
+                handlePublishUnpublish(first, entryname, unpublishRequest);
+            }
         }
     }
 

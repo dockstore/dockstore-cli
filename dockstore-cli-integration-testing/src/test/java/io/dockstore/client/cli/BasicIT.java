@@ -1497,4 +1497,37 @@ public class BasicIT extends BaseIT {
         final long count = testingPostgres.runSelectStatement("select count(*) from user_profile where location='Toronto'", long.class);
         Assert.assertEquals("One user should have this info now, there are " + count, 1, count);
     }
+
+    /**
+     * Checks that you can properly publish and unpublish a Quay/Github tool using the --entryname parameter
+     */
+    @Test
+    public void testQuayGithubPublishAndUnpublishAToolEntryname() {
+        // Publish
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", "--entryname", "fake_tool_name", "--script" });
+
+        final long countPublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 1 registered tool", 1, countPublish);
+
+        // Unpublish incorrectly
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", "--entryname", "fake_tool_name", "--script" });
+        assertTrue("Shouldn't be able to use --unpub and --entryname simultaneously in a command",
+                systemOutRule.getLog().contains("Unable to specify both --unpub and --entryname together."));
+
+        final long countBadUnpublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 1 registered tool after invalid unpublish request", 1, countBadUnpublish);
+
+        // unpublish correctly
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
+
+        final long countGoodUnpublish = testingPostgres
+                .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 0 registered", 0, countGoodUnpublish);
+    }
 }

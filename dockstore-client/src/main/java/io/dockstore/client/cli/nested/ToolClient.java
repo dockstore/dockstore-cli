@@ -71,6 +71,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
 
 /**
@@ -210,28 +211,51 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     protected void handlePublishUnpublish(String entryPath, String newName, boolean unpublishRequest) {
+
+        DockstoreTool existingTool = null;
+        boolean isPublished = false;
+
+        try {
+            existingTool = containersApi.getContainerByToolPath(entryPath, null);
+            isPublished = existingTool.isIsPublished();
+        } catch (ApiException ex) {
+            exceptionMessage(ex, "Unable to publish/unpublish " + entryPath, Client.API_ERROR);
+        }
+
+        if (existingTool == null) {
+            errorMessage("Unable to locate " + entryPath, COMMAND_ERROR);
+        }
+
         if (unpublishRequest) {
-            publish(false, entryPath);
+            if (isPublished) {
+                publish(false, entryPath);
+            } else {
+                out("The following tool is already unpublished: " + entryPath);
+            }
         } else {
             if (newName == null) {
-                publish(true, entryPath);
+                if (isPublished) {
+                    out("The following tool is already published: " + entryPath);
+                } else {
+                    publish(true, entryPath);
+                }
             } else {
                 try {
-                    DockstoreTool container = containersApi.getContainerByToolPath(entryPath, null);
                     DockstoreTool newContainer = new DockstoreTool();
+
                     // copy only the fields that we want to replicate, not sure why simply blanking
                     // the returned container does not work
-                    newContainer.setMode(container.getMode());
-                    newContainer.setName(container.getName());
-                    newContainer.setNamespace(container.getNamespace());
-                    newContainer.setRegistryString(container.getRegistryString());
-                    newContainer.setDefaultDockerfilePath(container.getDefaultDockerfilePath());
-                    newContainer.setDefaultCwlPath(container.getDefaultCwlPath());
-                    newContainer.setDefaultWdlPath(container.getDefaultWdlPath());
-                    newContainer.setDefaultCWLTestParameterFile(container.getDefaultCWLTestParameterFile());
-                    newContainer.setDefaultWDLTestParameterFile(container.getDefaultWDLTestParameterFile());
+                    newContainer.setMode(existingTool.getMode());
+                    newContainer.setName(existingTool.getName());
+                    newContainer.setNamespace(existingTool.getNamespace());
+                    newContainer.setRegistryString(existingTool.getRegistryString());
+                    newContainer.setDefaultDockerfilePath(existingTool.getDefaultDockerfilePath());
+                    newContainer.setDefaultCwlPath(existingTool.getDefaultCwlPath());
+                    newContainer.setDefaultWdlPath(existingTool.getDefaultWdlPath());
+                    newContainer.setDefaultCWLTestParameterFile(existingTool.getDefaultCWLTestParameterFile());
+                    newContainer.setDefaultWDLTestParameterFile(existingTool.getDefaultWDLTestParameterFile());
                     newContainer.setIsPublished(false);
-                    newContainer.setGitUrl(container.getGitUrl());
+                    newContainer.setGitUrl(existingTool.getGitUrl());
                     newContainer.setToolname(newName);
 
                     newContainer = containersApi.registerManual(newContainer);
