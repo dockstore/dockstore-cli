@@ -1109,11 +1109,9 @@ public class GeneralWorkflowIT extends BaseIT {
         assertEquals("Ensure there is a published workflow with the expected workflow name", 1, countPublishedWorkflowWithCustomName);
 
         // Try unpublishing with both --unpub and --entryname specified, should fail
-        systemOutRule.clearLog();
+        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
             "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", "--entryname", "test_entryname", "--script"});
-        assertTrue("Shouldn't be able to use --unpub and --entryname simultaneously in a command",
-            systemOutRule.getLog().contains("Unable to specify both --unpub and --entryname together."));
 
         // unpublish workflow with name 'test_entryname'
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",

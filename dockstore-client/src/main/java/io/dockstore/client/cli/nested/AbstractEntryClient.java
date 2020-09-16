@@ -99,6 +99,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.common.DescriptorLanguage.CWL;
@@ -454,8 +455,8 @@ public abstract class AbstractEntryClient<T> {
 
             // prevent specifying --unpub and --entryname together
             if (unpublishRequest && entryname != null) {
-                out("Unable to specify both --unpub and --entryname together. If trying to unpublish an entry,"
-                    + " provide the entire entry path under the --entry parameter.");
+                errorMessage("Unable to specify both --unpub and --entryname together. If trying to unpublish an entry,"
+                    + " provide the entire entry path under the --entry parameter.", COMMAND_ERROR);
             } else {
                 handlePublishUnpublish(first, entryname, unpublishRequest);
             }

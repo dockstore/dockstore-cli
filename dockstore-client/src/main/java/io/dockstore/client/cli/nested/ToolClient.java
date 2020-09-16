@@ -211,15 +211,17 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     protected void handlePublishUnpublish(String entryPath, String newName, boolean unpublishRequest) {
-
         DockstoreTool existingTool = null;
         boolean isPublished = false;
+
+        // Cannot be making an unpublish request with a specified new name
+        assert (!(unpublishRequest && newName != null));
 
         try {
             existingTool = containersApi.getContainerByToolPath(entryPath, null);
             isPublished = existingTool.isIsPublished();
         } catch (ApiException ex) {
-            exceptionMessage(ex, "Unable to publish/unpublish " + entryPath, Client.API_ERROR);
+            exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
         }
 
         if (existingTool == null) {
@@ -239,7 +241,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 } else {
                     publish(true, entryPath);
                 }
-            } else {
+            } else if (!toolExists(entryPath + "/" + newName)) {
                 try {
                     DockstoreTool newContainer = new DockstoreTool();
 
@@ -270,9 +272,21 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 } catch (ApiException ex) {
                     exceptionMessage(ex, "Unable to publish " + newName, Client.API_ERROR);
                 }
+            } else {
+                out("The following tool is already published: " + entryPath + "/" + newName);
             }
         }
     }
+
+    private boolean toolExists(String entryPath) {
+        try {
+            containersApi.getContainerByToolPath(entryPath, null);
+            return true;
+        } catch (ApiException ex) {
+            return false;
+        }
+    }
+
     @Override
     protected void publishHelp() {
         printHelpHeader();

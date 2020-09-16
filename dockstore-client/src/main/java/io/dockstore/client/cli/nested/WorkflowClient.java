@@ -645,11 +645,14 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         Workflow existingWorkflow = null;
         boolean isPublished = false;
 
+        // Cannot be making an unpublish request with a specified new name
+        assert (!(unpublishRequest && newName != null));
+
         try {
             existingWorkflow = workflowsApi.getWorkflowByPath(entryPath, null, false);
             isPublished = existingWorkflow.isIsPublished();
         } catch (ApiException ex) {
-            exceptionMessage(ex, "Unable to publish/unpublish " + entryPath, Client.API_ERROR);
+            exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
         }
 
         if (existingWorkflow == null) {
@@ -669,7 +672,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 } else {
                     publish(true, entryPath);
                 }
-            } else {
+            } else if (!workflowExists(entryPath + "/" + newName)) {
                 try {
                     // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
                     final Workflow newWorkflow = workflowsApi.manualRegister(
@@ -693,7 +696,18 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 } catch (ApiException ex) {
                     exceptionMessage(ex, "Unable to publish " + entryPath + "/" + newName, Client.API_ERROR);
                 }
+            } else {
+                out("The following workflow is already published: " + entryPath + "/" + newName);
             }
+        }
+    }
+
+    private boolean workflowExists(String entryPath) {
+        try {
+            workflowsApi.getWorkflowByPath(entryPath, null, false);
+            return true;
+        } catch (ApiException ex) {
+            return false;
         }
     }
 

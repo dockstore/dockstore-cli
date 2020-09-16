@@ -1512,11 +1512,9 @@ public class BasicIT extends BaseIT {
         Assert.assertEquals("there should be 1 registered tool", 1, countPublish);
 
         // Unpublish incorrectly
-        systemOutRule.clearLog();
+        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
             "quay.io/dockstoretestuser/quayandgithub", "--entryname", "fake_tool_name", "--script" });
-        assertTrue("Shouldn't be able to use --unpub and --entryname simultaneously in a command",
-                systemOutRule.getLog().contains("Unable to specify both --unpub and --entryname together."));
 
         final long countBadUnpublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
