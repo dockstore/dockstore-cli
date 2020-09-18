@@ -450,15 +450,20 @@ public abstract class AbstractEntryClient<T> {
             publishHelp();
         } else {
             String first = reqVal(args, "--entry");
-            String entryname = optVal(args, "--entryname", null);
             final boolean unpublishRequest = args.contains("--unpub");
 
+            // --newEntryName is the desired parameter flag, but maintaining backwards compatibility for --entryname
+            String newEntryName = optVal(args, "--newEntryName", null);
+            if (newEntryName == null) {
+                newEntryName = optVal(args, "--entryname", null);
+            }
+
             // prevent specifying --unpub and --entryname together
-            if (unpublishRequest && entryname != null) {
-                errorMessage("Unable to specify both --unpub and --entryname together. If trying to unpublish an entry,"
+            if (unpublishRequest && newEntryName != null) {
+                errorMessage("Unable to specify both --unpub and --newEntryName together. If trying to unpublish an entry,"
                     + " provide the entire entry path under the --entry parameter.", COMMAND_ERROR);
             } else {
-                handlePublishUnpublish(first, entryname, unpublishRequest);
+                handlePublishUnpublish(first, newEntryName, unpublishRequest);
             }
         }
     }

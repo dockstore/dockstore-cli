@@ -726,7 +726,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  --entry <entry>                      Complete " + getEntryType()
             + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("Optional Parameters:");
-        out("  --entryname <newWorflowName>         New name to give the workflow specified by --entry. This will register and publish a new copy of the workflow with the given name.");
+        out("  --newEntryName <newWorflowName>         New name to give the workflow specified by --entry. This will register and publish a new copy of the workflow with the given name.");
         printHelpFooter();
     }
 

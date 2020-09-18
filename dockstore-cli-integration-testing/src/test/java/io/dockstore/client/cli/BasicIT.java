@@ -1499,13 +1499,13 @@ public class BasicIT extends BaseIT {
     }
 
     /**
-     * Checks that you can properly publish and unpublish a Quay/Github tool using the --entryname parameter
+     * Checks that you can properly publish and unpublish a Quay/Github tool using the --newEntryName parameter
      */
     @Test
-    public void testQuayGithubPublishAndUnpublishAToolEntryname() {
+    public void testQuayGithubPublishAndUnpublishAToolnewEntryName() {
         // Publish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
-            "quay.io/dockstoretestuser/quayandgithub", "--entryname", "fake_tool_name", "--script" });
+            "quay.io/dockstoretestuser/quayandgithub", "--newEntryName", "fake_tool_name", "--script" });
 
         final long countPublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
@@ -1514,7 +1514,7 @@ public class BasicIT extends BaseIT {
         // Unpublish incorrectly
         systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "quay.io/dockstoretestuser/quayandgithub", "--entryname", "fake_tool_name", "--script" });
+            "quay.io/dockstoretestuser/quayandgithub", "--newEntryName", "fake_tool_name", "--script" });
 
         final long countBadUnpublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);

@@ -1077,10 +1077,10 @@ public class GeneralWorkflowIT extends BaseIT {
     }
 
     /**
-    * Tests publishing/unpublishing workflows with the --entryname parameter
+    * Tests publishing/unpublishing workflows with the --newEntryName parameter
     */
     @Test
-    public void testPublishWithEntryName() {
+    public void testPublishWithNewEntryName() {
         // register workflow
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
             "parameter_test_workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--script"});
@@ -1094,7 +1094,7 @@ public class GeneralWorkflowIT extends BaseIT {
         // publish workflow with name 'test_entryname'
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
-                "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", "--entryname", "test_entryname", "--script"});
+                "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", "--newEntryName", "test_entryname", "--script"});
 
         // verify there are 2 workflows associated with the user
         final long countTotalPublishedWorkflows = testingPostgres
@@ -1111,7 +1111,7 @@ public class GeneralWorkflowIT extends BaseIT {
         // Try unpublishing with both --unpub and --entryname specified, should fail
         systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
-            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", "--entryname", "test_entryname", "--script"});
+            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", "--newEntryName", "test_entryname", "--script"});
 
         // unpublish workflow with name 'test_entryname'
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
