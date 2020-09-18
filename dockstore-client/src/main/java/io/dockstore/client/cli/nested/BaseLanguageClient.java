@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
@@ -14,9 +15,13 @@ import com.google.common.io.Files;
 import io.dockstore.client.cli.nested.notificationsclients.NotificationsClient;
 import io.dockstore.common.Utilities;
 import io.swagger.client.ApiException;
+import io.swagger.client.api.Ga4Ghv1Api;
+import io.swagger.client.model.Checksum;
 import io.swagger.client.model.ToolDescriptor;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,6 +202,48 @@ public abstract class BaseLanguageClient {
         notificationsClient.sendMessage(NotificationsClient.COMPLETED, true);
 
         return 0;
+    }
+
+    /**
+     * Validates the localPrimaryDescriptor file has the same SHA-1 checksum as the descriptor stored in the database
+     * @param type CWL or WDL
+     * @param entryVal Tool/workflow path
+     * @param versionID String version of the tool/workflow that we are taking the descriptor from
+     * @return boolean representing if the locally downloaded descriptor's checksum matches the one stored
+     */
+    public boolean validateDescriptorChecksum(ToolDescriptor.TypeEnum type, String entryVal, String versionID) {
+        Checksum storedDescriptorChecksum = null;
+        Checksum localDescriptorChecksum = null;
+
+        // get stored descriptor
+        try {
+            Ga4Ghv1Api ghv1Api = new Ga4Ghv1Api();
+            ToolDescriptor td = ghv1Api.toolsIdVersionsVersionIdTypeDescriptorGet(type.toString(), entryVal, versionID);
+            final String fileChecksum = DigestUtils.sha1Hex(td.getDescriptor());
+            storedDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
+        } catch (ApiException ex) {
+            exceptionMessage(ex, "The descriptor does not exist", ENTRY_NOT_FOUND);
+        }
+
+        // calculate checksum for locally downloaded descriptor file
+        try {
+            final String fileContents = FileUtils.readFileToString(localPrimaryDescriptorFile, StandardCharsets.UTF_8);
+            final String fileChecksum = DigestUtils.sha1Hex(fileContents);
+            localDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
+        } catch (IOException ex) {
+            exceptionMessage(ex, "Unable to read from local primary descriptor file.", IO_ERROR);
+        }
+
+        // compare checksums
+        if (storedDescriptorChecksum == null) {
+            // warning message
+            out("No stored checksum for the specified workflow descriptor. Unable to validate.");
+        } else if (!storedDescriptorChecksum.equals(localDescriptorChecksum)) {
+            // checksums do not match
+            return false;
+        }
+
+        return true;
     }
 
     /**
