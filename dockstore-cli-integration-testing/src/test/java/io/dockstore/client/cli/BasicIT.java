@@ -1499,12 +1499,12 @@ public class BasicIT extends BaseIT {
     }
 
     /**
-     * Checks that you can properly publish and unpublish a Quay/Github tool using the --newEntryName parameter
+     * Checks that you can properly publish and unpublish a Quay/Github tool using the --new-entry-name parameter
      */
     @Test
     public void testQuayGithubPublishAndUnpublishAToolnewEntryName() {
 
-        final String publishNameParameter = "--newEntryName";
+        final String publishNameParameter = "--new-entry-name";
 
         // Publish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",

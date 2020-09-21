@@ -453,16 +453,16 @@ public abstract class AbstractEntryClient<T> {
             String first = reqVal(args, "--entry");
             final boolean unpublishRequest = args.contains("--unpub");
 
-            // --newEntryName is the desired parameter flag, but maintaining backwards compatibility for --entryname
-            String newEntryName = optVal(args, "--newEntryName", null);
+            // --new-entry-name is the desired parameter flag, but maintaining backwards compatibility for --entryname
+            String newEntryName = optVal(args, "--new-entry-name", null);
             if (newEntryName == null && args.contains("--entryname")) {
-                err("Dockstore CLI has deprecated the --entryname parameter and may remove it without warning. Please use --newEntryName instead.");
+                err("Dockstore CLI has deprecated the --entryname parameter and may remove it without warning. Please use --new-entry-name instead.");
                 newEntryName = optVal(args, "--entryname", null);
             }
 
             // prevent specifying --unpub and --entryname together
             if (unpublishRequest && newEntryName != null) {
-                errorMessage("Unable to specify both --unpub and --newEntryName together. If trying to unpublish an entry,"
+                errorMessage("Unable to specify both --unpub and --new-entry-name together. If trying to unpublish an entry,"
                     + " provide the entire entry path under the --entry parameter.", COMMAND_ERROR);
             } else {
                 handlePublishUnpublish(first, newEntryName, unpublishRequest);

@@ -1077,12 +1077,12 @@ public class GeneralWorkflowIT extends BaseIT {
     }
 
     /**
-    * Tests publishing/unpublishing workflows with the --newEntryName parameter
+    * Tests publishing/unpublishing workflows with the --new-entry-name parameter
     */
     @Test
     public void testPublishWithNewEntryName() {
 
-        final String publishNameParameter = "--newEntryName";
+        final String publishNameParameter = "--new-entry-name";
 
         // register workflow
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
