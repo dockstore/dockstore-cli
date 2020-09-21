@@ -85,6 +85,7 @@ import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.MAX_DESCRIPTION;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
+import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.invalid;
@@ -454,7 +455,8 @@ public abstract class AbstractEntryClient<T> {
 
             // --newEntryName is the desired parameter flag, but maintaining backwards compatibility for --entryname
             String newEntryName = optVal(args, "--newEntryName", null);
-            if (newEntryName == null) {
+            if (newEntryName == null && args.contains("--entryname")) {
+                err("Dockstore CLI has deprecated the --entryname parameter and may remove it without warning. Please use --newEntryName instead.");
                 newEntryName = optVal(args, "--entryname", null);
             }
 

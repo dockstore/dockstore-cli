@@ -655,10 +655,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
         }
 
-        if (existingWorkflow == null) {
-            errorMessage("Unable to locate " + entryPath, COMMAND_ERROR);
-        }
-
         if (unpublishRequest) {
             if (isPublished) {
                 publish(false, entryPath);
@@ -676,28 +672,25 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 try {
                     // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
                     final Workflow newWorkflow = workflowsApi.manualRegister(
-                            getGitRegistry(existingWorkflow.getGitUrl()),
-                            existingWorkflow.getOrganization() + "/" + existingWorkflow.getRepository(),
-                            existingWorkflow.getWorkflowPath(),
-                            newName,
-                            existingWorkflow.getDescriptorType().toString(),
-                            existingWorkflow.getDefaultTestParameterFilePath()
+                        getGitRegistry(existingWorkflow.getGitUrl()),
+                        existingWorkflow.getOrganization() + "/" + existingWorkflow.getRepository(),
+                        existingWorkflow.getWorkflowPath(),
+                        newName,
+                        existingWorkflow.getDescriptorType().toString(),
+                        existingWorkflow.getDefaultTestParameterFilePath()
                     );
 
                     final String completeEntryPath = entryPath + "/" + newName;
 
-                    if (newWorkflow != null) {
-                        out("Successfully registered " + completeEntryPath);
-                        workflowsApi.refresh(newWorkflow.getId());
-                        publish(true, completeEntryPath);
-                    } else {
-                        errorMessage("Unable to publish " + completeEntryPath, COMMAND_ERROR);
-                    }
+                    out("Successfully registered " + completeEntryPath);
+
+                    workflowsApi.refresh(newWorkflow.getId());
+                    publish(true, completeEntryPath);
                 } catch (ApiException ex) {
                     exceptionMessage(ex, "Unable to publish " + entryPath + "/" + newName, Client.API_ERROR);
                 }
             } else {
-                out("The following workflow is already published: " + entryPath + "/" + newName);
+                out("The following workflow is already registered: " + entryPath + "/" + newName);
             }
         }
     }

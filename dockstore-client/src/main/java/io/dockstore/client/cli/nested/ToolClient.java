@@ -71,7 +71,6 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
-import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
 
 /**
@@ -224,10 +223,6 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
         }
 
-        if (existingTool == null) {
-            errorMessage("Unable to locate " + entryPath, COMMAND_ERROR);
-        }
-
         if (unpublishRequest) {
             if (isPublished) {
                 publish(false, entryPath);
@@ -262,18 +257,15 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
                     newContainer = containersApi.registerManual(newContainer);
 
-                    if (newContainer != null) {
-                        out("Successfully registered " + entryPath + "/" + newName);
-                        containersApi.refresh(newContainer.getId());
-                        publish(true, newContainer.getToolPath());
-                    } else {
-                        errorMessage("Unable to publish " + newName, Client.COMMAND_ERROR);
-                    }
+                    out("Successfully registered " + entryPath + "/" + newName);
+
+                    containersApi.refresh(newContainer.getId());
+                    publish(true, newContainer.getToolPath());
                 } catch (ApiException ex) {
                     exceptionMessage(ex, "Unable to publish " + newName, Client.API_ERROR);
                 }
             } else {
-                out("The following tool is already published: " + entryPath + "/" + newName);
+                out("The following tool is already registered: " + entryPath + "/" + newName);
             }
         }
     }

@@ -1503,9 +1503,19 @@ public class BasicIT extends BaseIT {
      */
     @Test
     public void testQuayGithubPublishAndUnpublishAToolnewEntryName() {
+
+        final String publishNameParameter = "--newEntryName";
+
         // Publish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
-            "quay.io/dockstoretestuser/quayandgithub", "--newEntryName", "fake_tool_name", "--script" });
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+
+        // Publish a second time, should fail
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+        assertTrue("Attempting to publish a registered tool should notify the user",
+            systemOutRule.getLog().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
 
         final long countPublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
@@ -1514,7 +1524,7 @@ public class BasicIT extends BaseIT {
         // Unpublish incorrectly
         systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "quay.io/dockstoretestuser/quayandgithub", "--newEntryName", "fake_tool_name", "--script" });
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
 
         final long countBadUnpublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
@@ -1525,7 +1535,63 @@ public class BasicIT extends BaseIT {
             "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
 
         final long countGoodUnpublish = testingPostgres
-                .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
         Assert.assertEquals("there should be 0 registered", 0, countGoodUnpublish);
+
+        // try to unpublish the unpublished tool
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
+        assertTrue("Attempting to publish a registered tool should notify the user",
+            systemOutRule.getLog().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+    }
+
+    /**
+     * Checks that you can properly publish and unpublish a Quay/Github tool using the --entryname parameter. --entryname is deprecated,
+     * verifying backwards compatibility
+     */
+    @Test
+    public void testQuayGithubPublishAndUnpublishAToolEntryName() {
+
+        final String publishNameParameter = "--entryname";
+
+        // Publish
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+
+        // Publish a second time, should fail
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+        assertTrue("Attempting to publish a registered tool should notify the user",
+            systemOutRule.getLog().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+
+        final long countPublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 1 registered tool", 1, countPublish);
+
+        // Unpublish incorrectly
+        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+
+        final long countBadUnpublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 1 registered tool after invalid unpublish request", 1, countBadUnpublish);
+
+        // unpublish correctly
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
+
+        final long countGoodUnpublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 0 registered", 0, countGoodUnpublish);
+
+        // try to unpublish the unpublished tool
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
+        assertTrue("Attempting to publish a registered tool should notify the user",
+            systemOutRule.getLog().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
     }
 }
