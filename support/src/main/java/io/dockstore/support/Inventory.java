@@ -4,7 +4,10 @@ import java.util.Map;
 
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudformation.CloudFormationClient;
+import software.amazon.awssdk.services.cloudformation.model.DescribeStackInstanceResponse;
+import software.amazon.awssdk.services.cloudformation.model.StackInstance;
 import software.amazon.awssdk.services.config.ConfigClient;
 import software.amazon.awssdk.services.config.model.ListDiscoveredResourcesRequest;
 import software.amazon.awssdk.services.config.model.ListDiscoveredResourcesResponse;
@@ -13,6 +16,8 @@ import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
 import software.amazon.awssdk.services.ec2.model.Instance;
+import software.amazon.awssdk.services.iam.IamClient;
+import software.amazon.awssdk.services.iam.model.GetUserResponse;
 import software.amazon.awssdk.services.lambda.LambdaClient;
 import software.amazon.awssdk.services.lambda.model.GetFunctionRequest;
 import software.amazon.awssdk.services.lambda.model.GetFunctionResponse;
@@ -21,7 +26,8 @@ import software.amazon.awssdk.services.rds.model.DBInstance;
 import software.amazon.awssdk.services.rds.model.DescribeDbInstancesRequest;
 import software.amazon.awssdk.services.rds.model.DescribeDbInstancesResponse;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 
 /**
  * Configure a credentials file like so https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html before running
@@ -130,13 +136,9 @@ public final class Inventory {
             break;
         case AWS_S3_BUCKET:
             S3Client s3Client = S3Client.builder().build();
-            //TODO: this is not filtering right
-            ListBucketsResponse listBucketsResponse = s3Client.listBuckets();
-            //            ListBucketsRequest s3Builder = ListBucketsRequest.builder().build();
-            //            ListBucketsResponse listBucketsResponse = s3Client.listBuckets(s3Builder.toBuilder().build());
-            //            Bucket bucket = listBucketsResponse.buckets().get(0);
-            //            // demo some extra info for RDS instances
-            //            strings.put("S3:creationDate", bucket.creationDate().toString());
+            ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(ListObjectsV2Request.builder().bucket(id.resourceName()).build());
+            // demo some extra info for S3 instances
+            strings.put("S3:numberObjects", listObjectsV2Response.keyCount().toString());
             break;
         case AWS_SSM_MANAGED_INSTANCE_INVENTORY:
             break;
@@ -155,14 +157,28 @@ public final class Inventory {
         case AWS_CLOUD_WATCH_ALARM:
             break;
         case AWS_CLOUD_FORMATION_STACK:
+            // https://github.com/aws/aws-sdk-java-v2/issues/206
+            IamClient iamClient = IamClient.builder().region(Region.AWS_GLOBAL).build();
+            GetUserResponse user = iamClient.getUser();
+            String[] split = user.user().arn().split(":");
             CloudFormationClient build = CloudFormationClient.builder().build();
-            //TODO: this is not filtering right
-            //            DescribeStackInstanceRequest.Builder builder2 = DescribeStackInstanceRequest.builder().stackSetName(id.resourceName()).stackInstanceRegion("").stackInstanceAccount("");
-            //            DescribeStackInstanceResponse describeStackInstanceResponse = build.describeStackInstance(builder2.build());
-            //            StackInstance stackInstance = describeStackInstanceResponse.stackInstance();
-            //            // demo some extra info for cloudformation instances
-            //            strings.put("CloudFormation:status", stackInstance.status().toString());
-            //            strings.put("CloudFormation:statusreason", stackInstance.statusReason());
+            DescribeStackInstanceResponse describeStackInstanceResponse = null;
+            // doesn't quite work, will need to puzzle out later
+            //            for (Region region : Region.regions()) {
+            //                // don't know how to figure out proper region
+            //                try {
+            //                    describeStackInstanceResponse = build.describeStackInstance(
+            //                            DescribeStackInstanceRequest.builder().stackInstanceAccount(split[4]).stackInstanceRegion(region.toString()).stackSetName(id.resourceName()).build());
+            //                } catch (Exception e) {
+            //                    // will die on incorrect region
+            //                }
+            //            }
+            if (describeStackInstanceResponse != null) {
+                StackInstance stackInstance = describeStackInstanceResponse.stackInstance();
+                /// demo some extra info for cloudformation instances
+                strings.put("CloudFormation:status", stackInstance.status().toString());
+                strings.put("CloudFormation:statusreason", stackInstance.statusReason());
+            }
             break;
         case AWS_DYNAMO_DB_TABLE:
             break;
