@@ -598,7 +598,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             if (user == null) {
                 throw new RuntimeException("User not found");
             }
-            final List<Workflow> updatedWorkflows = usersApi.userWorkflows(user.getId()).stream()
+
+            // add user to all workflows
+            final List<Workflow> updatedWorkflows = usersApi.addUserToDockstoreWorkflows(user.getId(), null).stream()
                     // Skip hosted workflows
                     .filter(workflow -> StringUtils.isNotEmpty(workflow.getGitUrl()))
                     .map(workflow -> {

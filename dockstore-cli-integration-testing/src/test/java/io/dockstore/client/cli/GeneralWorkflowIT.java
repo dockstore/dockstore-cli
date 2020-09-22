@@ -70,6 +70,29 @@ public class GeneralWorkflowIT extends BaseIT {
         CommonTestUtilities.cleanStatePrivate2(SUPPORT, false);
     }
 
+    @Test
+    public void refreshAll() {
+        // refresh all
+        refreshByOrganizationReplacement(USER_2_USERNAME);
+
+        // get userid
+        final long userid = testingPostgres.runSelectStatement(String.format("SELECT id FROM user_profile WHERE username='%s';", USER_2_USERNAME), long.class);
+
+        // Delete all entries associated with the userid
+        testingPostgres.runDeleteStatement(String.format("DELETE FROM user_entry ue WHERE ue.userid = %d", userid));
+
+        // Count number of entries after running the delete statement
+        final long entryCountAfterDelete = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), long.class);
+        assertEquals("After deletion, there should be 0 entries remaining associated with this user", 0, entryCountAfterDelete);
+
+        // run CLI refresh command to refresh all workflows
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh"});
+
+        // final count of workflows associated with this user
+        final long entryCountAfterRefresh = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), long.class);
+        assertEquals("User should be associated with 40 workflows", 40, entryCountAfterRefresh);
+    }
+
     /**
      * This test checks that refresh all workflows (with a mix of stub and full) and refresh individual.  It then tries to publish them
      */
