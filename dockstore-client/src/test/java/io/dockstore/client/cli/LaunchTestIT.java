@@ -1368,4 +1368,14 @@ public class LaunchTestIT {
 
         assertTrue("output should include a successful cromwell run", systemOutRule.getLog().contains("Cromwell exit code: 0"));
     }
+
+    @Test
+    public void cwlNullInputParameter() {
+        // Tests if a null input parameter is correctly handled when converting json
+        File nullCWL = new File(ResourceHelpers.resourceFilePath("nullParam.cwl"));
+        File nullJSON = new File(ResourceHelpers.resourceFilePath("nullParam.json"));
+
+        // run simple echo null tool
+        runTool(nullCWL, nullJSON, false);
+    }
 }
