@@ -794,7 +794,8 @@ public class Client {
         ApiClient defaultApiClient;
         defaultApiClient = Configuration.getDefaultApiClient();
         String cliVersion = getClientVersion();
-        defaultApiClient.setUserAgent("Dockstore-CLI/" + cliVersion + "/java");
+        final String userAgent = "Dockstore-CLI/" + cliVersion + "/java";
+        defaultApiClient.setUserAgent(userAgent);
 
         ApiKeyAuth bearer = (ApiKeyAuth)defaultApiClient.getAuthentication("BEARER");
         bearer.setApiKeyPrefix("BEARER");
@@ -809,7 +810,7 @@ public class Client {
 
         // openapi client
         io.dockstore.openapi.client.ApiClient openApiClient = new io.dockstore.openapi.client.ApiClient();
-        openApiClient.setUserAgent("Dockstore-CLI/" + cliVersion + "/java");
+        openApiClient.setUserAgent(userAgent);
         openApiClient.setBasePath(serverUrl);
 
         this.ga4ghv20Api = new Ga4Ghv20Api(openApiClient);

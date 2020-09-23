@@ -17,6 +17,7 @@ import io.dockstore.common.Utilities;
 import io.dockstore.openapi.client.api.Ga4Ghv20Api;
 import io.dockstore.openapi.client.model.FileWrapper;
 import io.dockstore.openapi.client.model.Checksum;
+import io.dockstore.openapi.client.model.ToolFile;
 import io.swagger.client.ApiException;
 import io.swagger.client.model.ToolDescriptor;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -27,6 +28,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
@@ -215,50 +217,52 @@ public abstract class BaseLanguageClient {
      * @return void if the checksums do not match or don't exist it errors out by design
      */
     public void validateDescriptorChecksum(ToolDescriptor.TypeEnum type, String entryVal) {
-
-        Checksum storedDescriptorChecksum = null;
-        Checksum localDescriptorChecksum = null;
-
-        // 1. https://dockstore.org/api/static/swagger-ui/index.html#/GA4GHV20/toolsIdVersionsVersionIdTypeFilesGet
-        // 2. https://dockstore.org/api/static/swagger-ui/index.html#/GA4GHV20/toolsIdVersionsVersionIdTypeDescriptorRelativePathGet
-
-        List<FileWrapper> remoteSecondaryDescriptors = abstractEntryClient.getAllToolDescriptors(entryVal);
-
-        // split entryVal into path and version
-        String[] parts = entryVal.split(":");
+        final String[] parts = entryVal.split(":");
         String path = parts[0];
-        String versionID = parts.length > 1 ? parts[1] : null;
 
-        // get stored descriptor
-        try {
-            Ga4Ghv20Api ghv20Api = abstractEntryClient.getClient().getGa4Ghv20Api();
-            FileWrapper td = ghv20Api.toolsIdVersionsVersionIdTypeDescriptorGet(type.toString(), path, versionID);
-            List<Checksum> checksumList = td.getChecksum();
-            if (checksumList.size() == 1) {
-                storedDescriptorChecksum = checksumList.get(0);
-            } else {
-                // what to do with more/less than 1 checksum?
+        // workflows have a special prefix for TRS endpoints
+        String ga4ghv20Path = abstractEntryClient.getEntryType().toLowerCase().equals("workflow") ? "#workflow/" + path : path;
+        String tag = abstractEntryClient.getVersionID(entryVal);
+
+        List<ToolFile> allDescriptors = abstractEntryClient.getAllToolDescriptors(type.toString(), entryVal);
+
+        Ga4Ghv20Api ga4ghv20api = abstractEntryClient.getClient().getGa4Ghv20Api();
+
+        // All secondary files are located relative to the location of the primary descriptor.
+        final String localTemporaryDirectory = localPrimaryDescriptorFile.getParent() + "/";
+
+        for (ToolFile toolFile : allDescriptors) {
+            Checksum remoteDescriptorChecksum = null;
+            Checksum localDescriptorChecksum = null;
+
+            // Get remote descriptor checksum
+            try {
+                final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, tag, toolFile.getPath());
+                remoteDescriptorChecksum = remoteDescriptor.getChecksum().get(0);
+            } catch (ApiException ex) {
+                exceptionMessage(ex, "unable to locate remote descriptor", ENTRY_NOT_FOUND);
             }
-        } catch (ApiException ex) {
-            exceptionMessage(ex, "The descriptor does not exist", ENTRY_NOT_FOUND);
-        }
 
-        // calculate checksum for locally downloaded descriptor file
-        try {
-            final String fileContents = FileUtils.readFileToString(localPrimaryDescriptorFile, StandardCharsets.UTF_8);
-            final String fileChecksum = DigestUtils.sha1Hex(fileContents);
-            localDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
-        } catch (IOException ex) {
-            exceptionMessage(ex, "Unable to read from local primary descriptor file.", IO_ERROR);
-        }
+            // Get local descriptor checksum
+            try {
+                final File localDescriptor = new File(localTemporaryDirectory + toolFile.getPath());
+                final String fileContents = FileUtils.readFileToString(localDescriptor, StandardCharsets.UTF_8);
+                final String fileChecksum = DigestUtils.sha1Hex(fileContents);
+                localDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
+            } catch (IOException ex) {
+                exceptionMessage(ex, "unable to locate local descriptor", IO_ERROR);
+            }
 
-        // compare checksums
-        if (storedDescriptorChecksum == null) {
-            // no stored descriptor
-        } else if (!storedDescriptorChecksum.equals(localDescriptorChecksum)) {
-            // checksums do not match
+            // compare checksums
+            if (remoteDescriptorChecksum == null) {
+                // no stored descriptor
+                err("Unable to locate checksum for descriptor " + toolFile.getPath() + ". Cannot validate the checksum of the locally downloaded descriptor. Refreshing the workflow will calculate the entry checksum.");
+            } else if (!remoteDescriptorChecksum.equals(localDescriptorChecksum)) {
+                // checksums do not match
+
+            }
+            out("validated checksum");
         }
-        out("validated checksum");
     }
 
     /**

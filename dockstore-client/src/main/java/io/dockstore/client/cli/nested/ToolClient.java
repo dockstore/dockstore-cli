@@ -37,7 +37,9 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Registry;
+import io.dockstore.openapi.client.api.Ga4Ghv20Api;
 import io.dockstore.openapi.client.model.FileWrapper;
+import io.dockstore.openapi.client.model.ToolFile;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.ContainertagsApi;
@@ -50,6 +52,7 @@ import io.swagger.client.model.StarRequest;
 import io.swagger.client.model.Tag;
 import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.User;
+import io.swagger.client.model.Workflow;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -685,9 +688,54 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         }
     }
 
+    /**
+     * Returns the descriptors of the specified tool
+     * @param type Descriptor type CWL, WDL, NFL ...
+     * @param entryPath Workflow path
+     */
     @Override
-    public List<FileWrapper> getAllToolDescriptors(String entryPath) {
-        return null;
+    public List<ToolFile> getAllToolDescriptors(String type, String entryPath) {
+
+        final String[] parts = entryPath.split(":");
+        final String path = parts[0];
+        final String tag = getVersionID(entryPath);
+
+        final Ga4Ghv20Api ga4ghv20api = this.client.getGa4Ghv20Api();
+
+        // get all the tool files and filter out anything not a descriptor
+        return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, path, tag).stream()
+            .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the version ID for the provided entry path
+     * @param entryPath Tool path
+     */
+    @Override
+    public String getVersionID(String entryPath) {
+        final String[] parts = entryPath.split(":");
+
+        if (parts.length > 1) {
+            return parts[1];
+        }
+
+        String versionID = null;
+
+        try {
+            final DockstoreTool tool = containersApi.getContainerByToolPath(entryPath, null);
+            versionID = tool.getDefaultVersion();
+        } catch (ApiException ex) {
+            exceptionMessage(ex, "Could not find container", Client.API_ERROR);
+        }
+
+        // as a last resort, default to latest
+        if (versionID == null) {
+            versionID = "latest";
+        }
+
+        return versionID;
+
     }
 
     @Override

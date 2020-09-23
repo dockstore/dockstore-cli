@@ -46,6 +46,7 @@ import io.dockstore.openapi.client.model.ToolFile;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
+import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.Label;
 import io.swagger.client.model.PublishRequest;
 import io.swagger.client.model.SourceFile;
@@ -393,36 +394,48 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
      * Returns a list of all the tool descriptors associated with this workflow
      * @param entryPath Workflow path
      */
-    public List<FileWrapper> getAllToolDescriptors(String entryPath) {
-
-        // get workflow associated with entryPath
-        final Workflow workflow = getDockstoreWorkflowByPath(entryPath);
-        final String workflowDescriptorType = workflow.getDescriptorType().toString();
+    public List<ToolFile> getAllToolDescriptors(String type, String entryPath) {
 
         // get workflow id and tag
         final String[] parts = entryPath.split(":");
         final String path = parts[0];
-        final String tag = (parts.length > 1) ? parts[1] : workflow.getDefaultVersion();
+        final String tag = getVersionID(entryPath);
 
         Ga4Ghv20Api ga4ghv20api = this.client.getGa4Ghv20Api();
 
-        // workflows are identified within ga4gh endpoints when their prefix is '#workflow' (tools do not require a special prefix)
-        final String ga4ghv20Path = path.startsWith("#workflow/") ? path : "#workflow/" + path;
+        // workflows are identified within ga4gh endpoints when their prefix is '#workflow/' (tools do not require a special prefix)
+        final String ga4ghv20Path = "#workflow/" + path;
 
-        final List<FileWrapper> secondaryDescriptorFiles = ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(workflowDescriptorType, ga4ghv20Path, tag).stream()
+        // get all the tool files and filter out anything not a descriptor
+        return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, ga4ghv20Path, tag).stream()
             .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
-            .map(toolFile -> {
-                try {
-                    return ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(workflowDescriptorType, ga4ghv20Path, tag, toolFile.getPath());
-                } catch (Exception ex) {
-                    err(ex.getMessage());
-                    return null;
-                }
-            })
-            .filter(Objects::nonNull)
             .collect(Collectors.toList());
+    }
 
-        return secondaryDescriptorFiles;
+    /**
+     * Returns the version ID of
+     * @param entryPath Workflow path
+     */
+    @Override
+    public String getVersionID(String entryPath) {
+        final String[] parts = entryPath.split(":");
+
+        if (parts.length > 1) {
+            return parts[1];
+        }
+
+        String versionID =  null;
+
+        final Workflow workflow = getDockstoreWorkflowByPath(entryPath);
+        versionID = workflow.getDefaultVersion();
+
+        // as a last resort, default to master
+        if (versionID == null) {
+            versionID = "master";
+        }
+
+        return versionID;
+
     }
 
     @Override
