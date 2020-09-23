@@ -54,6 +54,7 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
+import io.dockstore.openapi.client.model.FileWrapper;
 import io.github.collaboratory.cwl.CWLClient;
 import io.github.collaboratory.nextflow.NextflowClient;
 import io.github.collaboratory.wdl.WDLClient;
@@ -437,6 +438,13 @@ public abstract class AbstractEntryClient<T> {
     protected abstract void manualPublish(List<String> args);
 
     public abstract SourceFile getDescriptorFromServer(String entry, DescriptorLanguage descriptorType) throws ApiException, IOException;
+
+    /**
+     * Get all tool descriptors associated with the entry type
+     *
+     * @param entryPath path to either a tool or workflow
+     */
+    public abstract List<FileWrapper> getAllToolDescriptors(String entryPath);
 
     /**
      * private helper methods
@@ -1283,8 +1291,6 @@ public abstract class AbstractEntryClient<T> {
     }
 
     public abstract Client getClient();
-
-
 
     /**
      * help text output

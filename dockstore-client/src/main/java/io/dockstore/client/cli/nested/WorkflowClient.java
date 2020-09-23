@@ -40,6 +40,9 @@ import io.dockstore.client.cli.JCommanderUtility;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.SourceControl;
+import io.dockstore.openapi.client.api.Ga4Ghv20Api;
+import io.dockstore.openapi.client.model.FileWrapper;
+import io.dockstore.openapi.client.model.ToolFile;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
@@ -75,6 +78,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
@@ -383,6 +387,42 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         } else {
             throw new RuntimeException("version not found");
         }
+    }
+
+    /**
+     * Returns a list of all the tool descriptors associated with this workflow
+     * @param entryPath Workflow path
+     */
+    public List<FileWrapper> getAllToolDescriptors(String entryPath) {
+
+        // get workflow associated with entryPath
+        final Workflow workflow = getDockstoreWorkflowByPath(entryPath);
+        final String workflowDescriptorType = workflow.getDescriptorType().toString();
+
+        // get workflow id and tag
+        final String[] parts = entryPath.split(":");
+        final String path = parts[0];
+        final String tag = (parts.length > 1) ? parts[1] : workflow.getDefaultVersion();
+
+        Ga4Ghv20Api ga4ghv20api = this.client.getGa4Ghv20Api();
+
+        // workflows are identified within ga4gh endpoints when their prefix is '#workflow' (tools do not require a special prefix)
+        final String ga4ghv20Path = path.startsWith("#workflow/") ? path : "#workflow/" + path;
+
+        final List<FileWrapper> secondaryDescriptorFiles = ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(workflowDescriptorType, ga4ghv20Path, tag).stream()
+            .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
+            .map(toolFile -> {
+                try {
+                    return ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(workflowDescriptorType, ga4ghv20Path, tag, toolFile.getPath());
+                } catch (Exception ex) {
+                    err(ex.getMessage());
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        return secondaryDescriptorFiles;
     }
 
     @Override

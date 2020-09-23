@@ -37,6 +37,7 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Registry;
+import io.dockstore.openapi.client.model.FileWrapper;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.ContainertagsApi;
@@ -682,6 +683,11 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         } else {
             throw new RuntimeException("version not found");
         }
+    }
+
+    @Override
+    public List<FileWrapper> getAllToolDescriptors(String entryPath) {
+        return null;
     }
 
     @Override

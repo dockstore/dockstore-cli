@@ -27,6 +27,7 @@ import io.dockstore.client.cli.nested.notificationsclients.NotificationsClient;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.NextflowUtilities;
 import io.swagger.client.ApiException;
+import io.swagger.client.model.ToolDescriptor;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.exec.ExecuteException;
 import org.slf4j.Logger;
@@ -96,7 +97,7 @@ public class NextflowClient extends BaseLanguageClient implements LanguageClient
     public long launch(String entry, boolean isLocalEntry, String yamlRun, String jsonRun, String wdlOutputTarget, String uuid)
         throws ApiException {
         // Call common launch command
-        return launchPipeline(entry, isLocalEntry, yamlRun, jsonRun, null, uuid);
+        return launchPipeline(entry, isLocalEntry, ToolDescriptor.TypeEnum.NFL, yamlRun, jsonRun, null, uuid);
     }
 
     /**

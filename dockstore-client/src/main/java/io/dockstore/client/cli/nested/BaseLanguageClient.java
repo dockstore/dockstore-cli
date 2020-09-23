@@ -14,9 +14,10 @@ import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import io.dockstore.client.cli.nested.notificationsclients.NotificationsClient;
 import io.dockstore.common.Utilities;
+import io.dockstore.openapi.client.api.Ga4Ghv20Api;
+import io.dockstore.openapi.client.model.FileWrapper;
+import io.dockstore.openapi.client.model.Checksum;
 import io.swagger.client.ApiException;
-import io.swagger.client.api.Ga4Ghv1Api;
-import io.swagger.client.model.Checksum;
 import io.swagger.client.model.ToolDescriptor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration2.INIConfiguration;
@@ -30,6 +31,7 @@ import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
@@ -135,7 +137,7 @@ public abstract class BaseLanguageClient {
      * Common code to setup and launch a pipeline
      * @return Exit code of process
      */
-    public long launchPipeline(String entryVal, boolean localEntry, String yamlFile, String jsonFile, String outputTarget, String notificationUUID) throws ApiException {
+    public long launchPipeline(String entryVal, boolean localEntry, ToolDescriptor.TypeEnum type, String yamlFile, String jsonFile, String outputTarget, String notificationUUID) throws ApiException {
         // Initialize client with some launch information
         setLaunchInformation(entryVal, localEntry, yamlFile, jsonFile, outputTarget, notificationUUID);
 
@@ -179,10 +181,12 @@ public abstract class BaseLanguageClient {
                 exceptionMessage(ex, ex.getMessage(), GENERIC_ERROR);
             }
         }
+        if (!localEntry) {
+            validateDescriptorChecksum(type, entryVal);
+        }
 
         // Update the launcher with references to the files to be launched
         launcher.setFiles(localPrimaryDescriptorFile, zippedEntryFile, provisionedParameterFile, selectedParameterFile, workingDirectory);
-
 
         try {
             // Attempt to run launcher
@@ -205,22 +209,36 @@ public abstract class BaseLanguageClient {
     }
 
     /**
-     * Validates the localPrimaryDescriptor file has the same SHA-1 checksum as the descriptor stored in the database
-     * @param type CWL or WDL
+     * Validates the locally downloaded descriptor file has the same SHA-1 checksum as the descriptor stored in the database
+     * @param type CWL or WDL or NFL
      * @param entryVal Tool/workflow path
-     * @param versionID String version of the tool/workflow that we are taking the descriptor from
-     * @return boolean representing if the locally downloaded descriptor's checksum matches the one stored
+     * @return void if the checksums do not match or don't exist it errors out by design
      */
-    public boolean validateDescriptorChecksum(ToolDescriptor.TypeEnum type, String entryVal, String versionID) {
+    public void validateDescriptorChecksum(ToolDescriptor.TypeEnum type, String entryVal) {
+
         Checksum storedDescriptorChecksum = null;
         Checksum localDescriptorChecksum = null;
 
+        // 1. https://dockstore.org/api/static/swagger-ui/index.html#/GA4GHV20/toolsIdVersionsVersionIdTypeFilesGet
+        // 2. https://dockstore.org/api/static/swagger-ui/index.html#/GA4GHV20/toolsIdVersionsVersionIdTypeDescriptorRelativePathGet
+
+        List<FileWrapper> remoteSecondaryDescriptors = abstractEntryClient.getAllToolDescriptors(entryVal);
+
+        // split entryVal into path and version
+        String[] parts = entryVal.split(":");
+        String path = parts[0];
+        String versionID = parts.length > 1 ? parts[1] : null;
+
         // get stored descriptor
         try {
-            Ga4Ghv1Api ghv1Api = new Ga4Ghv1Api();
-            ToolDescriptor td = ghv1Api.toolsIdVersionsVersionIdTypeDescriptorGet(type.toString(), entryVal, versionID);
-            final String fileChecksum = DigestUtils.sha1Hex(td.getDescriptor());
-            storedDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
+            Ga4Ghv20Api ghv20Api = abstractEntryClient.getClient().getGa4Ghv20Api();
+            FileWrapper td = ghv20Api.toolsIdVersionsVersionIdTypeDescriptorGet(type.toString(), path, versionID);
+            List<Checksum> checksumList = td.getChecksum();
+            if (checksumList.size() == 1) {
+                storedDescriptorChecksum = checksumList.get(0);
+            } else {
+                // what to do with more/less than 1 checksum?
+            }
         } catch (ApiException ex) {
             exceptionMessage(ex, "The descriptor does not exist", ENTRY_NOT_FOUND);
         }
@@ -236,14 +254,11 @@ public abstract class BaseLanguageClient {
 
         // compare checksums
         if (storedDescriptorChecksum == null) {
-            // warning message
-            out("No stored checksum for the specified workflow descriptor. Unable to validate.");
+            // no stored descriptor
         } else if (!storedDescriptorChecksum.equals(localDescriptorChecksum)) {
             // checksums do not match
-            return false;
         }
-
-        return true;
+        out("validated checksum");
     }
 
     /**

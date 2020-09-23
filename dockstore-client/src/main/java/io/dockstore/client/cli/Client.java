@@ -51,6 +51,7 @@ import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.GeneratedConstants;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridgeShutDown;
+import io.dockstore.openapi.client.api.Ga4Ghv20Api;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerInterface;
 import io.swagger.client.ApiClient;
@@ -113,6 +114,7 @@ public class Client {
     private ContainersApi containersApi;
     private UsersApi usersApi;
     private Ga4GhApi ga4ghApi;
+    private Ga4Ghv20Api ga4ghv20Api;
     private ExtendedGa4GhApi extendedGA4GHApi;
     private MetadataApi metadataApi;
 
@@ -805,6 +807,13 @@ public class Client {
         this.extendedGA4GHApi = new ExtendedGa4GhApi(defaultApiClient);
         this.metadataApi = new MetadataApi(defaultApiClient);
 
+        // openapi client
+        io.dockstore.openapi.client.ApiClient openApiClient = new io.dockstore.openapi.client.ApiClient();
+        openApiClient.setUserAgent("Dockstore-CLI/" + cliVersion + "/java");
+        openApiClient.setBasePath(serverUrl);
+
+        this.ga4ghv20Api = new Ga4Ghv20Api(openApiClient);
+
         try {
             if (this.usersApi.getApiClient() != null) {
                 this.isAdmin = this.usersApi.getUser().isIsAdmin();
@@ -812,6 +821,7 @@ public class Client {
         } catch (ApiException | ProcessingException ex) {
             this.isAdmin = false;
         }
+
         this.toolClient = new ToolClient(containersApi, new ContainertagsApi(defaultApiClient), usersApi, this, isAdmin);
         this.workflowClient = new WorkflowClient(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
         this.checkerClient = new CheckerClient(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
@@ -858,4 +868,7 @@ public class Client {
     public CheckerClient getCheckerClient() {
         return checkerClient;
     }
+
+    public Ga4Ghv20Api getGa4Ghv20Api() {return ga4ghv20Api;}
+
 }
