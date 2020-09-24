@@ -708,9 +708,15 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     public String getVersionID(String entryPath) {
         final String[] parts = entryPath.split(":");
 
-        final String versionID = parts.length > 1 ? parts[1] : "latest";
+        String versionID = parts.length > 1 ? parts[1] : null;
 
-        return versionID;
+        if (versionID == null) {
+            final DockstoreTool container = getDockstoreTool(parts[0]);
+            versionID = container.getDefaultVersion();
+        }
+
+        // last resort use 'latest' tag
+        return versionID == null ? "latest" : versionID;
     }
 
     @Override

@@ -182,7 +182,8 @@ public abstract class BaseLanguageClient {
                 exceptionMessage(ex, ex.getMessage(), GENERIC_ERROR);
             }
         }
-        if (!localEntry) {
+
+        if (!localEntry && !abstractEntryClient.ignoreChecksums) {
             validateDescriptorChecksum(type, entryVal);
         }
 

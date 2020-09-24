@@ -454,6 +454,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String jsonRun = commandLaunch.json;
         String yamlRun = commandLaunch.yaml;
         String wdlOutputTarget = commandLaunch.wdlOutputTarget;
+        boolean ignoreChecksumFlag = commandLaunch.ignoreChecksums;
         String uuid = commandLaunch.uuid;
 
         // trim the final slash on output if it is present, probably an error ( https://github.com/aws/aws-cli/issues/421 ) causes a double slash which can fail
@@ -466,6 +467,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             if ((entry == null) != (localEntry == null)) {
                 if (entry != null) {
                     this.isLocalEntry = false;
+                    this.ignoreChecksums = ignoreChecksumFlag;
                     String[] parts = entry.split(":");
                     String path = parts[0];
                     try {
@@ -1181,6 +1183,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         private String yaml;
         @Parameter(names = "--wdl-output-target", description = "Allows you to specify a remote path to provision outputs files to (ex: s3://oicr.temp/testing-launcher/")
         private String wdlOutputTarget;
+        @Parameter(names = "--ignore-checksums", description = "Allows you to ignore validating checksums of each downloaded descriptor")
+        private boolean ignoreChecksums;
         @Parameter(names = "--help", description = "Prints help for launch command", help = true)
         private boolean help = false;
         @Parameter(names = "--uuid", description = "Allows you to specify a uuid for 3rd party notifications")

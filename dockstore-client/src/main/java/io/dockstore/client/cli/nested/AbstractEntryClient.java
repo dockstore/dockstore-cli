@@ -125,6 +125,7 @@ public abstract class AbstractEntryClient<T> {
     protected boolean isAdmin = false;
 
     boolean isLocalEntry = false;
+    boolean ignoreChecksums = false;
 
     private boolean isWesCommand = false;
     private String wesUri = null;
@@ -1151,6 +1152,8 @@ public abstract class AbstractEntryClient<T> {
                     errorMessage("dockstore: missing required flag --entry", CLIENT_ERROR);
                 }
                 this.isLocalEntry = false;
+                this.ignoreChecksums = args.contains("--ignore-checksums");
+
                 preValidateLaunchArguments(args);
                 checkIfDockerRunning();
 
@@ -1622,6 +1625,7 @@ public abstract class AbstractEntryClient<T> {
         }
         out("  --wdl-output-target                 Allows you to specify a remote path to provision output files to ex: s3://oicr.temp/testing-launcher/");
         out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
+        out("  --ignore-checksums                  Allows you to ignore validating checksums of each downloaded descriptor");
         out("");
     }
 
