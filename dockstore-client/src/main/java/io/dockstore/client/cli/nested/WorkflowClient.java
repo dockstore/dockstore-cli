@@ -41,12 +41,10 @@ import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.SourceControl;
 import io.dockstore.openapi.client.api.Ga4Ghv20Api;
-import io.dockstore.openapi.client.model.FileWrapper;
 import io.dockstore.openapi.client.model.ToolFile;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.Label;
 import io.swagger.client.model.PublishRequest;
 import io.swagger.client.model.SourceFile;
@@ -79,7 +77,6 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
-import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
@@ -354,17 +351,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String[] parts = toolpath.split(":");
         String path = parts[0];
         // match behaviour from getDescriptorFromServer, use master if no version is provided
-        String tag = (parts.length > 1) ? parts[1] : "master";
+        String tag = getVersionID(toolpath);
         Workflow workflow = getDockstoreWorkflowByPath(path);
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(tag))
             .findFirst();
-        // if no master is present (for example, for hosted workflows), fail over to the latest descriptor
-        if (first.isEmpty()) {
-            first = workflow.getWorkflowVersions().stream().max(Comparator.comparing(WorkflowVersion::getLastModified));
-            first.ifPresent(workflowVersion -> System.out.println(
-                "Could not locate workflow with version '" + tag + "'. Using last modified version '" + workflowVersion.getName()
-                    + "' instead."));
-        }
 
         if (first.isPresent()) {
             boolean isValid = first.get().isValid();
@@ -392,50 +382,55 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     /**
      * Returns a list of all the tool descriptors associated with this workflow
+     * @param type workflow type, CWL, WDL, NFL ...
      * @param entryPath Workflow path
+     * @param versionID version we are getting descriptors for
      */
-    public List<ToolFile> getAllToolDescriptors(String type, String entryPath) {
+    public List<ToolFile> getAllToolDescriptors(String type, String entryPath, String versionID) {
 
-        // get workflow id and tag
-        final String[] parts = entryPath.split(":");
-        final String path = parts[0];
-        final String tag = getVersionID(entryPath);
-
-        Ga4Ghv20Api ga4ghv20api = this.client.getGa4Ghv20Api();
+        final Ga4Ghv20Api ga4ghv20api = this.client.getGa4Ghv20Api();
 
         // workflows are identified within ga4gh endpoints when their prefix is '#workflow/' (tools do not require a special prefix)
-        final String ga4ghv20Path = "#workflow/" + path;
+        final String ga4ghv20Path = "#workflow/" + entryPath;
 
         // get all the tool files and filter out anything not a descriptor
-        return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, ga4ghv20Path, tag).stream()
-            .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
-            .collect(Collectors.toList());
+        try {
+            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, ga4ghv20Path, versionID).stream()
+                .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
+                .collect(Collectors.toList());
+        } catch (NullPointerException ex) {
+            exceptionMessage(ex, "Unable to locate entry  " + entryPath + ":" + versionID, Client.COMMAND_ERROR);
+        }
+
+        return null;
     }
 
     /**
-     * Returns the version ID of
+     * Returns the version ID of the given workflow, falls back to the latest version
      * @param entryPath Workflow path
      */
     @Override
     public String getVersionID(String entryPath) {
         final String[] parts = entryPath.split(":");
 
-        if (parts.length > 1) {
-            return parts[1];
-        }
+        final String versionID = parts.length > 1 ? parts[1] : "master";
 
-        String versionID =  null;
+        final Workflow workflow = getDockstoreWorkflowByPath(parts[0]);
 
-        final Workflow workflow = getDockstoreWorkflowByPath(entryPath);
-        versionID = workflow.getDefaultVersion();
+        // ensure workflow has version
+        Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(versionID))
+            .findFirst();
 
-        // as a last resort, default to master
-        if (versionID == null) {
-            versionID = "master";
+        // if no master is present (for example, for hosted workflows), fail over to the latest descriptor
+        if (first.isEmpty()) {
+            first = workflow.getWorkflowVersions().stream().max(Comparator.comparing(WorkflowVersion::getLastModified));
+            first.ifPresent(workflowVersion -> System.out.println(
+                "Could not locate workflow with version '" + versionID + "'. Using last modified version '" + workflowVersion.getName()
+                    + "' instead."));
+            return first.get().getName();
         }
 
         return versionID;
-
     }
 
     @Override

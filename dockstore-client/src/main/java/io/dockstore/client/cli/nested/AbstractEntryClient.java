@@ -54,7 +54,6 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
-import io.dockstore.openapi.client.model.FileWrapper;
 import io.dockstore.openapi.client.model.ToolFile;
 import io.github.collaboratory.cwl.CWLClient;
 import io.github.collaboratory.nextflow.NextflowClient;
@@ -442,11 +441,11 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * Get all tool descriptors associated with the entry type
-     *
-     * @param type descriptor type, CWL, WDL, NFL ...
+     *  @param type descriptor type, CWL, WDL, NFL ...
      * @param entryPath path to either a tool or workflow
+     * @param versionID version we are fetching descriptors for
      */
-    public abstract List<ToolFile> getAllToolDescriptors(String type,String entryPath);
+    public abstract List<ToolFile> getAllToolDescriptors(String type, String entryPath, String versionID);
 
     /**
      * Returns the versionID of the specified entry, or the default version if unspecified in the path

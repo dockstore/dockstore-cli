@@ -222,9 +222,9 @@ public abstract class BaseLanguageClient {
 
         // workflows have a special prefix for TRS endpoints
         String ga4ghv20Path = abstractEntryClient.getEntryType().toLowerCase().equals("workflow") ? "#workflow/" + path : path;
-        String tag = abstractEntryClient.getVersionID(entryVal);
+        String versionID = abstractEntryClient.getVersionID(entryVal);
 
-        List<ToolFile> allDescriptors = abstractEntryClient.getAllToolDescriptors(type.toString(), entryVal);
+        List<ToolFile> allDescriptors = abstractEntryClient.getAllToolDescriptors(type.toString(), path, versionID);
 
         Ga4Ghv20Api ga4ghv20api = abstractEntryClient.getClient().getGa4Ghv20Api();
 
@@ -237,8 +237,15 @@ public abstract class BaseLanguageClient {
 
             // Get remote descriptor checksum
             try {
-                final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, tag, toolFile.getPath());
-                remoteDescriptorChecksum = remoteDescriptor.getChecksum().get(0);
+                final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, versionID, toolFile.getPath());
+                List<Checksum> remoteChecksumList = remoteDescriptor.getChecksum();
+
+                // if the remote descriptor had multiple checksums, no clear way to handle.
+                if (remoteChecksumList.size() > 1) {
+                    errorMessage("Multiple remote checksums to be compared to single local", API_ERROR);
+                }
+
+                remoteDescriptorChecksum = remoteChecksumList.get(0);
             } catch (ApiException ex) {
                 exceptionMessage(ex, "unable to locate remote descriptor", ENTRY_NOT_FOUND);
             }
@@ -249,6 +256,7 @@ public abstract class BaseLanguageClient {
                 final String fileContents = FileUtils.readFileToString(localDescriptor, StandardCharsets.UTF_8);
                 final String fileChecksum = DigestUtils.sha1Hex(fileContents);
                 localDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
+                localDescriptorChecksum.setType("sha1");
             } catch (IOException ex) {
                 exceptionMessage(ex, "unable to locate local descriptor", IO_ERROR);
             }
@@ -259,9 +267,8 @@ public abstract class BaseLanguageClient {
                 err("Unable to locate checksum for descriptor " + toolFile.getPath() + ". Cannot validate the checksum of the locally downloaded descriptor. Refreshing the workflow will calculate the entry checksum.");
             } else if (!remoteDescriptorChecksum.equals(localDescriptorChecksum)) {
                 // checksums do not match
-
+                errorMessage("Local checksum does not match remote checksum. Launch halted.", API_ERROR);
             }
-            out("validated checksum");
         }
     }
 

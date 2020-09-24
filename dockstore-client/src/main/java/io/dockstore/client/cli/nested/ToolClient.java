@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +39,6 @@ import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Registry;
 import io.dockstore.openapi.client.api.Ga4Ghv20Api;
-import io.dockstore.openapi.client.model.FileWrapper;
 import io.dockstore.openapi.client.model.ToolFile;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.ContainersApi;
@@ -51,8 +51,10 @@ import io.swagger.client.model.SourceFile;
 import io.swagger.client.model.StarRequest;
 import io.swagger.client.model.Tag;
 import io.swagger.client.model.ToolDescriptor;
+import io.swagger.client.model.ToolVersion;
 import io.swagger.client.model.User;
 import io.swagger.client.model.Workflow;
+import io.swagger.client.model.WorkflowVersion;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -651,19 +653,10 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         String[] parts = toolpath.split(":");
         String path = parts[0];
 
-        String tag = (parts.length > 1) ? parts[1] : null;
-
         DockstoreTool container = getDockstoreTool(path);
-        if (tag == null && container.getDefaultVersion() != null) {
-            tag = container.getDefaultVersion();
-        }
 
-        // as a last resort, use latest to match pre-existing behavior from EntryVersionHelper
-        if (tag == null) {
-            tag = "latest";
-        }
+        final String fixTag = getVersionID(toolpath);
 
-        final String fixTag = tag;
         Optional<Tag> first = container.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(fixTag)).findFirst();
         if (first.isPresent()) {
             Long versionId = first.get().getId();
@@ -692,20 +685,23 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
      * Returns the descriptors of the specified tool
      * @param type Descriptor type CWL, WDL, NFL ...
      * @param entryPath Workflow path
+     * @param versionID version we are getting descriptors for
      */
     @Override
-    public List<ToolFile> getAllToolDescriptors(String type, String entryPath) {
-
-        final String[] parts = entryPath.split(":");
-        final String path = parts[0];
-        final String tag = getVersionID(entryPath);
+    public List<ToolFile> getAllToolDescriptors(String type, String entryPath, String versionID) {
 
         final Ga4Ghv20Api ga4ghv20api = this.client.getGa4Ghv20Api();
 
         // get all the tool files and filter out anything not a descriptor
-        return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, path, tag).stream()
-            .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
-            .collect(Collectors.toList());
+        try {
+            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, entryPath, versionID).stream()
+                .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
+                .collect(Collectors.toList());
+        } catch (NullPointerException ex) {
+            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID, Client.COMMAND_ERROR);
+        }
+
+        return null;
     }
 
     /**
@@ -716,26 +712,9 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     public String getVersionID(String entryPath) {
         final String[] parts = entryPath.split(":");
 
-        if (parts.length > 1) {
-            return parts[1];
-        }
-
-        String versionID = null;
-
-        try {
-            final DockstoreTool tool = containersApi.getContainerByToolPath(entryPath, null);
-            versionID = tool.getDefaultVersion();
-        } catch (ApiException ex) {
-            exceptionMessage(ex, "Could not find container", Client.API_ERROR);
-        }
-
-        // as a last resort, default to latest
-        if (versionID == null) {
-            versionID = "latest";
-        }
+        final String versionID = parts.length > 1 ? parts[1] : "latest";
 
         return versionID;
-
     }
 
     @Override
