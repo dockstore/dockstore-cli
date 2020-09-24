@@ -870,6 +870,8 @@ public class Client {
         return checkerClient;
     }
 
-    public Ga4Ghv20Api getGa4Ghv20Api() {return ga4ghv20Api;}
+    public Ga4Ghv20Api getGa4Ghv20Api() {
+        return ga4ghv20Api;
+    }
 
 }
