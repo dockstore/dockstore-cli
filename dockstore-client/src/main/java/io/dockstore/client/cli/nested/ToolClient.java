@@ -212,45 +212,75 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     protected void handlePublishUnpublish(String entryPath, String newName, boolean unpublishRequest) {
+        DockstoreTool existingTool = null;
+        boolean isPublished = false;
+
+        // Cannot be making an unpublish request with a specified new name
+        assert (!(unpublishRequest && newName != null));
+
+        try {
+            existingTool = containersApi.getContainerByToolPath(entryPath, null);
+            isPublished = existingTool.isIsPublished();
+        } catch (ApiException ex) {
+            exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
+        }
+
         if (unpublishRequest) {
-            publish(false, entryPath);
+            if (isPublished) {
+                publish(false, entryPath);
+            } else {
+                out("The following tool is already unpublished: " + entryPath);
+            }
         } else {
             if (newName == null) {
-                publish(true, entryPath);
-            } else {
+                if (isPublished) {
+                    out("The following tool is already published: " + entryPath);
+                } else {
+                    publish(true, entryPath);
+                }
+            } else if (!toolExists(entryPath + "/" + newName)) {
                 try {
-                    DockstoreTool container = containersApi.getContainerByToolPath(entryPath, null);
                     DockstoreTool newContainer = new DockstoreTool();
+
                     // copy only the fields that we want to replicate, not sure why simply blanking
                     // the returned container does not work
-                    newContainer.setMode(container.getMode());
-                    newContainer.setName(container.getName());
-                    newContainer.setNamespace(container.getNamespace());
-                    newContainer.setRegistryString(container.getRegistryString());
-                    newContainer.setDefaultDockerfilePath(container.getDefaultDockerfilePath());
-                    newContainer.setDefaultCwlPath(container.getDefaultCwlPath());
-                    newContainer.setDefaultWdlPath(container.getDefaultWdlPath());
-                    newContainer.setDefaultCWLTestParameterFile(container.getDefaultCWLTestParameterFile());
-                    newContainer.setDefaultWDLTestParameterFile(container.getDefaultWDLTestParameterFile());
+                    newContainer.setMode(existingTool.getMode());
+                    newContainer.setName(existingTool.getName());
+                    newContainer.setNamespace(existingTool.getNamespace());
+                    newContainer.setRegistryString(existingTool.getRegistryString());
+                    newContainer.setDefaultDockerfilePath(existingTool.getDefaultDockerfilePath());
+                    newContainer.setDefaultCwlPath(existingTool.getDefaultCwlPath());
+                    newContainer.setDefaultWdlPath(existingTool.getDefaultWdlPath());
+                    newContainer.setDefaultCWLTestParameterFile(existingTool.getDefaultCWLTestParameterFile());
+                    newContainer.setDefaultWDLTestParameterFile(existingTool.getDefaultWDLTestParameterFile());
                     newContainer.setIsPublished(false);
-                    newContainer.setGitUrl(container.getGitUrl());
+                    newContainer.setGitUrl(existingTool.getGitUrl());
                     newContainer.setToolname(newName);
 
                     newContainer = containersApi.registerManual(newContainer);
 
-                    if (newContainer != null) {
-                        out("Successfully registered " + entryPath + "/" + newName);
-                        containersApi.refresh(newContainer.getId());
-                        publish(true, newContainer.getToolPath());
-                    } else {
-                        errorMessage("Unable to publish " + newName, Client.COMMAND_ERROR);
-                    }
+                    out("Successfully registered " + entryPath + "/" + newName);
+
+                    containersApi.refresh(newContainer.getId());
+                    publish(true, newContainer.getToolPath());
                 } catch (ApiException ex) {
                     exceptionMessage(ex, "Unable to publish " + newName, Client.API_ERROR);
                 }
+            } else {
+                out("The following tool is already registered: " + entryPath + "/" + newName);
             }
         }
     }
+
+    private boolean toolExists(String entryPath) {
+        try {
+            containersApi.getContainerByToolPath(entryPath, null);
+            return true;
+        } catch (ApiException ex) {
+            return false;
+        }
+    }
+
     @Override
     protected void publishHelp() {
         printHelpHeader();
@@ -266,7 +296,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         out("  --entry <entry>             Complete " + getEntryType()
                 + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("Optional Parameter(s):");
-        out("  --entryname <New" + getEntryType() + "name>      " + "New name to give the tool specified by --entry. "
+        out("  --new-entry-name <new-tool-name>      " + "New name to give the tool specified by --entry. "
                 + "This will register and publish a new copy of the tool with the given name.");
         printHelpFooter();
     }

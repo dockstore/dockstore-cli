@@ -1138,4 +1138,134 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
     }
+
+    /**
+    * Tests publishing/unpublishing workflows with the --new-entry-name parameter
+    */
+    @Test
+    public void testPublishWithNewEntryName() {
+
+        final String publishNameParameter = "--new-entry-name";
+
+        // register workflow
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            "parameter_test_workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--script"});
+
+        // count number of workflows for this user with the workflowname 'test_entryname'
+        final long countInitialWorkflowPublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
+                + "AND repository='parameter_test_workflow' AND workflowname IS NULL;", long.class);
+        assertEquals("The initial workflow should be published without a workflow name", 1, countInitialWorkflowPublish);
+
+        // publish workflow with name 'test_entryname'
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+                "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
+
+        // publish workflow with name 'test_entryname' a second time, shouldn't work
+        systemOutRule.clearLog();
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+                "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
+        assertTrue("Attempting to publish a registered workflow should notify the user",
+            systemOutRule.getLog().contains("The following workflow is already registered: github.com/DockstoreTestUser2/parameter_test_workflow"));
+
+        // verify there are 2 workflows associated with the user
+        final long countTotalPublishedWorkflows = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
+                + "AND repository='parameter_test_workflow' AND ispublished='t';", long.class);
+        assertEquals("Ensure there are 2 published workflows", 2, countTotalPublishedWorkflows);
+
+        // verify count of number of published workflows, with the desired name, is 1
+        final long countPublishedWorkflowWithCustomName = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
+                + "AND repository='parameter_test_workflow' AND workflowname='test_entryname' AND ispublished='t';", long.class);
+        assertEquals("Ensure there is a published workflow with the expected workflow name", 1, countPublishedWorkflowWithCustomName);
+
+        // Try unpublishing with both --unpub and --entryname specified, should fail
+        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
+
+        // unpublish workflow with name 'test_entryname'
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", "--script"});
+
+        // verify count of number of unpublish workflows with the desired name is 1
+        final long countUnpublishedWorkflowWithCustomName = testingPostgres.runSelectStatement(
+            "SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' AND repository='parameter_test_workflow' AND workflowname='test_entryname' AND ispublished='f';", long.class);
+        assertEquals("The workflow should exist and be unpublished", 1, countUnpublishedWorkflowWithCustomName);
+
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", "--script"});
+        assertTrue("Attempting to publish a registered workflow should notify the user",
+            systemOutRule.getLog().contains("The following workflow is already unpublished: github.com/DockstoreTestUser2/parameter_test_workflow"));
+    }
+
+
+    /**
+     * Tests publishing/unpublishing workflows with the original --entryname parameter to ensure backwards compatibility
+     */
+    @Test
+    public void testPublishWithEntryName() {
+
+        final String publishNameParameter = "--entryname";
+
+        // register workflow
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            "parameter_test_workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--script"});
+
+        // count number of workflows for this user with the workflowname 'test_entryname'
+        final long countInitialWorkflowPublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
+                + "AND repository='parameter_test_workflow' AND workflowname IS NULL;", long.class);
+        assertEquals("The initial workflow should be published without a workflow name", 1, countInitialWorkflowPublish);
+
+        // publish workflow with name 'test_entryname'
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+                "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
+
+        // publish workflow with name 'test_entryname' a second time, shouldn't work
+        systemOutRule.clearLog();
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+                "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
+        assertTrue("Attempting to publish a registered workflow should notify the user",
+            systemOutRule.getLog().contains("The following workflow is already registered: github.com/DockstoreTestUser2/parameter_test_workflow"));
+
+        // verify there are 2 workflows associated with the user
+        final long countTotalPublishedWorkflows = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
+                        + "AND repository='parameter_test_workflow' AND ispublished='t';", long.class);
+        assertEquals("Ensure there are 2 published workflows", 2, countTotalPublishedWorkflows);
+
+        // verify count of number of published workflows, with the desired name, is 1
+        final long countPublishedWorkflowWithCustomName = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' "
+                        + "AND repository='parameter_test_workflow' AND workflowname='test_entryname' AND ispublished='t';", long.class);
+        assertEquals("Ensure there is a published workflow with the expected workflow name", 1, countPublishedWorkflowWithCustomName);
+
+        // Try unpublishing with both --unpub and --entryname specified, should fail
+        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
+
+        // unpublish workflow with name 'test_entryname'
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", "--script"});
+
+        // verify count of number of unpublish workflows with the desired name is 1
+        final long countUnpublishedWorkflowWithCustomName = testingPostgres.runSelectStatement(
+            "SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' AND repository='parameter_test_workflow' AND workflowname='test_entryname' AND ispublished='f';", long.class);
+        assertEquals("The workflow should exist and be unpublished", 1, countUnpublishedWorkflowWithCustomName);
+
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", "--script"});
+        assertTrue("Attempting to publish a registered workflow should notify the user",
+            systemOutRule.getLog().contains("The following workflow is already unpublished: github.com/DockstoreTestUser2/parameter_test_workflow"));
+
+    }
 }

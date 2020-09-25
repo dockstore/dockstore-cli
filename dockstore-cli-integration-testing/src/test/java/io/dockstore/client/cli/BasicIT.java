@@ -1501,40 +1501,130 @@ public class BasicIT extends BaseIT {
     @Test
     public void launchToolChecksumValidation() {
         // manual publish the tool
-        Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
-                "quay.io/dockstoretestuser/test_input_json", "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+            "quay.io/dockstoretestuser/test_input_json", "--script" });
 
         // refresh the tool
-        Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--entry",
-                "quay.io/dockstoretestuser/test_input_json", "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--entry",
+            "quay.io/dockstoretestuser/test_input_json", "--script" });
 
         // launch the tool
         systemOutRule.clearLog();
-        Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
-                "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
+            "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
             systemOutRule.getLog().contains("Validated checksums") && !systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
-
 
         // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = '' WHERE path='/Dockstore.cwl';");
 
         systemOutRule.clearLog();
-        Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
-                "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
+            "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
             systemOutRule.getLog().contains("Validated checksums") && systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
-
 
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = 'SHA-1:VeryFakeChecksum' WHERE path='/Dockstore.cwl';");
 
         systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
-                "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
+            "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+    }
+
+    /**
+     * Checks that you can properly publish and unpublish a Quay/Github tool using the --new-entry-name parameter
+     */
+    @Test
+    public void testQuayGithubPublishAndUnpublishAToolnewEntryName() {
+
+        final String publishNameParameter = "--new-entry-name";
+
+        // Publish
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+
+        // Publish a second time, should fail
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+        assertTrue("Attempting to publish a registered tool should notify the user",
+            systemOutRule.getLog().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+
+        final long countPublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 1 registered tool", 1, countPublish);
+
+        // Unpublish incorrectly
+        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+
+        final long countBadUnpublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 1 registered tool after invalid unpublish request", 1, countBadUnpublish);
+
+        // unpublish correctly
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
+
+        final long countGoodUnpublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 0 registered", 0, countGoodUnpublish);
+
+        // try to unpublish the unpublished tool
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
+        assertTrue("Attempting to publish a registered tool should notify the user",
+            systemOutRule.getLog().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+    }
+
+    /**
+     * Checks that you can properly publish and unpublish a Quay/Github tool using the --entryname parameter. --entryname is deprecated,
+     * verifying backwards compatibility
+     */
+    @Test
+    public void testQuayGithubPublishAndUnpublishAToolEntryName() {
+
+        final String publishNameParameter = "--entryname";
+
+        // Publish
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+
+        // Publish a second time, should fail
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+        assertTrue("Attempting to publish a registered tool should notify the user",
+            systemOutRule.getLog().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+
+        final long countPublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 1 registered tool", 1, countPublish);
+
+        // Unpublish incorrectly
+        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+
+        final long countBadUnpublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 1 registered tool after invalid unpublish request", 1, countBadUnpublish);
+
+        // unpublish correctly
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
+
+        final long countGoodUnpublish = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
+        Assert.assertEquals("there should be 0 registered", 0, countGoodUnpublish);
+
+        // try to unpublish the unpublished tool
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
+        assertTrue("Attempting to publish a registered tool should notify the user",
+            systemOutRule.getLog().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
     }
 }
