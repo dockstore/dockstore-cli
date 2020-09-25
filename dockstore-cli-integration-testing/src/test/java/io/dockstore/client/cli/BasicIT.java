@@ -1497,4 +1497,43 @@ public class BasicIT extends BaseIT {
         final long count = testingPostgres.runSelectStatement("select count(*) from user_profile where location='Toronto'", long.class);
         Assert.assertEquals("One user should have this info now, there are " + count, 1, count);
     }
+
+    @Test
+    public void launchToolChecksumValidation() {
+        // manual publish the tool
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+                "quay.io/dockstoretestuser/test_input_json", "--script" });
+
+        // refresh the tool
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--entry",
+                "quay.io/dockstoretestuser/test_input_json", "--script" });
+
+        // launch the tool
+        systemOutRule.clearLog();
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
+                "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+        assertTrue("Output should indicate that checksums have been validated",
+            systemOutRule.getLog().contains("Validated checksums") && !systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
+
+
+        testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = '' WHERE path='/Dockstore.cwl';");
+
+        systemOutRule.clearLog();
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
+                "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+        assertTrue("Output should indicate that checksums have been validated",
+            systemOutRule.getLog().contains("Validated checksums") && systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
+
+
+        testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = 'SHA-1:VeryFakeChecksum' WHERE path='/Dockstore.cwl';");
+
+        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
+                "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+    }
 }

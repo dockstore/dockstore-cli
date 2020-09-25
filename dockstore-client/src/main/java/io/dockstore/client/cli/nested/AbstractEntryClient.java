@@ -442,7 +442,7 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * Get all tool descriptors associated with the entry type
-     *  @param type descriptor type, CWL, WDL, NFL ...
+     * @param type descriptor type, CWL, WDL, NFL ...
      * @param entryPath path to either a tool or workflow
      * @param versionID version we are fetching descriptors for
      */

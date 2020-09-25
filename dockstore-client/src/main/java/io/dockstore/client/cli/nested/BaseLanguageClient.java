@@ -185,6 +185,7 @@ public abstract class BaseLanguageClient {
 
         if (!localEntry && !abstractEntryClient.ignoreChecksums) {
             validateDescriptorChecksum(type, entryVal);
+            out("Validated checksums");
         }
 
         // Update the launcher with references to the files to be launched
@@ -214,7 +215,7 @@ public abstract class BaseLanguageClient {
      * Validates the locally downloaded descriptor file has the same SHA-1 checksum as the descriptor stored in the database
      * @param type CWL or WDL or NFL
      * @param entryVal Tool/workflow path
-     * @return void if the checksums do not match or don't exist it errors out by design
+     * @return void errors out if checksums do not match, provides a warning if a remote checksum is null
      */
     public void validateDescriptorChecksum(ToolDescriptor.TypeEnum type, String entryVal) {
         final String[] parts = entryVal.split(":");
@@ -240,14 +241,15 @@ public abstract class BaseLanguageClient {
                 final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, versionID, toolFile.getPath());
                 List<Checksum> remoteChecksumList = remoteDescriptor.getChecksum();
 
-                // if the remote descriptor had multiple checksums, no clear way to handle.
+                // if the remote descriptor had multiple checksums, no clear way to handle. If the are no descriptors, leave as null.
                 if (remoteChecksumList.size() > 1) {
-                    errorMessage("Multiple remote checksums to be compared to single local", API_ERROR);
+                    errorMessage("Multiple remote checksums to be compared to single local descriptor", API_ERROR);
+                } else if (remoteChecksumList.size() == 1) {
+                    remoteDescriptorChecksum = remoteChecksumList.get(0);
                 }
 
-                remoteDescriptorChecksum = remoteChecksumList.get(0);
             } catch (ApiException ex) {
-                exceptionMessage(ex, "unable to locate remote descriptor", ENTRY_NOT_FOUND);
+                exceptionMessage(ex, "unable to locate remote descriptor " + ga4ghv20Path, ENTRY_NOT_FOUND);
             }
 
             // Get local descriptor checksum
@@ -258,7 +260,7 @@ public abstract class BaseLanguageClient {
                 localDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
                 localDescriptorChecksum.setType("sha1");
             } catch (IOException ex) {
-                exceptionMessage(ex, "unable to locate local descriptor", IO_ERROR);
+                exceptionMessage(ex, "unable to locate local descriptor at " + localTemporaryDirectory + toolFile.getPath(), IO_ERROR);
             }
 
             // compare checksums
