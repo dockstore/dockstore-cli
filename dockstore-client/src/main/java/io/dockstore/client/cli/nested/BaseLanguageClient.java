@@ -183,9 +183,9 @@ public abstract class BaseLanguageClient {
             }
         }
 
-        if (!localEntry && !abstractEntryClient.ignoreChecksums) {
+        // Don't validate descriptors if the entry is local, a flag to ignore validation was part of the command, or if the entry is not published.
+        if (!localEntry && !abstractEntryClient.ignoreChecksums && abstractEntryClient.isEntryPublished(entryVal)) {
             validateDescriptorChecksum(type, entryVal);
-            out("Validated checksums");
         }
 
         // Update the launcher with references to the files to be launched
@@ -238,6 +238,7 @@ public abstract class BaseLanguageClient {
 
             // Get remote descriptor checksum
             try {
+                // The TRS endpoint only discovers published entries
                 final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, versionID, toolFile.getPath());
                 List<Checksum> remoteChecksumList = remoteDescriptor.getChecksum();
 
@@ -272,6 +273,8 @@ public abstract class BaseLanguageClient {
                 errorMessage("Local checksum does not match remote checksum. Launch halted.", API_ERROR);
             }
         }
+
+        out("Validated checksums");
     }
 
     /**

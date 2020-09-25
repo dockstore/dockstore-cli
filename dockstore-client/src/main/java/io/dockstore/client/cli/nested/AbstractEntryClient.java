@@ -456,6 +456,13 @@ public abstract class AbstractEntryClient<T> {
     public abstract String getVersionID(String entryPath);
 
     /**
+     * Returns if the provided entry is published
+     *
+     * @param entryPath path to either a tool or workflow
+     */
+    public abstract boolean isEntryPublished(String entryPath);
+
+    /**
      * private helper methods
      */
 
