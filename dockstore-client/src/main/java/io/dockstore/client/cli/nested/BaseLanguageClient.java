@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -246,14 +247,12 @@ public abstract class BaseLanguageClient {
             try {
                 // The TRS endpoint only discovers published entries
                 final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, versionID, toolFile.getPath());
-                List<Checksum> remoteChecksumList = remoteDescriptor.getChecksum();
+                List<Checksum> remoteChecksumList = remoteDescriptor.getChecksum()
+                    .stream()
+                    .filter(c -> c.getType().equals("sha1"))
+                    .collect(Collectors.toList());
 
-                // if the remote descriptor had multiple checksums, no clear way to handle. If the are no descriptors, leave as null.
-                if (remoteChecksumList.size() > 1) {
-                    errorMessage("Multiple remote checksums to be compared to single local descriptor", API_ERROR);
-                } else if (remoteChecksumList.size() == 1) {
-                    remoteDescriptorChecksum = remoteChecksumList.get(0);
-                }
+                remoteDescriptorChecksum = remoteChecksumList.size() > 0 ? remoteChecksumList.get(0) : null;
             } catch (io.dockstore.openapi.client.ApiException ex) {
                 // The TRS endpoint throw openapi ApiExceptions
                 exceptionMessage(ex, "unable to locate remote descriptor " + ga4ghv20Path, ENTRY_NOT_FOUND);
