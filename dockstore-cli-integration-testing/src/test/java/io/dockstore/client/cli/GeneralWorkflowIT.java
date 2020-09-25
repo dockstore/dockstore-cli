@@ -1115,7 +1115,7 @@ public class GeneralWorkflowIT extends BaseIT {
         // ensure checksum validation is acknowledged, and no null checksums were discovered
         systemOutRule.clearLog();
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json") , "--script" });
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
             systemOutRule.getLog().contains("Validated checksums") && !systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
 
@@ -1126,7 +1126,7 @@ public class GeneralWorkflowIT extends BaseIT {
         // run workflow again, should still succeed but indicate that checksums were null
         systemOutRule.clearLog();
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json") , "--script" });
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated, but null checksums were present",
             systemOutRule.getLog().contains("Validated checksums") && systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
 
@@ -1136,6 +1136,6 @@ public class GeneralWorkflowIT extends BaseIT {
         // expect the launch to be exited due to mismatching checksums
         systemExit.expectSystemExitWithStatus(Client.API_ERROR);
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json") , "--script" });
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
     }
 }

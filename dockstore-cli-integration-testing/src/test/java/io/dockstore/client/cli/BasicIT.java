@@ -1519,6 +1519,7 @@ public class BasicIT extends BaseIT {
             systemOutRule.getLog().contains("Validated checksums") && !systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
 
 
+        // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = '' WHERE path='/Dockstore.cwl';");
 
         systemOutRule.clearLog();

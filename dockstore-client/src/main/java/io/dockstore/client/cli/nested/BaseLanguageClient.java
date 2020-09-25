@@ -221,8 +221,13 @@ public abstract class BaseLanguageClient {
         final String[] parts = entryVal.split(":");
         String path = parts[0];
 
-        // workflows have a special prefix for TRS endpoints
-        String ga4ghv20Path = abstractEntryClient.getEntryType().toLowerCase().equals("workflow") ? "#workflow/" + path : path;
+        // workflows/checkers have a special prefix for TRS endpoints
+        String ga4ghv20Path = path;
+        if (abstractEntryClient.getEntryType().toLowerCase().equals("workflow") || abstractEntryClient.getEntryType().toLowerCase().equals("checker")) {
+            ga4ghv20Path = "#workflow/" + ga4ghv20Path;
+        }
+
+        // Get the entry version we are validating for
         String versionID = abstractEntryClient.getVersionID(entryVal);
 
         List<ToolFile> allDescriptors = abstractEntryClient.getAllToolDescriptors(type.toString(), path, versionID);
@@ -232,6 +237,7 @@ public abstract class BaseLanguageClient {
         // All secondary files are located relative to the location of the primary descriptor.
         final String localTemporaryDirectory = localPrimaryDescriptorFile.getParent() + "/";
 
+        // Validate each tool file associated with the entry (Primary and secondary descriptors)
         for (ToolFile toolFile : allDescriptors) {
             Checksum remoteDescriptorChecksum = null;
             Checksum localDescriptorChecksum = null;
@@ -248,8 +254,8 @@ public abstract class BaseLanguageClient {
                 } else if (remoteChecksumList.size() == 1) {
                     remoteDescriptorChecksum = remoteChecksumList.get(0);
                 }
-
-            } catch (ApiException ex) {
+            } catch (io.dockstore.openapi.client.ApiException ex) {
+                // The TRS endpoint throw openapi ApiExceptions
                 exceptionMessage(ex, "unable to locate remote descriptor " + ga4ghv20Path, ENTRY_NOT_FOUND);
             }
 
