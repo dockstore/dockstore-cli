@@ -1106,6 +1106,10 @@ public class GeneralWorkflowIT extends BaseIT {
     @Test
     public void launchWorkflowChecksumValidation() {
 
+        // These match the print statements made by the validateDescriptorChecksums function
+        final String checksumsValidatedPrint = "Validated checksums";
+        final String checksumsNullValuePrint = "Cannot validate the checksum of the locally downloaded descriptor.";
+
         // register and publish a workflow
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -1117,7 +1121,7 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
-            systemOutRule.getLog().contains("Validated checksums") && !systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
+            systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
 
         // replace the checksum with a null value
         // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
@@ -1128,7 +1132,7 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated, but null checksums were present",
-            systemOutRule.getLog().contains("Validated checksums") && systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
+            systemOutRule.getLog().contains(checksumsValidatedPrint) && systemOutRule.getLog().contains(checksumsNullValuePrint));
 
         // update checksum values to something fake
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = 'SHA-1:VeryFakeChecksum' WHERE path='/checker-workflow-wrapping-tool.cwl';");

@@ -1500,6 +1500,11 @@ public class BasicIT extends BaseIT {
 
     @Test
     public void launchToolChecksumValidation() {
+
+        // These match the print statements made by the validateDescriptorChecksums function
+        final String checksumsValidatedPrint = "Validated checksums";
+        final String checksumsNullValuePrint = "Cannot validate the checksum of the locally downloaded descriptor.";
+
         // manual publish the tool
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser/test_input_json", "--script" });
@@ -1513,7 +1518,7 @@ public class BasicIT extends BaseIT {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
             "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
-            systemOutRule.getLog().contains("Validated checksums") && !systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
+            systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
 
         // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = '' WHERE path='/Dockstore.cwl';");
@@ -1522,7 +1527,7 @@ public class BasicIT extends BaseIT {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
             "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
-            systemOutRule.getLog().contains("Validated checksums") && systemOutRule.getLog().contains("Cannot validate the checksum of the locally downloaded descriptor."));
+            systemOutRule.getLog().contains(checksumsValidatedPrint) && systemOutRule.getLog().contains(checksumsNullValuePrint));
 
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = 'SHA-1:VeryFakeChecksum' WHERE path='/Dockstore.cwl';");
 
