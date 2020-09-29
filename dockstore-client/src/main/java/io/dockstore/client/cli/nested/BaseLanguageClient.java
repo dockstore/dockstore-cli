@@ -185,7 +185,7 @@ public abstract class BaseLanguageClient {
         }
 
         // Don't validate descriptors if the entry is local, a flag to ignore validation was part of the command, or if the entry is not published.
-        if (!localEntry && !abstractEntryClient.ignoreChecksums && abstractEntryClient.isEntryPublished(entryVal)) {
+        if (!localEntry && !abstractEntryClient.getIgnoreChecksums() && abstractEntryClient.isEntryPublished(entryVal)) {
             validateDescriptorChecksum(type, entryVal);
         }
 
@@ -254,13 +254,13 @@ public abstract class BaseLanguageClient {
 
                 remoteDescriptorChecksum = remoteChecksumList.size() > 0 ? remoteChecksumList.get(0) : null;
             } catch (io.dockstore.openapi.client.ApiException ex) {
-                // The TRS endpoint throw openapi ApiExceptions
                 exceptionMessage(ex, "unable to locate remote descriptor " + ga4ghv20Path, ENTRY_NOT_FOUND);
             }
 
             // Get local descriptor checksum
             try {
-                final File localDescriptor = new File(localTemporaryDirectory + toolFile.getPath());
+                // if the toolFile.getPath() is absolute, it is converted to a relative path by File the constructor
+                final File localDescriptor = new File(localTemporaryDirectory, toolFile.getPath());
                 final String fileContents = FileUtils.readFileToString(localDescriptor, StandardCharsets.UTF_8);
                 final String fileChecksum = DigestUtils.sha1Hex(fileContents);
                 localDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
@@ -275,7 +275,7 @@ public abstract class BaseLanguageClient {
                 err("Unable to locate checksum for descriptor " + toolFile.getPath() + ". Cannot validate the checksum of the locally downloaded descriptor. Refreshing the workflow will calculate the entry checksum.");
             } else if (!remoteDescriptorChecksum.equals(localDescriptorChecksum)) {
                 // checksums do not match
-                errorMessage("Local checksum does not match remote checksum. Launch halted.", API_ERROR);
+                errorMessage("Local checksum does not match remote checksum for " + toolFile.getPath() + ". Launch halted.", API_ERROR);
             }
         }
 

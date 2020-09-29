@@ -400,7 +400,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
                 .collect(Collectors.toList());
         } catch (NullPointerException ex) {
-            exceptionMessage(ex, "Unable to locate entry  " + entryPath + ":" + versionID, Client.COMMAND_ERROR);
+            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.COMMAND_ERROR);
+        } catch (io.dockstore.openapi.client.ApiException ex) {
+            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.API_ERROR);
         }
 
         return null;
@@ -425,13 +427,12 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         // if no master is present (for example, for hosted workflows), fail over to the latest descriptor
         if (first.isEmpty()) {
             first = workflow.getWorkflowVersions().stream().max(Comparator.comparing(WorkflowVersion::getLastModified));
-            first.ifPresent(workflowVersion -> System.out.println(
+            first.ifPresent(workflowVersion -> out(
                 "Could not locate workflow with version '" + versionID + "'. Using last modified version '" + workflowVersion.getName()
                     + "' instead."));
-            return first.get().getName();
         }
 
-        return versionID;
+        return first.isEmpty() ? versionID : first.get().getName();
     }
 
     /**
@@ -440,7 +441,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
      */
     @Override
     public boolean isEntryPublished(String entryPath) {
-        Workflow workflow = getDockstoreWorkflowByPath(entryPath);
+        String[] parts = entryPath.split(":");
+        Workflow workflow = getDockstoreWorkflowByPath(parts[0]);
         return workflow.isIsPublished();
     }
 

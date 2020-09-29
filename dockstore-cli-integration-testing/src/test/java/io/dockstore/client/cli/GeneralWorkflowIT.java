@@ -1109,6 +1109,7 @@ public class GeneralWorkflowIT extends BaseIT {
         // These match the print statements made by the validateDescriptorChecksums function
         final String checksumsValidatedPrint = "Validated checksums";
         final String checksumsNullValuePrint = "Cannot validate the checksum of the locally downloaded descriptor.";
+        final String checksumsInvalidMatch = "Launch halted.";
 
         // register and publish a workflow
         Client.main(
@@ -1139,6 +1140,11 @@ public class GeneralWorkflowIT extends BaseIT {
 
         // expect the launch to be exited due to mismatching checksums
         systemExit.expectSystemExitWithStatus(Client.API_ERROR);
+        systemExit.checkAssertionAfterwards(() -> {
+                assertTrue("Checksums did not match, launch should be halted",
+                    systemOutRule.getLog().contains(checksumsInvalidMatch));
+            }
+        );
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
     }

@@ -710,7 +710,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     /**
      * Returns the descriptors of the specified tool
      * @param type Descriptor type CWL, WDL, NFL ...
-     * @param entryPath Workflow path
+     * @param entryPath Tool path
      * @param versionID version we are getting descriptors for
      */
     @Override
@@ -724,7 +724,9 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
                 .collect(Collectors.toList());
         } catch (NullPointerException ex) {
-            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID, Client.COMMAND_ERROR);
+            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.COMMAND_ERROR);
+        } catch (io.dockstore.openapi.client.ApiException ex) {
+            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.API_ERROR);
         }
 
         return null;

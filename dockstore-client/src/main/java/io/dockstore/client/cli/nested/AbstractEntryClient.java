@@ -159,6 +159,10 @@ public abstract class AbstractEntryClient<T> {
         return isLocalEntry;
     }
 
+    boolean getIgnoreChecksums() {
+        return ignoreChecksums;
+    }
+
     public CWL getCwlUtil() {
         // TODO: may be reactivated if we find a different way to read CWL into Java
         // String cwlrunner = CWLRunnerFactory.getCWLRunner();

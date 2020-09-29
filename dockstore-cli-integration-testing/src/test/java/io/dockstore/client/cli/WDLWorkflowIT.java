@@ -114,14 +114,7 @@ public class WDLWorkflowIT extends BaseIT {
         FileUtils.writeStringToFile(tempFile.toFile(), testParameterFiles.get(0).getContent(), StandardCharsets.UTF_8);
         // launch without error
         // run a workflow
-        Client client = new Client();
-        client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
-        AbstractEntryClient main = new WorkflowClient(workflowApi, new UsersApi(webClient), client, false);
-        LanguageClientInterface wdlClient = LanguageClientFactory.createLanguageCLient(main, DescriptorLanguage.WDL)
-            .orElseThrow(RuntimeException::new);
-        final long run = wdlClient
-            .launch(UNIFIED_WORKFLOW + ":" + testVersion, false, null, tempFile.toFile().getAbsolutePath(), null, null);
-        Assert.assertEquals(0, run);
+        Client.main(new String[] {"workflow", "launch", "--entry", UNIFIED_WORKFLOW + ":" + testVersion, "--json", tempFile.toFile().getAbsolutePath()});
     }
 
     /**

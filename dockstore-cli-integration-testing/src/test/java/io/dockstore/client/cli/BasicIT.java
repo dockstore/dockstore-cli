@@ -1504,6 +1504,7 @@ public class BasicIT extends BaseIT {
         // These match the print statements made by the validateDescriptorChecksums function
         final String checksumsValidatedPrint = "Validated checksums";
         final String checksumsNullValuePrint = "Cannot validate the checksum of the locally downloaded descriptor.";
+        final String checksumsInvalidMatch = "Launch halted.";
 
         // manual publish the tool
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
@@ -1532,6 +1533,11 @@ public class BasicIT extends BaseIT {
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = 'SHA-1:VeryFakeChecksum' WHERE path='/Dockstore.cwl';");
 
         systemExit.expectSystemExitWithStatus(Client.API_ERROR);
+        systemExit.checkAssertionAfterwards(() -> {
+                assertTrue("Checksums did not match, launch should be halted",
+                    systemOutRule.getLog().contains(checksumsInvalidMatch));
+            }
+        );
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
             "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
     }
