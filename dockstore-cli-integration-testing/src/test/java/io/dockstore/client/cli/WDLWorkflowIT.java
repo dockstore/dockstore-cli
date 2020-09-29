@@ -23,18 +23,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.dockstore.client.cli.nested.AbstractEntryClient;
-import io.dockstore.client.cli.nested.LanguageClientFactory;
-import io.dockstore.client.cli.nested.LanguageClientInterface;
-import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.WorkflowTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;
-import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.Entry;
 import io.swagger.client.model.PublishRequest;
