@@ -37,8 +37,6 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Registry;
-import io.dockstore.openapi.client.api.Ga4Ghv20Api;
-import io.dockstore.openapi.client.model.ToolFile;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.ContainertagsApi;

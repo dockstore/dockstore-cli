@@ -1124,6 +1124,17 @@ public class GeneralWorkflowIT extends BaseIT {
         assertTrue("Output should indicate that checksums have been validated",
             systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
 
+        // unpublish the workflow
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub", "--entry", "github.com/DockstoreTestUser2/md5sum-checker/checksumTester"});
+
+        // ensure checksum validation is acknowledged for the unpublished workflow, and no null checksums were discovered
+        systemOutRule.clearLog();
+        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+        assertTrue("Output should indicate that checksums have been validated",
+            systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
+
         // replace the checksum with a null value
         // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = '' WHERE path='/checker-workflow-wrapping-tool.cwl';");

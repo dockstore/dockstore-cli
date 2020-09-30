@@ -1521,6 +1521,17 @@ public class BasicIT extends BaseIT {
         assertTrue("Output should indicate that checksums have been validated",
             systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
 
+        // unpublish the tool
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+            "quay.io/dockstoretestuser/test_input_json", "--script" });
+
+        // launch the unpublished tool
+        systemOutRule.clearLog();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
+            "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+        assertTrue("Output should indicate that checksums have been validated",
+            systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
+
         // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = '' WHERE path='/Dockstore.cwl';");
 

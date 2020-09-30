@@ -811,9 +811,7 @@ public class Client {
         // openapi client
         io.dockstore.openapi.client.ApiClient openApiClient = new io.dockstore.openapi.client.ApiClient();
         openApiClient.setUserAgent(userAgent);
-
-        io.dockstore.openapi.client.auth.OAuth openApiBearer = (io.dockstore.openapi.client.auth.OAuth) openApiClient.getAuthentication("bearer");
-        openApiBearer.setAccessToken(token);
+        openApiClient.addDefaultHeader("Authorization", "Bearer " + token);
         openApiClient.setBasePath(serverUrl);
 
         this.ga4ghv20Api = new Ga4Ghv20Api(openApiClient);

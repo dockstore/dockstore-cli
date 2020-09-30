@@ -184,8 +184,8 @@ public abstract class BaseLanguageClient {
             }
         }
 
-        // Don't validate descriptors if the entry is local, a flag to ignore validation was part of the command, or if the entry is not published.
-        if (!localEntry && !abstractEntryClient.getIgnoreChecksums() && abstractEntryClient.isEntryPublished(entryVal)) {
+        // Don't validate descriptors if the entry is local or a flag to ignore validation was part of the command
+        if (!localEntry && !abstractEntryClient.getIgnoreChecksums()) {
             validateDescriptorChecksum(type, entryVal);
         }
 
