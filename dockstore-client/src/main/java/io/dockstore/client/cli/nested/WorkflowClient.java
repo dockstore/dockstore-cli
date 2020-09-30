@@ -382,30 +382,13 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     }
 
     /**
-     * Returns a list of all the tool descriptors associated with this workflow
-     * @param type workflow type, CWL, WDL, NFL ...
-     * @param entryPath Workflow path
-     * @param versionID version we are getting descriptors for
+     * Appends the #workflow/ prefix to the start of the provided path if necessary
+     *
+     * @param entryPath path to either a tool or workflow
      */
-    public List<ToolFile> getAllToolDescriptors(String type, String entryPath, String versionID) {
-
-        final Ga4Ghv20Api ga4ghv20api = this.client.getGa4Ghv20Api();
-
-        // workflows are identified within ga4gh endpoints when their prefix is '#workflow/' (tools do not require a special prefix)
-        final String ga4ghv20Path = "#workflow/" + entryPath;
-
-        // get all the tool files and filter out anything not a descriptor
-        try {
-            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, ga4ghv20Path, versionID).stream()
-                .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
-                .collect(Collectors.toList());
-        } catch (NullPointerException ex) {
-            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.COMMAND_ERROR);
-        } catch (io.dockstore.openapi.client.ApiException ex) {
-            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.API_ERROR);
-        }
-
-        return null;
+    @Override
+    public String getTrsId(String entryPath) {
+        return entryPath.startsWith("#workflow/") ? entryPath : "#workflow/" + entryPath;
     }
 
     /**

@@ -220,23 +220,21 @@ public abstract class BaseLanguageClient {
      */
     public void validateDescriptorChecksum(ToolDescriptor.TypeEnum type, String entryVal) {
         final String[] parts = entryVal.split(":");
-        String path = parts[0];
+        final String path = parts[0];
 
         // workflows/checkers have a special prefix for TRS endpoints
-        String ga4ghv20Path = path;
-        if (abstractEntryClient.getEntryType().toLowerCase().equals("workflow") || abstractEntryClient.getEntryType().toLowerCase().equals("checker")) {
-            ga4ghv20Path = "#workflow/" + ga4ghv20Path;
-        }
+        final String ga4ghv20Path = abstractEntryClient.getTrsId(path);
 
         // Get the entry version we are validating for
-        String versionID = abstractEntryClient.getVersionID(entryVal);
+        final String versionID = abstractEntryClient.getVersionID(entryVal);
 
-        List<ToolFile> allDescriptors = abstractEntryClient.getAllToolDescriptors(type.toString(), path, versionID);
+        final List<ToolFile> allDescriptors = abstractEntryClient.getAllToolDescriptors(type.toString(), ga4ghv20Path, versionID);
 
-        Ga4Ghv20Api ga4ghv20api = abstractEntryClient.getClient().getGa4Ghv20Api();
+        final Ga4Ghv20Api ga4ghv20api = abstractEntryClient.getClient().getGa4Ghv20Api();
 
         // All secondary files are located relative to the location of the primary descriptor.
-        final String localTemporaryDirectory = localPrimaryDescriptorFile.getParent() + "/";
+        final String localTemporaryDirectory = localPrimaryDescriptorFile.getParent();
+        final String checksumFunction = "sha1";
 
         // Validate each tool file associated with the entry (Primary and secondary descriptors)
         for (ToolFile toolFile : allDescriptors) {
@@ -247,9 +245,9 @@ public abstract class BaseLanguageClient {
             try {
                 // The TRS endpoint only discovers published entries
                 final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, versionID, toolFile.getPath());
-                List<Checksum> remoteChecksumList = remoteDescriptor.getChecksum()
+                final List<Checksum> remoteChecksumList = remoteDescriptor.getChecksum()
                     .stream()
-                    .filter(c -> c.getType().equals("sha1"))
+                    .filter(c -> c.getType().equals(checksumFunction))
                     .collect(Collectors.toList());
 
                 remoteDescriptorChecksum = remoteChecksumList.size() > 0 ? remoteChecksumList.get(0) : null;
@@ -258,15 +256,17 @@ public abstract class BaseLanguageClient {
             }
 
             // Get local descriptor checksum
-            try {
-                // if the toolFile.getPath() is absolute, it is converted to a relative path by File the constructor
-                final File localDescriptor = new File(localTemporaryDirectory, toolFile.getPath());
-                final String fileContents = FileUtils.readFileToString(localDescriptor, StandardCharsets.UTF_8);
-                final String fileChecksum = DigestUtils.sha1Hex(fileContents);
-                localDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
-                localDescriptorChecksum.setType("sha1");
-            } catch (IOException ex) {
-                exceptionMessage(ex, "unable to locate local descriptor at " + localTemporaryDirectory + toolFile.getPath(), IO_ERROR);
+            if (remoteDescriptorChecksum != null) {
+                try {
+                    // if the toolFile.getPath() is absolute, it is converted to a relative path by File the constructor
+                    final File localDescriptor = new File(localTemporaryDirectory, toolFile.getPath());
+                    final String fileContents = FileUtils.readFileToString(localDescriptor, StandardCharsets.UTF_8);
+                    final String fileChecksum = DigestUtils.sha1Hex(fileContents);
+                    localDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
+                    localDescriptorChecksum.setType(checksumFunction);
+                } catch (IOException ex) {
+                    exceptionMessage(ex, "unable to locate local descriptor at " + localTemporaryDirectory + "/" + toolFile.getPath(), IO_ERROR);
+                }
             }
 
             // compare checksums

@@ -708,31 +708,6 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     /**
-     * Returns the descriptors of the specified tool
-     * @param type Descriptor type CWL, WDL, NFL ...
-     * @param entryPath Tool path
-     * @param versionID version we are getting descriptors for
-     */
-    @Override
-    public List<ToolFile> getAllToolDescriptors(String type, String entryPath, String versionID) {
-
-        final Ga4Ghv20Api ga4ghv20api = this.client.getGa4Ghv20Api();
-
-        // get all the tool files and filter out anything not a descriptor
-        try {
-            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, entryPath, versionID).stream()
-                .filter(toolFile -> toolFile.getFileType().equals(ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR) || toolFile.getFileType().equals(ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR))
-                .collect(Collectors.toList());
-        } catch (NullPointerException ex) {
-            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.COMMAND_ERROR);
-        } catch (io.dockstore.openapi.client.ApiException ex) {
-            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.API_ERROR);
-        }
-
-        return null;
-    }
-
-    /**
      * Returns the version ID for the provided entry path
      * @param entryPath Tool path
      */

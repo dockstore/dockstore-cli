@@ -54,6 +54,7 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
+import io.dockstore.openapi.client.api.Ga4Ghv20Api;
 import io.dockstore.openapi.client.model.ToolFile;
 import io.github.collaboratory.cwl.CWLClient;
 import io.github.collaboratory.nextflow.NextflowClient;
@@ -447,14 +448,6 @@ public abstract class AbstractEntryClient<T> {
     public abstract SourceFile getDescriptorFromServer(String entry, DescriptorLanguage descriptorType) throws ApiException, IOException;
 
     /**
-     * Get all tool descriptors associated with the entry type
-     * @param type descriptor type, CWL, WDL, NFL ...
-     * @param entryPath path to either a tool or workflow
-     * @param versionID version we are fetching descriptors for
-     */
-    public abstract List<ToolFile> getAllToolDescriptors(String type, String entryPath, String versionID);
-
-    /**
      * Returns the versionID of the specified entry, or the default version if unspecified in the path
      *
      * @param entryPath path to either a tool or workflow
@@ -796,6 +789,38 @@ public abstract class AbstractEntryClient<T> {
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Returns the correct path for use in TRS endpoints
+     *
+     * @param entryPath path to either a tool or workflow
+     */
+    public String getTrsId(String entryPath) {
+        return entryPath;
+    }
+
+    /**
+     * Get all tool descriptors associated with the entry type
+     * @param type descriptor type, CWL, WDL, NFL ...
+     * @param entryPath path to either a tool or workflow, the path for a workflow must have the #workflow/ prefix
+     * @param versionID version we are fetching descriptors for
+     */
+    public List<ToolFile> getAllToolDescriptors(String type, String entryPath, String versionID) {
+        final Ga4Ghv20Api ga4ghv20api = this.getClient().getGa4Ghv20Api();
+
+        // get all the tool files and filter out anything not a descriptor
+        try {
+            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, entryPath, versionID).stream()
+                .filter(toolFile -> ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR.equals(toolFile.getFileType()) || ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR.equals(toolFile.getFileType()))
+                .collect(Collectors.toList());
+        } catch (NullPointerException ex) {
+            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.COMMAND_ERROR);
+        } catch (io.dockstore.openapi.client.ApiException ex) {
+            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.API_ERROR);
+        }
+
+        return null;
     }
 
     /**
