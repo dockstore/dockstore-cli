@@ -132,6 +132,7 @@
         <module>dockstore-file-plugin-parent</module>
         <module>dockstore-client</module>
         <module>dockstore-cli-integration-testing</module>
+        <module>support</module>
         <module>reports</module>
         <module>openapi-java-wes-client</module>
     </modules>

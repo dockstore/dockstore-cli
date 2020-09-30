@@ -85,6 +85,7 @@ import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.MAX_DESCRIPTION;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
+import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.invalid;
@@ -99,6 +100,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.common.DescriptorLanguage.CWL;
@@ -449,9 +451,22 @@ public abstract class AbstractEntryClient<T> {
             publishHelp();
         } else {
             String first = reqVal(args, "--entry");
-            String entryname = optVal(args, "--entryname", null);
             final boolean unpublishRequest = args.contains("--unpub");
-            handlePublishUnpublish(first, entryname, unpublishRequest);
+
+            // --new-entry-name is the desired parameter flag, but maintaining backwards compatibility for --entryname
+            String newEntryName = optVal(args, "--new-entry-name", null);
+            if (newEntryName == null && args.contains("--entryname")) {
+                err("Dockstore CLI has deprecated the --entryname parameter and may remove it without warning. Please use --new-entry-name instead.");
+                newEntryName = optVal(args, "--entryname", null);
+            }
+
+            // prevent specifying --unpub and --entryname together
+            if (unpublishRequest && newEntryName != null) {
+                errorMessage("Unable to specify both --unpub and --new-entry-name together. If trying to unpublish an entry,"
+                    + " provide the entire entry path under the --entry parameter.", COMMAND_ERROR);
+            } else {
+                handlePublishUnpublish(first, newEntryName, unpublishRequest);
+            }
         }
     }
 
