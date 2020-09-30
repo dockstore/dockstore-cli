@@ -724,16 +724,6 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         return versionID == null ? "latest" : versionID;
     }
 
-    /**
-     * Returns if the provided tool path is for a published entry
-     * @param entryPath Tool path
-     */
-    @Override
-    public boolean isEntryPublished(String entryPath) {
-        DockstoreTool container = getDockstoreTool(entryPath);
-        return container.isIsPublished();
-    }
-
     @Override
     public String zipFilename(DockstoreTool container) {
         return container.getToolPath().replaceAll("/", "_") + ".zip";

@@ -416,17 +416,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         return first.isEmpty() ? versionID : first.get().getName();
     }
 
-    /**
-     * Returns if the provided tool path is for a published entry
-     * @param entryPath Tool path
-     */
-    @Override
-    public boolean isEntryPublished(String entryPath) {
-        String[] parts = entryPath.split(":");
-        Workflow workflow = getDockstoreWorkflowByPath(parts[0]);
-        return workflow.isIsPublished();
-    }
-
     @Override
     public String zipFilename(Workflow workflow) {
         return workflow.getFullWorkflowPath().replaceAll("/", "_") + ".zip";
