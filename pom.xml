@@ -144,7 +144,7 @@
                 <groupId>io.dockstore</groupId>
                 <artifactId>bom-internal</artifactId>
                 <type>pom</type>
-                <version>1.10.0-alpha.0</version>
+                <version>1.10.0-alpha.1</version>
                 <scope>import</scope>
             </dependency>
 
