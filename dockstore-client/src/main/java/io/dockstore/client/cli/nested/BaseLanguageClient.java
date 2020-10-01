@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -238,25 +239,24 @@ public abstract class BaseLanguageClient {
 
         // Validate each tool file associated with the entry (Primary and secondary descriptors)
         for (ToolFile toolFile : allDescriptors) {
-            Checksum remoteDescriptorChecksum = null;
-            Checksum localDescriptorChecksum = null;
 
             // Get remote descriptor checksum
+            Optional<Checksum> remoteDescriptorChecksum = Optional.empty();
             try {
                 // The TRS endpoint only discovers published entries
                 final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, versionID, toolFile.getPath());
-                final List<Checksum> remoteChecksumList = remoteDescriptor.getChecksum()
+                remoteDescriptorChecksum = remoteDescriptor.getChecksum()
                     .stream()
                     .filter(c -> c.getType().equals(checksumFunction))
-                    .collect(Collectors.toList());
-
-                remoteDescriptorChecksum = remoteChecksumList.size() > 0 ? remoteChecksumList.get(0) : null;
+                    .findFirst();
             } catch (io.dockstore.openapi.client.ApiException ex) {
                 exceptionMessage(ex, "unable to locate remote descriptor " + ga4ghv20Path, ENTRY_NOT_FOUND);
             }
 
-            // Get local descriptor checksum
-            if (remoteDescriptorChecksum != null) {
+            if (!remoteDescriptorChecksum.isEmpty()) {
+
+                // Get local descriptor checksum
+                Checksum localDescriptorChecksum = null;
                 try {
                     // if the toolFile.getPath() is absolute, it is converted to a relative path by File the constructor
                     final File localDescriptor = new File(localTemporaryDirectory, toolFile.getPath());
@@ -267,15 +267,14 @@ public abstract class BaseLanguageClient {
                 } catch (IOException ex) {
                     exceptionMessage(ex, "unable to locate local descriptor at " + localTemporaryDirectory + "/" + toolFile.getPath(), IO_ERROR);
                 }
-            }
 
-            // compare checksums
-            if (remoteDescriptorChecksum == null) {
-                // no stored descriptor
+                // verify checksums match
+                if (!remoteDescriptorChecksum.get().equals(localDescriptorChecksum)) {
+                    errorMessage("Local checksum does not match remote checksum for " + toolFile.getPath() + ". Launch halted.", API_ERROR);
+                }
+            } else {
+                // remote descriptor checksum is empty, notify the user but continue with launch
                 err("Unable to locate checksum for descriptor " + toolFile.getPath() + ". Cannot validate the checksum of the locally downloaded descriptor. Refreshing the workflow will calculate the entry checksum.");
-            } else if (!remoteDescriptorChecksum.equals(localDescriptorChecksum)) {
-                // checksums do not match
-                errorMessage("Local checksum does not match remote checksum for " + toolFile.getPath() + ". Launch halted.", API_ERROR);
             }
         }
 
