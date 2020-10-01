@@ -37,6 +37,9 @@ import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_MISMATCH_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
 
 /**
  * A base class for all language clients
@@ -249,35 +252,35 @@ public abstract class BaseLanguageClient {
                     .filter(c -> c.getType().equals(checksumFunction))
                     .findFirst();
             } catch (io.dockstore.openapi.client.ApiException ex) {
-                exceptionMessage(ex, "unable to locate remote descriptor " + ga4ghv20Path, ENTRY_NOT_FOUND);
+                exceptionMessage(ex, "Unable to locate remote descriptor " + ga4ghv20Path, ENTRY_NOT_FOUND);
             }
 
             if (!remoteDescriptorChecksum.isEmpty()) {
 
                 // Get local descriptor checksum
-                Checksum localDescriptorChecksum = null;
+                Checksum localDescriptorChecksum = new Checksum();
+                localDescriptorChecksum.setType(checksumFunction);
                 try {
                     // if the toolFile.getPath() is absolute, it is converted to a relative path by File the constructor
                     final File localDescriptor = new File(localTemporaryDirectory, toolFile.getPath());
                     final String fileContents = FileUtils.readFileToString(localDescriptor, StandardCharsets.UTF_8);
                     final String fileChecksum = DigestUtils.sha1Hex(fileContents);
-                    localDescriptorChecksum = (new Checksum()).checksum(fileChecksum);
-                    localDescriptorChecksum.setType(checksumFunction);
+                    localDescriptorChecksum.setChecksum(fileChecksum);
                 } catch (IOException ex) {
-                    exceptionMessage(ex, "unable to locate local descriptor at " + localTemporaryDirectory + "/" + toolFile.getPath(), IO_ERROR);
+                    exceptionMessage(ex, "Unable to locate local descriptor at " + localTemporaryDirectory + "/" + toolFile.getPath(), IO_ERROR);
                 }
 
                 // verify checksums match
                 if (!remoteDescriptorChecksum.get().equals(localDescriptorChecksum)) {
-                    errorMessage("Local checksum does not match remote checksum for " + toolFile.getPath() + ". Launch halted.", API_ERROR);
+                    errorMessage(CHECKSUM_MISMATCH_MESSAGE + toolFile.getPath(), API_ERROR);
                 }
             } else {
                 // remote descriptor checksum is empty, notify the user but continue with launch
-                err("Unable to locate checksum for descriptor " + toolFile.getPath() + ". Cannot validate the checksum of the locally downloaded descriptor. Refreshing the workflow will calculate the entry checksum.");
+                err(CHECKSUM_NULL_MESSAGE + toolFile.getPath());
             }
         }
 
-        out("Validated checksums");
+        out(CHECKSUM_VALIDATED_MESSAGE);
     }
 
     /**

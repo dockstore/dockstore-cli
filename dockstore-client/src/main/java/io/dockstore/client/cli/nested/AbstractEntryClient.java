@@ -123,8 +123,13 @@ import static io.dockstore.common.DescriptorLanguage.WDL;
  * @author dyuen
  */
 public abstract class AbstractEntryClient<T> {
+    public static final String CHECKSUM_NULL_MESSAGE = "Unable to validate local descriptor checksum. Please refresh the entry. Missing checksum for descriptor ";
+    public static final String CHECKSUM_MISMATCH_MESSAGE = "Launch halted. Local checksum does not match remote checksum for ";
+    public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
+
     private static final String WORKFLOW = "workflow";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
+
     protected boolean isAdmin = false;
 
     boolean isLocalEntry = false;
@@ -807,8 +812,6 @@ public abstract class AbstractEntryClient<T> {
             return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, entryPath, versionID).stream()
                 .filter(toolFile -> ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR.equals(toolFile.getFileType()) || ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR.equals(toolFile.getFileType()))
                 .collect(Collectors.toList());
-        } catch (NullPointerException ex) {
-            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.COMMAND_ERROR);
         } catch (io.dockstore.openapi.client.ApiException ex) {
             exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.API_ERROR);
         }

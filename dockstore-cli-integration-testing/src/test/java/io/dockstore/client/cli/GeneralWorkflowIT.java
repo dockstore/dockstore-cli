@@ -41,6 +41,9 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 
 import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_MISMATCH_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
 import static io.dockstore.webservice.resources.WorkflowResource.FROZEN_VERSION_REQUIRED;
 import static io.dockstore.webservice.resources.WorkflowResource.NO_ZENDO_USER_TOKEN;
 import static org.junit.Assert.assertEquals;
@@ -1105,12 +1108,6 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     public void launchWorkflowChecksumValidation() {
-
-        // These match the print statements made by the validateDescriptorChecksums function
-        final String checksumsValidatedPrint = "Validated checksums";
-        final String checksumsNullValuePrint = "Cannot validate the checksum of the locally downloaded descriptor.";
-        final String checksumsInvalidMatch = "Launch halted.";
-
         // register and publish a workflow
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -1122,7 +1119,7 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
-            systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
+            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
 
         // unpublish the workflow
         Client.main(
@@ -1133,7 +1130,7 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
-            systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
+            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
 
         // replace the checksum with a null value
         // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
@@ -1144,16 +1141,17 @@ public class GeneralWorkflowIT extends BaseIT {
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated, but null checksums were present",
-            systemOutRule.getLog().contains(checksumsValidatedPrint) && systemOutRule.getLog().contains(checksumsNullValuePrint));
+            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
 
         // update checksum values to something fake
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = 'SHA-1:VeryFakeChecksum' WHERE path='/checker-workflow-wrapping-tool.cwl';");
 
         // expect the launch to be exited due to mismatching checksums
+        systemOutRule.clearLog();
         systemExit.expectSystemExitWithStatus(Client.API_ERROR);
         systemExit.checkAssertionAfterwards(() -> {
                 assertTrue("Checksums did not match, launch should be halted",
-                    systemOutRule.getLog().contains(checksumsInvalidMatch));
+                    systemOutRule.getLog().contains(CHECKSUM_MISMATCH_MESSAGE));
             }
         );
         Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",

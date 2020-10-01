@@ -41,6 +41,9 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_MISMATCH_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -1501,11 +1504,6 @@ public class BasicIT extends BaseIT {
     @Test
     public void launchToolChecksumValidation() {
 
-        // These match the print statements made by the validateDescriptorChecksums function
-        final String checksumsValidatedPrint = "Validated checksums";
-        final String checksumsNullValuePrint = "Cannot validate the checksum of the locally downloaded descriptor.";
-        final String checksumsInvalidMatch = "Launch halted.";
-
         // manual publish the tool
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser/test_input_json", "--script" });
@@ -1519,7 +1517,7 @@ public class BasicIT extends BaseIT {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
             "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
-            systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
+            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
 
         // unpublish the tool
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
@@ -1530,7 +1528,7 @@ public class BasicIT extends BaseIT {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
             "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
-            systemOutRule.getLog().contains(checksumsValidatedPrint) && !systemOutRule.getLog().contains(checksumsNullValuePrint));
+            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
 
         // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = '' WHERE path='/Dockstore.cwl';");
@@ -1539,14 +1537,15 @@ public class BasicIT extends BaseIT {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",
             "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
-            systemOutRule.getLog().contains(checksumsValidatedPrint) && systemOutRule.getLog().contains(checksumsNullValuePrint));
+            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
 
         testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = 'SHA-1:VeryFakeChecksum' WHERE path='/Dockstore.cwl';");
 
+        systemOutRule.clearLog();
         systemExit.expectSystemExitWithStatus(Client.API_ERROR);
         systemExit.checkAssertionAfterwards(() -> {
                 assertTrue("Checksums did not match, launch should be halted",
-                    systemOutRule.getLog().contains(checksumsInvalidMatch));
+                    systemOutRule.getLog().contains(CHECKSUM_MISMATCH_MESSAGE));
             }
         );
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "launch", "--entry",

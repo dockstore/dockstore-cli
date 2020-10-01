@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -713,15 +714,25 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     public String getVersionID(String entryPath) {
         final String[] parts = entryPath.split(":");
 
-        String versionID = parts.length > 1 ? parts[1] : null;
+        final DockstoreTool container = getDockstoreTool(parts[0]);
 
-        if (versionID == null) {
-            final DockstoreTool container = getDockstoreTool(parts[0]);
-            versionID = container.getDefaultVersion();
+        // attempt to locate default version, fallback to 'latest'
+        final String defaultVersion = container.getDefaultVersion() != null ? container.getDefaultVersion() : "latest";
+
+        // if a version is specified in the path, use that, otherwise uses the default version
+        final String versionID = parts.length > 1 ? parts[1] : defaultVersion;
+
+        Optional<Tag> firstTag = container.getWorkflowVersions().stream().filter(tag -> tag.getName().equalsIgnoreCase(versionID))
+            .findFirst();
+
+        if (firstTag.isEmpty()) {
+            firstTag = container.getWorkflowVersions().stream().max(Comparator.comparing(Tag::getLastBuilt));
+            firstTag.ifPresent(tag -> out(
+                "Could not locate tool with version '" + versionID + "'. Using last built version '" + tag.getName()
+                    + "' instead."));
         }
 
-        // last resort use 'latest' tag
-        return versionID == null ? "latest" : versionID;
+        return firstTag.isEmpty() ? versionID : firstTag.get().getName();
     }
 
     @Override
