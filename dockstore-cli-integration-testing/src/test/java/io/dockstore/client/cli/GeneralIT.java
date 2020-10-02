@@ -36,7 +36,6 @@ import io.swagger.client.ApiException;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.PublishRequest;
-import io.swagger.client.model.SourceFile;
 import io.swagger.client.model.Tag;
 import org.junit.Assert;
 import org.junit.Before;
@@ -470,21 +469,11 @@ public class GeneralIT extends BaseIT {
         tag.setImageId("123456");
         tag.setCwlPath(c.getDefaultCwlPath());
         tag.setWdlPath(c.getDefaultWdlPath());
-        // construct source files
-        SourceFile fileCWL = new SourceFile();
-        fileCWL.setContent("cwlstuff");
-        fileCWL.setType(SourceFile.TypeEnum.DOCKSTORE_CWL);
-        fileCWL.setPath("/dockstore.cwl");
-        fileCWL.setAbsolutePath("/dockstore.cwl");
-        List<SourceFile> list = new ArrayList<>();
-        list.add(fileCWL);
-        tag.setSourceFiles(list);
-        SourceFile fileDockerFile = new SourceFile();
-        fileDockerFile.setContent("dockerstuff");
-        fileDockerFile.setType(SourceFile.TypeEnum.DOCKERFILE);
-        fileDockerFile.setPath("/Dockerfile");
-        fileDockerFile.setAbsolutePath("/Dockerfile");
-        tag.getSourceFiles().add(fileDockerFile);
+        List<String> list = new ArrayList<>();
+        list.add("/Dockstore.cwl");
+        tag.setVerifiedSources(list);
+
+        tag.getVerifiedSources().add("/Dockerfile");
         List<Tag> tags = new ArrayList<>();
         tags.add(tag);
         c.setWorkflowVersions(tags);

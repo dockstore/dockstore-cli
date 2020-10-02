@@ -181,10 +181,10 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("  info             :  print detailed information about a particular published " + getEntryType());
         out("");
-        out("  " + CWL.getLowerShortName() + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
+        out("  " + CWL.getShortName() + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
         out("                      which enables integration with Global Alliance compliant systems");
         out("");
-        out("  " + WDL.getLowerShortName() + "              :  returns the Workflow Descriptor Language definition for this Docker image");
+        out("  " + WDL.getShortName() + "              :  returns the Workflow Descriptor Language definition for this Docker image");
         out("");
         out("  refresh          :  updates your list of " + getEntryType() + "s stored on Dockstore or an individual " + getEntryType());
         out("");
@@ -739,7 +739,7 @@ public abstract class AbstractEntryClient<T> {
                         break;
                     }
                 }
-                final String joinedLanguages = Joiner.on(',').join(Arrays.stream(DescriptorLanguage.values()).map(DescriptorLanguage::getLowerShortName).collect(Collectors.toSet()));
+                final String joinedLanguages = Joiner.on(',').join(Arrays.stream(DescriptorLanguage.values()).map(DescriptorLanguage::getShortName).collect(Collectors.toSet()));
                 if (!validType) {
                     errorMessage("Only " + joinedLanguages + " are valid descriptor types", CLIENT_ERROR);
                 }
@@ -779,9 +779,9 @@ public abstract class AbstractEntryClient<T> {
      * Type.NONE if file extension is neither WDL nor CWL, could be no extension or some other random extension(e.g .txt)
      */
     Optional<DescriptorLanguage> checkFileExtension(String path) {
-        if (FilenameUtils.getExtension(path).equalsIgnoreCase(CWL.getLowerShortName()) || FilenameUtils.getExtension(path).equalsIgnoreCase("yaml") || FilenameUtils.getExtension(path).equalsIgnoreCase("yml")) {
+        if (FilenameUtils.getExtension(path).equalsIgnoreCase(CWL.getShortName()) || FilenameUtils.getExtension(path).equalsIgnoreCase("yaml") || FilenameUtils.getExtension(path).equalsIgnoreCase("yml")) {
             return Optional.of(CWL);
-        } else if (FilenameUtils.getExtension(path).equalsIgnoreCase(WDL.getLowerShortName())) {
+        } else if (FilenameUtils.getExtension(path).equalsIgnoreCase(WDL.getShortName())) {
             return Optional.of(WDL);
         } else if (path.endsWith("nextflow.config")) {
             return Optional.of(NEXTFLOW);
@@ -836,9 +836,9 @@ public abstract class AbstractEntryClient<T> {
                 } else if (!cwlContentPresent && descriptor == null) {
                     //extension is cwl but the content is not cwl
                     out("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end");
-                } else if (!cwlContentPresent && CWL.getLowerShortName().equals(descriptor)) {
+                } else if (!cwlContentPresent && CWL.getShortName().equals(descriptor)) {
                     errorMessage("Entry file is not a valid CWL file.", CLIENT_ERROR);
-                } else if (wdlContentPresent && WDL.getLowerShortName().equals(descriptor)) {
+                } else if (wdlContentPresent && WDL.getShortName().equals(descriptor)) {
                     out("This is a WDL file.. Please put the correct extension to the entry file name.");
                     out("Launching entry file as a WDL file..");
                     try {
@@ -861,9 +861,9 @@ public abstract class AbstractEntryClient<T> {
                 } else if (!wdlContentPresent && descriptor == null) {
                     //extension is wdl but the content is not wdl
                     out("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end");
-                } else if (!wdlContentPresent && WDL.getLowerShortName().equals(descriptor)) {
+                } else if (!wdlContentPresent && WDL.getShortName().equals(descriptor)) {
                     errorMessage("Entry file is not a valid WDL file.", CLIENT_ERROR);
-                } else if (cwlContentPresent && CWL.getLowerShortName().equals(descriptor)) {
+                } else if (cwlContentPresent && CWL.getShortName().equals(descriptor)) {
                     out("This is a CWL file.. Please put the correct extension to the entry file name.");
                     out("Launching entry file as a CWL file..");
                     try {
@@ -1153,8 +1153,8 @@ public abstract class AbstractEntryClient<T> {
                 preValidateLaunchArguments(args);
                 checkIfDockerRunning();
 
-                final String descriptor = optVal(args, "--descriptor", CWL.getLowerShortName());
-                if (descriptor.equals(CWL.getLowerShortName())) {
+                final String descriptor = optVal(args, "--descriptor", CWL.getShortName());
+                if (descriptor.equals(CWL.getShortName())) {
                     try {
                         String entry = reqVal(args, "--entry");
                         launchCwl(entry, args, false);
@@ -1165,7 +1165,7 @@ public abstract class AbstractEntryClient<T> {
                         exceptionMessage(e, "IO error launching workflow. Did you mean to use --local-entry instead of --entry?",
                                 Client.IO_ERROR);
                     }
-                } else if (descriptor.equals(WDL.getLowerShortName())) {
+                } else if (descriptor.equals(WDL.getShortName())) {
                     try {
                         launchWdl(args, false);
                     } catch (ApiException e) {
@@ -1253,7 +1253,7 @@ public abstract class AbstractEntryClient<T> {
 
     private String convertEntry2Json(List<String> args, final boolean json) throws ApiException, IOException {
         final String entry = reqVal(args, "--entry");
-        final String descriptor = optVal(args, "--descriptor", CWL.getLowerShortName());
+        final String descriptor = optVal(args, "--descriptor", CWL.getShortName());
         LanguageClientInterface languageCLient = convertCLIStringToEnum(descriptor);
         return languageCLient.generateInputJson(entry, json);
     }
@@ -1617,7 +1617,7 @@ public abstract class AbstractEntryClient<T> {
         out("Optional parameters:");
         out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.getLowerShortName());
+        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.getShortName());
         if (!(this instanceof CheckerClient)) {
             out("  --local-entry                       Allows you to specify a full path to a local descriptor for --entry instead of an entry path");
         }

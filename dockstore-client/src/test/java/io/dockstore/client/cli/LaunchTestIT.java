@@ -23,7 +23,6 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -717,7 +716,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
-        args.add(CWL.getLowerShortName());
+        args.add(CWL.getShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -726,7 +725,7 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getLowerShortName());
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getShortName());
 
         assertTrue("output should include a successful cromwell run",
             systemOutRule.getLog().contains("This is a CWL file.. Please put the correct extension to the entry file name."));
@@ -819,7 +818,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
-        args.add(WDL.getLowerShortName());
+        args.add(WDL.getShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -828,7 +827,7 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        workflowClient.checkEntryFile(file.getAbsolutePath(), args, WDL.getLowerShortName());
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, WDL.getShortName());
 
         assertTrue("output should include a successful cromwell run",
             systemOutRule.getLog().contains("This is a WDL file.. Please put the correct extension to the entry file name."));
@@ -848,7 +847,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
-        args.add(WDL.getLowerShortName());
+        args.add(WDL.getShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -859,7 +858,7 @@ public class LaunchTestIT {
         exit.expectSystemExit();
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        workflowClient.checkEntryFile(file.getAbsolutePath(), args, WDL.getLowerShortName());
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, WDL.getShortName());
     }
 
     @Test
@@ -876,7 +875,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
-        args.add(CWL.getLowerShortName());
+        args.add(CWL.getShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -887,7 +886,7 @@ public class LaunchTestIT {
         exit.expectSystemExit();
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getLowerShortName());
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getShortName());
     }
 
     @Test
@@ -1227,8 +1226,7 @@ public class LaunchTestIT {
         WorkflowVersion aWorkflowVersion1 = new WorkflowVersion();
         aWorkflowVersion1.setName("master");
         aWorkflowVersion1.setValid(false);
-        Date earlierDate = new Date(100L);
-        aWorkflowVersion1.setLastModified(earlierDate);
+        aWorkflowVersion1.setLastModified(100L);
 
         List<WorkflowVersion> listWorkflowVersions = new ArrayList<>();
         listWorkflowVersions.add(aWorkflowVersion1);
@@ -1265,8 +1263,7 @@ public class LaunchTestIT {
         WorkflowVersion aWorkflowVersion1 = new WorkflowVersion();
         aWorkflowVersion1.setName("1.0.0");
         aWorkflowVersion1.setValid(false);
-        Date laterDate = new Date(1000L);
-        aWorkflowVersion1.setLastModified(laterDate);
+        aWorkflowVersion1.setLastModified(1000L);
 
         List<WorkflowVersion> listWorkflowVersions = new ArrayList<>();
         listWorkflowVersions.add(aWorkflowVersion1);

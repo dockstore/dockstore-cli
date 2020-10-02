@@ -544,7 +544,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             if (workflow == null || !workflow.isIsPublished()) {
                 errorMessage("This workflow is not published.", COMMAND_ERROR);
             } else {
-                Date lastUpdated = Date.from(workflow.getLastUpdated().toInstant());
+                Date lastUpdated = new Date(workflow.getLastUpdated());
 
                 String description = workflow.getDescription();
                 if (description == null) {

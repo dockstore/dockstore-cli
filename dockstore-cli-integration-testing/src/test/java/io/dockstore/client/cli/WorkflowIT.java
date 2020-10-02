@@ -352,10 +352,6 @@ public class WorkflowIT extends BaseIT {
             .filter(version -> "master".equalsIgnoreCase(version.getName())).findFirst();
         assertTrue(optionalWorkflowVersion.isPresent());
         WorkflowVersion workflowVersion = optionalWorkflowVersion.get();
-        List<SourceFile> sourceFiles = workflowVersion.getSourceFiles();
-        Assert.assertEquals(2, sourceFiles.size());
-        Assert.assertTrue(sourceFiles.stream().anyMatch(sourceFile -> sourceFile.getPath().equals("/cwl/v1.1/cat-job.json")));
-        Assert.assertTrue(sourceFiles.stream().anyMatch(sourceFile -> sourceFile.getPath().equals("/cwl/v1.1/metadata.cwl")));
         // Check validation works.  It is invalid because this is a tool and not a workflow.
         Assert.assertFalse(workflowVersion.isValid());
 

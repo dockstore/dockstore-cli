@@ -35,7 +35,7 @@
     <properties>
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.9.1</dockstore-core.version>
+        <dockstore-core.version>1.10.0-alpha.1</dockstore-core.version>
         <maven-failsafe.version>2.21.0</maven-failsafe.version>
         <maven-surefire.version>2.21.0</maven-surefire.version>
         <skipTests>false</skipTests>
@@ -144,30 +144,8 @@
                 <groupId>io.dockstore</groupId>
                 <artifactId>bom-internal</artifactId>
                 <type>pom</type>
-                <version>1.10.0-alpha.1</version>
+                <version>${dockstore-core.version}</version>
                 <scope>import</scope>
-            </dependency>
-
-            <!-- update dockstore bom-internal pom.xml dependency to this version (or greater?)
-           then delete this jersey-bom dependency from this pom
-           -->
-            <dependency>
-                <groupId>org.glassfish.jersey</groupId>
-                <artifactId>jersey-bom</artifactId>
-                <version>2.31</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>5.4.3.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>1.3.2</version>
             </dependency>
             <dependency>
                 <groupId>ro.fortsoft.pf4j</groupId>

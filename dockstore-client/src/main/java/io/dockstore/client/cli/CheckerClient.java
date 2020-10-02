@@ -117,7 +117,7 @@ public class CheckerClient extends WorkflowClient {
 
             // Check that descriptor type is valid
             descriptorType = descriptorType.toLowerCase();
-            if (!Objects.equals(descriptorType, CWL.getLowerShortName()) && !Objects.equals(descriptorType, WDL.getLowerShortName())) {
+            if (!Objects.equals(descriptorType, CWL.getShortName()) && !Objects.equals(descriptorType, WDL.getShortName())) {
                 errorMessage("The given descriptor type " + descriptorType + " is not valid.",
                     Client.CLIENT_ERROR);
             }
