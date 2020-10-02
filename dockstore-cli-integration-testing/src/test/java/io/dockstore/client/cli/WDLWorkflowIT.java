@@ -108,7 +108,7 @@ public class WDLWorkflowIT extends BaseIT {
         FileUtils.writeStringToFile(tempFile.toFile(), testParameterFiles.get(0).getContent(), StandardCharsets.UTF_8);
         // launch without error
         // run a workflow
-        Client.main(new String[] {"workflow", "launch", "--entry", UNIFIED_WORKFLOW + ":" + testVersion, "--json", tempFile.toFile().getAbsolutePath()});
+        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry", UNIFIED_WORKFLOW + ":" + testVersion, "--json", tempFile.toFile().getAbsolutePath()});
     }
 
     /**
