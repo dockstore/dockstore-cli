@@ -601,7 +601,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             }
 
             // add user to all workflows
-            final List<Workflow> updatedWorkflows = usersApi.addUserToDockstoreWorkflows(user.getId(), null).stream()
+            final List<Workflow> updatedWorkflows = usersApi.addUserToDockstoreWorkflows(user.getId(), "").stream()
                     // Skip hosted workflows
                     .filter(workflow -> StringUtils.isNotEmpty(workflow.getGitUrl()))
                     .map(workflow -> {
