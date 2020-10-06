@@ -289,10 +289,10 @@ public class GeneralWorkflowIT extends BaseIT {
                 "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "version_tag", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--name", "master",
-            "--workflow-path", "/Dockstore2.wdl", "--hidden", "true", "--script" });
+            "--workflow-path", "/Dockstore2.wdl", "--script" });
 
         final long count = testingPostgres.runSelectStatement(
-            "select count(*) from workflowversion wv, version_metadata vm where wv.name = 'master' and vm.hidden = 't' and wv.workflowpath = '/Dockstore2.wdl' and wv.id = vm.id",
+            "select count(*) from workflowversion wv, version_metadata vm where wv.name = 'master' and wv.workflowpath = '/Dockstore2.wdl' and wv.id = vm.id",
             long.class);
         assertEquals("there should be 1 matching workflow version, there is " + count, 1, count);
     }
