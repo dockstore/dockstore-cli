@@ -29,6 +29,12 @@
 
     <dependencies>
         <dependency>
+            <!-- https://stackoverflow.com/questions/44088493/jersey-stopped-working-with-injectionmanagerfactory-not-found-->
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
         </dependency>
@@ -321,7 +327,10 @@
                                 <ignoredDependency>javax.ws.rs:javax.ws.rs-api</ignoredDependency>
                                 <ignoredDependency>jakarta.ws.rs:jakarta.ws.rs-api</ignoredDependency>
                             </ignoredDependencies>
-
+                            <ignoredUnusedDeclaredDependencies>
+                                <!-- https://stackoverflow.com/questions/44088493/jersey-stopped-working-with-injectionmanagerfactory-not-found-->
+                                <ignoredUnusedDeclaredDependency>org.glassfish.jersey.inject:jersey-hk2</ignoredUnusedDeclaredDependency>
+                            </ignoredUnusedDeclaredDependencies>
                             <usedDependencies>
                                 <usedDependency>javax.annotation:javax.annotation-api</usedDependency>
                                 <usedDependency>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</usedDependency>
