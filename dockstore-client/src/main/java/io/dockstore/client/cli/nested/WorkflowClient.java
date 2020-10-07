@@ -52,6 +52,7 @@ import io.swagger.client.model.User;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -864,9 +865,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 errorMessage("Please ensure that the descriptor type is either cwl or wdl.", Client.CLIENT_ERROR);
             }
 
-            if (!workflowPath.endsWith(descriptorType.toLowerCase())) {
+            if (!FilenameUtils.getExtension(workflowPath).equalsIgnoreCase(descriptorType)) {
                 errorMessage("Please ensure that the given workflow path '" + workflowPath + "' is of type " + descriptorType
-                    + " and has the file extension " + descriptorType, Client.CLIENT_ERROR);
+                    + " and has the file extension " + descriptorType.toLowerCase(), Client.CLIENT_ERROR);
             }
 
             String workflowname = optVal(args, "--workflow-name", null);

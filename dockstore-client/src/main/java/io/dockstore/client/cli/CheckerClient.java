@@ -109,8 +109,7 @@ public class CheckerClient extends WorkflowClient {
         } else {
             // Retrieve arguments
             String entryPath = reqVal(args, "--entry");
-            String descriptorType = optVal(args, "--descriptor-type", DescriptorLanguage.CWL.toString());
-            descriptorType = descriptorType.toUpperCase();
+            final String descriptorType = optVal(args, "--descriptor-type", DescriptorLanguage.CWL.toString()).toUpperCase();
             String descriptorPath = reqVal(args, "--descriptor-path");
             String inputParameterPath = optVal(args, "--input-parameter-path", null);
 

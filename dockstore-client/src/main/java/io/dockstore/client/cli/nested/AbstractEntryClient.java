@@ -1252,7 +1252,7 @@ public abstract class AbstractEntryClient<T> {
 
     private String convertEntry2Json(List<String> args, final boolean json) throws ApiException, IOException {
         final String entry = reqVal(args, "--entry");
-        final String descriptor = optVal(args, "--descriptor", CWL.toString());
+        final String descriptor = optVal(args, "--descriptor", CWL.toString()).toUpperCase();
         LanguageClientInterface languageCLient = convertCLIStringToEnum(descriptor);
         return languageCLient.generateInputJson(entry, json);
     }
