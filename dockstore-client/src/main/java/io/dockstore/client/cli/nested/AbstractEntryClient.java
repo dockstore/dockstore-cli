@@ -54,6 +54,8 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
+import io.dockstore.openapi.client.api.Ga4Ghv20Api;
+import io.dockstore.openapi.client.model.ToolFile;
 import io.github.collaboratory.cwl.CWLClient;
 import io.github.collaboratory.nextflow.NextflowClient;
 import io.github.collaboratory.wdl.WDLClient;
@@ -121,11 +123,17 @@ import static io.dockstore.common.DescriptorLanguage.WDL;
  * @author dyuen
  */
 public abstract class AbstractEntryClient<T> {
+    public static final String CHECKSUM_NULL_MESSAGE = "Unable to validate local descriptor checksum. Please refresh the entry. Missing checksum for descriptor ";
+    public static final String CHECKSUM_MISMATCH_MESSAGE = "Launch halted. Local checksum does not match remote checksum for ";
+    public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
+
     private static final String WORKFLOW = "workflow";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
+
     protected boolean isAdmin = false;
 
     boolean isLocalEntry = false;
+    boolean ignoreChecksums = false;
 
     private boolean isWesCommand = false;
     private String wesUri = null;
@@ -155,6 +163,10 @@ public abstract class AbstractEntryClient<T> {
 
     boolean isLocalEntry() {
         return isLocalEntry;
+    }
+
+    boolean getIgnoreChecksums() {
+        return ignoreChecksums;
     }
 
     public CWL getCwlUtil() {
@@ -439,6 +451,13 @@ public abstract class AbstractEntryClient<T> {
     protected abstract void manualPublish(List<String> args);
 
     public abstract SourceFile getDescriptorFromServer(String entry, DescriptorLanguage descriptorType) throws ApiException, IOException;
+
+    /**
+     * Returns the versionID of the specified entry, or the default version if unspecified in the path
+     *
+     * @param entryPath path to either a tool or workflow
+     */
+    public abstract String getVersionID(String entryPath);
 
     /**
      * private helper methods
@@ -768,6 +787,36 @@ public abstract class AbstractEntryClient<T> {
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Returns the correct path for use in TRS endpoints
+     *
+     * @param entryPath path to either a tool or workflow
+     */
+    public String getTrsId(String entryPath) {
+        return entryPath;
+    }
+
+    /**
+     * Get all tool descriptors associated with the entry type
+     * @param type descriptor type, CWL, WDL, NFL ...
+     * @param entryPath path to either a tool or workflow, the path for a workflow must have the #workflow/ prefix
+     * @param versionID version we are fetching descriptors for
+     */
+    public List<ToolFile> getAllToolDescriptors(String type, String entryPath, String versionID) {
+        final Ga4Ghv20Api ga4ghv20api = this.getClient().getGa4Ghv20Api();
+
+        // get all the tool files and filter out anything not a descriptor
+        try {
+            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, entryPath, versionID).stream()
+                .filter(toolFile -> ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR.equals(toolFile.getFileType()) || ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR.equals(toolFile.getFileType()))
+                .collect(Collectors.toList());
+        } catch (io.dockstore.openapi.client.ApiException ex) {
+            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.API_ERROR);
+        }
+
+        return null;
     }
 
     /**
@@ -1150,6 +1199,8 @@ public abstract class AbstractEntryClient<T> {
                     errorMessage("dockstore: missing required flag --entry", CLIENT_ERROR);
                 }
                 this.isLocalEntry = false;
+                this.ignoreChecksums = args.contains("--ignore-checksums");
+
                 preValidateLaunchArguments(args);
                 checkIfDockerRunning();
 
@@ -1298,8 +1349,6 @@ public abstract class AbstractEntryClient<T> {
     }
 
     public abstract Client getClient();
-
-
 
     /**
      * help text output
@@ -1623,6 +1672,7 @@ public abstract class AbstractEntryClient<T> {
         }
         out("  --wdl-output-target                 Allows you to specify a remote path to provision output files to ex: s3://oicr.temp/testing-launcher/");
         out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
+        out("  --ignore-checksums                  Allows you to ignore validating checksums of each downloaded descriptor");
         out("");
     }
 

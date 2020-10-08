@@ -350,17 +350,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String[] parts = toolpath.split(":");
         String path = parts[0];
         // match behaviour from getDescriptorFromServer, use master if no version is provided
-        String tag = (parts.length > 1) ? parts[1] : "master";
+        String tag = getVersionID(toolpath);
         Workflow workflow = getDockstoreWorkflowByPath(path);
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(tag))
             .findFirst();
-        // if no master is present (for example, for hosted workflows), fail over to the latest descriptor
-        if (first.isEmpty()) {
-            first = workflow.getWorkflowVersions().stream().max(Comparator.comparing(WorkflowVersion::getLastModified));
-            first.ifPresent(workflowVersion -> System.out.println(
-                "Could not locate workflow with version '" + tag + "'. Using last modified version '" + workflowVersion.getName()
-                    + "' instead."));
-        }
 
         if (first.isPresent()) {
             boolean isValid = first.get().isValid();
@@ -386,6 +379,43 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         }
     }
 
+    /**
+     * Appends the #workflow/ prefix to the start of the provided path if necessary
+     *
+     * @param entryPath path to either a tool or workflow
+     */
+    @Override
+    public String getTrsId(String entryPath) {
+        return entryPath.startsWith("#workflow/") ? entryPath : "#workflow/" + entryPath;
+    }
+
+    /**
+     * Returns the version ID of the given workflow, falls back to the latest version
+     * @param entryPath Workflow path
+     */
+    @Override
+    public String getVersionID(String entryPath) {
+        final String[] parts = entryPath.split(":");
+
+        final String versionID = parts.length > 1 ? parts[1] : "master";
+
+        final Workflow workflow = getDockstoreWorkflowByPath(parts[0]);
+
+        // ensure workflow has version
+        Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(versionID))
+            .findFirst();
+
+        // if no master is present (for example, for hosted workflows), fail over to the latest descriptor
+        if (first.isEmpty()) {
+            first = workflow.getWorkflowVersions().stream().max(Comparator.comparing(WorkflowVersion::getLastModified));
+            first.ifPresent(workflowVersion -> out(
+                "Could not locate workflow with version '" + versionID + "'. Using last modified version '" + workflowVersion.getName()
+                    + "' instead."));
+        }
+
+        return first.isEmpty() ? versionID : first.get().getName();
+    }
+
     @Override
     public String zipFilename(Workflow workflow) {
         return workflow.getFullWorkflowPath().replaceAll("/", "_") + ".zip";
@@ -407,6 +437,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String jsonRun = commandLaunch.json;
         String yamlRun = commandLaunch.yaml;
         String wdlOutputTarget = commandLaunch.wdlOutputTarget;
+        boolean ignoreChecksumFlag = commandLaunch.ignoreChecksums;
         String uuid = commandLaunch.uuid;
 
         // trim the final slash on output if it is present, probably an error ( https://github.com/aws/aws-cli/issues/421 ) causes a double slash which can fail
@@ -419,6 +450,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             if ((entry == null) != (localEntry == null)) {
                 if (entry != null) {
                     this.isLocalEntry = false;
+                    this.ignoreChecksums = ignoreChecksumFlag;
                     String[] parts = entry.split(":");
                     String path = parts[0];
                     try {
@@ -1168,6 +1200,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         private String yaml;
         @Parameter(names = "--wdl-output-target", description = "Allows you to specify a remote path to provision outputs files to (ex: s3://oicr.temp/testing-launcher/")
         private String wdlOutputTarget;
+        @Parameter(names = "--ignore-checksums", description = "Allows you to ignore validating checksums of each downloaded descriptor")
+        private boolean ignoreChecksums;
         @Parameter(names = "--help", description = "Prints help for launch command", help = true)
         private boolean help = false;
         @Parameter(names = "--uuid", description = "Allows you to specify a uuid for 3rd party notifications")

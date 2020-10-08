@@ -23,18 +23,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.dockstore.client.cli.nested.AbstractEntryClient;
-import io.dockstore.client.cli.nested.LanguageClientFactory;
-import io.dockstore.client.cli.nested.LanguageClientInterface;
-import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.WorkflowTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;
-import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.Entry;
 import io.swagger.client.model.PublishRequest;
@@ -114,14 +108,7 @@ public class WDLWorkflowIT extends BaseIT {
         FileUtils.writeStringToFile(tempFile.toFile(), testParameterFiles.get(0).getContent(), StandardCharsets.UTF_8);
         // launch without error
         // run a workflow
-        Client client = new Client();
-        client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
-        AbstractEntryClient main = new WorkflowClient(workflowApi, new UsersApi(webClient), client, false);
-        LanguageClientInterface wdlClient = LanguageClientFactory.createLanguageCLient(main, DescriptorLanguage.WDL)
-            .orElseThrow(RuntimeException::new);
-        final long run = wdlClient
-            .launch(UNIFIED_WORKFLOW + ":" + testVersion, false, null, tempFile.toFile().getAbsolutePath(), null, null);
-        Assert.assertEquals(0, run);
+        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry", UNIFIED_WORKFLOW + ":" + testVersion, "--json", tempFile.toFile().getAbsolutePath()});
     }
 
     /**

@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -13,14 +15,21 @@ import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import io.dockstore.client.cli.nested.notificationsclients.NotificationsClient;
 import io.dockstore.common.Utilities;
+import io.dockstore.openapi.client.api.Ga4Ghv20Api;
+import io.dockstore.openapi.client.model.Checksum;
+import io.dockstore.openapi.client.model.FileWrapper;
+import io.dockstore.openapi.client.model.ToolFile;
 import io.swagger.client.ApiException;
 import io.swagger.client.model.ToolDescriptor;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
@@ -28,6 +37,9 @@ import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_MISMATCH_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
 
 /**
  * A base class for all language clients
@@ -130,7 +142,7 @@ public abstract class BaseLanguageClient {
      * Common code to setup and launch a pipeline
      * @return Exit code of process
      */
-    public long launchPipeline(String entryVal, boolean localEntry, String yamlFile, String jsonFile, String outputTarget, String notificationUUID) throws ApiException {
+    public long launchPipeline(String entryVal, boolean localEntry, ToolDescriptor.TypeEnum type, String yamlFile, String jsonFile, String outputTarget, String notificationUUID) throws ApiException {
         // Initialize client with some launch information
         setLaunchInformation(entryVal, localEntry, yamlFile, jsonFile, outputTarget, notificationUUID);
 
@@ -175,9 +187,13 @@ public abstract class BaseLanguageClient {
             }
         }
 
+        // Don't validate descriptors if the entry is local or a flag to ignore validation was part of the command
+        if (!localEntry && !abstractEntryClient.getIgnoreChecksums()) {
+            validateDescriptorChecksum(type, entryVal);
+        }
+
         // Update the launcher with references to the files to be launched
         launcher.setFiles(localPrimaryDescriptorFile, zippedEntryFile, provisionedParameterFile, selectedParameterFile, workingDirectory);
-
 
         try {
             // Attempt to run launcher
@@ -197,6 +213,74 @@ public abstract class BaseLanguageClient {
         notificationsClient.sendMessage(NotificationsClient.COMPLETED, true);
 
         return 0;
+    }
+
+    /**
+     * Validates the locally downloaded descriptor file has the same SHA-1 checksum as the descriptor stored in the database
+     * @param type CWL or WDL or NFL
+     * @param entryVal Tool/workflow path
+     * @return void errors out if checksums do not match, provides a warning if a remote checksum is null
+     */
+    public void validateDescriptorChecksum(ToolDescriptor.TypeEnum type, String entryVal) {
+        final String[] parts = entryVal.split(":");
+        final String path = parts[0];
+
+        // workflows/checkers have a special prefix for TRS endpoints
+        final String ga4ghv20Path = abstractEntryClient.getTrsId(path);
+
+        // Get the entry version we are validating for
+        final String versionID = abstractEntryClient.getVersionID(entryVal);
+
+        final List<ToolFile> allDescriptors = abstractEntryClient.getAllToolDescriptors(type.toString(), ga4ghv20Path, versionID);
+
+        final Ga4Ghv20Api ga4ghv20api = abstractEntryClient.getClient().getGa4Ghv20Api();
+
+        // All secondary files are located relative to the location of the primary descriptor.
+        final String localTemporaryDirectory = localPrimaryDescriptorFile.getParent();
+        final String checksumFunction = "sha1";
+
+        // Validate each tool file associated with the entry (Primary and secondary descriptors)
+        for (ToolFile toolFile : allDescriptors) {
+
+            // Get remote descriptor checksum
+            Optional<Checksum> remoteDescriptorChecksum = Optional.empty();
+            try {
+                // The TRS endpoint only discovers published entries
+                final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, versionID, toolFile.getPath());
+                remoteDescriptorChecksum = remoteDescriptor.getChecksum()
+                    .stream()
+                    .filter(c -> c.getType().equals(checksumFunction))
+                    .findFirst();
+            } catch (io.dockstore.openapi.client.ApiException ex) {
+                exceptionMessage(ex, "Unable to locate remote descriptor " + ga4ghv20Path, ENTRY_NOT_FOUND);
+            }
+
+            if (!remoteDescriptorChecksum.isEmpty()) {
+
+                // Get local descriptor checksum
+                Checksum localDescriptorChecksum = new Checksum();
+                localDescriptorChecksum.setType(checksumFunction);
+                try {
+                    // if the toolFile.getPath() is absolute, it is converted to a relative path by File the constructor
+                    final File localDescriptor = new File(localTemporaryDirectory, toolFile.getPath());
+                    final String fileContents = FileUtils.readFileToString(localDescriptor, StandardCharsets.UTF_8);
+                    final String fileChecksum = DigestUtils.sha1Hex(fileContents);
+                    localDescriptorChecksum.setChecksum(fileChecksum);
+                } catch (IOException ex) {
+                    exceptionMessage(ex, "Unable to locate local descriptor at " + localTemporaryDirectory + "/" + toolFile.getPath(), IO_ERROR);
+                }
+
+                // verify checksums match
+                if (!remoteDescriptorChecksum.get().equals(localDescriptorChecksum)) {
+                    errorMessage(CHECKSUM_MISMATCH_MESSAGE + toolFile.getPath(), API_ERROR);
+                }
+            } else {
+                // remote descriptor checksum is empty, notify the user but continue with launch
+                err(CHECKSUM_NULL_MESSAGE + toolFile.getPath());
+            }
+        }
+
+        out(CHECKSUM_VALIDATED_MESSAGE);
     }
 
     /**

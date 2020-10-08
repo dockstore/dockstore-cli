@@ -60,7 +60,8 @@ public final class JCommanderUtility {
         out("");
         out("Optional parameters:\n"
                 + "  --wdl-output-target                 Allows you to specify a remote path to provision output files to ex: s3://oicr.temp/testing-launcher/\n"
-                + "  --uuid                              Allows you to specify a uuid for 3rd party notifications\n");
+                + "  --uuid                              Allows you to specify a uuid for 3rd party notifications\n"
+                + "  --ignore-checksums                  Allows you to ignore validating checksums of each downloaded descriptor");
         printJCommanderHelpFooter();
     }
 

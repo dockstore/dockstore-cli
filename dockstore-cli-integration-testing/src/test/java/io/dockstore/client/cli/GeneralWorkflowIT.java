@@ -41,6 +41,9 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 
 import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_MISMATCH_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
 import static io.dockstore.webservice.resources.WorkflowResource.FROZEN_VERSION_REQUIRED;
 import static io.dockstore.webservice.resources.WorkflowResource.NO_ZENDO_USER_TOKEN;
 import static org.junit.Assert.assertEquals;
@@ -1096,7 +1099,63 @@ public class GeneralWorkflowIT extends BaseIT {
             assertTrue(ex.getResponseBody().contains(NO_ZENDO_USER_TOKEN));
 
         }
+    }
 
+    /**
+     * This tests that a published workflow, when launched, attempts to validate descriptor checksums.
+     * That cases that are tested: Checksum matches, checksum doesn't match, checksum doesn't exist
+     *
+     */
+    @Test
+    public void launchWorkflowChecksumValidation() {
+        // register and publish a workflow
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+                "md5sum-checker", "--organization", "DockstoreTestUser2", "--git-version-control", "github",
+                "--workflow-path", "/checker-workflow-wrapping-tool.cwl", "--descriptor-type", "cwl", "--workflow-name", "checksumTester", "--script" });
+
+        // ensure checksum validation is acknowledged, and no null checksums were discovered
+        systemOutRule.clearLog();
+        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+        assertTrue("Output should indicate that checksums have been validated",
+            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
+
+        // unpublish the workflow
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub", "--entry", "github.com/DockstoreTestUser2/md5sum-checker/checksumTester"});
+
+        // ensure checksum validation is acknowledged for the unpublished workflow, and no null checksums were discovered
+        systemOutRule.clearLog();
+        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+        assertTrue("Output should indicate that checksums have been validated",
+            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
+
+        // replace the checksum with a null value
+        // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
+        testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = '' WHERE path='/checker-workflow-wrapping-tool.cwl';");
+
+        // run workflow again, should still succeed but indicate that checksums were null
+        systemOutRule.clearLog();
+        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+        assertTrue("Output should indicate that checksums have been validated, but null checksums were present",
+            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
+
+        // update checksum values to something fake
+        testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = 'SHA-1:VeryFakeChecksum' WHERE path='/checker-workflow-wrapping-tool.cwl';");
+
+        // expect the launch to be exited due to mismatching checksums
+        systemOutRule.clearLog();
+        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
+        systemExit.checkAssertionAfterwards(() -> {
+                assertTrue("Checksums did not match, launch should be halted",
+                    systemOutRule.getLog().contains(CHECKSUM_MISMATCH_MESSAGE));
+            }
+        );
+        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
     }
 
     /**

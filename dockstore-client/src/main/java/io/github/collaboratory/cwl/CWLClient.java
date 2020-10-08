@@ -286,7 +286,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     public long launch(String entry, boolean isLocalEntry, String yamlParameterFile, String jsonParameterFile, String outputTarget,
         String uuid) {
         // Call common launch command
-        return launchPipeline(entry, isLocalEntry, yamlParameterFile, jsonParameterFile, outputTarget, uuid);
+        return launchPipeline(entry, isLocalEntry, ToolDescriptor.TypeEnum.CWL, yamlParameterFile, jsonParameterFile, outputTarget, uuid);
     }
 
     /**
