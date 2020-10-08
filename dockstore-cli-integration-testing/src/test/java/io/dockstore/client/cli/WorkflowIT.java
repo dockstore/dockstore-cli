@@ -337,7 +337,7 @@ public class WorkflowIT extends BaseIT {
      */
     @Test
     public void cwlVersion11() {
-        final ApiClient userApiClient = getWebClient(USER_2_USERNAME, testingPostgres);
+        final ApiClient userApiClient = CommonTestUtilities.getWebClient(true, USER_2_USERNAME, testingPostgres);
         WorkflowsApi userWorkflowsApi = new WorkflowsApi(userApiClient);
         userWorkflowsApi.manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/metadata.cwl", "metadata", "cwl",
             "/cwl/v1.1/cat-job.json");
@@ -352,6 +352,16 @@ public class WorkflowIT extends BaseIT {
             .filter(version -> "master".equalsIgnoreCase(version.getName())).findFirst();
         assertTrue(optionalWorkflowVersion.isPresent());
         WorkflowVersion workflowVersion = optionalWorkflowVersion.get();
+
+        // verify sourcefiles
+        final io.dockstore.openapi.client.ApiClient userOpenApiClient = CommonTestUtilities.getOpenApiWebClient(true, USER_2_USERNAME, testingPostgres);
+        io.dockstore.openapi.client.api.WorkflowsApi openApiWorkflowApi = new io.dockstore.openapi.client.api.WorkflowsApi(userOpenApiClient);
+        List<io.dockstore.openapi.client.model.SourceFile> sourceFileList = openApiWorkflowApi.getWorkflowVersionsSourcefiles(workflow.getId(), workflowVersion.getId(), null);
+
+        Assert.assertEquals(2, sourceFileList.size());
+        Assert.assertTrue(sourceFileList.stream().anyMatch(sourceFile -> sourceFile.getPath().equals("/cwl/v1.1/cat-job.json")));
+        Assert.assertTrue(sourceFileList.stream().anyMatch(sourceFile -> sourceFile.getPath().equals("/cwl/v1.1/metadata.cwl")));
+
         // Check validation works.  It is invalid because this is a tool and not a workflow.
         Assert.assertFalse(workflowVersion.isValid());
 
