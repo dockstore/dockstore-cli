@@ -89,39 +89,6 @@ public class GeneralRegressionIT extends BaseIT {
     }
 
     /**
-     * This method will create and register a new container for testing
-     *
-     * @return DockstoreTool
-     * @throws ApiException comes back from a web service error
-     */
-    private DockstoreTool getContainer() {
-        DockstoreTool c = new DockstoreTool();
-        c.setMode(DockstoreTool.ModeEnum.MANUAL_IMAGE_PATH);
-        c.setName("testUpdatePath");
-        c.setGitUrl("https://github.com/DockstoreTestUser2/dockstore-tool-imports");
-        c.setDefaultDockerfilePath("/Dockerfile");
-        c.setDefaultCwlPath("/Dockstore.cwl");
-        c.setRegistryString(Registry.DOCKER_HUB.toString());
-        c.setIsPublished(false);
-        c.setNamespace("testPath");
-        c.setToolname("test5");
-        c.setPath("quay.io/dockstoretestuser2/dockstore-tool-imports");
-        Tag tag = new Tag();
-        tag.setName("master");
-        tag.setReference("refs/heads/master");
-        tag.setValid(true);
-        tag.setImageId("123456");
-        List<String> list = new ArrayList<>();
-        list.add("/Dockstore.cwl");
-        tag.setVerifiedSources(list);
-        tag.getVerifiedSources().add("/Dockerfile");
-        List<Tag> tags = new ArrayList<>();
-        tags.add(tag);
-        c.setWorkflowVersions(tags);
-        return c;
-    }
-
-    /**
      * this method will set up the webservice and return the container api
      *
      * @return ContainersApi
@@ -425,7 +392,7 @@ public class GeneralRegressionIT extends BaseIT {
         ContainersApi toolsApi = setupWebService();
 
         //register tool
-        DockstoreTool c = getContainer();
+        DockstoreTool c = CommonTestUtilities.getContainer();
         DockstoreTool toolTest = toolsApi.registerManual(c);
         toolsApi.refresh(toolTest.getId());
 
@@ -450,7 +417,7 @@ public class GeneralRegressionIT extends BaseIT {
         ContainersApi toolsApi = setupWebService();
 
         //register tool
-        DockstoreTool c = getContainer();
+        DockstoreTool c = CommonTestUtilities.getContainer();
         DockstoreTool toolTest = toolsApi.registerManual(c);
         toolsApi.refresh(toolTest.getId());
 
@@ -475,7 +442,7 @@ public class GeneralRegressionIT extends BaseIT {
         ContainersApi toolsApi = setupWebService();
 
         //register tool
-        DockstoreTool c = getContainer();
+        DockstoreTool c = CommonTestUtilities.getContainer();
         DockstoreTool toolTest = toolsApi.registerManual(c);
         toolsApi.refresh(toolTest.getId());
 

@@ -445,42 +445,6 @@ public class GeneralIT extends BaseIT {
     }
 
     /**
-     * This method will create and register a new container for testing
-     *
-     * @return DockstoreTool
-     * @throws ApiException
-     */
-    private DockstoreTool getContainer() {
-        DockstoreTool c = new DockstoreTool();
-        c.setMode(DockstoreTool.ModeEnum.MANUAL_IMAGE_PATH);
-        c.setName("testUpdatePath");
-        c.setGitUrl("https://github.com/DockstoreTestUser2/dockstore-tool-imports");
-        c.setDefaultDockerfilePath("/Dockerfile");
-        c.setDefaultCwlPath("/dockstore.cwl");
-        c.setRegistryString(Registry.DOCKER_HUB.getDockerPath());
-        c.setIsPublished(false);
-        c.setNamespace("testPath");
-        c.setToolname("test5");
-        c.setPath("quay.io/dockstoretestuser2/dockstore-tool-imports");
-        Tag tag = new Tag();
-        tag.setName("1.0");
-        tag.setReference("master");
-        tag.setValid(true);
-        tag.setImageId("123456");
-        tag.setCwlPath(c.getDefaultCwlPath());
-        tag.setWdlPath(c.getDefaultWdlPath());
-        List<String> list = new ArrayList<>();
-        list.add("/Dockstore.cwl");
-        tag.setVerifiedSources(list);
-
-        tag.getVerifiedSources().add("/Dockerfile");
-        List<Tag> tags = new ArrayList<>();
-        tags.add(tag);
-        c.setWorkflowVersions(tags);
-        return c;
-    }
-
-    /**
      * This tests that zip file can be downloaded or not based on published state and auth.
      */
     @Test
@@ -495,7 +459,7 @@ public class GeneralIT extends BaseIT {
         ContainersApi otherUserContainersApi = new ContainersApi(otherUserWebClient);
 
         // Register and refresh tool
-        DockstoreTool tool = ownerContainersApi.registerManual(getContainer());
+        DockstoreTool tool = ownerContainersApi.registerManual(CommonTestUtilities.getContainer());
         DockstoreTool refresh = ownerContainersApi.refresh(tool.getId());
         Long toolId = refresh.getId();
         Tag tag = refresh.getWorkflowVersions().get(0);

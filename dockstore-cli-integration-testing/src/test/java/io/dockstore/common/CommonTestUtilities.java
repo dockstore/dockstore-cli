@@ -28,6 +28,9 @@ import io.dropwizard.Application;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;
+import io.swagger.client.ApiException;
+import io.swagger.client.model.DockstoreTool;
+import io.swagger.client.model.Tag;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -298,5 +301,36 @@ public final class CommonTestUtilities {
         Assert.assertTrue(log.contains("NAME"));
         Assert.assertTrue(log.contains("DESCRIPTION"));
         Assert.assertTrue(log.contains("GIT REPO"));
+    }
+
+    /**
+     * This method will create and register a new container for testing
+     *
+     * @return DockstoreTool
+     * @throws ApiException comes back from a web service error
+     */
+    public static DockstoreTool getContainer() {
+        DockstoreTool c = new DockstoreTool();
+        c.setMode(DockstoreTool.ModeEnum.MANUAL_IMAGE_PATH);
+        c.setName("testUpdatePath");
+        c.setGitUrl("https://github.com/DockstoreTestUser2/dockstore-tool-imports");
+        c.setDefaultDockerfilePath("/Dockerfile");
+        c.setDefaultCwlPath("/dockstore.cwl");
+        c.setRegistryString(Registry.DOCKER_HUB.getDockerPath());
+        c.setIsPublished(false);
+        c.setNamespace("testPath");
+        c.setToolname("test5");
+        c.setPath("quay.io/dockstoretestuser2/dockstore-tool-imports");
+        Tag tag = new Tag();
+        tag.setName("1.0");
+        tag.setReference("master");
+        tag.setValid(true);
+        tag.setImageId("123456");
+        tag.setCwlPath(c.getDefaultCwlPath());
+        tag.setWdlPath(c.getDefaultWdlPath());
+        List<Tag> tags = new ArrayList<>();
+        tags.add(tag);
+        c.setWorkflowVersions(tags);
+        return c;
     }
 }
