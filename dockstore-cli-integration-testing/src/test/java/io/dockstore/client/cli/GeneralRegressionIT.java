@@ -19,8 +19,6 @@ package io.dockstore.client.cli;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.Registry;
@@ -31,7 +29,6 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.model.DockstoreTool;
-import io.swagger.client.model.Tag;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
