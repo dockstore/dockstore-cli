@@ -867,7 +867,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             if (!FilenameUtils.getExtension(workflowPath).equalsIgnoreCase(descriptorType)) {
                 errorMessage("Please ensure that the given workflow path '" + workflowPath + "' is of type " + descriptorType
-                    + " and has the file extension " + descriptorType.toLowerCase(), Client.CLIENT_ERROR);
+                    + " and has the file extension " + descriptorType.toLowerCase(), CLIENT_ERROR);
             }
 
             String workflowname = optVal(args, "--workflow-name", null);

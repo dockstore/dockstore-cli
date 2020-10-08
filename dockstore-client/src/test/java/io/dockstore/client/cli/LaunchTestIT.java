@@ -63,6 +63,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 public class LaunchTestIT {
+    public static final long LAST_MODIFIED_TIME_100 = 100L;
+    public static final long LAST_MODIFIED_TIME_1000 = 1000L;
+    
     //create tests that will call client.checkEntryFile for workflow launch with different files and descriptor
 
     @Rule
@@ -1226,7 +1229,7 @@ public class LaunchTestIT {
         WorkflowVersion aWorkflowVersion1 = new WorkflowVersion();
         aWorkflowVersion1.setName("master");
         aWorkflowVersion1.setValid(false);
-        aWorkflowVersion1.setLastModified(100L);
+        aWorkflowVersion1.setLastModified(LAST_MODIFIED_TIME_100);
 
         List<WorkflowVersion> listWorkflowVersions = new ArrayList<>();
         listWorkflowVersions.add(aWorkflowVersion1);
@@ -1263,7 +1266,7 @@ public class LaunchTestIT {
         WorkflowVersion aWorkflowVersion1 = new WorkflowVersion();
         aWorkflowVersion1.setName("1.0.0");
         aWorkflowVersion1.setValid(false);
-        aWorkflowVersion1.setLastModified(1000L);
+        aWorkflowVersion1.setLastModified(LAST_MODIFIED_TIME_1000);
 
         List<WorkflowVersion> listWorkflowVersions = new ArrayList<>();
         listWorkflowVersions.add(aWorkflowVersion1);
