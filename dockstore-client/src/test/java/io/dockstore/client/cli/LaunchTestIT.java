@@ -65,7 +65,7 @@ import static org.mockito.Mockito.mock;
 public class LaunchTestIT {
     public static final long LAST_MODIFIED_TIME_100 = 100L;
     public static final long LAST_MODIFIED_TIME_1000 = 1000L;
-    
+
     //create tests that will call client.checkEntryFile for workflow launch with different files and descriptor
 
     @Rule
