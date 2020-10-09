@@ -774,9 +774,10 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 errorMessage("This container is not published.", Client.COMMAND_ERROR);
             } else {
 
-                Date lastBuild = container.getLastBuild();
+                final Long lastBuildLong = container.getLastBuild();
                 Date dateUploaded = null;
-                if (lastBuild != null) {
+                if (lastBuildLong != null) {
+                    final Date lastBuild = new Date(lastBuildLong);
                     dateUploaded = Date.from(lastBuild.toInstant());
                 }
 

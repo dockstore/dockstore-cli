@@ -3,9 +3,9 @@ package io.dockstore.client.cli;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 
 import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.DescriptorLanguage;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
@@ -25,8 +25,6 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
-import static io.dockstore.common.DescriptorLanguage.CWL;
-import static io.dockstore.common.DescriptorLanguage.WDL;
 
 /**
  * This implements all operations on the CLI that are specific to checkers
@@ -111,13 +109,12 @@ public class CheckerClient extends WorkflowClient {
         } else {
             // Retrieve arguments
             String entryPath = reqVal(args, "--entry");
-            String descriptorType = optVal(args, "--descriptor-type", "cwl");
+            final String descriptorType = optVal(args, "--descriptor-type", DescriptorLanguage.CWL.toString()).toUpperCase();
             String descriptorPath = reqVal(args, "--descriptor-path");
             String inputParameterPath = optVal(args, "--input-parameter-path", null);
 
             // Check that descriptor type is valid
-            descriptorType = descriptorType.toLowerCase();
-            if (!Objects.equals(descriptorType, CWL.getLowerShortName()) && !Objects.equals(descriptorType, WDL.getLowerShortName())) {
+            if (!DescriptorLanguage.CWL.toString().equals(descriptorType) && !DescriptorLanguage.WDL.toString().equals(descriptorType)) {
                 errorMessage("The given descriptor type " + descriptorType + " is not valid.",
                     Client.CLIENT_ERROR);
             }
@@ -159,7 +156,7 @@ public class CheckerClient extends WorkflowClient {
         out("");
         out("Required Parameters:");
         out("  --entry <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("  --descriptor-type <descriptor-type>                                      cwl/wdl, defaults to cwl.");
+        out("  --descriptor-type <descriptor-type>                                      " + DescriptorLanguage.CWL.toString() + "/" + DescriptorLanguage.WDL.toString() + ", defaults to " + DescriptorLanguage.CWL.toString());
         out("  --descriptor-path <descriptor-path>                                      Path to the main descriptor file.");
         out("");
         out("Optional Parameters:");

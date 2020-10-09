@@ -92,11 +92,13 @@ public class WDLWorkflowIT extends BaseIT {
         Workflow refresh = workflowApi.refresh(workflow.getId());
         final PublishRequest publishRequest = SwaggerUtility.createPublishRequest(true);
         workflowApi.publish(refresh.getId(), publishRequest);
+
         // get test json
         String testVersion = "1.3.0";
         // Also test that files can be gotten by owner even though it's hidden
         List<WorkflowVersion> workflowVersions = refresh.getWorkflowVersions();
-        workflowVersions.forEach(version -> version.setHidden(true));
+        workflowVersions.stream().filter(v -> v.getName().equals(testVersion)).forEach(v -> v.setHidden(true));
+
         workflowApi.updateWorkflowVersion(refresh.getId(), workflowVersions);
         List<SourceFile> testParameterFiles = workflowApi.getTestParameterFiles(refresh.getId(), testVersion);
         Assert.assertEquals(1, testParameterFiles.size());

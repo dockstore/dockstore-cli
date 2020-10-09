@@ -52,6 +52,7 @@ import io.swagger.client.model.User;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -146,7 +147,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("Optional parameters:");
         out("  --workflow-path <workflow-path>                      Path for the descriptor file, defaults to /Dockstore.cwl");
         out("  --workflow-name <workflow-name>                      Workflow name, defaults to null");
-        out("  --descriptor-type <descriptor-type>                  Descriptor type, defaults to cwl");
+        out("  --descriptor-type <descriptor-type>                  Descriptor type, defaults to " + DescriptorLanguage.CWL.toString());
         out("  --test-parameter-path <test-parameter-path>          Path to default test parameter file, defaults to /test.json");
 
         printHelpFooter();
@@ -576,7 +577,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             if (workflow == null || !workflow.isIsPublished()) {
                 errorMessage("This workflow is not published.", COMMAND_ERROR);
             } else {
-                Date lastUpdated = Date.from(workflow.getLastUpdated().toInstant());
+                Date lastUpdated = new Date(workflow.getLastUpdated());
 
                 String description = workflow.getDescription();
                 if (description == null) {
@@ -633,7 +634,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             }
 
             // add user to all workflows
-            final List<Workflow> updatedWorkflows = usersApi.addUserToDockstoreWorkflows(user.getId(), null).stream()
+            final List<Workflow> updatedWorkflows = usersApi.addUserToDockstoreWorkflows(user.getId(), "").stream()
                     // Skip hosted workflows
                     .filter(workflow -> StringUtils.isNotEmpty(workflow.getGitUrl()))
                     .map(workflow -> {
@@ -888,17 +889,17 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             final String gitVersionControl = reqVal(args, "--git-version-control");
 
             final String workflowPath = optVal(args, "--workflow-path", "/Dockstore.cwl");
-            final String descriptorType = optVal(args, "--descriptor-type", "cwl");
+            final String descriptorType = optVal(args, "--descriptor-type", DescriptorLanguage.CWL.toString()).toUpperCase();
             final String testParameterFile = optVal(args, "--test-parameter-path", "/test.json");
 
             // Check if valid input
-            if (!"cwl".equalsIgnoreCase(descriptorType) && !"wdl".equalsIgnoreCase(descriptorType)) {
+            if (!DescriptorLanguage.CWL.toString().equals(descriptorType) && !DescriptorLanguage.WDL.toString().equals(descriptorType)) {
                 errorMessage("Please ensure that the descriptor type is either cwl or wdl.", Client.CLIENT_ERROR);
             }
 
-            if (!workflowPath.endsWith(descriptorType)) {
+            if (!FilenameUtils.getExtension(workflowPath).equalsIgnoreCase(descriptorType)) {
                 errorMessage("Please ensure that the given workflow path '" + workflowPath + "' is of type " + descriptorType
-                    + " and has the file extension " + descriptorType, Client.CLIENT_ERROR);
+                    + " and has the file extension " + descriptorType.toLowerCase(), CLIENT_ERROR);
             }
 
             String workflowname = optVal(args, "--workflow-name", null);
