@@ -56,20 +56,20 @@
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-webservice</artifactId>
             <version>${dockstore-core.version}</version>
-            <exclusions>
-                <exclusion>                    <!--
-                     The liquibase.build.properties file is included in two
-                     separate JAR files and this causes a failure when
-                     running integration tests.
-                     The liquibase.build.properties file originally comes
-                     in the liquibase.core.jar file
-                     Liquibase is bundled in the dockstore-webservice JAR so we
-                     exclude it to remove one liquibase.build.properties file
-                     -->
-                    <groupId>org.liquibase</groupId>
-                    <artifactId>liquibase-core</artifactId>
-                </exclusion>
-            </exclusions>
+<!--            <exclusions>-->
+<!--                <exclusion>                    &lt;!&ndash;-->
+<!--                     The liquibase.build.properties file is included in two-->
+<!--                     separate JAR files and this causes a failure when-->
+<!--                     running integration tests.-->
+<!--                     The liquibase.build.properties file originally comes-->
+<!--                     in the liquibase.core.jar file-->
+<!--                     Liquibase is bundled in the dockstore-webservice JAR so we-->
+<!--                     exclude it to remove one liquibase.build.properties file-->
+<!--                     &ndash;&gt;-->
+<!--                    <groupId>org.liquibase</groupId>-->
+<!--                    <artifactId>liquibase-core</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
         </dependency>
 
         <dependency>
