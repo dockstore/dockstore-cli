@@ -1214,7 +1214,7 @@ public class LaunchTestIT {
         runClientCommand(args);
 
         assertTrue("output should include an error message",
-            systemErrRule.getLog().contains("Syntax error while parsing a block collection"));
+            systemErrRule.getLog().contains("while parsing a block collection"));
     }
 
     @Test
