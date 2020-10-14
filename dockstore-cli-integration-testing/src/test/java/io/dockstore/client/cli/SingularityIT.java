@@ -59,7 +59,8 @@ public class SingularityIT extends BaseIT {
             "launch",
             "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
-            "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json")
+            "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"),
+            "--script"
         });
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully

@@ -71,7 +71,7 @@ public class NotificationsIT extends BaseIT {
         });
         Client.main(
             new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--local-entry", SAMPLE_CWL_DESCRIPTOR,
-                "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
+                "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info", "--script" });
     }
 
     /**
@@ -83,7 +83,7 @@ public class NotificationsIT extends BaseIT {
     public void launchCWLToolWithNotificationsUUIDInvalidURL() throws IOException {
         Client.main(
             new String[] { "--config", TestUtility.getConfigFileLocationWithInvalidNotifications(true), "tool", "launch", "--local-entry",
-                SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
+                SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info", "--script" });
         String log = systemOutRule.getLog();
         Assert.assertTrue(log, log.contains(SENDING_NOTIFICATION));
         Assert.assertFalse(log, log.contains(SLACK_DESTINATION));
@@ -98,7 +98,7 @@ public class NotificationsIT extends BaseIT {
     public void launchCWLToolWithNotificationsUUIDValidURL() throws IOException {
         Client.main(
             new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
-                SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
+                SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info", "--script" });
         String log = systemOutRule.getLog();
         Assert.assertTrue(log, log.contains(SENDING_NOTIFICATION));
         Assert.assertTrue(log, log.contains(SLACK_DESTINATION));
@@ -113,7 +113,7 @@ public class NotificationsIT extends BaseIT {
     public void launchCWLToolWithNotificationsNoUUIDValidURL() throws IOException {
         Client.main(
             new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
-                SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--info" });
+                SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--info", "--script" });
         String log = systemOutRule.getLog();
         Assert.assertTrue(log, log.contains(SENDING_NOTIFICATION));
         Assert.assertTrue(log, log.contains(GENERATING_UUID));
