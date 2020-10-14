@@ -16,7 +16,7 @@ if [ "${TESTING_PROFILE}" = "toil-integration-tests" ]; then
 elif [ "${TESTING_PROFILE}" = "regression-integration-tests" ]; then
     pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.6.0/requirements3.txt
 else
-    pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.7.0/requirements3.txt
+    pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/feature/3196/updateCWLtool/dockstore-webservice/src/main/resources/requirements/1.10.0/requirements3.txt
 fi
 
 if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
