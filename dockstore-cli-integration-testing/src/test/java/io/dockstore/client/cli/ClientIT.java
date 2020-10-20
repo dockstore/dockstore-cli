@@ -279,7 +279,7 @@ public class ClientIT extends BaseIT {
     }
 
     private void assertDepsCommandOutput() {
-        Assert.assertTrue(systemOutRule.getLog().contains("cwlref-runner"));
+        Assert.assertTrue(systemOutRule.getLog().contains("cwlref-runner") || systemOutRule.getLog().contains("cwl-runner"));
         Assert.assertTrue(systemOutRule.getLog().contains("cwltool=="));
         Assert.assertTrue(systemOutRule.getLog().contains("schema-salad=="));
         Assert.assertTrue(systemOutRule.getLog().contains("ruamel.yaml=="));
