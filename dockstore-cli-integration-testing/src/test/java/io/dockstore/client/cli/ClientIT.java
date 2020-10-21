@@ -262,7 +262,7 @@ public class ClientIT extends BaseIT {
     @Test
     public void testDepsCommand() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps" });
-        Assert.assertFalse(systemOutRule.getLog().contains("monotonic=="));
+        Assert.assertFalse("Python 3 does not have monotonic as a dependency", systemOutRule.getLog().contains("monotonic=="));
         assertDepsCommandOutput();
     }
 

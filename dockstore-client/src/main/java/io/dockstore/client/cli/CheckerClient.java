@@ -203,7 +203,7 @@ public class CheckerClient extends WorkflowClient {
                     workflowsApi.updateWorkflow(checkerWorkflow.getId(), checkerWorkflow);
 
                     // Refresh the checker workflow
-                    workflowsApi.refresh(checkerWorkflow.getId(), null);
+                    workflowsApi.refresh(checkerWorkflow.getId(), true);
                     out("The checker workflow has been updated.");
                 } catch (ApiException ex) {
                     exceptionMessage(ex, "There was a problem updating the checker workflow.", Client.API_ERROR);

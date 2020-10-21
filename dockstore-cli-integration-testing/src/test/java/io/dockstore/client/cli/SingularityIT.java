@@ -49,7 +49,7 @@ public class SingularityIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
                 "/checker-workflow-wrapping-workflow.cwl", "test", "cwl", null);
-        workflowApi.refresh(workflow.getId(), false);
+        workflowApi.refresh(workflow.getId(), true);
 
         // run the md5sum-checker workflow
         Client.main(new String[] {
@@ -77,7 +77,7 @@ public class SingularityIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
                 "/checker-workflow-wrapping-workflow.wdl", "test", "wdl", null);
-        workflowApi.refresh(workflow.getId(), null);
+        workflowApi.refresh(workflow.getId(), true);
 
         // make a tmp copy of the dockstore config and add the cromwell conf file option to it
         // this is done in the test because the path to the cromwell conf is different if it's running locally vs. on Travis
