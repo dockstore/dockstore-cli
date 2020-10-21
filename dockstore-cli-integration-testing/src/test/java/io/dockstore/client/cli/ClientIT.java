@@ -279,6 +279,7 @@ public class ClientIT extends BaseIT {
     }
 
     private void assertDepsCommandOutput() {
+        // cwl-runner is an alias for cwlref-runner, both should be fine
         Assert.assertTrue(systemOutRule.getLog().contains("cwlref-runner") || systemOutRule.getLog().contains("cwl-runner"));
         Assert.assertTrue(systemOutRule.getLog().contains("cwltool=="));
         Assert.assertTrue(systemOutRule.getLog().contains("schema-salad=="));
