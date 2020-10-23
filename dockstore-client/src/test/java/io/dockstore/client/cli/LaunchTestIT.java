@@ -1214,7 +1214,7 @@ public class LaunchTestIT {
         runClientCommand(args);
 
         assertTrue("output should include an error message",
-            systemErrRule.getLog().contains("Syntax error while parsing a block collection"));
+            systemErrRule.getLog().contains("while parsing a block collection"));
     }
 
     @Test
@@ -1242,7 +1242,7 @@ public class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
 
-        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(null), eq(false));
+        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(null), eq(false), eq(null));
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
 
@@ -1279,7 +1279,7 @@ public class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
 
-        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(null), eq(false));
+        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(null), eq(false), eq(null));
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
 

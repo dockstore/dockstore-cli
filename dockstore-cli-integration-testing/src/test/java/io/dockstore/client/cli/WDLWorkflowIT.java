@@ -89,7 +89,7 @@ public class WDLWorkflowIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi
             .manualRegister(SourceControl.GITHUB.getFriendlyName(), UNIFIED_WORKFLOW_REPO, "/checker.wdl", "", "wdl", "/md5sum.wdl.json");
-        Workflow refresh = workflowApi.refresh(workflow.getId());
+        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         final PublishRequest publishRequest = SwaggerUtility.createPublishRequest(true);
         workflowApi.publish(refresh.getId(), publishRequest);
 
@@ -122,7 +122,7 @@ public class WDLWorkflowIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), SKYLAB_WORKFLOW_REPO,
             "/pipelines/smartseq2_single_sample/SmartSeq2SingleSample.wdl", "", "wdl", null);
-        Workflow refresh = workflowApi.refresh(workflow.getId());
+        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         final PublishRequest publishRequest = SwaggerUtility.createPublishRequest(true);
         workflowApi.publish(refresh.getId(), publishRequest);
         checkOnConvert(SKYLAB_WORKFLOW, "Dockstore_Testing", "SmartSeq2SingleCell");
@@ -138,14 +138,14 @@ public class WDLWorkflowIT extends BaseIT {
         // register underlying workflow
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), SKYLAB_WORKFLOW_REPO,
             "/pipelines/smartseq2_single_sample/SmartSeq2SingleSample.wdl", "", "wdl", null);
-        Workflow refresh = workflowApi.refresh(workflow.getId());
+        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         final PublishRequest publishRequest = SwaggerUtility.createPublishRequest(true);
         workflowApi.publish(refresh.getId(), publishRequest);
         // register checker workflow
         Entry checkerWorkflow = workflowApi
             .registerCheckerWorkflow("/test/smartseq2_single_sample/pr/test_smartseq2_single_sample_PR.wdl", workflow.getId(), "wdl",
                 "/test/smartseq2_single_sample/pr/dockstore_test_inputs.json");
-        workflowApi.refresh(checkerWorkflow.getId());
+        workflowApi.refresh(checkerWorkflow.getId(), true);
         checkOnConvert(SKYLAB_WORKFLOW_CHECKER, "feature/upperThingy", "TestSmartSeq2SingleCellPR");
     }
 

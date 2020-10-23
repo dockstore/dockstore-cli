@@ -1072,7 +1072,7 @@ public class GeneralWorkflowIT extends BaseIT {
         Workflow githubWorkflow = workflowApi
             .manualRegister("github", "DockstoreTestUser2/test_lastmodified", "/hello.wdl", "test-update-workflow", "wdl", "/test.json");
 
-        Workflow workflowBeforeFreezing = workflowApi.refresh(githubWorkflow.getId());
+        Workflow workflowBeforeFreezing = workflowApi.refresh(githubWorkflow.getId(), true);
         WorkflowVersion master = workflowBeforeFreezing.getWorkflowVersions().stream().filter(v -> v.getName().equals("master")).findFirst()
             .get();
 

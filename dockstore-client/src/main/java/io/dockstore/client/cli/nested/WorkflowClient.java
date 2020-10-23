@@ -303,7 +303,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         // simply getting published descriptors does not require permissions
         Workflow workflow = null;
         try {
-            workflow = workflowsApi.getPublishedWorkflowByPath(path, null, false);
+            workflow = workflowsApi.getPublishedWorkflowByPath(path, null, false, null);
         } catch (ApiException e) {
             if (e.getResponseBody().contains("Entry not found")) {
                 LOG.info("Unable to locate entry without credentials, trying again as authenticated user");
@@ -573,7 +573,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     @Override
     public void handleInfo(String entryPath) {
         try {
-            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entryPath, null, false);
+            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entryPath, null, false, null);
             if (workflow == null || !workflow.isIsPublished()) {
                 errorMessage("This workflow is not published.", COMMAND_ERROR);
             } else {
@@ -640,7 +640,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     .map(workflow -> {
                         out(MessageFormat.format("Refreshing {0}", workflow.getFullWorkflowPath()));
                         try {
-                            return workflowsApi.refresh(workflow.getId());
+                            return workflowsApi.refresh(workflow.getId(), true);
                         } catch (ApiException ex) {
                             err(ex.getMessage());
                             return null;
@@ -664,7 +664,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             Workflow workflow = workflowsApi.getWorkflowByPath(path, null, false);
             final Long workflowId = workflow.getId();
             out("Refreshing workflow...");
-            Workflow updatedWorkflow = workflowsApi.refresh(workflowId);
+            Workflow updatedWorkflow = workflowsApi.refresh(workflowId, true);
             List<Workflow> workflowList = new ArrayList<>();
             workflowList.add(updatedWorkflow);
             out("YOUR UPDATED WORKFLOW");
@@ -719,7 +719,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
                     out("Successfully registered " + completeEntryPath);
 
-                    workflowsApi.refresh(newWorkflow.getId());
+                    workflowsApi.refresh(newWorkflow.getId(), true);
                     publish(true, completeEntryPath);
                 } catch (ApiException ex) {
                     exceptionMessage(ex, "Unable to publish " + entryPath + "/" + newName, Client.API_ERROR);
@@ -820,7 +820,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     protected void handleStarUnstar(String entry, boolean star) {
         String action = star ? "star" : "unstar";
         try {
-            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entry, null, false);
+            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entry, null, false, null);
             StarRequest request = new StarRequest();
             request.setStar(star);
             workflowsApi.starEntry(workflow.getId(), request);
@@ -923,7 +923,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     .manualRegister(gitVersionControl, organization + "/" + repository, workflowPath, workflowname, descriptorType,
                         testParameterFile);
                 if (workflow != null) {
-                    workflow = workflowsApi.refresh(workflow.getId());
+                    workflow = workflowsApi.refresh(workflow.getId(), true);
                 } else {
                     errorMessage("Unable to register " + path, COMMAND_ERROR);
                 }
@@ -1022,7 +1022,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 if (newVersion) { // Update default version separately, see https://github.com/dockstore/dockstore/issues/3563
                     workflowsApi.updateWorkflowDefaultVersion(workflowId, defaultVersion);
                 }
-                workflowsApi.refresh(workflowId);
+                workflowsApi.refresh(workflowId, true);
                 out("The workflow has been updated.");
             } catch (ApiException ex) {
                 exceptionMessage(ex, "", Client.API_ERROR);
@@ -1046,7 +1046,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             }
 
             if (adds.size() > 0 || removes.size() > 0) {
-                workflowsApi.refresh(workflow.getId());
+                workflowsApi.refresh(workflow.getId(), true);
                 out("The test parameter files for version " + versionName + " of " + getEntryType().toLowerCase() + " " + parentEntry
                     + " have been updated.");
             } else {
@@ -1088,7 +1088,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         newVersions.add(workflowVersion);
 
                         workflowsApi.updateWorkflowVersion(workflow.getId(), newVersions);
-                        workflowsApi.refresh(workflow.getId());
+                        workflowsApi.refresh(workflow.getId(), true);
                         out("Workflow Version " + name + " has been updated.");
                         break;
                     }
