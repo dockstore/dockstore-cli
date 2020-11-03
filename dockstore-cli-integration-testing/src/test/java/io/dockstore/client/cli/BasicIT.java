@@ -290,16 +290,15 @@ public class BasicIT extends BaseIT {
             long.class);
         Assert.assertEquals("the tool should now have an associated git repo", 1, count);
 
-        // Commenting out until https://github.com/dockstore/dockstore/issues/3569 is fixed
-        //        Client.main(
-        //            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
-        //                "quay.io/dockstoretestuser/nobuildsatall", "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git",
-        //                "--script" });
-        //
-        //        final long count2 = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
-        //                + "' and namespace = 'dockstoretestuser' and name = 'nobuildsatall' and giturl = 'git@github.com:DockstoreTestUser/dockstore-whalesay.git'",
-        //            long.class);
-        //        Assert.assertEquals("the tool should now have an associated git repo", 1, count2);
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
+                "quay.io/dockstoretestuser/nobuildsatall", "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git",
+                "--script" });
+        
+        final long count2 = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
+                + "' and namespace = 'dockstoretestuser' and name = 'nobuildsatall' and giturl = 'git@github.com:DockstoreTestUser/dockstore-whalesay.git'",
+            long.class);
+        Assert.assertEquals("the tool should now have an associated git repo", 1, count2);
 
     }
 
