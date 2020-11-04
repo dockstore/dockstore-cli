@@ -288,7 +288,7 @@ public class BasicIT extends BaseIT {
         final long count = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'noautobuild' and giturl = 'git@github.com:DockstoreTestUser/dockstore-whalesay.git'",
             long.class);
-        Assert.assertEquals("the tool should now have an associated git repo", 1, count);
+        assertEquals("the tool should now have an associated git repo", 1, count);
 
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
@@ -298,7 +298,7 @@ public class BasicIT extends BaseIT {
         final long count2 = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'nobuildsatall' and giturl = 'git@github.com:DockstoreTestUser/dockstore-whalesay.git'",
             long.class);
-        Assert.assertEquals("the tool should now have an associated git repo", 1, count2);
+        assertEquals("the tool should now have an associated git repo", 1, count2);
 
     }
 

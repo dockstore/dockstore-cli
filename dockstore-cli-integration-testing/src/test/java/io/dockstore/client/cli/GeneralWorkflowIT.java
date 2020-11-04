@@ -93,7 +93,7 @@ public class GeneralWorkflowIT extends BaseIT {
 
         // final count of workflows associated with this user
         final long entryCountAfterRefresh = testingPostgres.runSelectStatement(String.format("SELECT COUNT(*) FROM user_entry WHERE userid = %d;", userid), long.class);
-        assertEquals("User should be associated with 40 workflows", 40, entryCountAfterRefresh);
+        assertTrue("User should be associated with >= 40 workflows", entryCountAfterRefresh >= 40);
     }
 
     /**
