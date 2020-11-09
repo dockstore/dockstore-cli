@@ -28,6 +28,9 @@ import io.dropwizard.Application;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;
+import io.swagger.client.ApiException;
+import io.swagger.client.model.DockstoreTool;
+import io.swagger.client.model.Tag;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -85,7 +88,8 @@ public final class CommonTestUtilities {
         Application<DockstoreWebserviceConfiguration> application = support.newApplication();
         application.run("db", "drop-all", "--confirm-delete-everything", dropwizardConfigurationFile);
         application
-            .run("db", "migrate", dropwizardConfigurationFile, "--include", "1.3.0.generated,1.3.1.consistency,1.4.0,1.5.0,1.6.0,1.7.0,1.8.0,1.9.0");
+            .run("db", "migrate", dropwizardConfigurationFile, "--include", "1.3.0.generated,1.3.1.consistency,1.4.0,1.5.0,"
+                    + "1.6.0,1.7.0,1.8.0,1.9.0,1.10.0");
     }
 
     /**
@@ -111,7 +115,8 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", dropwizardConfigurationFile);
 
         List<String> migrationList = Arrays
-            .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0");
+            .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0",
+                    "1.8.0", "1.9.0", "1.10.0");
         runMigration(migrationList, application, dropwizardConfigurationFile);
     }
 
@@ -124,6 +129,24 @@ public final class CommonTestUtilities {
         File configFile = FileUtils.getFile("src", "test", "resources", "config2");
         INIConfiguration parseConfig = Utilities.parseConfig(configFile.getAbsolutePath());
         ApiClient client = new ApiClient();
+        client.setBasePath(parseConfig.getString(Constants.WEBSERVICE_BASE_PATH));
+        if (authenticated) {
+            client.addDefaultHeader("Authorization", "Bearer " + (testingPostgres
+                .runSelectStatement("select content from token where tokensource='dockstore' and username= '" + username + "';",
+                    String.class)));
+        }
+        return client;
+    }
+
+    /**
+     * Shared convenience method for openApi Client
+     *
+     * @return
+     */
+    public static io.dockstore.openapi.client.ApiClient getOpenApiWebClient(boolean authenticated, String username, TestingPostgres testingPostgres) {
+        File configFile = FileUtils.getFile("src", "test", "resources", "config2");
+        INIConfiguration parseConfig = Utilities.parseConfig(configFile.getAbsolutePath());
+        io.dockstore.openapi.client.ApiClient client = new io.dockstore.openapi.client.ApiClient();
         client.setBasePath(parseConfig.getString(Constants.WEBSERVICE_BASE_PATH));
         if (authenticated) {
             client.addDefaultHeader("Authorization", "Bearer " + (testingPostgres
@@ -170,7 +193,7 @@ public final class CommonTestUtilities {
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml");
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0");
         runMigration(migrationList, application, configPath);
     }
 
@@ -238,7 +261,7 @@ public final class CommonTestUtilities {
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml");
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0");
         runMigration(migrationList, application, configPath);
     }
 
@@ -278,5 +301,36 @@ public final class CommonTestUtilities {
         Assert.assertTrue(log.contains("NAME"));
         Assert.assertTrue(log.contains("DESCRIPTION"));
         Assert.assertTrue(log.contains("GIT REPO"));
+    }
+
+    /**
+     * This method will create and register a new container for testing
+     *
+     * @return DockstoreTool
+     * @throws ApiException comes back from a web service error
+     */
+    public static DockstoreTool getContainer() {
+        DockstoreTool c = new DockstoreTool();
+        c.setMode(DockstoreTool.ModeEnum.MANUAL_IMAGE_PATH);
+        c.setName("testUpdatePath");
+        c.setGitUrl("https://github.com/DockstoreTestUser2/dockstore-tool-imports");
+        c.setDefaultDockerfilePath("/Dockerfile");
+        c.setDefaultCwlPath("/dockstore.cwl");
+        c.setRegistryString(Registry.DOCKER_HUB.getDockerPath());
+        c.setIsPublished(false);
+        c.setNamespace("testPath");
+        c.setToolname("test5");
+        c.setPath("quay.io/dockstoretestuser2/dockstore-tool-imports");
+        Tag tag = new Tag();
+        tag.setName("1.0");
+        tag.setReference("master");
+        tag.setValid(true);
+        tag.setImageId("123456");
+        tag.setCwlPath(c.getDefaultCwlPath());
+        tag.setWdlPath(c.getDefaultWdlPath());
+        List<Tag> tags = new ArrayList<>();
+        tags.add(tag);
+        c.setWorkflowVersions(tags);
+        return c;
     }
 }

@@ -52,6 +52,7 @@ import io.swagger.client.model.User;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -65,8 +66,10 @@ import static io.dockstore.client.cli.ArgumentUtility.NAME_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.boolWord;
 import static io.dockstore.client.cli.ArgumentUtility.columnWidthsWorkflow;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
+import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.getGitRegistry;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.outFormatted;
@@ -124,7 +127,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             String description = getCleanedDescription(workflow.getDescription());
 
-            outFormatted(format, workflow.getPath(), description, gitUrl, boolWord(workflow.isIsPublished()));
+            outFormatted(format, workflow.getFullWorkflowPath(), description, gitUrl, boolWord(workflow.isIsPublished()));
         }
     }
 
@@ -144,7 +147,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("Optional parameters:");
         out("  --workflow-path <workflow-path>                      Path for the descriptor file, defaults to /Dockstore.cwl");
         out("  --workflow-name <workflow-name>                      Workflow name, defaults to null");
-        out("  --descriptor-type <descriptor-type>                  Descriptor type, defaults to cwl");
+        out("  --descriptor-type <descriptor-type>                  Descriptor type, defaults to " + DescriptorLanguage.CWL.toString());
         out("  --test-parameter-path <test-parameter-path>          Path to default test parameter file, defaults to /test.json");
 
         printHelpFooter();
@@ -300,7 +303,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         // simply getting published descriptors does not require permissions
         Workflow workflow = null;
         try {
-            workflow = workflowsApi.getPublishedWorkflowByPath(path, null, false);
+            workflow = workflowsApi.getPublishedWorkflowByPath(path, null, false, null);
         } catch (ApiException e) {
             if (e.getResponseBody().contains("Entry not found")) {
                 LOG.info("Unable to locate entry without credentials, trying again as authenticated user");
@@ -348,17 +351,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String[] parts = toolpath.split(":");
         String path = parts[0];
         // match behaviour from getDescriptorFromServer, use master if no version is provided
-        String tag = (parts.length > 1) ? parts[1] : "master";
+        String tag = getVersionID(toolpath);
         Workflow workflow = getDockstoreWorkflowByPath(path);
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(tag))
             .findFirst();
-        // if no master is present (for example, for hosted workflows), fail over to the latest descriptor
-        if (first.isEmpty()) {
-            first = workflow.getWorkflowVersions().stream().max(Comparator.comparing(WorkflowVersion::getLastModified));
-            first.ifPresent(workflowVersion -> System.out.println(
-                "Could not locate workflow with version '" + tag + "'. Using last modified version '" + workflowVersion.getName()
-                    + "' instead."));
-        }
 
         if (first.isPresent()) {
             boolean isValid = first.get().isValid();
@@ -384,6 +380,43 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         }
     }
 
+    /**
+     * Appends the #workflow/ prefix to the start of the provided path if necessary
+     *
+     * @param entryPath path to either a tool or workflow
+     */
+    @Override
+    public String getTrsId(String entryPath) {
+        return entryPath.startsWith("#workflow/") ? entryPath : "#workflow/" + entryPath;
+    }
+
+    /**
+     * Returns the version ID of the given workflow, falls back to the latest version
+     * @param entryPath Workflow path
+     */
+    @Override
+    public String getVersionID(String entryPath) {
+        final String[] parts = entryPath.split(":");
+
+        final String versionID = parts.length > 1 ? parts[1] : "master";
+
+        final Workflow workflow = getDockstoreWorkflowByPath(parts[0]);
+
+        // ensure workflow has version
+        Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(versionID))
+            .findFirst();
+
+        // if no master is present (for example, for hosted workflows), fail over to the latest descriptor
+        if (first.isEmpty()) {
+            first = workflow.getWorkflowVersions().stream().max(Comparator.comparing(WorkflowVersion::getLastModified));
+            first.ifPresent(workflowVersion -> out(
+                "Could not locate workflow with version '" + versionID + "'. Using last modified version '" + workflowVersion.getName()
+                    + "' instead."));
+        }
+
+        return first.isEmpty() ? versionID : first.get().getName();
+    }
+
     @Override
     public String zipFilename(Workflow workflow) {
         return workflow.getFullWorkflowPath().replaceAll("/", "_") + ".zip";
@@ -405,6 +438,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String jsonRun = commandLaunch.json;
         String yamlRun = commandLaunch.yaml;
         String wdlOutputTarget = commandLaunch.wdlOutputTarget;
+        boolean ignoreChecksumFlag = commandLaunch.ignoreChecksums;
         String uuid = commandLaunch.uuid;
 
         // trim the final slash on output if it is present, probably an error ( https://github.com/aws/aws-cli/issues/421 ) causes a double slash which can fail
@@ -417,6 +451,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             if ((entry == null) != (localEntry == null)) {
                 if (entry != null) {
                     this.isLocalEntry = false;
+                    this.ignoreChecksums = ignoreChecksumFlag;
                     String[] parts = entry.split(":");
                     String path = parts[0];
                     try {
@@ -538,11 +573,11 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     @Override
     public void handleInfo(String entryPath) {
         try {
-            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entryPath, null, false);
+            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entryPath, null, false, null);
             if (workflow == null || !workflow.isIsPublished()) {
                 errorMessage("This workflow is not published.", COMMAND_ERROR);
             } else {
-                Date lastUpdated = Date.from(workflow.getLastUpdated().toInstant());
+                Date lastUpdated = new Date(workflow.getLastUpdated());
 
                 String description = workflow.getDescription();
                 if (description == null) {
@@ -597,13 +632,18 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             if (user == null) {
                 throw new RuntimeException("User not found");
             }
-            final List<Workflow> updatedWorkflows = usersApi.userWorkflows(user.getId()).stream()
+
+            // add user to all workflows
+            final List<Workflow> updatedWorkflows = usersApi.addUserToDockstoreWorkflows(user.getId(), "").stream()
                     // Skip hosted workflows
                     .filter(workflow -> StringUtils.isNotEmpty(workflow.getGitUrl()))
                     .map(workflow -> {
                         out(MessageFormat.format("Refreshing {0}", workflow.getFullWorkflowPath()));
                         try {
-                            return workflowsApi.refresh(workflow.getId());
+                            return workflowsApi.refresh(workflow.getId(), true);
+                        } catch (ApiException ex) {
+                            err(ex.getMessage());
+                            return null;
                         } catch (Exception ex) {
                             exceptionMessage(ex, "", 0);
                             return null;
@@ -624,45 +664,78 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             Workflow workflow = workflowsApi.getWorkflowByPath(path, null, false);
             final Long workflowId = workflow.getId();
             out("Refreshing workflow...");
-            Workflow updatedWorkflow = workflowsApi.refresh(workflowId);
+            Workflow updatedWorkflow = workflowsApi.refresh(workflowId, true);
             List<Workflow> workflowList = new ArrayList<>();
             workflowList.add(updatedWorkflow);
             out("YOUR UPDATED WORKFLOW");
             printLineBreak();
             printWorkflowList(workflowList);
         } catch (ApiException ex) {
-            exceptionMessage(ex, "", Client.API_ERROR);
+            errorMessage(ex.getMessage(), Client.API_ERROR);
         }
     }
 
     @Override
     protected void handlePublishUnpublish(String entryPath, String newName, boolean unpublishRequest) {
-        Workflow existingWorkflow;
+        Workflow existingWorkflow = null;
         boolean isPublished = false;
+
+        // Cannot be making an unpublish request with a specified new name
+        assert (!(unpublishRequest && newName != null));
+
         try {
             existingWorkflow = workflowsApi.getWorkflowByPath(entryPath, null, false);
             isPublished = existingWorkflow.isIsPublished();
         } catch (ApiException ex) {
-            exceptionMessage(ex, "Unable to publish/unpublish " + newName, Client.API_ERROR);
+            exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
         }
+
         if (unpublishRequest) {
             if (isPublished) {
                 publish(false, entryPath);
             } else {
-                out("This workflow is already unpublished.");
+                out("The following workflow is already unpublished: " + entryPath);
             }
         } else {
             if (newName == null) {
                 if (isPublished) {
-                    out("This workflow is already published.");
+                    out("The following workflow is already published: " + entryPath);
                 } else {
                     publish(true, entryPath);
                 }
+            } else if (!workflowExists(entryPath + "/" + newName)) {
+                try {
+                    // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
+                    final Workflow newWorkflow = workflowsApi.manualRegister(
+                        getGitRegistry(existingWorkflow.getGitUrl()),
+                        existingWorkflow.getOrganization() + "/" + existingWorkflow.getRepository(),
+                        existingWorkflow.getWorkflowPath(),
+                        newName,
+                        existingWorkflow.getDescriptorType().toString(),
+                        existingWorkflow.getDefaultTestParameterFilePath()
+                    );
+
+                    final String completeEntryPath = entryPath + "/" + newName;
+
+                    out("Successfully registered " + completeEntryPath);
+
+                    workflowsApi.refresh(newWorkflow.getId(), true);
+                    publish(true, completeEntryPath);
+                } catch (ApiException ex) {
+                    exceptionMessage(ex, "Unable to publish " + entryPath + "/" + newName, Client.API_ERROR);
+                }
             } else {
-                //for workflows method currently doesn't work with --entryname flag
-                errorMessage("Parameter '--entryname' not valid for workflows. See `workflow publish --help` for more information.",
-                    CLIENT_ERROR);
+                out("The following workflow is already registered: " + entryPath + "/" + newName);
             }
+        }
+    }
+
+    private boolean workflowExists(String entryPath) {
+        try {
+            workflowsApi.getWorkflowByPath(entryPath, null, false);
+            return true;
+        } catch (ApiException ex) {
+            return false;
         }
     }
 
@@ -678,9 +751,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  Publish/unpublish a registered " + getEntryType() + ".");
         out("  No arguments will list the current and potential " + getEntryType() + "s to share.");
         out("Required Parameters:");
-        out("  --entry <entry>             Complete " + getEntryType()
+        out("  --entry <entry>                      Complete " + getEntryType()
             + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        //TODO add support for optional parameter '--entryname'
+        out("Optional Parameters:");
+        out("  --new-entry-name <new-workflow-name>         New name to give the workflow specified by --entry. This will register and publish a new copy of the workflow with the given name.");
         printHelpFooter();
     }
 
@@ -746,7 +820,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     protected void handleStarUnstar(String entry, boolean star) {
         String action = star ? "star" : "unstar";
         try {
-            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entry, null, false);
+            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entry, null, false, null);
             StarRequest request = new StarRequest();
             request.setStar(star);
             workflowsApi.starEntry(workflow.getId(), request);
@@ -815,17 +889,17 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             final String gitVersionControl = reqVal(args, "--git-version-control");
 
             final String workflowPath = optVal(args, "--workflow-path", "/Dockstore.cwl");
-            final String descriptorType = optVal(args, "--descriptor-type", "cwl");
+            final String descriptorType = optVal(args, "--descriptor-type", DescriptorLanguage.CWL.toString()).toUpperCase();
             final String testParameterFile = optVal(args, "--test-parameter-path", "/test.json");
 
             // Check if valid input
-            if (!"cwl".equalsIgnoreCase(descriptorType) && !"wdl".equalsIgnoreCase(descriptorType)) {
+            if (!DescriptorLanguage.CWL.toString().equals(descriptorType) && !DescriptorLanguage.WDL.toString().equals(descriptorType)) {
                 errorMessage("Please ensure that the descriptor type is either cwl or wdl.", Client.CLIENT_ERROR);
             }
 
-            if (!workflowPath.endsWith(descriptorType)) {
+            if (!FilenameUtils.getExtension(workflowPath).equalsIgnoreCase(descriptorType)) {
                 errorMessage("Please ensure that the given workflow path '" + workflowPath + "' is of type " + descriptorType
-                    + " and has the file extension " + descriptorType, Client.CLIENT_ERROR);
+                    + " and has the file extension " + descriptorType.toLowerCase(), CLIENT_ERROR);
             }
 
             String workflowname = optVal(args, "--workflow-name", null);
@@ -849,7 +923,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     .manualRegister(gitVersionControl, organization + "/" + repository, workflowPath, workflowname, descriptorType,
                         testParameterFile);
                 if (workflow != null) {
-                    workflow = workflowsApi.refresh(workflow.getId());
+                    workflow = workflowsApi.refresh(workflow.getId(), true);
                 } else {
                     errorMessage("Unable to register " + path, COMMAND_ERROR);
                 }
@@ -948,7 +1022,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 if (newVersion) { // Update default version separately, see https://github.com/dockstore/dockstore/issues/3563
                     workflowsApi.updateWorkflowDefaultVersion(workflowId, defaultVersion);
                 }
-                workflowsApi.refresh(workflowId);
+                workflowsApi.refresh(workflowId, true);
                 out("The workflow has been updated.");
             } catch (ApiException ex) {
                 exceptionMessage(ex, "", Client.API_ERROR);
@@ -972,7 +1046,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             }
 
             if (adds.size() > 0 || removes.size() > 0) {
-                workflowsApi.refresh(workflow.getId());
+                workflowsApi.refresh(workflow.getId(), true);
                 out("The test parameter files for version " + versionName + " of " + getEntryType().toLowerCase() + " " + parentEntry
                     + " have been updated.");
             } else {
@@ -1014,7 +1088,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         newVersions.add(workflowVersion);
 
                         workflowsApi.updateWorkflowVersion(workflow.getId(), newVersions);
-                        workflowsApi.refresh(workflow.getId());
+                        workflowsApi.refresh(workflow.getId(), true);
                         out("Workflow Version " + name + " has been updated.");
                         break;
                     }
@@ -1127,6 +1201,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         private String yaml;
         @Parameter(names = "--wdl-output-target", description = "Allows you to specify a remote path to provision outputs files to (ex: s3://oicr.temp/testing-launcher/")
         private String wdlOutputTarget;
+        @Parameter(names = "--ignore-checksums", description = "Allows you to ignore validating checksums of each downloaded descriptor")
+        private boolean ignoreChecksums;
         @Parameter(names = "--help", description = "Prints help for launch command", help = true)
         private boolean help = false;
         @Parameter(names = "--uuid", description = "Allows you to specify a uuid for 3rd party notifications")

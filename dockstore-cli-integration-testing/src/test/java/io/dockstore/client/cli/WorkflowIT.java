@@ -96,7 +96,7 @@ public class WorkflowIT extends BaseIT {
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
             "/checker-workflow-wrapping-workflow.cwl", "test", "cwl", null);
         assertEquals("There should be one user of the workflow after manually registering it.", 1, workflow.getUsers().size());
-        Workflow refresh = workflowApi.refresh(workflow.getId());
+        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
 
         assertFalse(refresh.isIsPublished());
 
@@ -126,7 +126,7 @@ public class WorkflowIT extends BaseIT {
         Workflow workflow = workflowApi
             .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
                 "test", "cwl", null);
-        Workflow refresh = workflowApi.refresh(workflow.getId());
+        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         Long workflowId = refresh.getId();
         WorkflowVersion workflowVersion = refresh.getWorkflowVersions().get(0);
         Long versionId = workflowVersion.getId();
@@ -197,10 +197,10 @@ public class WorkflowIT extends BaseIT {
         Workflow workflow = workflowApi
             .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
                 "test", "cwl", null);
-        Workflow refresh = workflowApi.refresh(workflow.getId());
+        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         assertFalse(refresh.isIsPublished());
         workflowApi.registerCheckerWorkflow("checker-workflow-wrapping-workflow.cwl", workflow.getId(), "cwl", "checker-input-cwl.json");
-        workflowApi.refresh(workflow.getId());
+        workflowApi.refresh(workflow.getId(), true);
 
         final String fileWithIncorrectCredentials = ResourceHelpers.resourceFilePath("config_file.txt");
         final String fileWithCorrectCredentials = ResourceHelpers.resourceFilePath("config_file2.txt");
@@ -240,12 +240,12 @@ public class WorkflowIT extends BaseIT {
         Workflow workflow = workflowApi
             .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
                 "test", "cwl", null);
-        Workflow refresh = workflowApi.refresh(workflow.getId());
+        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         Assert.assertFalse(refresh.isIsPublished());
 
         workflowApi.registerCheckerWorkflow("/checker-workflow-wrapping-workflow.cwl", workflow.getId(), "cwl", "checker-input-cwl.json");
 
-        workflowApi.refresh(workflow.getId());
+        workflowApi.refresh(workflow.getId(), true);
 
         // should be able to launch properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
@@ -337,13 +337,13 @@ public class WorkflowIT extends BaseIT {
      */
     @Test
     public void cwlVersion11() {
-        final ApiClient userApiClient = getWebClient(USER_2_USERNAME, testingPostgres);
+        final ApiClient userApiClient = CommonTestUtilities.getWebClient(true, USER_2_USERNAME, testingPostgres);
         WorkflowsApi userWorkflowsApi = new WorkflowsApi(userApiClient);
         userWorkflowsApi.manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/metadata.cwl", "metadata", "cwl",
             "/cwl/v1.1/cat-job.json");
         final Workflow workflowByPathGithub = userWorkflowsApi
             .getWorkflowByPath("github.com/dockstore-testing/Workflows-For-CI/metadata", null, false);
-        final Workflow workflow = userWorkflowsApi.refresh(workflowByPathGithub.getId());
+        final Workflow workflow = userWorkflowsApi.refresh(workflowByPathGithub.getId(), true);
         Assert.assertEquals("Print the contents of a file to stdout using 'cat' running in a docker container.", workflow.getDescription());
         Assert.assertEquals("Peter Amstutz", workflow.getAuthor());
         Assert.assertEquals("peter.amstutz@curoverse.com", workflow.getEmail());
@@ -352,10 +352,16 @@ public class WorkflowIT extends BaseIT {
             .filter(version -> "master".equalsIgnoreCase(version.getName())).findFirst();
         assertTrue(optionalWorkflowVersion.isPresent());
         WorkflowVersion workflowVersion = optionalWorkflowVersion.get();
-        List<SourceFile> sourceFiles = workflowVersion.getSourceFiles();
-        Assert.assertEquals(2, sourceFiles.size());
-        Assert.assertTrue(sourceFiles.stream().anyMatch(sourceFile -> sourceFile.getPath().equals("/cwl/v1.1/cat-job.json")));
-        Assert.assertTrue(sourceFiles.stream().anyMatch(sourceFile -> sourceFile.getPath().equals("/cwl/v1.1/metadata.cwl")));
+
+        // verify sourcefiles
+        final io.dockstore.openapi.client.ApiClient userOpenApiClient = CommonTestUtilities.getOpenApiWebClient(true, USER_2_USERNAME, testingPostgres);
+        io.dockstore.openapi.client.api.WorkflowsApi openApiWorkflowApi = new io.dockstore.openapi.client.api.WorkflowsApi(userOpenApiClient);
+        List<io.dockstore.openapi.client.model.SourceFile> sourceFileList = openApiWorkflowApi.getWorkflowVersionsSourcefiles(workflow.getId(), workflowVersion.getId(), null);
+
+        Assert.assertEquals(2, sourceFileList.size());
+        Assert.assertTrue(sourceFileList.stream().anyMatch(sourceFile -> sourceFile.getPath().equals("/cwl/v1.1/cat-job.json")));
+        Assert.assertTrue(sourceFileList.stream().anyMatch(sourceFile -> sourceFile.getPath().equals("/cwl/v1.1/metadata.cwl")));
+
         // Check validation works.  It is invalid because this is a tool and not a workflow.
         Assert.assertFalse(workflowVersion.isValid());
 
@@ -364,7 +370,7 @@ public class WorkflowIT extends BaseIT {
                 "/cwl/v1.1/wc-job.json");
         final Workflow workflowByPathGithub2 = userWorkflowsApi
             .getWorkflowByPath("github.com/dockstore-testing/Workflows-For-CI/count-lines1-wf", null, false);
-        final Workflow workflow2 = userWorkflowsApi.refresh(workflowByPathGithub2.getId());
+        final Workflow workflow2 = userWorkflowsApi.refresh(workflowByPathGithub2.getId(), true);
         Assert.assertTrue(workflow.getWorkflowVersions().stream().anyMatch(versions -> "master".equals(versions.getName())));
         Optional<WorkflowVersion> optionalWorkflowVersion2 = workflow2.getWorkflowVersions().stream()
             .filter(version -> "master".equalsIgnoreCase(version.getName())).findFirst();

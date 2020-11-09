@@ -295,12 +295,12 @@ public class GeneralWorkflowRegressionIT extends BaseIT {
                 "/test.json");
 
         // Publish github workflow
-        Workflow workflow = workflowApi.refresh(githubWorkflow.getId());
+        Workflow workflow = workflowApi.refresh(githubWorkflow.getId(), null);
 
         //update the default workflow path to be hello.cwl , the workflow path in workflow versions should also be changes
         workflow.setWorkflowPath("/hello.cwl");
         workflowApi.updateWorkflowPath(githubWorkflow.getId(), workflow);
-        workflowApi.refresh(githubWorkflow.getId());
+        workflowApi.refresh(githubWorkflow.getId(), null);
 
         // Set up DB
 

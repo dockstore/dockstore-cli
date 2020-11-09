@@ -262,7 +262,7 @@ public class ClientIT extends BaseIT {
     @Test
     public void testDepsCommand() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps" });
-        Assert.assertTrue(systemOutRule.getLog().contains("monotonic=="));
+        Assert.assertFalse("Python 3 does not have monotonic as a dependency", systemOutRule.getLog().contains("monotonic=="));
         assertDepsCommandOutput();
     }
 
@@ -279,7 +279,8 @@ public class ClientIT extends BaseIT {
     }
 
     private void assertDepsCommandOutput() {
-        Assert.assertTrue(systemOutRule.getLog().contains("cwlref-runner"));
+        // cwl-runner is an alias for cwlref-runner, both should be fine
+        Assert.assertTrue(systemOutRule.getLog().contains("cwlref-runner") || systemOutRule.getLog().contains("cwl-runner"));
         Assert.assertTrue(systemOutRule.getLog().contains("cwltool=="));
         Assert.assertTrue(systemOutRule.getLog().contains("schema-salad=="));
         Assert.assertTrue(systemOutRule.getLog().contains("ruamel.yaml=="));
