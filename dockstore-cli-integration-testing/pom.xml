@@ -69,6 +69,15 @@
                     <groupId>org.liquibase</groupId>
                     <artifactId>liquibase-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <!--
+                    Exclude so TravisCI dockstore-cli-integration-testing doesn't
+                    report a warning. SLF4J will find binding in
+                    ch.qos.logback.classic.util.ContextSelectorStaticBinder
+                    -->
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
