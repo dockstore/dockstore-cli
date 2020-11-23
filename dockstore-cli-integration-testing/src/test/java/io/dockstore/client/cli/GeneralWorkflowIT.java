@@ -1359,7 +1359,6 @@ public class GeneralWorkflowIT extends BaseIT {
                 + "AND repository='workflow-dockstore-yml' AND mode='DOCKSTORE_YML' AND ispublished='t';", long.class);
         assertEquals("There should be 1 published DOCKSTORE_YML workflow", 1, initialPublishedYMLCount);
 
-
         // Call publish with an entryname parameter specified
         systemOutRule.clearLog();
         Client.main(
