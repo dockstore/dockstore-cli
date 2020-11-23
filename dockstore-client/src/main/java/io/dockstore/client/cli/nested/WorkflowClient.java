@@ -90,7 +90,7 @@ import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
  * @author dyuen
  */
 public class WorkflowClient extends AbstractEntryClient<Workflow> {
-    public static final String BAD_WORKFLOW_MODE_PUBLISH = "Custom entry names are not supported for " + Workflow.ModeEnum.HOSTED + " and "
+    public static final String INVALID_WORKFLOW_MODE_PUBLISH = "Custom entry names are not supported for " + Workflow.ModeEnum.HOSTED + " and "
         + Workflow.ModeEnum.DOCKSTORE_YML + " workflows.";
     protected static final Logger LOG = LoggerFactory.getLogger(WorkflowClient.class);
     private static final String UPDATE_WORKFLOW = "update_workflow";
@@ -707,7 +707,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             } else if (!workflowExists(entryPath + "/" + newName)) {
                 // Prevent specifying a custom name for both HOSTED and DOCKSTORE_YML workflows
                 if (Workflow.ModeEnum.HOSTED.equals(existingWorkflow.getMode()) || Workflow.ModeEnum.DOCKSTORE_YML.equals(existingWorkflow.getMode())) {
-                    out(WorkflowClient.BAD_WORKFLOW_MODE_PUBLISH);
+                    out(WorkflowClient.INVALID_WORKFLOW_MODE_PUBLISH);
                 } else {
                     try {
                         // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)

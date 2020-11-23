@@ -1320,7 +1320,7 @@ public class GeneralWorkflowIT extends BaseIT {
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
                 "--entry", "dockstore.org/DockstoreTestUser2/testHosted", publishNameParameter, "fakeName", "--script"});
         assertTrue("User should be notified that the command is invalid",
-            systemOutRule.getLog().contains(WorkflowClient.BAD_WORKFLOW_MODE_PUBLISH));
+            systemOutRule.getLog().contains(WorkflowClient.INVALID_WORKFLOW_MODE_PUBLISH));
 
         // Check that there are no published workflows for this user using the HOSTED name/custom names
         final long countTotalPublishedWorkflows = testingPostgres
@@ -1365,7 +1365,7 @@ public class GeneralWorkflowIT extends BaseIT {
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
                 "--entry", "github.com/" + USER_2_USERNAME + "/workflow-dockstore-yml", publishNameParameter, "fakeName", "--script"});
         assertTrue("User should be notified that the command is invalid",
-            systemOutRule.getLog().contains(WorkflowClient.BAD_WORKFLOW_MODE_PUBLISH));
+            systemOutRule.getLog().contains(WorkflowClient.INVALID_WORKFLOW_MODE_PUBLISH));
 
         // Verify only 1 workflow is published
         final long countTotalPublishedWorkflows = testingPostgres

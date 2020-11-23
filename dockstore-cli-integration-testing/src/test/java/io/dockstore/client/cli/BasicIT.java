@@ -1672,7 +1672,7 @@ public class BasicIT extends BaseIT {
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish",
                 "--entry", "quay.io/hostedToolNamespace/testHosted", publishNameParameter, "fakeName", "--script"});
         assertTrue("User should be notified that the command is invalid",
-            systemOutRule.getLog().contains(ToolClient.BAD_TOOL_MODE_PUBLISH));
+            systemOutRule.getLog().contains(ToolClient.INVALID_TOOL_MODE_PUBLISH));
 
         // verify there are no new published tools with the above/original name
         final long initialPublishedHostedCount = testingPostgres

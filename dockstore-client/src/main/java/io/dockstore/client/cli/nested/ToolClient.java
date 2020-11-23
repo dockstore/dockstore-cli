@@ -81,7 +81,7 @@ import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
  */
 public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     public static final String UPDATE_TOOL = "update_tool";
-    public static final String BAD_TOOL_MODE_PUBLISH = "Custom entry names are not supported for " + DockstoreTool.ModeEnum.HOSTED + " tools.";
+    public static final String INVALID_TOOL_MODE_PUBLISH = "Custom entry names are not supported for " + DockstoreTool.ModeEnum.HOSTED + " tools.";
     private static final Logger LOG = LoggerFactory.getLogger(ToolClient.class);
     private final Client client;
     private ContainersApi containersApi;
@@ -240,7 +240,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 }
             } else if (!toolExists(entryPath + "/" + newName)) {
                 if (DockstoreTool.ModeEnum.HOSTED.equals(existingTool.getMode())) {
-                    out(ToolClient.BAD_TOOL_MODE_PUBLISH);
+                    out(ToolClient.INVALID_TOOL_MODE_PUBLISH);
                 } else {
                     try {
                         DockstoreTool newContainer = new DockstoreTool();
