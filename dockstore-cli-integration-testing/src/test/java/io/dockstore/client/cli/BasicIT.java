@@ -1658,11 +1658,11 @@ public class BasicIT extends BaseIT {
         // Create a hosted tool
         final ApiClient webClient = getWebClient(BaseIT.USER_1_USERNAME, testingPostgres);
         HostedApi hostedApi = new HostedApi(webClient);
-        DockstoreTool hostedTool = hostedApi.createHostedTool("testHosted", Registry.QUAY_IO.getDockerPath().toLowerCase(), DescriptorLanguage.CWL.getShortName(), "coolNamespace", null);
+        DockstoreTool hostedTool = hostedApi.createHostedTool("testHosted", Registry.QUAY_IO.getDockerPath().toLowerCase(), DescriptorLanguage.CWL.getShortName(), "hostedToolNamespace", null);
 
         // verify there is an unpublished hosted tool
         final long initialUnpublishedHostedCount = testingPostgres
-            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE namespace='coolNamespace' "
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE namespace='hostedToolNamespace' "
                 + "AND name='testHosted' AND mode='HOSTED' AND ispublished='f';", long.class);
         assertEquals("There should be 1 unpublished hosted tool", 1, initialUnpublishedHostedCount);
 
@@ -1670,24 +1670,24 @@ public class BasicIT extends BaseIT {
         systemOutRule.clearLog();
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish",
-                "--entry", "quay.io/coolNamespace/testHosted", publishNameParameter, "fakeName", "--script"});
+                "--entry", "quay.io/hostedToolNamespace/testHosted", publishNameParameter, "fakeName", "--script"});
         assertTrue("User should be notified that the command is invalid",
             systemOutRule.getLog().contains(ToolClient.BAD_TOOL_MODE_PUBLISH));
 
         // verify there are no new published tools with the above/original name
         final long initialPublishedHostedCount = testingPostgres
-            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE namespace='coolNamespace' "
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE namespace='hostedToolNamespace' "
                 + "AND mode='HOSTED' AND ispublished='t';", long.class);
         assertEquals("There should be 0 published hosted tools for this namespace", 0, initialPublishedHostedCount);
 
         // call publish normally
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish",
-                "--entry", "quay.io/coolNamespace/testHosted", "--script"});
+                "--entry", "quay.io/hostedToolNamespace/testHosted", "--script"});
 
         // verify the tool is published
         final long finalPublishedHostedCount = testingPostgres
-            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE namespace='coolNamespace' "
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE namespace='hostedToolNamespace' "
                 + "AND mode='HOSTED' AND ispublished='t';", long.class);
         assertEquals("There should be 1 published hosted tool", 1, finalPublishedHostedCount);
     }

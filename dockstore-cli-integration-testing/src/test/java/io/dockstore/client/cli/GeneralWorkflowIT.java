@@ -1322,7 +1322,7 @@ public class GeneralWorkflowIT extends BaseIT {
         assertTrue("User should be notified that the command is invalid",
             systemOutRule.getLog().contains(WorkflowClient.BAD_WORKFLOW_MODE_PUBLISH));
 
-        // Check that the original workflow, and the one with the custom name are not published
+        // Check that there are no published workflows for this user using the HOSTED name/custom names
         final long countTotalPublishedWorkflows = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='" + USER_2_USERNAME + "' "
                 + "AND (repository='testHosted' OR repository='fakeName') AND ispublished='t';", long.class);
@@ -1353,11 +1353,11 @@ public class GeneralWorkflowIT extends BaseIT {
         // force the workflow into DOCKSTOR_YML mode.
         testingPostgres.runUpdateStatement("UPDATE workflow SET mode = 'DOCKSTORE_YML' WHERE repository='workflow-dockstore-yml' AND organization='" + USER_2_USERNAME + "';");
 
-        // Verify the user has 1 unpublished, apps workflow
+        // Verify the user has 1 published, apps workflow
         final long initialPublishedYMLCount = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='" + USER_2_USERNAME + "' "
                 + "AND repository='workflow-dockstore-yml' AND mode='DOCKSTORE_YML' AND ispublished='t';", long.class);
-        assertEquals("There should be 1 unpublished DOCKSTORE_YML workflow", 1, initialPublishedYMLCount);
+        assertEquals("There should be 1 published DOCKSTORE_YML workflow", 1, initialPublishedYMLCount);
 
 
         // Call publish with an entryname parameter specified
@@ -1366,12 +1366,12 @@ public class GeneralWorkflowIT extends BaseIT {
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
                 "--entry", "github.com/" + USER_2_USERNAME + "/workflow-dockstore-yml", publishNameParameter, "fakeName", "--script"});
         assertTrue("User should be notified that the command is invalid",
-            systemOutRule.getLog().contains("Unable to specify"));
+            systemOutRule.getLog().contains(WorkflowClient.BAD_WORKFLOW_MODE_PUBLISH));
 
-        // Check that the original workflow, and the one with the custom name are not published
+        // Verify only 1 workflow is published
         final long countTotalPublishedWorkflows = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='" + USER_2_USERNAME + "' "
                 + "AND (repository='workflow-dockstore-yml' OR repository='fakeName') AND ispublished='t';", long.class);
-        assertEquals("Should contain the original", 1, countTotalPublishedWorkflows);
+        assertEquals("User should have only 1 published workflow", 1, countTotalPublishedWorkflows);
     }
 }

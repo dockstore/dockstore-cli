@@ -90,9 +90,8 @@ import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
  * @author dyuen
  */
 public class WorkflowClient extends AbstractEntryClient<Workflow> {
-
-    public static final String BAD_WORKFLOW_MODE_PUBLISH = "Custom entry names are not supported for " + Workflow.ModeEnum.HOSTED + " and " + Workflow.ModeEnum.DOCKSTORE_YML + " workflows.";
-
+    public static final String BAD_WORKFLOW_MODE_PUBLISH = "Custom entry names are not supported for " + Workflow.ModeEnum.HOSTED + " and "
+        + Workflow.ModeEnum.DOCKSTORE_YML + " workflows.";
     protected static final Logger LOG = LoggerFactory.getLogger(WorkflowClient.class);
     private static final String UPDATE_WORKFLOW = "update_workflow";
     protected final WorkflowsApi workflowsApi;
