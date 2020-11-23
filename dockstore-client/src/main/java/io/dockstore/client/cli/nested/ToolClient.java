@@ -81,6 +81,7 @@ import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
  */
 public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     public static final String UPDATE_TOOL = "update_tool";
+    public static final String BAD_TOOL_MODE_PUBLISH = "Unable to specify a new name for " + DockstoreTool.ModeEnum.HOSTED + " tools.";
     private static final Logger LOG = LoggerFactory.getLogger(ToolClient.class);
     private final Client client;
     private ContainersApi containersApi;
@@ -238,32 +239,36 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                     publish(true, entryPath);
                 }
             } else if (!toolExists(entryPath + "/" + newName)) {
-                try {
-                    DockstoreTool newContainer = new DockstoreTool();
+                if (DockstoreTool.ModeEnum.HOSTED.equals(existingTool.getMode())) {
+                    out(ToolClient.BAD_TOOL_MODE_PUBLISH);
+                } else {
+                    try {
+                        DockstoreTool newContainer = new DockstoreTool();
 
-                    // copy only the fields that we want to replicate, not sure why simply blanking
-                    // the returned container does not work
-                    newContainer.setMode(existingTool.getMode());
-                    newContainer.setName(existingTool.getName());
-                    newContainer.setNamespace(existingTool.getNamespace());
-                    newContainer.setRegistryString(existingTool.getRegistryString());
-                    newContainer.setDefaultDockerfilePath(existingTool.getDefaultDockerfilePath());
-                    newContainer.setDefaultCwlPath(existingTool.getDefaultCwlPath());
-                    newContainer.setDefaultWdlPath(existingTool.getDefaultWdlPath());
-                    newContainer.setDefaultCWLTestParameterFile(existingTool.getDefaultCWLTestParameterFile());
-                    newContainer.setDefaultWDLTestParameterFile(existingTool.getDefaultWDLTestParameterFile());
-                    newContainer.setIsPublished(false);
-                    newContainer.setGitUrl(existingTool.getGitUrl());
-                    newContainer.setToolname(newName);
+                        // copy only the fields that we want to replicate, not sure why simply blanking
+                        // the returned container does not work
+                        newContainer.setMode(existingTool.getMode());
+                        newContainer.setName(existingTool.getName());
+                        newContainer.setNamespace(existingTool.getNamespace());
+                        newContainer.setRegistryString(existingTool.getRegistryString());
+                        newContainer.setDefaultDockerfilePath(existingTool.getDefaultDockerfilePath());
+                        newContainer.setDefaultCwlPath(existingTool.getDefaultCwlPath());
+                        newContainer.setDefaultWdlPath(existingTool.getDefaultWdlPath());
+                        newContainer.setDefaultCWLTestParameterFile(existingTool.getDefaultCWLTestParameterFile());
+                        newContainer.setDefaultWDLTestParameterFile(existingTool.getDefaultWDLTestParameterFile());
+                        newContainer.setIsPublished(false);
+                        newContainer.setGitUrl(existingTool.getGitUrl());
+                        newContainer.setToolname(newName);
 
-                    newContainer = containersApi.registerManual(newContainer);
+                        newContainer = containersApi.registerManual(newContainer);
 
-                    out("Successfully registered " + entryPath + "/" + newName);
+                        out("Successfully registered " + entryPath + "/" + newName);
 
-                    containersApi.refresh(newContainer.getId());
-                    publish(true, newContainer.getToolPath());
-                } catch (ApiException ex) {
-                    exceptionMessage(ex, "Unable to publish " + newName, Client.API_ERROR);
+                        containersApi.refresh(newContainer.getId());
+                        publish(true, newContainer.getToolPath());
+                    } catch (ApiException ex) {
+                        exceptionMessage(ex, "Unable to publish " + newName, Client.API_ERROR);
+                    }
                 }
             } else {
                 out("The following tool is already registered: " + entryPath + "/" + newName);

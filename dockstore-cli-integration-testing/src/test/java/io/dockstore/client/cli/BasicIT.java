@@ -22,6 +22,7 @@ import java.util.List;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Registry;
 import io.dockstore.common.SlowTest;
 import io.dockstore.common.SourceControl;
@@ -29,6 +30,7 @@ import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;
 import io.swagger.client.api.ContainersApi;
+import io.swagger.client.api.HostedApi;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.model.DescriptorType;
 import org.junit.Assert;
@@ -1646,5 +1648,47 @@ public class BasicIT extends BaseIT {
             "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
         assertTrue("Attempting to publish a registered tool should notify the user",
             systemOutRule.getLog().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+    }
+
+    @Test
+    public void testPublishUnpublishHostedTool() {
+
+        final String publishNameParameter = "--new-entry-name";
+
+        // Create a hosted tool
+        final ApiClient webClient = getWebClient(BaseIT.USER_1_USERNAME, testingPostgres);
+        HostedApi hostedApi = new HostedApi(webClient);
+        DockstoreTool hostedTool = hostedApi.createHostedTool("testHosted", Registry.QUAY_IO.getDockerPath().toLowerCase(), DescriptorLanguage.CWL.getShortName(), "coolNamespace", null);
+
+        // verify there is an unpublished hosted tool
+        final long initialUnpublishedHostedCount = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE namespace='coolNamespace' "
+                + "AND name='testHosted' AND mode='HOSTED' AND ispublished='f';", long.class);
+        assertEquals("There should be 1 unpublished hosted tool", 1, initialUnpublishedHostedCount);
+
+        // attempt to publish the tool with a custom name, should fail
+        systemOutRule.clearLog();
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish",
+                "--entry", "quay.io/coolNamespace/testHosted", publishNameParameter, "fakeName", "--script"});
+        assertTrue("User should be notified that the command is invalid",
+            systemOutRule.getLog().contains(ToolClient.BAD_TOOL_MODE_PUBLISH));
+
+        // verify there are no new published tools with the above/original name
+        final long initialPublishedHostedCount = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE namespace='coolNamespace' "
+                + "AND mode='HOSTED' AND ispublished='t';", long.class);
+        assertEquals("There should be 0 published hosted tools for this namespace", 0, initialPublishedHostedCount);
+
+        // call publish normally
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish",
+                "--entry", "quay.io/coolNamespace/testHosted", "--script"});
+
+        // verify the tool is published
+        final long finalPublishedHostedCount = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM tool WHERE namespace='coolNamespace' "
+                + "AND mode='HOSTED' AND ispublished='t';", long.class);
+        assertEquals("There should be 1 published hosted tool", 1, finalPublishedHostedCount);
     }
 }

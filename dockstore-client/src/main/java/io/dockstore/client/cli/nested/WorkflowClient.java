@@ -91,6 +91,8 @@ import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
  */
 public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
+    public static final String BAD_WORKFLOW_MODE_PUBLISH = "Unable to specify a new name for " + Workflow.ModeEnum.HOSTED + " and " + Workflow.ModeEnum.DOCKSTORE_YML + " workflows.";
+
     protected static final Logger LOG = LoggerFactory.getLogger(WorkflowClient.class);
     private static final String UPDATE_WORKFLOW = "update_workflow";
     protected final WorkflowsApi workflowsApi;
@@ -704,25 +706,30 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     publish(true, entryPath);
                 }
             } else if (!workflowExists(entryPath + "/" + newName)) {
-                try {
-                    // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
-                    final Workflow newWorkflow = workflowsApi.manualRegister(
-                        getGitRegistry(existingWorkflow.getGitUrl()),
-                        existingWorkflow.getOrganization() + "/" + existingWorkflow.getRepository(),
-                        existingWorkflow.getWorkflowPath(),
-                        newName,
-                        existingWorkflow.getDescriptorType().toString(),
-                        existingWorkflow.getDefaultTestParameterFilePath()
-                    );
+                // Prevent specifying a custom name for both HOSTED and DOCKSTORE_YML workflows
+                if (Workflow.ModeEnum.HOSTED.equals(existingWorkflow.getMode()) || Workflow.ModeEnum.DOCKSTORE_YML.equals(existingWorkflow.getMode())) {
+                    out(WorkflowClient.BAD_WORKFLOW_MODE_PUBLISH);
+                } else {
+                    try {
+                        // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
+                        final Workflow newWorkflow = workflowsApi.manualRegister(
+                            getGitRegistry(existingWorkflow.getGitUrl()),
+                            existingWorkflow.getOrganization() + "/" + existingWorkflow.getRepository(),
+                            existingWorkflow.getWorkflowPath(),
+                            newName,
+                            existingWorkflow.getDescriptorType().toString(),
+                            existingWorkflow.getDefaultTestParameterFilePath()
+                        );
 
-                    final String completeEntryPath = entryPath + "/" + newName;
+                        final String completeEntryPath = entryPath + "/" + newName;
 
-                    out("Successfully registered " + completeEntryPath);
+                        out("Successfully registered " + completeEntryPath);
 
-                    workflowsApi.refresh(newWorkflow.getId(), true);
-                    publish(true, completeEntryPath);
-                } catch (ApiException ex) {
-                    exceptionMessage(ex, "Unable to publish " + entryPath + "/" + newName, Client.API_ERROR);
+                        workflowsApi.refresh(newWorkflow.getId(), true);
+                        publish(true, completeEntryPath);
+                    } catch (ApiException ex) {
+                        exceptionMessage(ex, "Unable to publish " + entryPath + "/" + newName, Client.API_ERROR);
+                    }
                 }
             } else {
                 out("The following workflow is already registered: " + entryPath + "/" + newName);
