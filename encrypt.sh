@@ -6,7 +6,7 @@ set -o xtrace
 
 regex="encrypted_([0-9a-zA-Z]+)_key"
 
-tar cvf secrets.tar dockstore-cli-integration-testing/src/test/resources/dstesting_pcks8.pem dockstore-cli-integration-testing/src/test/resources/config_file.txt dockstore-cli-integration-testing/src/test/resources/config_file2.txt dockstore-webservice/src/main/resources/migrations.test.confidential2.xml dockstore-cli-integration-testing/src/test/resources/dockstoreTest.yml dockstore-webservice/src/main/resources/migrations.test.confidential1.xml dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml
+tar cvf secrets.tar dockstore-integration-testing/src/test/resources/dstesting_pcks8.pem dockstore-integration-testing/src/test/resources/config_file.txt dockstore-integration-testing/src/test/resources/config_file2.txt dockstore-webservice/src/main/resources/migrations.test.confidential2.xml dockstore-integration-testing/src/test/resources/dockstoreTest.yml dockstore-webservice/src/main/resources/migrations.test.confidential1.xml dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml
 
 # store working dir
 GIT_DIR=`pwd`
@@ -18,7 +18,7 @@ mkdir -p /tmp/$CUSTOM_DIR_NAME
 
 cp $GIT_DIR/scripts/decrypt.template.mustache /tmp/$CUSTOM_DIR_NAME
 cd /tmp/$CUSTOM_DIR_NAME
-ENCRYPT_FILE_CONTENTS=`travis encrypt-file $GIT_DIR/secrets.tar -r dockstore/dockstore-cli`
+ENCRYPT_FILE_CONTENTS=`travis encrypt-file $GIT_DIR/secrets.tar -r dockstore/dockstore`
 
 if [[ $ENCRYPT_FILE_CONTENTS =~ $regex ]]
     then
