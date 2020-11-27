@@ -15,6 +15,5 @@ openssl aes-256-cbc -d -in circle_ci_test_data.zip.enc -k "$CIRCLE_CI_KEY" -iv "
 tar xvf secrets.tar
 sudo mkdir -p /home/travis
 sudo cp dockstore-cli-integration-testing/src/test/resources/dstesting_pcks8.pem /home/travis/dstesting_pcks8.pem
-cat dockstore-cli-integration-testing/src/test/resources/partialDockstoreTest.yml >> dockstore-cli-integration-testing/src/test/resources/dockstoreTest.yml
 rm secrets.tar
 
