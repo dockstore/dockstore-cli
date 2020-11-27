@@ -52,7 +52,3 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     sudo make -C ./builddir install
     singularity --version
 fi
-
-# hook up integration tests with elastic search
-docker pull elasticsearch:5.6.3
-docker run -p 9200:9200 -d elasticsearch:5.6.3
