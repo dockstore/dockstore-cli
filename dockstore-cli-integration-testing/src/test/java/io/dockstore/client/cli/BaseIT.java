@@ -147,7 +147,7 @@ public class BaseIT {
                 List<Repository> userOrganizationRepositories = openUsersApi.getUserOrganizationRepositories(control.name(), org);
                 for (Repository repo : userOrganizationRepositories) {
                     workflowApi.manualRegister(control.name(), repo.getPath(), "/Dockstore.cwl", "",
-                            DescriptorLanguage.CWL.getLowerShortName(), "");
+                            DescriptorLanguage.CWL.getShortName(), "");
                 }
             }
         }

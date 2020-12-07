@@ -286,7 +286,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     public long launch(String entry, boolean isLocalEntry, String yamlParameterFile, String jsonParameterFile, String outputTarget,
         String uuid) {
         // Call common launch command
-        return launchPipeline(entry, isLocalEntry, yamlParameterFile, jsonParameterFile, outputTarget, uuid);
+        return launchPipeline(entry, isLocalEntry, ToolDescriptor.TypeEnum.CWL, yamlParameterFile, jsonParameterFile, outputTarget, uuid);
     }
 
     /**
@@ -894,7 +894,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
 
                 // TODO: fill in for all possible types
             } else if (currentParam instanceof Integer || currentParam instanceof Double || currentParam instanceof Float
-                    || currentParam instanceof Boolean || currentParam instanceof String) {
+                    || currentParam instanceof Boolean || currentParam instanceof String || currentParam == null) {
                 newJSON.put(paramName, currentParam);
             } else if (currentParam instanceof List) {
                 // this code kinda assumes that if a list exists, its a list of files which is not correct

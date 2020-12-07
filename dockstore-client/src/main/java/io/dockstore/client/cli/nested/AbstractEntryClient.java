@@ -54,6 +54,8 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
+import io.dockstore.openapi.client.api.Ga4Ghv20Api;
+import io.dockstore.openapi.client.model.ToolFile;
 import io.github.collaboratory.cwl.CWLClient;
 import io.github.collaboratory.nextflow.NextflowClient;
 import io.github.collaboratory.wdl.WDLClient;
@@ -85,6 +87,7 @@ import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.MAX_DESCRIPTION;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
+import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.invalid;
@@ -99,6 +102,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.common.DescriptorLanguage.CWL;
@@ -119,11 +123,17 @@ import static io.dockstore.common.DescriptorLanguage.WDL;
  * @author dyuen
  */
 public abstract class AbstractEntryClient<T> {
+    public static final String CHECKSUM_NULL_MESSAGE = "Unable to validate local descriptor checksum. Please refresh the entry. Missing checksum for descriptor ";
+    public static final String CHECKSUM_MISMATCH_MESSAGE = "Launch halted. Local checksum does not match remote checksum for ";
+    public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
+
     private static final String WORKFLOW = "workflow";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
+
     protected boolean isAdmin = false;
 
     boolean isLocalEntry = false;
+    boolean ignoreChecksums = false;
 
     private boolean isWesCommand = false;
     private String wesUri = null;
@@ -155,6 +165,10 @@ public abstract class AbstractEntryClient<T> {
         return isLocalEntry;
     }
 
+    boolean getIgnoreChecksums() {
+        return ignoreChecksums;
+    }
+
     public CWL getCwlUtil() {
         // TODO: may be reactivated if we find a different way to read CWL into Java
         // String cwlrunner = CWLRunnerFactory.getCWLRunner();
@@ -179,10 +193,10 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("  info             :  print detailed information about a particular published " + getEntryType());
         out("");
-        out("  " + CWL.getLowerShortName() + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
+        out("  " + CWL.toString() + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
         out("                      which enables integration with Global Alliance compliant systems");
         out("");
-        out("  " + WDL.getLowerShortName() + "              :  returns the Workflow Descriptor Language definition for this Docker image");
+        out("  " + WDL.toString() + "              :  returns the Workflow Descriptor Language definition for this Docker image");
         out("");
         out("  refresh          :  updates your list of " + getEntryType() + "s stored on Dockstore or an individual " + getEntryType());
         out("");
@@ -240,7 +254,7 @@ public abstract class AbstractEntryClient<T> {
             }
 
             final Optional<DescriptorLanguage> first = Arrays.stream((DescriptorLanguage.values()))
-                .filter(lang -> activeCommand.equalsIgnoreCase(lang.getShortName())).findFirst();
+                .filter(lang -> activeCommand.equalsIgnoreCase(lang.toString())).findFirst();
             if (first.isPresent()) {
                 descriptor(args, first.get());
                 return true;
@@ -439,6 +453,13 @@ public abstract class AbstractEntryClient<T> {
     public abstract SourceFile getDescriptorFromServer(String entry, DescriptorLanguage descriptorType) throws ApiException, IOException;
 
     /**
+     * Returns the versionID of the specified entry, or the default version if unspecified in the path
+     *
+     * @param entryPath path to either a tool or workflow
+     */
+    public abstract String getVersionID(String entryPath);
+
+    /**
      * private helper methods
      */
 
@@ -449,9 +470,22 @@ public abstract class AbstractEntryClient<T> {
             publishHelp();
         } else {
             String first = reqVal(args, "--entry");
-            String entryname = optVal(args, "--entryname", null);
             final boolean unpublishRequest = args.contains("--unpub");
-            handlePublishUnpublish(first, entryname, unpublishRequest);
+
+            // --new-entry-name is the desired parameter flag, but maintaining backwards compatibility for --entryname
+            String newEntryName = optVal(args, "--new-entry-name", null);
+            if (newEntryName == null && args.contains("--entryname")) {
+                err("Dockstore CLI has deprecated the --entryname parameter and may remove it without warning. Please use --new-entry-name instead.");
+                newEntryName = optVal(args, "--entryname", null);
+            }
+
+            // prevent specifying --unpub and --entryname together
+            if (unpublishRequest && newEntryName != null) {
+                errorMessage("Unable to specify both --unpub and --new-entry-name together. If trying to unpublish an entry,"
+                    + " provide the entire entry path under the --entry parameter.", COMMAND_ERROR);
+            } else {
+                handlePublishUnpublish(first, newEntryName, unpublishRequest);
+            }
         }
     }
 
@@ -462,8 +496,8 @@ public abstract class AbstractEntryClient<T> {
             starHelp();
         } else {
             String first = reqVal(args, "--entry");
-            final boolean unstarRequest = args.contains("--unstar");
-            handleStarUnstar(first, unstarRequest);
+            final boolean toStar = !args.contains("--unstar");
+            handleStarUnstar(first, toStar);
         }
     }
 
@@ -715,16 +749,15 @@ public abstract class AbstractEntryClient<T> {
             String parentEntry = optVal(args, "--parent-entry", entry);
 
             if (getEntryType().equalsIgnoreCase("tool")) {
-                descriptorType = reqVal(args, "--descriptor-type");
-                descriptorType = descriptorType.toLowerCase();
+                descriptorType = reqVal(args, "--descriptor-type").toUpperCase();
                 boolean validType = false;
                 for (DescriptorLanguage type : DescriptorLanguage.values()) {
-                    if (type.toString().equalsIgnoreCase(descriptorType) && !"none".equalsIgnoreCase(descriptorType)) {
+                    if (type.toString().equals(descriptorType) && !"none".equalsIgnoreCase(descriptorType)) {
                         validType = true;
                         break;
                     }
                 }
-                final String joinedLanguages = Joiner.on(',').join(Arrays.stream(DescriptorLanguage.values()).map(DescriptorLanguage::getLowerShortName).collect(Collectors.toSet()));
+                final String joinedLanguages = Joiner.on(',').join(Arrays.stream(DescriptorLanguage.values()).map(DescriptorLanguage::toString).collect(Collectors.toSet()));
                 if (!validType) {
                     errorMessage("Only " + joinedLanguages + " are valid descriptor types", CLIENT_ERROR);
                 }
@@ -756,6 +789,36 @@ public abstract class AbstractEntryClient<T> {
     }
 
     /**
+     * Returns the correct path for use in TRS endpoints
+     *
+     * @param entryPath path to either a tool or workflow
+     */
+    public String getTrsId(String entryPath) {
+        return entryPath;
+    }
+
+    /**
+     * Get all tool descriptors associated with the entry type
+     * @param type descriptor type, CWL, WDL, NFL ...
+     * @param entryPath path to either a tool or workflow, the path for a workflow must have the #workflow/ prefix
+     * @param versionID version we are fetching descriptors for
+     */
+    public List<ToolFile> getAllToolDescriptors(String type, String entryPath, String versionID) {
+        final Ga4Ghv20Api ga4ghv20api = this.getClient().getGa4Ghv20Api();
+
+        // get all the tool files and filter out anything not a descriptor
+        try {
+            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, entryPath, versionID).stream()
+                .filter(toolFile -> ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR.equals(toolFile.getFileType()) || ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR.equals(toolFile.getFileType()))
+                .collect(Collectors.toList());
+        } catch (io.dockstore.openapi.client.ApiException ex) {
+            exceptionMessage(ex, "Unable to locate entry " + entryPath + ":" + versionID + " at TRS endpoint", Client.API_ERROR);
+        }
+
+        return null;
+    }
+
+    /**
      * this function will check the extension of the entry file (cwl/wdl)
      *
      * @param path the file path, Type String
@@ -764,9 +827,9 @@ public abstract class AbstractEntryClient<T> {
      * Type.NONE if file extension is neither WDL nor CWL, could be no extension or some other random extension(e.g .txt)
      */
     Optional<DescriptorLanguage> checkFileExtension(String path) {
-        if (FilenameUtils.getExtension(path).equalsIgnoreCase(CWL.getLowerShortName()) || FilenameUtils.getExtension(path).equalsIgnoreCase("yaml") || FilenameUtils.getExtension(path).equalsIgnoreCase("yml")) {
+        if (FilenameUtils.getExtension(path).equalsIgnoreCase(CWL.toString()) || FilenameUtils.getExtension(path).equalsIgnoreCase("yaml") || FilenameUtils.getExtension(path).equalsIgnoreCase("yml")) {
             return Optional.of(CWL);
-        } else if (FilenameUtils.getExtension(path).equalsIgnoreCase(WDL.getLowerShortName())) {
+        } else if (FilenameUtils.getExtension(path).equalsIgnoreCase(WDL.toString())) {
             return Optional.of(WDL);
         } else if (path.endsWith("nextflow.config")) {
             return Optional.of(NEXTFLOW);
@@ -821,9 +884,9 @@ public abstract class AbstractEntryClient<T> {
                 } else if (!cwlContentPresent && descriptor == null) {
                     //extension is cwl but the content is not cwl
                     out("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end");
-                } else if (!cwlContentPresent && CWL.getLowerShortName().equals(descriptor)) {
+                } else if (!cwlContentPresent && CWL.toString().equals(descriptor)) {
                     errorMessage("Entry file is not a valid CWL file.", CLIENT_ERROR);
-                } else if (wdlContentPresent && WDL.getLowerShortName().equals(descriptor)) {
+                } else if (wdlContentPresent && WDL.toString().equals(descriptor)) {
                     out("This is a WDL file.. Please put the correct extension to the entry file name.");
                     out("Launching entry file as a WDL file..");
                     try {
@@ -846,9 +909,9 @@ public abstract class AbstractEntryClient<T> {
                 } else if (!wdlContentPresent && descriptor == null) {
                     //extension is wdl but the content is not wdl
                     out("Entry file is ambiguous, please re-enter command with '--descriptor <descriptor>' at the end");
-                } else if (!wdlContentPresent && WDL.getLowerShortName().equals(descriptor)) {
+                } else if (!wdlContentPresent && WDL.toString().equals(descriptor)) {
                     errorMessage("Entry file is not a valid WDL file.", CLIENT_ERROR);
-                } else if (cwlContentPresent && CWL.getLowerShortName().equals(descriptor)) {
+                } else if (cwlContentPresent && CWL.toString().equals(descriptor)) {
                     out("This is a CWL file.. Please put the correct extension to the entry file name.");
                     out("Launching entry file as a CWL file..");
                     try {
@@ -1135,11 +1198,13 @@ public abstract class AbstractEntryClient<T> {
                     errorMessage("dockstore: missing required flag --entry", CLIENT_ERROR);
                 }
                 this.isLocalEntry = false;
+                this.ignoreChecksums = args.contains("--ignore-checksums");
+
                 preValidateLaunchArguments(args);
                 checkIfDockerRunning();
 
-                final String descriptor = optVal(args, "--descriptor", CWL.getLowerShortName());
-                if (descriptor.equals(CWL.getLowerShortName())) {
+                final String descriptor = optVal(args, "--descriptor", CWL.toString()).toUpperCase();
+                if (CWL.toString().equals(descriptor)) {
                     try {
                         String entry = reqVal(args, "--entry");
                         launchCwl(entry, args, false);
@@ -1150,7 +1215,7 @@ public abstract class AbstractEntryClient<T> {
                         exceptionMessage(e, "IO error launching workflow. Did you mean to use --local-entry instead of --entry?",
                                 Client.IO_ERROR);
                     }
-                } else if (descriptor.equals(WDL.getLowerShortName())) {
+                } else if (WDL.toString().equals(descriptor)) {
                     try {
                         launchWdl(args, false);
                     } catch (ApiException e) {
@@ -1238,7 +1303,7 @@ public abstract class AbstractEntryClient<T> {
 
     private String convertEntry2Json(List<String> args, final boolean json) throws ApiException, IOException {
         final String entry = reqVal(args, "--entry");
-        final String descriptor = optVal(args, "--descriptor", CWL.getLowerShortName());
+        final String descriptor = optVal(args, "--descriptor", CWL.toString()).toUpperCase();
         LanguageClientInterface languageCLient = convertCLIStringToEnum(descriptor);
         return languageCLient.generateInputJson(entry, json);
     }
@@ -1284,8 +1349,6 @@ public abstract class AbstractEntryClient<T> {
 
     public abstract Client getClient();
 
-
-
     /**
      * help text output
      */
@@ -1315,7 +1378,7 @@ public abstract class AbstractEntryClient<T> {
         out("Optional parameters:");
         out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.getShortName());
+        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.toString());
         out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
         out("");
     }
@@ -1425,7 +1488,7 @@ public abstract class AbstractEntryClient<T> {
                 + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --version <version>                                                      " + getEntryType() + " version name");
         if (getEntryType().equalsIgnoreCase("tool")) {
-            out("  --descriptor-type <descriptor-type>                                      CWL/WDL");
+            out("  --descriptor-type <descriptor-type>                                      " + DescriptorLanguage.CWL.toString() + "/" + DescriptorLanguage.WDL.toString());
         }
         out("");
         out("Optional Parameters:");
@@ -1602,12 +1665,13 @@ public abstract class AbstractEntryClient<T> {
         out("Optional parameters:");
         out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.getLowerShortName());
+        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.toString());
         if (!(this instanceof CheckerClient)) {
             out("  --local-entry                       Allows you to specify a full path to a local descriptor for --entry instead of an entry path");
         }
         out("  --wdl-output-target                 Allows you to specify a remote path to provision output files to ex: s3://oicr.temp/testing-launcher/");
         out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
+        out("  --ignore-checksums                  Allows you to ignore validating checksums of each downloaded descriptor");
         out("");
     }
 

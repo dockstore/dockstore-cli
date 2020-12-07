@@ -23,7 +23,6 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +63,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 public class LaunchTestIT {
+    public static final long LAST_MODIFIED_TIME_100 = 100L;
+    public static final long LAST_MODIFIED_TIME_1000 = 1000L;
+
     //create tests that will call client.checkEntryFile for workflow launch with different files and descriptor
 
     @Rule
@@ -717,7 +719,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
-        args.add(CWL.getLowerShortName());
+        args.add(CWL.getShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -726,7 +728,7 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getLowerShortName());
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getShortName());
 
         assertTrue("output should include a successful cromwell run",
             systemOutRule.getLog().contains("This is a CWL file.. Please put the correct extension to the entry file name."));
@@ -819,7 +821,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
-        args.add(WDL.getLowerShortName());
+        args.add(WDL.getShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -828,7 +830,7 @@ public class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        workflowClient.checkEntryFile(file.getAbsolutePath(), args, WDL.getLowerShortName());
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, WDL.getShortName());
 
         assertTrue("output should include a successful cromwell run",
             systemOutRule.getLog().contains("This is a WDL file.. Please put the correct extension to the entry file name."));
@@ -848,7 +850,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
-        args.add(WDL.getLowerShortName());
+        args.add(WDL.getShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -859,7 +861,7 @@ public class LaunchTestIT {
         exit.expectSystemExit();
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        workflowClient.checkEntryFile(file.getAbsolutePath(), args, WDL.getLowerShortName());
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, WDL.getShortName());
     }
 
     @Test
@@ -876,7 +878,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
-        args.add(CWL.getLowerShortName());
+        args.add(CWL.getShortName());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
@@ -887,7 +889,7 @@ public class LaunchTestIT {
         exit.expectSystemExit();
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getLowerShortName());
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getShortName());
     }
 
     @Test
@@ -1212,7 +1214,7 @@ public class LaunchTestIT {
         runClientCommand(args);
 
         assertTrue("output should include an error message",
-            systemErrRule.getLog().contains("Syntax error while parsing a block collection"));
+            systemErrRule.getLog().contains("while parsing a block collection"));
     }
 
     @Test
@@ -1227,8 +1229,7 @@ public class LaunchTestIT {
         WorkflowVersion aWorkflowVersion1 = new WorkflowVersion();
         aWorkflowVersion1.setName("master");
         aWorkflowVersion1.setValid(false);
-        Date earlierDate = new Date(100L);
-        aWorkflowVersion1.setLastModified(earlierDate);
+        aWorkflowVersion1.setLastModified(LAST_MODIFIED_TIME_100);
 
         List<WorkflowVersion> listWorkflowVersions = new ArrayList<>();
         listWorkflowVersions.add(aWorkflowVersion1);
@@ -1241,7 +1242,7 @@ public class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
 
-        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(null), eq(false));
+        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(null), eq(false), eq(null));
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
 
@@ -1265,8 +1266,7 @@ public class LaunchTestIT {
         WorkflowVersion aWorkflowVersion1 = new WorkflowVersion();
         aWorkflowVersion1.setName("1.0.0");
         aWorkflowVersion1.setValid(false);
-        Date laterDate = new Date(1000L);
-        aWorkflowVersion1.setLastModified(laterDate);
+        aWorkflowVersion1.setLastModified(LAST_MODIFIED_TIME_1000);
 
         List<WorkflowVersion> listWorkflowVersions = new ArrayList<>();
         listWorkflowVersions.add(aWorkflowVersion1);
@@ -1279,7 +1279,7 @@ public class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
 
-        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(null), eq(false));
+        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(null), eq(false), eq(null));
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
 
@@ -1367,5 +1367,15 @@ public class LaunchTestIT {
         runClientCommandConfig(args, config);
 
         assertTrue("output should include a successful cromwell run", systemOutRule.getLog().contains("Cromwell exit code: 0"));
+    }
+
+    @Test
+    public void cwlNullInputParameter() {
+        // Tests if a null input parameter is correctly handled when converting json
+        File nullCWL = new File(ResourceHelpers.resourceFilePath("nullParam.cwl"));
+        File nullJSON = new File(ResourceHelpers.resourceFilePath("nullParam.json"));
+
+        // run simple echo null tool
+        runTool(nullCWL, nullJSON, false);
     }
 }

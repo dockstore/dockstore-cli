@@ -18,7 +18,6 @@ package io.dockstore.client.cli;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -36,7 +35,6 @@ import io.swagger.client.ApiException;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.PublishRequest;
-import io.swagger.client.model.SourceFile;
 import io.swagger.client.model.Tag;
 import org.junit.Assert;
 import org.junit.Before;
@@ -446,52 +444,6 @@ public class GeneralIT extends BaseIT {
     }
 
     /**
-     * This method will create and register a new container for testing
-     *
-     * @return DockstoreTool
-     * @throws ApiException
-     */
-    private DockstoreTool getContainer() {
-        DockstoreTool c = new DockstoreTool();
-        c.setMode(DockstoreTool.ModeEnum.MANUAL_IMAGE_PATH);
-        c.setName("testUpdatePath");
-        c.setGitUrl("https://github.com/DockstoreTestUser2/dockstore-tool-imports");
-        c.setDefaultDockerfilePath("/Dockerfile");
-        c.setDefaultCwlPath("/dockstore.cwl");
-        c.setRegistryString(Registry.DOCKER_HUB.getDockerPath());
-        c.setIsPublished(false);
-        c.setNamespace("testPath");
-        c.setToolname("test5");
-        c.setPath("quay.io/dockstoretestuser2/dockstore-tool-imports");
-        Tag tag = new Tag();
-        tag.setName("1.0");
-        tag.setReference("master");
-        tag.setValid(true);
-        tag.setImageId("123456");
-        tag.setCwlPath(c.getDefaultCwlPath());
-        tag.setWdlPath(c.getDefaultWdlPath());
-        // construct source files
-        SourceFile fileCWL = new SourceFile();
-        fileCWL.setContent("cwlstuff");
-        fileCWL.setType(SourceFile.TypeEnum.DOCKSTORE_CWL);
-        fileCWL.setPath("/dockstore.cwl");
-        fileCWL.setAbsolutePath("/dockstore.cwl");
-        List<SourceFile> list = new ArrayList<>();
-        list.add(fileCWL);
-        tag.setSourceFiles(list);
-        SourceFile fileDockerFile = new SourceFile();
-        fileDockerFile.setContent("dockerstuff");
-        fileDockerFile.setType(SourceFile.TypeEnum.DOCKERFILE);
-        fileDockerFile.setPath("/Dockerfile");
-        fileDockerFile.setAbsolutePath("/Dockerfile");
-        tag.getSourceFiles().add(fileDockerFile);
-        List<Tag> tags = new ArrayList<>();
-        tags.add(tag);
-        c.setWorkflowVersions(tags);
-        return c;
-    }
-
-    /**
      * This tests that zip file can be downloaded or not based on published state and auth.
      */
     @Test
@@ -506,7 +458,7 @@ public class GeneralIT extends BaseIT {
         ContainersApi otherUserContainersApi = new ContainersApi(otherUserWebClient);
 
         // Register and refresh tool
-        DockstoreTool tool = ownerContainersApi.registerManual(getContainer());
+        DockstoreTool tool = ownerContainersApi.registerManual(CommonTestUtilities.getContainer());
         DockstoreTool refresh = ownerContainersApi.refresh(tool.getId());
         Long toolId = refresh.getId();
         Tag tag = refresh.getWorkflowVersions().get(0);
