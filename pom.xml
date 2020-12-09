@@ -19,7 +19,7 @@
 
     <groupId>io.dockstore</groupId>
     <artifactId>dockstore-cli</artifactId>
-    <version>1.10.0-beta.0-SNAPSHOT</version>
+    <version>1.11.0-alpha.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>dockstore</name>
@@ -35,7 +35,7 @@
     <properties>
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.10.0-alpha.2</dockstore-core.version>
+        <dockstore-core.version>1.10.0</dockstore-core.version>
         <maven-failsafe.version>2.21.0</maven-failsafe.version>
         <maven-surefire.version>2.21.0</maven-surefire.version>
         <skipTests>false</skipTests>
