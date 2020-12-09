@@ -63,6 +63,7 @@ import static io.dockstore.client.cli.ArgumentUtility.NAME_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.boolWord;
 import static io.dockstore.client.cli.ArgumentUtility.columnWidthsTool;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
+import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
@@ -225,22 +226,24 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
         }
 
+        assert (existingTool != null);
+
         if (unpublishRequest) {
             if (isPublished) {
                 publish(false, entryPath);
             } else {
-                out("The following tool is already unpublished: " + entryPath);
+                err("The following tool is already unpublished: " + entryPath);
             }
         } else {
             if (newName == null) {
                 if (isPublished) {
-                    out("The following tool is already published: " + entryPath);
+                    err("The following tool is already published: " + entryPath);
                 } else {
                     publish(true, entryPath);
                 }
             } else if (!toolExists(entryPath + "/" + newName)) {
-                if (DockstoreTool.ModeEnum.HOSTED.equals(existingTool.getMode())) {
-                    out(ToolClient.INVALID_TOOL_MODE_PUBLISH);
+                if (DockstoreTool.ModeEnum.HOSTED == existingTool.getMode()) {
+                    err(ToolClient.INVALID_TOOL_MODE_PUBLISH);
                 } else {
                     try {
                         DockstoreTool newContainer = new DockstoreTool();
@@ -262,7 +265,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
                         newContainer = containersApi.registerManual(newContainer);
 
-                        out("Successfully registered " + entryPath + "/" + newName);
+                        err("Successfully registered " + entryPath + "/" + newName);
 
                         containersApi.refresh(newContainer.getId());
                         publish(true, newContainer.getToolPath());
@@ -271,7 +274,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                     }
                 }
             } else {
-                out("The following tool is already registered: " + entryPath + "/" + newName);
+                err("The following tool is already registered: " + entryPath + "/" + newName);
             }
         }
     }

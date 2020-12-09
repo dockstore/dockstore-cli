@@ -691,24 +691,27 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
         }
 
+        assert (existingWorkflow != null);
+
         if (unpublishRequest) {
             if (isPublished) {
                 publish(false, entryPath);
             } else {
-                out("The following workflow is already unpublished: " + entryPath);
+                err("The following workflow is already unpublished: " + entryPath);
             }
         } else {
             if (newName == null) {
                 if (isPublished) {
-                    out("The following workflow is already published: " + entryPath);
+                    err("The following workflow is already published: " + entryPath);
                 } else {
                     publish(true, entryPath);
                 }
             } else if (!workflowExists(entryPath + "/" + newName)) {
                 // Prevent specifying a custom name for both HOSTED and DOCKSTORE_YML workflows
-                if (Workflow.ModeEnum.HOSTED.equals(existingWorkflow.getMode()) || Workflow.ModeEnum.DOCKSTORE_YML.equals(existingWorkflow.getMode())) {
-                    out(WorkflowClient.INVALID_WORKFLOW_MODE_PUBLISH);
+                if (Workflow.ModeEnum.HOSTED == existingWorkflow.getMode() || Workflow.ModeEnum.DOCKSTORE_YML == existingWorkflow.getMode()) {
+                    err(WorkflowClient.INVALID_WORKFLOW_MODE_PUBLISH);
                 } else {
+                    final String completeEntryPath = entryPath + "/" + newName;
                     try {
                         // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
                         final Workflow newWorkflow = workflowsApi.manualRegister(
@@ -720,18 +723,16 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                             existingWorkflow.getDefaultTestParameterFilePath()
                         );
 
-                        final String completeEntryPath = entryPath + "/" + newName;
-
-                        out("Successfully registered " + completeEntryPath);
+                        err("Successfully registered " + completeEntryPath);
 
                         workflowsApi.refresh(newWorkflow.getId(), true);
                         publish(true, completeEntryPath);
                     } catch (ApiException ex) {
-                        exceptionMessage(ex, "Unable to publish " + entryPath + "/" + newName, Client.API_ERROR);
+                        exceptionMessage(ex, "Unable to publish " + completeEntryPath, Client.API_ERROR);
                     }
                 }
             } else {
-                out("The following workflow is already registered: " + entryPath + "/" + newName);
+                err("The following workflow is already registered: " + entryPath + "/" + newName);
             }
         }
     }
