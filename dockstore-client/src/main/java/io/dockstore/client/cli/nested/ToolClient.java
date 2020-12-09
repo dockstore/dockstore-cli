@@ -73,7 +73,6 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
-import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
 
 /**
  * Implement all operations that have to do with tools.
@@ -827,7 +826,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 out(builder.toString());
 
                 out("SOURCE CONTROL:");
-                if (Objects.equals(container.getMode(), HOSTED)) {
+                if (Objects.equals(container.getMode(), DockstoreTool.ModeEnum.HOSTED)) {
                     out("Dockstore.org");
                 } else {
                     out(container.getGitUrl());
