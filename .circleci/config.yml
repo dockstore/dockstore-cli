@@ -60,6 +60,8 @@ jobs:
     environment:
       TESTING_PROFILE: integration-tests
     steps:
+      - setup_remote_docker:
+          version: 19.03.13
       - setup_test
       - setup_integration_test
       - save_test_results
