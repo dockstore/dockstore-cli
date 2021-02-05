@@ -42,11 +42,11 @@ workflows:
           <<: *common_filters
           requires:
             - build
-      - workflow-integration-tests:
+      - confidential-workflow-integration-tests:
           <<: *common_filters
           requires:
             - build
-      - tool-integration-tests:
+      - confidential-tool-integration-tests:
           <<: *common_filters
           requires:
             - build
@@ -65,19 +65,23 @@ jobs:
       - setup_test
       - setup_integration_test
       - save_test_results
-  tool-integration-tests:
+  confidential-tool-integration-tests:
     executor: integration_test_exec
     environment:
       TESTING_PROFILE: confidential-tool-tests
     steps:
+      - setup_remote_docker:
+          version: 19.03.13
       - setup_test
       - setup_integration_test
       - save_test_results
-  workflow-integration-tests:
+  confidential-workflow-integration-tests:
     executor: integration_test_exec
     environment:
       TESTING_PROFILE: confidential-workflow-tests
     steps:
+      - setup_remote_docker:
+          version: 19.03.13
       - setup_test
       - setup_integration_test
       - save_test_results
