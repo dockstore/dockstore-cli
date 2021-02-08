@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
-  integration_test_exec:
+  tests_executor:
     docker: # run the steps with Docker
       - image: cimg/openjdk:11.0.8
         environment:
@@ -39,15 +39,10 @@ workflows:
       - build:
           <<: *common_filters
 
-      - run-unit-tests:
+      - unit-tests:
           <<: *common_filters
           requires:
             - build
-
-#      - unit_test:
-#          <<: *common_filters
-#          requires:
-#            - build
       - confidential-workflow-integration-tests:
           <<: *common_filters
           requires:
@@ -61,45 +56,54 @@ workflows:
           requires:
             - build
 jobs:
-  run-unit-tests:
-    executor: integration_test_exec
+  unit-tests:
+    executor: tests_executor
     environment:
       TESTING_PROFILE: unit-tests
     steps:
       - setup_for_tests
-      - run_test
+      - run_tests
+      - clean_and_save_cache
       - save_test_results
       - send_coverage
 
   integration-tests:
-    executor: integration_test_exec
+    executor: tests_executor
     environment:
       TESTING_PROFILE: integration-tests
     steps:
       - setup_remote_docker:
           version: 19.03.13
-      - setup_test
-      - setup_integration_test
+      - setup_for_tests
+      - setup_for_integration_tests
+      - run_tests
+      - clean_and_save_cache
       - save_test_results
+
   confidential-tool-integration-tests:
-    executor: integration_test_exec
+    executor: tests_executor
     environment:
       TESTING_PROFILE: confidential-tool-tests
     steps:
       - setup_remote_docker:
           version: 19.03.13
-      - setup_test
-      - setup_integration_test
+      - setup_for_tests
+      - setup_for_integration_tests
+      - run_tests
+      - clean_and_save_cache
       - save_test_results
+
   confidential-workflow-integration-tests:
-    executor: integration_test_exec
+    executor: tests_executor
     environment:
       TESTING_PROFILE: confidential-workflow-tests
     steps:
       - setup_remote_docker:
           version: 19.03.13
-      - setup_test
-      - setup_integration_test
+      - setup_for_tests
+      - setup_for_integration_tests
+      - run_tests
+      - clean_and_save_cache
       - save_test_results
 
 
@@ -341,7 +345,7 @@ commands:
           command: scripts/install-tests.sh
       - install_confidential_test_data
 
-  run_test:
+  run_tests:
     steps:
       - run:
           name: "What is TESTING PROFILE?"
