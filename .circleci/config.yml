@@ -38,10 +38,16 @@ workflows:
     jobs:
       - build:
           <<: *common_filters
-      - unit_test:
+
+      - run-unit-tests:
           <<: *common_filters
           requires:
             - build
+
+#      - unit_test:
+#          <<: *common_filters
+#          requires:
+#            - build
       - confidential-workflow-integration-tests:
           <<: *common_filters
           requires:
@@ -55,6 +61,16 @@ workflows:
           requires:
             - build
 jobs:
+  run-unit-tests:
+    executor: integration_test_exec
+    environment:
+      TESTING_PROFILE: unit-tests
+    steps:
+      - setup_for_tests
+      - run_test
+      - save_test_results
+      - send_coverage
+
   integration-tests:
     executor: integration_test_exec
     environment:
@@ -85,31 +101,31 @@ jobs:
       - setup_test
       - setup_integration_test
       - save_test_results
+
+
   build:
     docker: # run the steps with Docker
       - image: cimg/openjdk:11.0.8
         environment:
-          JAVA_TOOL_OPTIONS: -Xmx512m # Java can read cgroup. Sadly the cgroup in CircleCI is wrong. Have to manually set. Nothing to do with surefire plugin, it has its own JVM. The two of these must add up to a bit less than 4GB.
+          # Java can read cgroup. Sadly the cgroup in
+          # CircleCI is wrong. Have to manually set. Nothing to do with surefire
+          # plugin, it has its own JVM. The two of these must add up to a bit less than 4GB.
+          JAVA_TOOL_OPTIONS: -Xmx512m
     steps: # a collection of executable commands
       - checkout # check out source code to working directory
       - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dockstore-cli-java-{{ checksum "pom.xml" }}
-      - run:
-          name: Install yq
-          command: |
-            wget https://github.com/mikefarah/yq/releases/download/3.3.2/yq_linux_amd64
-            chmod a+x yq_linux_amd64
-            sudo mv yq_linux_amd64 /usr/bin/yq
+      - install_yq
       - install-git-secrets
-      - run:
-          name: decrypt and expand confidential test data
-          command: |
-            sudo apt install openssl -y
-            bash scripts/decrypt.sh
+      - install_confidential_test_data
       - run:
           name: build
           command: mvn -B clean install -DskipTests
+
+        # Running scan must occur after build
+      - run_git_secrets_scan
+      - check_license_file
       - run:
           name: copy m2 manually
           command: cp -r ~/.m2 .
@@ -117,6 +133,10 @@ jobs:
           root: .
           paths:
             - .
+
+
+
+
   unit_test: # runs not using Workflows must have a `build` job as entry point
     docker: # run the steps with Docker
       - image: cimg/openjdk:11.0.8
@@ -189,7 +209,78 @@ jobs:
           path: ~/junit
       - store_artifacts:
           path: /tmp/artifacts
+
+
+
 commands:
+  install_confidential_test_data:
+    steps:
+      - run:
+          name: decrypt and expand confidential test data
+          command: |
+            sudo apt install openssl -y
+            bash scripts/decrypt.sh
+
+  send_coverage:
+    steps:
+      - run:
+          name: send coverage
+          command: bash <(curl -s https://codecov.io/bash) -F ${TESTING_PROFILE//-} || echo "Codecov did not collect coverage reports"
+
+  install_dockerize_and_wait_for_db_and_es:
+    steps:
+      - run:
+          name: install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.6.1
+      - run:
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Wait for ES
+          command: |
+            wget --output-document /dev/null --waitretry=5 --tries=10 --retry-connrefused localhost:9200 || true
+
+  check_license_file:
+    steps:
+      - run:
+          name: check generated THIRD-PARTY-LICENCES.txt matches checked-in file
+          command: |
+            scripts/check-licenses.sh
+          environment:
+              TESTING_PROFILE: automated-review
+
+  run_git_secrets_scan:
+    steps:
+      - run:
+          name: Run git-secrets scan on dockstore repository
+          # Needs to be after a build so that the correct configuration is set
+          # by the exec-maven plugin
+          command: |
+            git secrets --scan
+
+  clean_and_save_cache:
+    steps:
+      - run:
+          name: clean the cache
+          command: |
+            rm -rf ~/.m2/repository/io/dockstore
+            rm -rf ~/.m2/repository/.cache/download-maven-plugin directory
+      - save_cache: # saves the project dependencies
+          paths:
+            - ~/.m2
+          key: dockstore-cli-java-{{ checksum "pom.xml" }}
+
+  install_yq:
+    steps:
+      - run:
+          name: Install yq
+          command: |
+            wget https://github.com/mikefarah/yq/releases/download/3.3.2/yq_linux_amd64
+            chmod a+x yq_linux_amd64
+            sudo mv yq_linux_amd64 /usr/bin/yq
+
   install-git-secrets:
     steps:
       - run:
@@ -199,13 +290,83 @@ commands:
             tar -zxf git-secrets-1.3.0.tar.gz
             cd git-secrets-1.3.0
             sudo make install
+
   setup_postgres:
     steps:
       - run:
-          name: setup postgres
+          name: setup postgres user and DB
           command: |
             psql -c "create user dockstore with password 'dockstore' createdb;" -U postgres
             psql -c 'create database webservice_test with owner = dockstore;' -U postgres
+            psql -c "ALTER USER dockstore WITH superuser;" -U postgres
+
+  install_postgres_sql_client:
+    steps:
+     - run:
+         name: Install postgresql client
+         command: |
+           sudo rm -rf /var/lib/apt/lists/*
+           sudo apt update
+           sudo apt install -y postgresql-client
+
+  setup_for_tests:
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: dockstore-java-{{ checksum "pom.xml" }}
+      - run:
+          name: manually copy back .m2
+          command: cp -r .m2 ~/.m2
+      - install_yq
+      - install_postgres_sql_client
+      - install_dockerize_and_wait_for_db_and_es
+
+
+  setup_for_integration_tests:
+    steps:
+      - run:
+          name: install pip
+          command: |
+            sudo apt update
+            sudo apt install python3-distutils python3-dev
+            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+            python3 get-pip.py
+            # For debug purposes, a python3 version was installed in the image, pip is untagged
+            python3 --version
+            pip3 --version
+      - run:
+          name: install pip dependencies
+          command: scripts/install-tests.sh
+      - install_confidential_test_data
+
+  run_test:
+    steps:
+      - run:
+          name: run test
+          command: mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp
+
+
+  save_test_results:
+    steps:
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/test-results/junit/
+            find . -type f -regex ".*/target/.*-reports/.*xml" -exec cp {} ~/test-results/junit/ \;
+          when: always
+      - store_test_results:
+          path: ~/test-results
+
+
+
+
+
+
+
+
+
   setup_test:
     steps:
       - attach_workspace:
@@ -228,6 +389,7 @@ commands:
             sudo rm -rf /var/lib/apt/lists/*
             sudo apt update
             sudo apt install -y postgresql-client
+
   setup_integration_test:
     steps:
       - run:
@@ -268,13 +430,6 @@ commands:
       - run:
           name: send coverage
           command: bash <(curl -s https://codecov.io/bash) -F ${TESTING_PROFILE//-} || echo "Codecov did not collect coverage reports"
-  save_test_results:
-    steps:
-      - run:
-          name: Save test results
-          command: |
-            mkdir -p ~/test-results/junit/
-            find . -type f -regex ".*/target/.*-reports/.*xml" -exec cp {} ~/test-results/junit/ \;
-          when: always
-      - store_test_results:
-          path: ~/test-results
+
+
+
