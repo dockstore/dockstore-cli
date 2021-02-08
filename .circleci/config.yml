@@ -345,7 +345,7 @@ commands:
     steps:
       - run:
           name: "What is TESTING PROFILE?"
-          command: echo ${TESTING_PROFILE}
+          command: echo "TESTING PROFILE is:" ${TESTING_PROFILE}
       - run:
           name: run test
           command: mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp
