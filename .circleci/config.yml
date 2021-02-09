@@ -77,7 +77,7 @@ jobs:
       - setup_for_tests
       - setup_for_integration_tests
       - run_tests
-      - clean_and_save_cache
+        #- clean_and_save_cache
       - save_test_results
 
   confidential-tool-integration-tests:
@@ -90,7 +90,7 @@ jobs:
       - setup_for_tests
       - setup_for_integration_tests
       - run_tests
-      - clean_and_save_cache
+        #- clean_and_save_cache
       - save_test_results
 
   confidential-workflow-integration-tests:
@@ -103,7 +103,7 @@ jobs:
       - setup_for_tests
       - setup_for_integration_tests
       - run_tests
-      - clean_and_save_cache
+        #- clean_and_save_cache
       - save_test_results
 
 
@@ -324,6 +324,7 @@ commands:
           name: manually copy back .m2
           command: cp -r .m2 ~/.m2
       - install_yq
+      - setup_postgres
       - install_postgres_sql_client
       - install_dockerize_and_wait_for_db_and_es
 
