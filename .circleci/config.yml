@@ -86,9 +86,7 @@ jobs:
       TESTING_PROFILE: singularity-tests
     steps:
       - setup_for_tests
-      - run:
-          name: install pip dependencies
-          command: scripts/install-tests.sh
+      - setup_for_integration_tests
       - run_tests
       - clean_and_save_cache
       - save_test_results
