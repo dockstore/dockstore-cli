@@ -298,8 +298,8 @@ commands:
       - run:
           name: Setup pip dependencies environment variables
           command: |
-            echo 'export GO_PATH=/usr/local' >> $BASH_ENV
-            echo 'export SINGULARITY_PATH=${HOME}/go' >> $BASH_ENV
+            echo "export GO_PATH=/usr/local" >> $BASH_ENV
+            echo "export SINGULARITY_PATH=${HOME}/go" >> $BASH_ENV
             echo "export PATH=${GO_PATH}/go/bin:${PATH}:${SINGULARITY_PATH}/bin" >> $BASH_ENV
       - run:
           name: install pip dependencies
