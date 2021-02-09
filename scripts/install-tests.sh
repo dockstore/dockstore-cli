@@ -34,16 +34,17 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     # pick version at https://golang.org/dl/
     export VERSION=1.15.8 OS=linux ARCH=amd64 && \
     wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
-    sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
+    #sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
+    sudo tar -C $GO_PATH -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
-    #echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
-    #echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
+    #echo 'export SINGULARITY_PATH=${HOME}/go' >> ~/.bashrc && \
+    #echo 'export PATH=/usr/local/go/bin:${PATH}:${SINGULARITY_PATH}/bin' >> ~/.bashrc && \
     #source ~/.bashrc
 
     # https://circleci.com/docs/2.0/env-vars/#environment-variable-usage-options
-    #echo 'export GOPATH=${HOME}/go' >> $BASH_ENV
-    #echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> $BASH_ENV
+    #echo 'export SINGULARITY_PATH=${HOME}/go' >> $BASH_ENV
+    #echo 'export PATH=/usr/local/go/bin:${PATH}:${SINGULARITY_PATH}/bin' >> $BASH_ENV
 
     env
 
@@ -53,8 +54,8 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     # Download and install singularity from a release
     # https://sylabs.io/guides/3.0/user-guide/installation.html#download-and-install-singularity-from-a-release
     export VERSION=3.7.1 && # adjust this as necessary \
-    mkdir -p "$GOPATH"/src/github.com/sylabs && \
-    cd "$GOPATH"/src/github.com/sylabs && \
+    mkdir -p "$SINGULARITY_PATH"/src/github.com/sylabs && \
+    cd "$SINGULARITY_PATH"/src/github.com/sylabs && \
     wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
     tar -xzf singularity-${VERSION}.tar.gz && \
     cd ./singularity && \
