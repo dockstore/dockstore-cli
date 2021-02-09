@@ -37,10 +37,11 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
-    #echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
-    echo 'export GOPATH=/usr/local/go' >> ~/.bashrc && \
+    echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
     echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
     source ~/.bashrc
+
+    env
 
     # If you are installing Singularity v3.0.0 you will also need to install dep for dependency resolution.
     go get -u github.com/golang/dep/cmd/dep
