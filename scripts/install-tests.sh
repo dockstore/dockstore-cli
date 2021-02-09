@@ -42,8 +42,8 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     #source ~/.bashrc
 
     # https://circleci.com/docs/2.0/env-vars/#environment-variable-usage-options
-    echo 'export GOPATH=${HOME}/go' >> $BASH_ENV
-    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> $BASH_ENV
+    #echo 'export GOPATH=${HOME}/go' >> $BASH_ENV
+    #echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> $BASH_ENV
 
     env
 

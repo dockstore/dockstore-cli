@@ -294,6 +294,12 @@ commands:
             # For debug purposes, a python3 version was installed in the image, pip is untagged
             python3 --version
             pip3 --version
+      # https://circleci.com/docs/2.0/env-vars/#using-parameters-and-bash-environment
+      - run:
+          name: Setup pip dependencies environment variables
+          command: |
+            echo 'export GOPATH=${HOME}/go' >> $BASH_ENV
+            echo "export PATH=$GOPATH/bin:$PATH" >> $BASH_ENV
       - run:
           name: install pip dependencies
           command: scripts/install-tests.sh
