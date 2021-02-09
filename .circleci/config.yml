@@ -324,8 +324,8 @@ commands:
           name: manually copy back .m2
           command: cp -r .m2 ~/.m2
       - install_yq
-      - setup_postgres
       - install_postgres_sql_client
+      - setup_postgres
       - install_dockerize_and_wait_for_db_and_es
 
 
