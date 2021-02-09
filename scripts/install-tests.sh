@@ -37,9 +37,13 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
-    echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
-    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
-    source ~/.bashrc
+    #echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
+    #echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
+    #source ~/.bashrc
+
+    # https://circleci.com/docs/2.0/env-vars/#environment-variable-usage-options
+    echo 'export GOPATH=${HOME}/go' >> $BASH_ENV
+    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> $BASH_ENV
 
     env
 
