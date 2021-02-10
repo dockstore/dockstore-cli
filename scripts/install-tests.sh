@@ -62,9 +62,9 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     ./mconfig
 
     # Compile singularity
-    #./mconfig && \
-    mkdir -p "$HOME"/singularity-nonroot
-    ./mconfig --without-suid --prefix="$SINGULARITY_PATH" && \
+    ./mconfig && \
+    #mkdir -p "$HOME"/singularity-nonroot
+    #./mconfig --without-suid --prefix="$SINGULARITY_PATH" && \
     make -C ./builddir && \
     sudo make -C ./builddir install
     singularity --version
