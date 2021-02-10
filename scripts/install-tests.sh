@@ -53,7 +53,7 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
 
     # Download and install singularity from a release
     # https://sylabs.io/guides/3.0/user-guide/installation.html#download-and-install-singularity-from-a-release
-    export VERSION=3.0.3 && # adjust this as necessary \
+    export VERSION=3.7.1 && # adjust this as necessary \
     mkdir -p "$SINGULARITY_PATH"/src/github.com/sylabs && \
     cd "$SINGULARITY_PATH"/src/github.com/sylabs && \
     wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
@@ -62,7 +62,9 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     ./mconfig
 
     # Compile singularity
-    ./mconfig && \
+    #./mconfig && \
+    mkdir -p "$HOME"/singularity-nonroot
+    ./mconfig --without-suid --prefix="$HOME"/singularity-nonroot && \
     make -C ./builddir && \
     sudo make -C ./builddir install
     singularity --version
