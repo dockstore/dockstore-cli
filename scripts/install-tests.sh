@@ -38,16 +38,6 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     sudo tar -C $GO_PATH -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
-    #echo 'export SINGULARITY_PATH=${HOME}/go' >> ~/.bashrc && \
-    #echo 'export PATH=/usr/local/go/bin:${PATH}:${SINGULARITY_PATH}/bin' >> ~/.bashrc && \
-    #source ~/.bashrc
-
-    # https://circleci.com/docs/2.0/env-vars/#environment-variable-usage-options
-    #echo 'export SINGULARITY_PATH=${HOME}/go' >> $BASH_ENV
-    #echo 'export PATH=/usr/local/go/bin:${PATH}:${SINGULARITY_PATH}/bin' >> $BASH_ENV
-
-    env
-
     # If you are installing Singularity v3.0.0 you will also need to install dep for dependency resolution.
     go get -u github.com/golang/dep/cmd/dep
 
@@ -63,8 +53,6 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
 
     # Compile singularity
     ./mconfig && \
-    #mkdir -p "$HOME"/singularity-nonroot
-    #./mconfig --without-suid --prefix="$SINGULARITY_PATH" && \
     make -C ./builddir && \
     sudo make -C ./builddir install
     singularity --version

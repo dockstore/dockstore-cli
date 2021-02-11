@@ -88,7 +88,7 @@ jobs:
     #        # mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Pnon-confidential-tests,coverage -Djavax.net.ssl.trustStore=../LocalTrustStore -Djavax.net.ssl.trustStorePassword=changeit  -DskipSignatureCheck=false -ntp
     #        mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Pnon-confidential-tests,coverage -Djavax.net.ssl.trustStore=../LocalTrustStore -Djavax.net.ssl.trustStorePassword=changeit -ntp
   singularity-tests:
-    #executor: tests_executor
+    # Must use machine instead of Docker for Singularity
     executor: machine_integration_test_exec
     environment:
       TESTING_PROFILE: singularity-tests
@@ -196,15 +196,17 @@ commands:
           name: Docker-Compose
           command: docker-compose up -d
 
+  # install-tests.sh installs cwltool at /home/circleci/.local/bin
+  # (called from setup_for_integration_tests)
+  # It may be advisible to change this install location
+  # but at this time how to do that is unknown
+  # so we have to add /home/circleci/.local/bin to the PATH
   setup_machine_env_vars:
     steps:
       - run:
           name: Setup machine environment variables
           command: |
             echo "export PATH=/home/circleci/.local/bin:${PATH}" >> $BASH_ENV
-
-
-
 
   install_confidential_test_data:
     steps:
@@ -316,7 +318,6 @@ commands:
       - install_postgres_sql_client
       - setup_postgres
       - install_dockerize_and_wait_for_db_and_es
-
 
   setup_for_integration_tests:
     steps:
