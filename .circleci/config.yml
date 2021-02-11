@@ -24,6 +24,13 @@ executors:
           - discovery.type: single-node
     resource_class: medium+
 
+  machine_integration_test_exec:
+    machine: # run the steps with Ubuntu VM
+      image: ubuntu-2004:202010-01
+    environment:
+      PGHOST: 127.0.0.1
+    resource_class: medium
+
 common_filters: &common_filters
   filters:
     tags:
@@ -81,7 +88,8 @@ jobs:
     #        # mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Pnon-confidential-tests,coverage -Djavax.net.ssl.trustStore=../LocalTrustStore -Djavax.net.ssl.trustStorePassword=changeit  -DskipSignatureCheck=false -ntp
     #        mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Pnon-confidential-tests,coverage -Djavax.net.ssl.trustStore=../LocalTrustStore -Djavax.net.ssl.trustStorePassword=changeit -ntp
   singularity-tests:
-    executor: tests_executor
+    #executor: tests_executor
+    executor: machine_integration_test_exec
     environment:
       TESTING_PROFILE: singularity-tests
     steps:
