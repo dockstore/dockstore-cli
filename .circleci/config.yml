@@ -95,6 +95,9 @@ jobs:
     steps:
       - setup_machine
       - setup_for_tests
+
+      - setup_machine_env_vars
+
       - setup_for_integration_tests
       - run_tests
       - clean_and_save_cache
@@ -192,6 +195,16 @@ commands:
       - run:
           name: Docker-Compose
           command: docker-compose up -d
+
+  setup_machine_env_vars:
+    steps:
+      - run:
+          name: Setup machine environment variables
+          command: |
+            echo "export PATH=/home/circleci/.local/bin:${PATH}" >> $BASH_ENV
+
+
+
 
   install_confidential_test_data:
     steps:
