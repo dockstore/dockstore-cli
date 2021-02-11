@@ -62,10 +62,12 @@ workflows:
           <<: *common_filters
           requires:
             - build
-      - integration-tests:
-          <<: *common_filters
-          requires:
-            - build
+      # This catagory seems to be covered by
+      # confidential and non-confidential tests
+      #- integration-tests:
+      #    <<: *common_filters
+      #    requires:
+      #      - build
       - singularity-tests:
           <<: *common_filters
           requires:
@@ -98,15 +100,6 @@ jobs:
       - clean_and_save_cache
       - save_test_results
       - send_coverage
-
-
-    #  - run:
-    #      name: run the non-confidential integration tests
-    #      command: |
-    #        # Adding all "normal" certs into this local one that has the Hoverfly cert (instead of adding Hoverfly cert to the global one so it doesn't potentially affect other tests) 
-    #        /usr/local/jdk-11.0.8/bin/keytool -importkeystore -srckeystore $JAVA_HOME/lib/security/cacerts -destkeystore LocalTrustStore -srcstorepass changeit -deststorepass changeit
-    #        # mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Pnon-confidential-tests,coverage -Djavax.net.ssl.trustStore=../LocalTrustStore -Djavax.net.ssl.trustStorePassword=changeit  -DskipSignatureCheck=false -ntp
-    #        mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Pnon-confidential-tests,coverage -Djavax.net.ssl.trustStore=../LocalTrustStore -Djavax.net.ssl.trustStorePassword=changeit -ntp
 
   non-confidential-tests:
     # We must use machine executor instead of Docker executor and setup_remote_docker
@@ -165,24 +158,26 @@ jobs:
       - save_test_results
       - send_coverage
 
-  integration-tests:
-    # We must use machine executor instead of Docker executor and setup_remote_docker
-    # https://circleci.com/docs/2.0/executor-intro/#machine
-    # perhaps because cwltool cannot mount a volume from our job space
-    # into CircleCI remote Docker
-    # https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
-    executor: machine_integration_test_exec
-    environment:
-      TESTING_PROFILE: integration-tests
-    steps:
-      - setup_machine
-      - setup_for_tests
-      - setup_machine_env_vars
-      - setup_for_integration_tests
-      - run_tests
-      - clean_and_save_cache
-      - save_test_results
-      - send_coverage
+
+    # This catagory seems to be covered by confidential and non-confidential tests
+    #integration-tests:
+    ## We must use machine executor instead of Docker executor and setup_remote_docker
+    ## https://circleci.com/docs/2.0/executor-intro/#machine
+    ## perhaps because cwltool cannot mount a volume from our job space
+    ## into CircleCI remote Docker
+    ## https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
+    #executor: machine_integration_test_exec
+    #environment:
+    #  TESTING_PROFILE: integration-tests
+    #steps:
+    #  - setup_machine
+    #  - setup_for_tests
+    #  - setup_machine_env_vars
+    #  - setup_for_integration_tests
+    #  - run_tests
+    #  - clean_and_save_cache
+    #  - save_test_results
+    #  - send_coverage
 
 
 
@@ -216,8 +211,6 @@ jobs:
           root: .
           paths:
             - .
-
-
 
 
 
