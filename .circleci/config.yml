@@ -93,6 +93,7 @@ jobs:
     environment:
       TESTING_PROFILE: singularity-tests
     steps:
+      - setup_machine
       - setup_for_tests
       - setup_for_integration_tests
       - run_tests
@@ -178,6 +179,20 @@ jobs:
 
 
 commands:
+  setup_machine:
+    steps:
+      - attach_workspace:
+          at: .
+      - run: # Useful for verifying default versions on machine image
+          name: Java/Maven/Python versions
+          command: |
+            java -version
+            mvn -v
+            python3 -V
+      - run:
+          name: Docker-Compose
+          command: docker-compose up -d
+
   install_confidential_test_data:
     steps:
       - run:
