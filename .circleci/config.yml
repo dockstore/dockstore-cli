@@ -118,13 +118,20 @@ jobs:
       - save_test_results
 
   confidential-tool-integration-tests:
-    executor: tests_executor
+    #executor: tests_executor
+    executor: machine_integration_test_exec
     environment:
       TESTING_PROFILE: confidential-tool-tests
     steps:
-      - setup_remote_docker:
-          version: 19.03.13
+
+      - setup_machine
       - setup_for_tests
+      - setup_machine_env_vars
+
+
+      #- setup_remote_docker:
+      #  version: 19.03.13
+      #- setup_for_tests
       - setup_for_integration_tests
       - run_tests
       - clean_and_save_cache

@@ -33,10 +33,9 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     # Install instructions at https://sylabs.io/guides/3.0/user-guide/installation.html#install-go
     # pick version at https://golang.org/dl/
     export VERSION=1.15.8 OS=linux ARCH=amd64 && \
-    wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
-    #sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
-    sudo tar -C $GO_PATH -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
-    rm go$VERSION.$OS-$ARCH.tar.gz
+    wget https://dl.google.com/go/go"${VERSION}"."${OS}"-"${ARCH}".tar.gz && \
+    sudo tar -C "${GO_PATH}" -xzvf go"${VERSION}"."${OS}"-"${ARCH}".tar.gz && \
+    rm go"${VERSION}"."${OS}"-"${ARCH}".tar.gz
 
     # If you are installing Singularity v3.0.0 you will also need to install dep for dependency resolution.
     go get -u github.com/golang/dep/cmd/dep
@@ -44,10 +43,10 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     # Download and install singularity from a release
     # https://sylabs.io/guides/3.0/user-guide/installation.html#download-and-install-singularity-from-a-release
     export VERSION=3.7.1 && # adjust this as necessary \
-    mkdir -p "$SINGULARITY_PATH"/src/github.com/sylabs && \
-    cd "$SINGULARITY_PATH"/src/github.com/sylabs && \
-    wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
-    tar -xzf singularity-${VERSION}.tar.gz && \
+    mkdir -p "${SINGULARITY_PATH}"/src/github.com/sylabs && \
+    cd "${SINGULARITY_PATH}"/src/github.com/sylabs && \
+    wget https://github.com/sylabs/singularity/releases/download/v"${VERSION}"/singularity-"${VERSION}".tar.gz && \
+    tar -xzf singularity-"${VERSION}".tar.gz && \
     cd ./singularity && \
     ./mconfig
 
