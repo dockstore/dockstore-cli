@@ -63,30 +63,6 @@ workflows:
             - build
 
 
-    #  - non-confidential-tests:
-    #      <<: *common_filters
-    #      requires:
-    #        - build
-    #  - confidential-workflow-integration-tests:
-    #      <<: *common_filters
-    #      requires:
-    #        - build
-    #  - confidential-tool-integration-tests:
-    #      <<: *common_filters
-    #      requires:
-    #        - build
-    #  # This catagory seems to be covered by
-    #  # confidential and non-confidential tests
-    #  #- integration-tests:
-    #  #    <<: *common_filters
-    #  #    requires:
-    #  #      - build
-    #  - singularity-tests:
-    #      <<: *common_filters
-    #      requires:
-    #        - build
-
-
 jobs:
   unit-tests:
     executor: tests_executor
@@ -98,7 +74,6 @@ jobs:
       - clean_and_save_cache
       - save_test_results
       - send_coverage
-
 
   integration-tests:
     parameters:
@@ -122,100 +97,6 @@ jobs:
       - save_test_results
       - send_coverage
 
-
-
-  #singularity-tests:
-  #  # Must use machine instead of Docker for Singularity
-  #  executor: machine_integration_test_exec
-  #  environment:
-  #    TESTING_PROFILE: singularity-tests
-  #  steps:
-  #    - setup_machine
-  #    - setup_for_tests
-  #    - setup_machine_env_vars
-  #    - setup_for_integration_tests
-  #    - run_tests
-  #    - clean_and_save_cache
-  #    - save_test_results
-  #    - send_coverage
-
-  #non-confidential-tests:
-  #  # We must use machine executor instead of Docker executor and setup_remote_docker
-  #  # https://circleci.com/docs/2.0/executor-intro/#machine
-  #  # perhaps because cwltool cannot mount a volume from our job space
-  #  # into CircleCI remote Docker
-  #  # https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
-  #  executor: machine_integration_test_exec
-  #  environment:
-  #    TESTING_PROFILE: non-confidential-tests
-  #  steps:
-  #    - setup_machine
-  #    - setup_for_tests
-  #    - setup_machine_env_vars
-  #    - setup_for_integration_tests
-  #    - run_tests
-  #    - clean_and_save_cache
-  #    - save_test_results
-  #    - send_coverage
-
-  #confidential-workflow-integration-tests:
-  #  # We must use machine executor instead of Docker executor and setup_remote_docker
-  #  # https://circleci.com/docs/2.0/executor-intro/#machine
-  #  # perhaps because cwltool cannot mount a volume from our job space
-  #  # into CircleCI remote Docker
-  #  # https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
-  #  executor: machine_integration_test_exec
-  #  environment:
-  #    TESTING_PROFILE: confidential-workflow-tests
-  #  steps:
-  #    - setup_machine
-  #    - setup_for_tests
-  #    - setup_machine_env_vars
-  #    - setup_for_integration_tests
-  #    - run_tests
-  #    - clean_and_save_cache
-  #    - save_test_results
-  #    - send_coverage
-
-  #confidential-tool-integration-tests:
-  #  # We must use machine executor instead of Docker executor and setup_remote_docker
-  #  # https://circleci.com/docs/2.0/executor-intro/#machine
-  #  # perhaps because cwltool cannot mount a volume from our job space
-  #  # into CircleCI remote Docker
-  #  # https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
-  #  executor: machine_integration_test_exec
-  #  environment:
-  #    TESTING_PROFILE: confidential-tool-tests
-  #  steps:
-  #    - setup_machine
-  #    - setup_for_tests
-  #    - setup_machine_env_vars
-  #    - setup_for_integration_tests
-  #    - run_tests
-  #    - clean_and_save_cache
-  #    - save_test_results
-  #    - send_coverage
-
-
-    # This catagory seems to be covered by confidential and non-confidential tests
-    #integration-tests:
-    ## We must use machine executor instead of Docker executor and setup_remote_docker
-    ## https://circleci.com/docs/2.0/executor-intro/#machine
-    ## perhaps because cwltool cannot mount a volume from our job space
-    ## into CircleCI remote Docker
-    ## https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
-    #executor: machine_integration_test_exec
-    #environment:
-    #  TESTING_PROFILE: integration-tests
-    #steps:
-    #  - setup_machine
-    #  - setup_for_tests
-    #  - setup_machine_env_vars
-    #  - setup_for_integration_tests
-    #  - run_tests
-    #  - clean_and_save_cache
-    #  - save_test_results
-    #  - send_coverage
 
 
 
@@ -249,8 +130,6 @@ jobs:
           root: .
           paths:
             - .
-
-
 
 
 commands:
@@ -423,12 +302,8 @@ commands:
   run_tests:
     steps:
       - run:
-          name: "What is TESTING PROFILE?"
-          command: echo "TESTING PROFILE is:" ${TESTING_PROFILE}
-      - run:
           name: run test
           command: mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp
-
 
   save_test_results:
     steps:
