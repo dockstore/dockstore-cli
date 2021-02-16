@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
-  tests_executor:
+  unit_tests_executor:
     docker: # run the steps with Docker
       - image: cimg/openjdk:11.0.8
         environment:
@@ -15,14 +15,6 @@ executors:
           PG_HOST: localhost
           POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_PASSWORD: postgres
-      - image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
-        environment:
-          - xpack.security.enabled: false
-          - transport.host: localhost
-          - network.host: 127.0.0.1
-          - http.port: 9200
-          - discovery.type: single-node
-    resource_class: medium+
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
@@ -65,11 +57,11 @@ workflows:
 
 jobs:
   unit-tests:
-    executor: tests_executor
+    executor: unit_tests_executor
     environment:
       TESTING_PROFILE: unit-tests
     steps:
-      - setup_for_tests
+      - setup_for_unit_tests
       - run_tests
       - clean_and_save_cache
       - save_test_results
@@ -89,9 +81,9 @@ jobs:
       TESTING_PROFILE: << parameters.testing_profile >>
     steps:
       - setup_machine
-      - setup_for_tests
-      - setup_machine_env_vars
       - setup_for_integration_tests
+      - setup_machine_env_vars
+      - setup_integration_test_dependencies
       - run_tests
       - clean_and_save_cache
       - save_test_results
@@ -149,7 +141,7 @@ commands:
 
   # install-tests.sh installs cwltool at /home/circleci/.local/bin
   # on the executor machine
-  # (called from setup_for_integration_tests)
+  # (called from setup_integration_test_dependencies)
   # It may be advisible to change this install location
   # but at this time how to do that is unknown
   # so we have to add /home/circleci/.local/bin to the PATH
@@ -174,16 +166,22 @@ commands:
           name: send coverage
           command: bash <(curl -s https://codecov.io/bash) -F ${TESTING_PROFILE//-} || echo "Codecov did not collect coverage reports"
 
-  install_dockerize_and_wait_for_db_and_es:
+  install_dockerize:
     steps:
       - run:
           name: install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
           environment:
             DOCKERIZE_VERSION: v0.6.1
+
+  wait_for_db:
+    steps:
       - run:
           name: Wait for db
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+  wait_for_elastic_search:
+    steps:
       - run:
           name: Wait for ES
           command: |
@@ -258,6 +256,17 @@ commands:
            # specify version
            sudo apt install -y postgresql-client
 
+  setup_for_unit_tests:
+    steps:
+      - setup_for_tests
+      - wait_for_db
+
+  setup_for_integration_tests:
+    steps:
+      - setup_for_tests
+      - wait_for_db
+      - wait_for_elastic_search
+
   setup_for_tests:
     steps:
       - attach_workspace:
@@ -271,9 +280,9 @@ commands:
       - install_yq
       - install_postgres_sql_client
       - setup_postgres
-      - install_dockerize_and_wait_for_db_and_es
+      - install_dockerize
 
-  setup_for_integration_tests:
+  setup_integration_test_dependencies:
     steps:
       - run:
           name: install pip
