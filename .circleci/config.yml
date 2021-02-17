@@ -239,21 +239,27 @@ commands:
 
   setup_for_unit_tests:
     steps:
+      - get_workspace_and_dependencies
       - setup_for_tests
 
   setup_for_integration_tests:
     steps:
+      - get_workspace_and_dependencies
+      - setup_machine
       - setup_for_tests
       - wait_for_elastic_search
       - setup_integration_test_dependencies
 
-  setup_for_tests:
+  get_workspace_and_dependencies:
     steps:
       - attach_workspace:
           at: .
       - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dockstore-java-{{ checksum "pom.xml" }}
+
+  setup_for_tests:
+    steps:
       - install_yq
       - install_postgres_sql_client
       - setup_postgres
