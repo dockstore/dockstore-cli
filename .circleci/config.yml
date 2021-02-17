@@ -60,10 +60,10 @@ jobs:
     executor: unit_tests_executor
     environment:
       TESTING_PROFILE: unit-tests
+      MAVEN_GOAL: test
     steps:
       - setup_for_unit_tests
       - run_tests
-      - clean_and_save_cache
       - save_test_results
       - send_coverage
 
@@ -79,13 +79,11 @@ jobs:
     executor: machine_integration_test_exec
     environment:
       TESTING_PROFILE: << parameters.testing_profile >>
+      MAVEN_GOAL: verify
     steps:
       - setup_machine
       - setup_for_integration_tests
-      - setup_machine_env_vars
-      - setup_integration_test_dependencies
       - run_tests
-      - clean_and_save_cache
       - save_test_results
       - send_coverage
 
@@ -115,9 +113,7 @@ jobs:
         # Running scan must occur after build
       - run_git_secrets_scan
       - check_license_file
-      - run:
-          name: copy m2 manually
-          command: cp -r ~/.m2 .
+      - clean_and_save_cache
       - persist_to_workspace:
           root: .
           paths:
@@ -127,8 +123,6 @@ jobs:
 commands:
   setup_machine:
     steps:
-      - attach_workspace:
-          at: .
       - run: # Useful for verifying default versions on machine image
           name: Java/Maven/Python versions
           command: |
@@ -138,19 +132,6 @@ commands:
       - run:
           name: Docker-Compose
           command: docker-compose up -d
-
-  # install-tests.sh installs cwltool at /home/circleci/.local/bin
-  # on the executor machine
-  # (called from setup_integration_test_dependencies)
-  # It may be advisible to change this install location
-  # but at this time how to do that is unknown
-  # so we have to add /home/circleci/.local/bin to the PATH
-  setup_machine_env_vars:
-    steps:
-      - run:
-          name: Setup machine environment variables
-          command: |
-            echo "export PATH=/home/circleci/.local/bin:${PATH}" >> $BASH_ENV
 
   install_confidential_test_data:
     steps:
@@ -259,13 +240,12 @@ commands:
   setup_for_unit_tests:
     steps:
       - setup_for_tests
-      - wait_for_db
 
   setup_for_integration_tests:
     steps:
       - setup_for_tests
-      - wait_for_db
       - wait_for_elastic_search
+      - setup_integration_test_dependencies
 
   setup_for_tests:
     steps:
@@ -274,13 +254,11 @@ commands:
       - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dockstore-java-{{ checksum "pom.xml" }}
-      - run:
-          name: manually copy back .m2
-          command: cp -r .m2 ~/.m2
       - install_yq
       - install_postgres_sql_client
       - setup_postgres
       - install_dockerize
+      - wait_for_db
 
   setup_integration_test_dependencies:
     steps:
@@ -298,6 +276,14 @@ commands:
       - run:
           name: Setup pip dependencies environment variables
           command: |
+            # install-tests.sh installs cwltool at /home/circleci/.local/bin
+            # on the executor machine
+            # (called from setup_integration_test_dependencies)
+            # It may be advisible to change this install location
+            # but at this time how to do that is unknown
+            # so we have to add /home/circleci/.local/bin to the PATH
+            echo "export PATH=/home/circleci/.local/bin:${PATH}" >> $BASH_ENV
+
             export GO_PATH=/usr/local
             echo "export GO_PATH=/usr/local" >> $BASH_ENV
             export SINGULARITY_PATH=${HOME}/go
@@ -311,8 +297,8 @@ commands:
   run_tests:
     steps:
       - run:
-          name: run test
-          command: mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp
+          name: run tests
+          command: mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp
 
   save_test_results:
     steps:
