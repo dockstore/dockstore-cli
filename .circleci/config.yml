@@ -287,7 +287,6 @@ commands:
             # It may be advisible to change this install location
             # but at this time how to do that is unknown
             # so we have to add /home/circleci/.local/bin to the PATH
-            #echo "export PATH=/home/circleci/.local/bin:${PATH}" >> $BASH_ENV
             export CWLTOOL_PATH=/home/circleci/.local/bin
             echo "export CWLTOOL_PATH=/home/circleci/.local/bin" >> $BASH_ENV
 
@@ -301,7 +300,9 @@ commands:
             env
       - run:
           name: install pip dependencies
-          command: scripts/install-tests.sh
+          command: |
+             env
+             scripts/install-tests.sh
       - install_confidential_test_data
 
   run_tests:
