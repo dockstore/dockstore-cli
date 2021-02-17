@@ -287,8 +287,8 @@ commands:
             # It may be advisible to change this install location
             # but at this time how to do that is unknown
             # so we have to add /home/circleci/.local/bin to the PATH
-            export CWLTOOL_PATH=/home/circleci/.local/bin
-            echo "export CWLTOOL_PATH=/home/circleci/.local/bin" >> $BASH_ENV
+            export CWLTOOL_PATH=${HOME}/.local/bin
+            echo "export CWLTOOL_PATH=${HOME}/.local/bin" >> $BASH_ENV
 
             export GO_PATH=/usr/local
             echo "export GO_PATH=/usr/local" >> $BASH_ENV
@@ -296,13 +296,9 @@ commands:
             echo "export SINGULARITY_PATH=${HOME}/go" >> $BASH_ENV
 
             echo "export PATH=${CWLTOOL_PATH}:${GO_PATH}/go/bin:${PATH}:${SINGULARITY_PATH}/bin" >> $BASH_ENV
-
-            env
       - run:
           name: install pip dependencies
-          command: |
-             env
-             scripts/install-tests.sh
+          command: scripts/install-tests.sh
       - install_confidential_test_data
 
   run_tests:
