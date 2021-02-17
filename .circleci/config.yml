@@ -81,7 +81,6 @@ jobs:
       TESTING_PROFILE: << parameters.testing_profile >>
       MAVEN_GOAL: verify
     steps:
-      - setup_machine
       - setup_for_integration_tests
       - run_tests
       - save_test_results
