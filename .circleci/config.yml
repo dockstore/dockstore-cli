@@ -5,16 +5,16 @@ executors:
   unit_tests_executor:
     docker: # run the steps with Docker
       - image: cimg/openjdk:11.0.8
-        environment:
-          PGHOST: 127.0.0.1
-      - image: circleci/postgres:11.8
-        command: postgres -c max_connections=200
-        environment:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: postgres
-          PG_HOST: localhost
-          POSTGRES_HOST_AUTH_METHOD: trust
-          POSTGRES_PASSWORD: postgres
+      #  environment:
+      #    PGHOST: 127.0.0.1
+      # - image: circleci/postgres:11.8
+      #   command: postgres -c max_connections=200
+      #   environment:
+      #     POSTGRES_USER: postgres
+      #     POSTGRES_DB: postgres
+      #     PG_HOST: localhost
+      #     POSTGRES_HOST_AUTH_METHOD: trust
+      #     POSTGRES_PASSWORD: postgres
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
@@ -239,7 +239,8 @@ commands:
   setup_for_unit_tests:
     steps:
       - get_workspace_and_dependencies
-      - setup_for_tests
+      - install_yq
+      #- setup_for_tests
 
   setup_for_integration_tests:
     steps:
