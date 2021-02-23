@@ -35,7 +35,7 @@
     <properties>
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.10.0</dockstore-core.version>
+        <dockstore-core.version>1.10.1</dockstore-core.version>
         <maven-failsafe.version>2.21.0</maven-failsafe.version>
         <maven-surefire.version>2.21.0</maven-surefire.version>
         <skipTests>false</skipTests>
@@ -622,8 +622,13 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <excludeGroups>io.dockstore.common.RegressionTest, io.dockstore.common.ConfidentialTest,io.dockstore.common.SlowTest,
-                    io.dockstore.common.BenchmarkTest,io.dockstore.common.ToilOnlyTest
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.RegressionTest,
+                    io.dockstore.common.ConfidentialTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.BenchmarkTest,
+                    io.dockstore.common.ToilOnlyTest
                 </excludeGroups>
             </properties>
 
@@ -669,7 +674,12 @@
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.RegressionTest,
+                    io.dockstore.common.ToilOnlyTest
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -679,7 +689,13 @@
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
                 <groups>io.dockstore.common.ConfidentialTest</groups>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.WorkflowTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.RegressionTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.WorkflowTest
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -689,7 +705,13 @@
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
                 <groups>io.dockstore.common.ConfidentialTest</groups>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.ToolTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.RegressionTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.ToolTest
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -698,7 +720,13 @@
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.ConfidentialTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.RegressionTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.ConfidentialTest
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
