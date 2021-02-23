@@ -17,7 +17,7 @@ tar xvf secrets.tar
 # If you would like to change this path (might be a good idea since we no longer use
 # TravisCI for CI) you need to change the path in dockstoreTest.yml which currently
 # is in the encrypted bundle circle_ci_test_data.zip.enc
-sudo mkdir -p /home/travis
-sudo cp dockstore-cli-integration-testing/src/test/resources/dstesting_pcks8.pem /home/travis/dstesting_pcks8.pem
+sudo mkdir -p /usr/local/ci
+sudo cp dockstore-cli-integration-testing/src/test/resources/dstesting_pcks8.pem /usr/local/ci/dstesting_pcks8.pem
 rm secrets.tar
 
