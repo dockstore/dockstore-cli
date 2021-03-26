@@ -24,6 +24,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,13 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.HttpHeaders;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.InfoCmd;
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.transport.DockerHttpClient;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
@@ -44,10 +52,6 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.spotify.docker.client.DefaultDockerClient;
-import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.exceptions.DockerCertificateException;
-import com.spotify.docker.client.exceptions.DockerException;
 import io.cwl.avro.CWL;
 import io.dockstore.client.cli.CheckerClient;
 import io.dockstore.client.cli.Client;
@@ -1005,7 +1009,7 @@ public abstract class AbstractEntryClient<T> {
      */
     void preValidateLaunchArguments(List<String> args) {
         // Create a copy of args for prevalidation since optVals removes args from list
-        List<String> argsCopy = new java.util.ArrayList(args);
+        List<String> argsCopy = new ArrayList<>(args);
         String jsonFile = optVal(argsCopy, "--json", null);
         String yamlFile = optVal(argsCopy, "--yaml", null);
         if (jsonFile != null) {
@@ -1164,13 +1168,16 @@ public abstract class AbstractEntryClient<T> {
      * it is not running, it fails with a cryptic error. This should make the problem more obvious.
      */
     void checkIfDockerRunning() {
-        try (DockerClient docker = DefaultDockerClient.fromEnv().build()) {
-            docker.info();  // attempt to get information about docker
-        } catch (DockerException | DockerCertificateException e) {  // couldn't access docker
+        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+
+        try (DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder().dockerHost(config.getDockerHost())
+                .sslConfig(config.getSSLConfig()).build();
+                DockerClient instance = DockerClientImpl.getInstance(config, httpClient)) {
+            InfoCmd infoCmd = instance.infoCmd(); // attempt to get information about docker
+            infoCmd.exec();
+        } catch (Exception e) {  // couldn't access docker, this library is wonderfully non-specific about exceptions
             String type = this.getEntryType().toLowerCase(); // "tool" or "workflow"
             out("WARNING: Docker is not running. If this " + type + " uses Docker, it will fail.");
-        } catch (InterruptedException e) {  // something else went wrong
-            LOG.error("Check for Docker failed", e);
         }
     }
 

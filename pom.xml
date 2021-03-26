@@ -140,6 +140,19 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- remove likely when bumping bom-internal -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>1.64</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.46.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>io.dockstore</groupId>
                 <artifactId>bom-internal</artifactId>
