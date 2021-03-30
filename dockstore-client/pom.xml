@@ -27,12 +27,40 @@
 
     <name>dockstore-client</name>
 
+    <properties>
+        <docker-client.version>3.2.7</docker-client.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <!-- https://stackoverflow.com/questions/44088493/jersey-stopped-working-with-injectionmanagerfactory-not-found-->
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
         </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/com.github.docker-java/docker-java-transport-httpclient5 -->
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport-httpclient5</artifactId>
+            <version>${docker-client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-core</artifactId>
+            <version>${docker-client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport</artifactId>
+            <version>${docker-client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-api</artifactId>
+            <version>${docker-client.version}</version>
+        </dependency>
+
+
 
         <dependency>
             <groupId>com.beust</groupId>
@@ -250,11 +278,6 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.spotify</groupId>
-            <artifactId>docker-client</artifactId>
-        </dependency>
     </dependencies>
 
 
@@ -316,6 +339,7 @@
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
