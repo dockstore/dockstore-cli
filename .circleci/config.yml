@@ -246,6 +246,8 @@ commands:
       - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dockstore-java-{{ checksum "pom.xml" }}
+      - restore_cache:
+          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
 
   setup_for_tests:
     steps:
@@ -307,5 +309,10 @@ commands:
           when: always
       - store_test_results:
           path: ~/test-results
-
+      - save_cache:
+          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+          paths:
+            - /tmp/dockstore-web-cache
+      - store_artifacts:
+          path: /tmp/dockstore-web-cache.misses.log
 
