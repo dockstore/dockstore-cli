@@ -102,17 +102,12 @@ jobs:
         # Running scan must occur after build
       - run_git_secrets_scan
       - check_license_file
+      - check_pom_files
       - clean_and_save_cache
       - persist_to_workspace:
           root: .
           paths:
             - .
-      - run:
-          name: check generated flattened POMs match checked-in files.
-          command: |
-            scripts/check_poms.sh
-          environment:
-            TESTING_PROFILE: automated-review
 
 
 commands:
@@ -171,6 +166,15 @@ commands:
             scripts/check-licenses.sh
           environment:
               TESTING_PROFILE: automated-review
+
+  check_pom_files:
+    steps:
+      - run:
+          name: check generated flattened POMs match checked-in files.
+          command: |
+            scripts/check_poms.sh
+          environment:
+            TESTING_PROFILE: automated-review
 
   run_git_secrets_scan:
     steps:
