@@ -107,6 +107,12 @@ jobs:
           root: .
           paths:
             - .
+      - run:
+          name: check generated flattened POMs match checked-in files.
+          command: |
+            scripts/check_poms.sh
+          environment:
+            TESTING_PROFILE: automated-review
 
 
 commands:
