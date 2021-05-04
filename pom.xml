@@ -627,7 +627,6 @@
             <properties>
                 <excludeGroups>
                     io.dockstore.client.cli.nested.SingularityTest,
-                    io.dockstore.common.RegressionTest,
                     io.dockstore.common.ConfidentialTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.BenchmarkTest,
@@ -664,15 +663,6 @@
             </properties>
         </profile>
         <profile>
-            <id>regression-integration-tests</id>
-            <!-- run only regression tests-->
-            <properties>
-                <skipTests>true</skipTests>
-                <skipITs>false</skipITs>
-                <groups>io.dockstore.common.RegressionTest</groups>
-            </properties>
-        </profile>
-        <profile>
             <id>integration-tests</id>
             <properties>
                 <skipTests>true</skipTests>
@@ -680,7 +670,6 @@
                 <excludeGroups>
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
-                    io.dockstore.common.RegressionTest,
                     io.dockstore.common.ToilOnlyTest
                 </excludeGroups>
             </properties>
@@ -695,7 +684,6 @@
                 <excludeGroups>
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
-                    io.dockstore.common.RegressionTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.WorkflowTest
                 </excludeGroups>
@@ -711,7 +699,6 @@
                 <excludeGroups>
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
-                    io.dockstore.common.RegressionTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.ToolTest
                 </excludeGroups>
@@ -726,7 +713,6 @@
                 <excludeGroups>
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
-                    io.dockstore.common.RegressionTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.ConfidentialTest
                 </excludeGroups>
