@@ -46,8 +46,8 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     mkdir -p "${SINGULARITY_PATH}"/src/github.com/sylabs && \
     cd "${SINGULARITY_PATH}"/src/github.com/sylabs && \
     wget https://github.com/sylabs/singularity/archive/refs/tags/v"${VERSION}".tar.gz && \
-    tar -xzf singularity-"${VERSION}".tar.gz && \
-    cd ./singularity && \
+    tar -xzf v"${VERSION}".tar.gz && \
+    cd ./singularity-"${VERSION}" && \
     ./mconfig
 
     # Compile singularity
