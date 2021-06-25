@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.dockstore</groupId>
   <artifactId>dockstore-client</artifactId>
-  <version>1.11.0-alpha.0-SNAPSHOT</version>
+  <version>1.11.0-rc.0</version>
   <licenses>
     <license>
       <name>Apache Software License, Version 2.0</name>
@@ -72,7 +72,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.11.0-alpha.1</version>
+      <version>1.11.3</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -84,25 +84,25 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>swagger-java-client</artifactId>
-      <version>1.11.0-alpha.1</version>
+      <version>1.11.3</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.11.0-alpha.1</version>
+      <version>1.11.3</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-wes-client</artifactId>
-      <version>1.11.0-alpha.0-SNAPSHOT</version>
+      <version>1.11.0-rc.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-file-plugin-parent</artifactId>
-      <version>1.11.0-alpha.0-SNAPSHOT</version>
+      <version>1.11.0-rc.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -114,7 +114,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.11</version>
+      <version>3.12.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -126,7 +126,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>30.1-jre</version>
+      <version>30.1.1-jre</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -194,7 +194,7 @@
     <dependency>
       <groupId>org.broadinstitute</groupId>
       <artifactId>cromwell-wdl-transforms-draft3_2.12</artifactId>
-      <version>57</version>
+      <version>60</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
