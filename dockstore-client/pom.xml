@@ -28,7 +28,7 @@
     <name>dockstore-client</name>
 
     <properties>
-        <docker-client.version>3.2.7</docker-client.version>
+        <docker-client.version>3.2.8</docker-client.version>
     </properties>
 
     <dependencies>
