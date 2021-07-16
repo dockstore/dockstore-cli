@@ -104,7 +104,7 @@ public class CromwellIT {
         WdlBridge wdlBridge = new WdlBridge();
         Map<String, String> wdlInputs = null;
         try {
-            wdlInputs = wdlBridge.getInputFiles(workflowFile.getAbsolutePath());
+            wdlInputs = wdlBridge.getInputFiles(workflowFile.getAbsolutePath(), "/wdlfileprov.wdl");
         } catch (WdlParser.SyntaxError ex) {
             Assert.fail("Should not have any issue parsing file");
         }

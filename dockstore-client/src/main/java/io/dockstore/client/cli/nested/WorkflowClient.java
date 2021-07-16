@@ -303,11 +303,11 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         // simply getting published descriptors does not require permissions
         Workflow workflow = null;
         try {
-            workflow = workflowsApi.getPublishedWorkflowByPath(path, null, false, null);
+            workflow = workflowsApi.getPublishedWorkflowByPath(path, "versions", false, null);
         } catch (ApiException e) {
             if (e.getResponseBody().contains("Entry not found")) {
                 LOG.info("Unable to locate entry without credentials, trying again as authenticated user");
-                workflow = workflowsApi.getWorkflowByPath(path, null, false);
+                workflow = workflowsApi.getWorkflowByPath(path, "versions", false);
             }
         } finally {
             if (workflow == null) {
@@ -351,8 +351,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String[] parts = toolpath.split(":");
         String path = parts[0];
         // match behaviour from getDescriptorFromServer, use master if no version is provided
-        String tag = getVersionID(toolpath);
         Workflow workflow = getDockstoreWorkflowByPath(path);
+        String tag = getVersionID(toolpath);
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(tag))
             .findFirst();
 
@@ -573,7 +573,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     @Override
     public void handleInfo(String entryPath) {
         try {
-            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entryPath, null, false, null);
+            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entryPath, "versions", false, null);
             if (workflow == null || !workflow.isIsPublished()) {
                 errorMessage("This workflow is not published.", COMMAND_ERROR);
             } else {
@@ -966,7 +966,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         } else {
             final String entry = reqVal(args, "--entry");
             try {
-                Workflow workflow = workflowsApi.getWorkflowByPath(entry, null, false);
+                Workflow workflow = workflowsApi.getWorkflowByPath(entry, "versions", false);
                 long workflowId = workflow.getId();
 
                 String descriptorType = optVal(args, "--descriptor-type", workflow.getDescriptorType().getValue());
@@ -1067,7 +1067,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             final String name = reqVal(args, "--name");
 
             try {
-                Workflow workflow = workflowsApi.getWorkflowByPath(entry, null, false);
+                Workflow workflow = workflowsApi.getWorkflowByPath(entry, "versions", false);
                 List<WorkflowVersion> workflowVersions = workflow.getWorkflowVersions();
 
                 for (WorkflowVersion workflowVersion : workflowVersions) {

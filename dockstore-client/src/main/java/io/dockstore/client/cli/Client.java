@@ -111,8 +111,6 @@ public class Client {
     private static ObjectMapper objectMapper;
 
     private String configFile = null;
-    private ContainersApi containersApi;
-    private UsersApi usersApi;
     private Ga4GhApi ga4ghApi;
     private Ga4Ghv20Api ga4ghv20Api;
     private ExtendedGa4GhApi extendedGA4GHApi;
@@ -768,8 +766,6 @@ public class Client {
                     System.exit(GENERIC_ERROR);
                 }
             }
-        } catch (IOException | ApiException ex) {
-            exceptionMessage(ex, "", GENERIC_ERROR);
         } catch (ProcessingException ex) {
             exceptionMessage(ex, "Could not connect to Dockstore web service", CONNECTION_ERROR);
         } catch (Exception ex) {
@@ -802,8 +798,8 @@ public class Client {
         bearer.setApiKey(token);
         defaultApiClient.setBasePath(serverUrl);
 
-        this.containersApi = new ContainersApi(defaultApiClient);
-        this.usersApi = new UsersApi(defaultApiClient);
+        ContainersApi containersApi = new ContainersApi(defaultApiClient);
+        UsersApi usersApi = new UsersApi(defaultApiClient);
         this.ga4ghApi = new Ga4GhApi(defaultApiClient);
         this.extendedGA4GHApi = new ExtendedGa4GhApi(defaultApiClient);
         this.metadataApi = new MetadataApi(defaultApiClient);
@@ -817,8 +813,8 @@ public class Client {
         this.ga4ghv20Api = new Ga4Ghv20Api(openApiClient);
 
         try {
-            if (this.usersApi.getApiClient() != null) {
-                this.isAdmin = this.usersApi.getUser().isIsAdmin();
+            if (usersApi.getApiClient() != null) {
+                this.isAdmin = usersApi.getUser().isIsAdmin();
             }
         } catch (ApiException | ProcessingException ex) {
             this.isAdmin = false;

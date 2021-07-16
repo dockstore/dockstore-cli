@@ -19,7 +19,7 @@
 
     <groupId>io.dockstore</groupId>
     <artifactId>dockstore-cli</artifactId>
-    <version>1.11.0-alpha.0-SNAPSHOT</version>
+    <version>1.12.0-alpha.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>dockstore</name>
@@ -35,7 +35,7 @@
     <properties>
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.10.0</dockstore-core.version>
+        <dockstore-core.version>1.11.5</dockstore-core.version>
         <maven-failsafe.version>2.21.0</maven-failsafe.version>
         <maven-surefire.version>2.21.0</maven-surefire.version>
         <skipTests>false</skipTests>
@@ -61,33 +61,9 @@
             <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
         </repository>
         <repository>
-            <id>seqware.sourceforge.net</id>
-            <name>SeqWare Maven Repository</name>
-            <url>https://seqwaremaven.oicr.on.ca/artifactory/collab-release</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>seqwaremaven.oicr.on.ca</id>
-            <name>seqwaremaven.oicr.on.ca-releases</name>
-            <url>https://seqwaremaven.oicr.on.ca/artifactory/seqware-dependencies</url>
-        </repository>
-        <repository>
             <id>apache-releases</id>
             <name>Apache Releases repository</name>
             <url>https://repository.apache.org/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>jcenter</id>
-            <name>bintray</name>
-            <url>https://jcenter.bintray.com</url>
         </repository>
         <!-- broad -->
         <repository>
@@ -100,16 +76,6 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
-        <repository>
-            <id>sagebionetworks</id>
-            <name>sagebionetworks-releases</name>
-            <url>https://sagebionetworks.artifactoryonline.com/sagebionetworks/libs-releases-local</url>
-        </repository>
-        <repository>
-            <id>mockito</id>
-            <name>mockito</name>
-            <url>https://dl.bintray.com/mockito/maven/</url>
         </repository>
     </repositories>
 
@@ -140,6 +106,12 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- remove likely when bumping bom-internal -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>1.64</version>
+            </dependency>
             <dependency>
                 <groupId>io.dockstore</groupId>
                 <artifactId>bom-internal</artifactId>
@@ -231,8 +203,9 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.maven.shared</groupId>
@@ -416,6 +389,35 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>2.0.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>1.2.2</version>
+                    <configuration>
+                        <outputDirectory>${project.basedir}/generated/src/main/resources/</outputDirectory>
+                        <updatePomFile>false</updatePomFile>
+                        <!-- snyk is picky about filenames -->
+                        <flattenedPomFilename>pom.xml</flattenedPomFilename>
+                    </configuration>
+                    <executions>
+                        <!-- enable flattening -->
+                        <execution>
+                            <id>flatten</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                        <!-- ensure proper cleanup -->
+                        <execution>
+                            <id>flatten.clean</id>
+                            <phase>clean</phase>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -487,6 +489,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -622,8 +625,12 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <excludeGroups>io.dockstore.common.RegressionTest, io.dockstore.common.ConfidentialTest,io.dockstore.common.SlowTest,
-                    io.dockstore.common.BenchmarkTest,io.dockstore.common.ToilOnlyTest
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.ConfidentialTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.BenchmarkTest,
+                    io.dockstore.common.ToilOnlyTest
                 </excludeGroups>
             </properties>
 
@@ -656,20 +663,15 @@
             </properties>
         </profile>
         <profile>
-            <id>regression-integration-tests</id>
-            <!-- run only regression tests-->
-            <properties>
-                <skipTests>true</skipTests>
-                <skipITs>false</skipITs>
-                <groups>io.dockstore.common.RegressionTest</groups>
-            </properties>
-        </profile>
-        <profile>
             <id>integration-tests</id>
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.ToilOnlyTest
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -679,7 +681,12 @@
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
                 <groups>io.dockstore.common.ConfidentialTest</groups>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.WorkflowTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.WorkflowTest
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -689,7 +696,12 @@
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
                 <groups>io.dockstore.common.ConfidentialTest</groups>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.ToolTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.ToolTest
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -698,7 +710,12 @@
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.ConfidentialTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.ConfidentialTest
+                </excludeGroups>
             </properties>
         </profile>
         <profile>

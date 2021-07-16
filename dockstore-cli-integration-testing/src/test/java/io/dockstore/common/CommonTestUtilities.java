@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class CommonTestUtilities {
 
-    public static final String OLD_DOCKSTORE_VERSION = "1.7.4";
     // Travis is slow, need to wait up to 1 min for webservice to return
     public static final int WAIT_TIME = 60000;
     public static final String PUBLIC_CONFIG_PATH = ResourceHelpers.resourceFilePath("dockstore.yml");
@@ -89,7 +88,7 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", dropwizardConfigurationFile);
         application
             .run("db", "migrate", dropwizardConfigurationFile, "--include", "1.3.0.generated,1.3.1.consistency,1.4.0,1.5.0,"
-                    + "1.6.0,1.7.0,1.8.0,1.9.0,1.10.0");
+                    + "1.6.0,1.7.0,1.8.0,1.9.0,1.10.0,1.11.0");
     }
 
     /**
@@ -116,7 +115,7 @@ public final class CommonTestUtilities {
 
         List<String> migrationList = Arrays
             .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0",
-                    "1.8.0", "1.9.0", "1.10.0");
+                    "1.8.0", "1.9.0", "1.10.0", "1.11.0");
         runMigration(migrationList, application, dropwizardConfigurationFile);
     }
 
@@ -193,7 +192,7 @@ public final class CommonTestUtilities {
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml");
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0");
         runMigration(migrationList, application, configPath);
     }
 
@@ -261,7 +260,7 @@ public final class CommonTestUtilities {
         migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml");
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0");
         runMigration(migrationList, application, configPath);
     }
 

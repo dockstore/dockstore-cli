@@ -27,7 +27,7 @@
     <parent>
         <artifactId>dockstore-cli</artifactId>
         <groupId>io.dockstore</groupId>
-        <version>1.11.0-alpha.0-SNAPSHOT</version>
+        <version>1.12.0-alpha.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -232,6 +232,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
