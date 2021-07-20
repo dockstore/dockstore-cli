@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +42,7 @@ import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import io.cwl.avro.CWL;
@@ -334,7 +336,7 @@ public class Client {
     /**
      * for downloading content for upgrade
      */
-    private static void downloadURL(String browserDownloadUrl, String installLocation) {
+    private static void downloadURL(String browserDownloadUrl, String installLocation, String dockstoreVersion) {
         try {
             URL dockstoreExecutable = new URL(browserDownloadUrl);
             File file = new File(installLocation);
@@ -345,7 +347,15 @@ public class Client {
             // Run the dockstore script with the 'self-install' argument so if it needs
             // to download the appropriate CLI JAR file it will do so now
             // and not the next time the user runs the dockstore script
-            Utilities.executeCommand(file.toPath().toString() + " self-install");
+            // Also set the Dockstore version environment variable to make
+            // sure that the dockstore script will download the new version of
+            // the client jar. The Dockstore version environment variable might
+            // be set to the previous version of Dockstore if the dockstore script
+            // was run to upgrade the Dockstore version.
+            Map<String, String> additionalEnvVarMap = new HashMap<>();
+            additionalEnvVarMap.put("DOCKSTORE_VERSION", dockstoreVersion);
+            Utilities.executeCommand(file.toPath().toString() + " self-install", ByteStreams.nullOutputStream(),
+                     ByteStreams.nullOutputStream(), null, additionalEnvVarMap);
         } catch (IOException e) {
             exceptionMessage(e, "Could not connect to Github. You may have reached your rate limit.", IO_ERROR);
         }
@@ -396,7 +406,7 @@ public class Client {
                     if ("unstable".equals(optVal)) {   // downgrade or upgrade to recent unstable version
                         upgradeURL = getUnstableURL(latestUnstable, mapRel);
                         out("Downloading version " + latestUnstable + " of Dockstore.");
-                        downloadURL(upgradeURL, installLocation);
+                        downloadURL(upgradeURL, installLocation, latestUnstable);
                         out("Download complete. You are now on version " + latestUnstable + " of Dockstore.");
                     } else {
                         //user input '--upgrade' without knowing the version or the optional commands
@@ -408,7 +418,7 @@ public class Client {
                     switch (optVal) {
                     case "stable":
                         out("Upgrading to most recent stable release (" + currentVersion + " -> " + latestVersion + ")");
-                        downloadURL(browserDownloadUrl, installLocation);
+                        downloadURL(browserDownloadUrl, installLocation, latestVersion);
                         out("Download complete. You are now on version " + latestVersion + " of Dockstore.");
                         break;
                     case "none":
@@ -420,7 +430,7 @@ public class Client {
                             // current version is the older unstable version
                             // upgrade to latest stable version
                             out("Upgrading to most recent stable release (" + currentVersion + " -> " + latestVersion + ")");
-                            downloadURL(browserDownloadUrl, installLocation);
+                            downloadURL(browserDownloadUrl, installLocation, latestVersion);
                             out("Download complete. You are now on version " + latestVersion + " of Dockstore.");
                         }
                         break;
@@ -433,7 +443,7 @@ public class Client {
                             //user wants to upgrade to newest unstable version
                             upgradeURL = getUnstableURL(latestUnstable, mapRel);
                             out("Downloading version " + latestUnstable + " of Dockstore.");
-                            downloadURL(upgradeURL, installLocation);
+                            downloadURL(upgradeURL, installLocation, latestUnstable);
                             out("Download complete. You are now on version " + latestUnstable + " of Dockstore.");
                         }
                         break;
