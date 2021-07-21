@@ -27,8 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -352,8 +352,8 @@ public class Client {
             // the client jar. The Dockstore version environment variable might
             // be set to the previous version of Dockstore if the dockstore script
             // was run to upgrade the Dockstore version.
-            Map<String, String> additionalEnvVarMap = new HashMap<>();
-            additionalEnvVarMap.put("DOCKSTORE_VERSION", dockstoreVersion);
+            Map<String, String> additionalEnvVarMap =
+                    Collections.singletonMap("DOCKSTORE_VERSION", dockstoreVersion);
             Utilities.executeCommand(file.toPath().toString() + " self-install", ByteStreams.nullOutputStream(),
                      ByteStreams.nullOutputStream(), null, additionalEnvVarMap);
         } catch (IOException e) {
