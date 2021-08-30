@@ -40,6 +40,7 @@
         <maven-surefire.version>2.21.0</maven-surefire.version>
         <skipTests>false</skipTests>
         <skipITs>true</skipITs>
+        
     </properties>
 
     <organization>
