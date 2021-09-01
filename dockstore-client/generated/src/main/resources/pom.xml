@@ -326,7 +326,7 @@
         <enabled>true</enabled>
       </snapshots>
       <id>gitlab-maven</id>
-      <url>https://gitlab.com/api/v4/projects/28926799/packages/maven</url>
+      <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
     </repository>
     <repository>
       <snapshots>
