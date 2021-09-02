@@ -1,8 +1,8 @@
 name: Java CI
 
-#on:
-#  schedule:
-#    - cron: '0 16 * * *'
+on:
+  schedule:
+    - cron: '0 16 * * *'
 
 on: [push]
 
