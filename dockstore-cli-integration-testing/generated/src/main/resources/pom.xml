@@ -95,7 +95,7 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
-      <id>gitlab-maven</id>
+      <id>artifacts.oicr.on.ca.ca-snapshots</id>
       <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
     </repository>
     <repository>
