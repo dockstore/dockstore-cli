@@ -42,6 +42,16 @@
   </dependencies>
   <repositories>
     <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>artifacts.oicr.on.ca.ca-snapshots</id>
+      <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
       <id>artifacts.oicr.on.ca</id>
       <name>artifacts.oicr.on.ca</name>
       <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
