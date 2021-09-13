@@ -21,6 +21,6 @@ jobs:
       - name: Get latest snapshot version
         run: echo 'LATEST_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*" | cut -d '-' -f 1,2) >> $GITHUB_ENV
       - name: Build with mvnw
-        run: ./mvnw clean test -Punit-tests -Ddockstore-core.version=${{ env.LATEST_VERSION }} -B -ntp -U
+        run: ./mvnw clean test -Punit-tests -Ddockstore-core.version=${{ env.LATEST_VERSION }}-SNAPSHOT -B -ntp -U
       - name: Check what changed
         run: git diff
