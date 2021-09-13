@@ -1,8 +1,8 @@
 name: Java CI
 
-on:
-  schedule:
-    - cron: '0 4 * * *'
+# on:
+#   schedule:
+#     - cron: '0 4 * * *'
 
 jobs:
   build:
@@ -17,7 +17,9 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
            ${{ runner.os }}-maven-
+      - name: Get latest snapshot version
+        run: echo 'LATEST_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $GITHUB_ENV
       - name: Build with mvnw
-        run: ./mvnw clean test -Punit-tests -Ddockstore-core.version=1.12.0-alpha.1-SNAPSHOT -B -ntp -U
+        run: ./mvnw clean test -Punit-tests -Ddockstore-core.version=${{ env.LATEST_VERSION }} -B -ntp -U
       - name: Check what changed
         run: git diff
