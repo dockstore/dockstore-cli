@@ -1,5 +1,6 @@
 name: Java CI
 
+on: [push]
 # on:
 #   schedule:
 #     - cron: '0 4 * * *'
