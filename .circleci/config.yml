@@ -4,11 +4,11 @@ orbs:
 executors:
   unit_tests_executor:
     docker: # run the steps with Docker
-      - image: cimg/openjdk:11.0.8
+      - image: cimg/openjdk:11.0.10
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2004:202104-01
     environment:
       PGHOST: 127.0.0.1
     resource_class: medium
