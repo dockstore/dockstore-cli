@@ -1,9 +1,8 @@
 name: Java CI
 
-on: [push]
-# on:
-#   schedule:
-#     - cron: '0 4 * * *'
+on:
+  schedule:
+    - cron: '0 4 * * *'
 
 jobs:
   build:
