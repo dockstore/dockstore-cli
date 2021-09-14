@@ -1,10 +1,14 @@
 version: 2.1
+parameters:
+  java-tag:
+    type: string
+    default: "11.0.11"
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
   unit_tests_executor:
     docker: # run the steps with Docker
-      - image: cimg/openjdk:11.0.11
+      - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
@@ -81,7 +85,7 @@ jobs:
 
   build:
     docker: # run the steps with Docker
-      - image: cimg/openjdk:11.0.11
+      - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
         environment:
           # Java can read cgroup. Sadly the cgroup in
           # CircleCI is wrong. Have to manually set. Nothing to do with surefire
