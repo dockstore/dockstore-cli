@@ -29,6 +29,8 @@ if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     libseccomp-dev \
     pkg-config
 
+    # do we have conflicting go installations?
+    sudo rm -Rf /usr/local/go
     # Install Go (needed to install singularity)
     # Install instructions at https://sylabs.io/guides/3.0/user-guide/installation.html#install-go
     # pick version at https://golang.org/dl/
