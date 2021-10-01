@@ -6,11 +6,16 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import io.openapi.wes.client.ApiClient;
 import io.openapi.wes.client.ApiException;
+import io.openapi.wes.client.Pair;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.MultiPart;
@@ -114,5 +119,114 @@ public class ApiClientExtended extends ApiClient {
         }
         return entity;
     }
+
+    /**
+     * Invoke API by sending HTTP request with the given options.
+     *
+     * @param <T> Type
+     * @param path The sub-path of the HTTP URL
+     * @param method The request method, one of "GET", "POST", "PUT", "HEAD" and "DELETE"
+     * @param queryParams The query parameters
+     * @param body The request body object
+     * @param headerParams The header parameters
+     * @param formParams The form parameters
+     * @param accept The request's Accept header
+     * @param contentType The request's Content-Type header
+     * @param authNames The authentications to apply
+     * @param returnType The return type into which to deserialize the response
+     * @return The response body in type of string
+     * @throws ApiException API exception
+     */
+    public <T> T invokeAPI(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String accept, String contentType, String[] authNames, GenericType<T> returnType) throws ApiException {
+        updateParamsForAuth(authNames, queryParams, headerParams);
+
+        // Not using `.target(this.basePath).path(path)` below,
+        // to support (constant) query string in `path`, e.g. "/posts?draft=1"
+        WebTarget target = httpClient.target(this.basePath + path);
+
+        if (queryParams != null) {
+            for (Pair queryParam : queryParams) {
+                if (queryParam.getValue() != null) {
+                    target = target.queryParam(queryParam.getName(), queryParam.getValue());
+                }
+            }
+        }
+
+        Invocation.Builder invocationBuilder = target.request().accept(accept);
+
+        for (Map.Entry<String, String> entry : headerParams.entrySet()) {
+            String value = entry.getValue();
+            if (value != null) {
+                invocationBuilder = invocationBuilder.header(entry.getKey(), value);
+            }
+        }
+
+        for (Map.Entry<String, String> entry : defaultHeaderMap.entrySet()) {
+            String key = entry.getKey();
+            if (!headerParams.containsKey(key)) {
+                String value = entry.getValue();
+                if (value != null) {
+                    invocationBuilder = invocationBuilder.header(key, value);
+                }
+            }
+        }
+
+        Entity<?> entity = serialize(body, formParams, contentType);
+
+        Response response = null;
+
+        try {
+            if ("GET".equals(method)) {
+                response = invocationBuilder.get();
+            } else if ("POST".equals(method)) {
+                response = invocationBuilder.post(entity);
+            } else if ("PUT".equals(method)) {
+                response = invocationBuilder.put(entity);
+            } else if ("DELETE".equals(method)) {
+                response = invocationBuilder.delete();
+            } else if ("PATCH".equals(method)) {
+                response = invocationBuilder.method("PATCH", entity);
+            } else if ("HEAD".equals(method)) {
+                response = invocationBuilder.head();
+            } else {
+                throw new ApiException(500, "unknown method type " + method);
+            }
+
+            statusCode = response.getStatusInfo().getStatusCode();
+            responseHeaders = buildResponseHeaders(response);
+
+            if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+                return null;
+            } else if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+                if (returnType == null)
+                    return null;
+                else
+                    return deserialize(response, returnType);
+            } else {
+                String message = "error";
+                String respBody = null;
+                if (response.hasEntity()) {
+                    try {
+                        respBody = String.valueOf(response.readEntity(String.class));
+                        message = respBody;
+                    } catch (RuntimeException e) {
+                        // e.printStackTrace();
+                    }
+                }
+                throw new ApiException(
+                    response.getStatus(),
+                    message,
+                    buildResponseHeaders(response),
+                    respBody);
+            }
+        } finally {
+            try {
+                response.close();
+            } catch (Exception e) {
+                // it's not critical, since the response object is local in method invokeAPI; that's fine, just continue
+            }
+        }
+    }
+
 
 }
