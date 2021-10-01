@@ -6,7 +6,7 @@ import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 
 public class WesCredentials {
 
-    public enum CredentialType {BEARER_TOKEN, PERMANENT_AWS_CREDENTIALS}
+    public enum CredentialType {BEARER_TOKEN, AWS_PERMANENT_CREDENTIALS}
 
     // Type of credentials that are set
     private final CredentialType credentialType;
@@ -23,8 +23,8 @@ public class WesCredentials {
     // TODO AWS profiles
 
     /**
-     *
-     * @param bearerToken
+     * Credentials that use a single API/bearer token for authentication
+     * @param bearerToken The bearer token that will be used for authorization
      */
     public WesCredentials(String bearerToken) {
         this.bearerToken = bearerToken;
@@ -32,35 +32,46 @@ public class WesCredentials {
         this.credentialType = CredentialType.BEARER_TOKEN;
     }
 
+    /**
+     * Credentials that use an AWS access key and AWS secret access key for authentication
+     * @param awsAccessKey The permanent access key
+     * @param awsSecretKey The permanent secret access key
+     */
     public WesCredentials(String awsAccessKey, String awsSecretKey) {
         this.awsAccessKey = awsAccessKey;
         this.awsSecretKey = awsSecretKey;
 
-        this.credentialType = CredentialType.PERMANENT_AWS_CREDENTIALS;
+        this.credentialType = CredentialType.AWS_PERMANENT_CREDENTIALS;
     }
 
     public CredentialType getCredentialType() {
         return credentialType;
     }
 
-    public String getFirstToken() {
-        switch (credentialType) {
-        case BEARER_TOKEN:
+    public String getBearerToken() {
+        if (credentialType == CredentialType.BEARER_TOKEN) {
             return this.bearerToken;
-        case PERMANENT_AWS_CREDENTIALS:
-            return this.awsAccessKey;
-        default:
-            errorMessage("Unable to locate a primary credentials token (bearer token, AWS access key)", Client.COMMAND_ERROR);
-            return "";
+        } else {
+            errorMessage("Unable to locate a bearer token this, credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
+            return null;
         }
     }
 
-    public String getSecondToken() {
-        if (credentialType == CredentialType.PERMANENT_AWS_CREDENTIALS) {
+    public String getAwsAccessKey() {
+        if (credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS) {
+            return this.awsAccessKey;
+        } else {
+            errorMessage("Unable to locate a AWS access key, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
+            return null;
+        }
+    }
+
+    public String getAwsSecretKey() {
+        if (credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS) {
             return this.awsSecretKey;
         } else {
-            errorMessage("Unable to locate a secondary credentials token (AWS secret access key)", Client.COMMAND_ERROR);
-            return "";
+            errorMessage("Unable to locate a AWS secret access key, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
+            return null;
         }
     }
 }

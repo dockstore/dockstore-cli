@@ -274,6 +274,10 @@ public final class ArgumentUtility {
         return found;
     }
 
+    public static boolean flagPresent(List<String> args, String flag) {
+        return args.contains(flag);
+    }
+
     public static String getGitRegistry(String gitUrl) {
         if (gitUrl.contains("bitbucket")) {
             return "bitbucket";

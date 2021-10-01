@@ -95,6 +95,7 @@ import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.flagPresent;
 import static io.dockstore.client.cli.ArgumentUtility.invalid;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
 import static io.dockstore.client.cli.ArgumentUtility.optVals;
@@ -142,7 +143,8 @@ public abstract class AbstractEntryClient<T> {
 
     private boolean isWesCommand = false;
     private String wesUri = null;
-    private String wesAuth = null;
+    private WesCredentials wesAuth = null;
+    private boolean isAwsWes = false;
 
     static String getCleanedDescription(String description) {
         description = MoreObjects.firstNonNull(description, "");
@@ -158,7 +160,7 @@ public abstract class AbstractEntryClient<T> {
         return wesUri;
     }
 
-    String getWesAuth() {
+    WesCredentials getWesAuth() {
         return wesAuth;
     }
 
@@ -1041,7 +1043,7 @@ public abstract class AbstractEntryClient<T> {
      *
      * @param wesUrl URL to WES endpoint
      */
-    WorkflowExecutionServiceApi getWorkflowExecutionServiceApi(String wesUrl, String wesCred) {
+    WorkflowExecutionServiceApi getWorkflowExecutionServiceApi(String wesUrl, WesCredentials wesCred) {
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = new WorkflowExecutionServiceApi();
 
         // Uncomment this code when Swagger Codegen generates correct Java
@@ -1052,7 +1054,7 @@ public abstract class AbstractEntryClient<T> {
         // Since Swagger Codegen does not create correct code for the
         // workflow attachment
         // Delete these next two lines when Swagger Codegen is fixed
-        ApiClientExtended wesApiClient = new ApiClientExtended();
+        ApiClientExtended wesApiClient = new ApiClientExtended(wesCred);
         clientWorkflowExecutionServiceApi.setApiClient(wesApiClient);
 
         INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
@@ -1072,18 +1074,6 @@ public abstract class AbstractEntryClient<T> {
             wesApiClient.setBasePath(wesEndpointUrl);
         }
 
-        /*
-         * Setup authentication credentials for the WES URL
-         */
-        String wesAuthorizationCredentials = ObjectUtils.firstNonNull(wesCred, configSubNode.getString("authorization"));
-        if (wesAuthorizationCredentials == null) {
-            out("Could not set Authorization header. Authorization key not found in config file and not provided on the command line. "
-                    + "Please add 'authorization: <type> <credentials> to config file in WES section or "
-                    + "use --wes-auth '<type> <credentials>' option on the command line if authorization credentials are needed");
-        } else {
-            wesApiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, wesAuthorizationCredentials);
-        }
-
         // Add these headers to the http request. Are these needed?
         wesApiClient.addDefaultHeader("Accept", "*/*");
         wesApiClient.addDefaultHeader("Expect", "100-continue");
@@ -1098,8 +1088,15 @@ public abstract class AbstractEntryClient<T> {
      * @param args Arguments entered into the CLI
      */
     private void processWesCommands(final List<String> args) {
+        this.isAwsWes = flagPresent(args, "--aws");
         this.wesUri = optVal(args, "--wes-url", null);
-        this.wesAuth = optVal(args, "--wes-auth", null);
+
+        if (isAwsWes) {
+            this.wesAuth = new WesCredentials(reqVal(args, "--aws-access-key"), reqVal(args, "--aws-secret-key"));
+        } else {
+            this.wesAuth = new WesCredentials(reqVal(args, "--wes-auth"));
+        }
+
 
         if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
             wesHelp();

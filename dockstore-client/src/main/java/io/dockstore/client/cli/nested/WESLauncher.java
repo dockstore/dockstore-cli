@@ -39,7 +39,7 @@ public class WESLauncher extends BaseLauncher {
     @Override
     public void initialize() {
         String wesUrl = abstractEntryClient.getWesUri();
-        String wesAuth = abstractEntryClient.getWesAuth();
+        WesCredentials wesAuth = abstractEntryClient.getWesAuth();
         clientWorkflowExecutionServiceApi = abstractEntryClient.getWorkflowExecutionServiceApi(wesUrl, wesAuth);
     }
 

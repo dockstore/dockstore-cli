@@ -17,6 +17,12 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 
 public class ApiClientExtended extends ApiClient {
 
+    final WesCredentials wesCredentials;
+
+    public ApiClientExtended(WesCredentials wesCredentials) {
+        this.wesCredentials = wesCredentials;
+    }
+
     /**
      *
      * @param key Multi-part form body name
