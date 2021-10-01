@@ -67,6 +67,7 @@ import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
 import io.openapi.wes.client.model.RunLog;
 import io.openapi.wes.client.model.RunStatus;
+import io.openapi.wes.client.model.ServiceInfo;
 import io.swagger.client.ApiException;
 import io.swagger.client.model.Label;
 import io.swagger.client.model.SourceFile;
@@ -1155,6 +1156,19 @@ public abstract class AbstractEntryClient<T> {
                     }
                 }
                 break;
+            case "service-info":
+                if (containsHelpRequest(args)) {
+                    wesServiceInfoHelp();
+                } else {
+                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(getWesUri(), getWesAuth());
+                    try {
+                        ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
+                        out("WES server info: " + response.toString());
+                    } catch (io.openapi.wes.client.ApiException e) {
+                        LOG.error("Error getting WES server info", e);
+                    }
+                }
+                break;
             default:
                 invalid(cmd);
                 break;
@@ -1425,6 +1439,17 @@ public abstract class AbstractEntryClient<T> {
         out("Required Parameters:");
         out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
         out("");
+        printWesHelpFooter();
+        printHelpFooter();
+    }
+
+    private void wesServiceInfoHelp() {
+        printHelpHeader();
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes service-info --help");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes service-info");
+        out("");
+        out("Description:");
+        out("  Returns descriptive information of the provided WES server. ");
         printWesHelpFooter();
         printHelpFooter();
     }
