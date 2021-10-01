@@ -1381,6 +1381,7 @@ public abstract class AbstractEntryClient<T> {
         out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes service-info [parameters]");
         out("");
         out("Description:");
         out(" Sends a request to a Workflow Execution Service (WES) endpoint.");
