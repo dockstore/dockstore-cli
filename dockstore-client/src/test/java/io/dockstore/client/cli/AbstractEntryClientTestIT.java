@@ -8,7 +8,7 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
 public class AbstractEntryClientTestIT {
-    
+
     @Rule
     public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
     @Rule
@@ -19,25 +19,20 @@ public class AbstractEntryClientTestIT {
      */
     @Test
     public void testWESHelpMessages() {
-        String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
-        String[] command = { "workflow", "wes", "--help", "--config", clientConfig };
-        Client.main(command);
-        Assert.assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+        final String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
+        final String[] commandNames = {"", "launch", "status", "cancel", "service-info"};
 
-        String[] commandLaunch = { "workflow", "wes", "launch", "--help", "--config", clientConfig };
-        Client.main(commandLaunch);
-        Assert.assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+        for (String command : commandNames) {
+            String[] commandStatement;
 
-        String[] commandStatus = { "workflow", "wes", "status", "--help", "--config", clientConfig };
-        Client.main(commandStatus);
-        Assert.assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+            if (command.length() == 0) {
+                commandStatement = new String[]{ "workflow", "wes", "--help", "--config", clientConfig };
+            } else {
+                commandStatement = new String[]{ "workflow", "wes", command, "--help", "--config", clientConfig };
+            }
 
-        String[] commandCancel = { "workflow", "wes", "cancel", "--help", "--config", clientConfig };
-        Client.main(commandCancel);
-        Assert.assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
-
-        String[] commandServiceInfo = { "workflow", "wes", "service-info", "--help", "--config", clientConfig };
-        Client.main(commandServiceInfo);
-        Assert.assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+            Client.main(commandStatement);
+            Assert.assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+        }
     }
 }
