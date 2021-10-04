@@ -1,0 +1,140 @@
+package io.dockstore.common;
+
+import io.dockstore.client.cli.nested.WesRequestData;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.ExpectedSystemExit;
+import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.contrib.java.lang.system.SystemOutRule;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class WesRequestDataTest {
+
+    @Rule
+    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
+    @Rule
+    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+    @Rule
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+
+    @Test
+    public void testNoCredentials() {
+        WesRequestData wrd = new WesRequestData("myFakeUri");
+        assertSame("If only a URI was passed, there should ne no credentials", wrd.getCredentialType(),
+            WesRequestData.CredentialType.NO_CREDENTIALS);
+        assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        wrd.getBearerToken();
+        assertFalse("There should be error logs as no token exists but there aren't", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        wrd.getAwsAccessKey();
+        assertFalse("There should be error logs as no access key exists but there aren't", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        wrd.getAwsSecretKey();
+        assertFalse("There should be error logs as no secret key exists but there aren't", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        wrd.getAwsRegion();
+        assertFalse("There should be error logs as no region exists but there aren't", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testBearerTokenCredentials() {
+        WesRequestData wrd = new WesRequestData("myFakeUri", "myfaketoken");
+        assertSame("If a URI and single token was passed, this should be a interpreted as a bearer token", wrd.getCredentialType(),
+            WesRequestData.CredentialType.BEARER_TOKEN);
+        assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+
+        wrd.getBearerToken();
+        assertTrue("There should be no error logs as a token exists", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        wrd.getAwsAccessKey();
+        assertFalse("There should be error logs as no access key exists but there aren't", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        wrd.getAwsSecretKey();
+        assertFalse("There should be error logs as no secret key exists but there aren't", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        wrd.getAwsRegion();
+        assertFalse("There should be error logs as no region exists but there aren't", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAwsPermanentCredentials() {
+        WesRequestData wrd = new WesRequestData("myFakeUri", "myFakeAccessKey", "myFakeSecretKey", "myFakeRegion");
+        assertSame("If AWS credentials were passed (access key, secret key, rgion), this should be interpreted as permanent credentials", wrd.getCredentialType(),
+            WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS);
+        assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        wrd.getBearerToken();
+        assertFalse("There should be error logs as no token exists but there aren't", systemErrRule.getLog().isBlank());
+
+        wrd.getAwsAccessKey();
+        wrd.getAwsSecretKey();
+        wrd.getAwsRegion();
+        assertTrue("There should be no error logs for accessing any of the AWS credentials", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testNullAndEmptyURI() {
+        systemExit.expectSystemExit();
+        WesRequestData wrd = new WesRequestData("");
+        assertFalse("An empty URI should not be accepted", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        WesRequestData wrd2 = new WesRequestData(null);
+        assertFalse("A null URI should not be accepted", systemErrRule.getLog().isBlank());
+
+    }
+
+    @Test
+    public void testNullCredentials() {
+        systemExit.expectSystemExit();
+        WesRequestData wrd = new WesRequestData("myFakeUri", null);
+        assertFalse("A null bearer token should not be accepted", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        WesRequestData wrd2 = new WesRequestData("myFakeUri", null, null, null);
+        assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        WesRequestData wrd3 = new WesRequestData("myFakeUri", null, "whatIfIPassInJustOne?", null);
+        assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        WesRequestData wrd4 = new WesRequestData("myFakeUri", "whatIfIPassInJustOne?", "howAboutTwo?", null);
+        assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
+
+    }
+
+    @Test
+    public void testCorrectResponses() {
+        final String uri = "myFakeUri";
+        final String bearerToken = "myFakeBearerToken";
+        final String awsAccessKey = "12345678";
+        final String awsSecretKey = "87654321";
+        final String awsRegion = "space-mars-1";
+
+        WesRequestData wrd = new WesRequestData(uri);
+        assertSame("URIs should match", wrd.getUrl(), uri);
+
+        wrd = new WesRequestData(uri, bearerToken);
+        assertSame("URIs should match", wrd.getUrl(), uri);
+        assertSame("Bearer token should match", wrd.getBearerToken(), bearerToken);
+
+        wrd = new WesRequestData(uri, awsAccessKey, awsSecretKey, awsRegion);
+        assertSame("URIs should match", wrd.getUrl(), uri);
+        assertSame("Access key should match", wrd.getAwsAccessKey(), awsAccessKey);
+        assertSame("Secret key should match", wrd.getAwsSecretKey(), awsSecretKey);
+        assertSame("Region should match", wrd.getAwsRegion(), awsRegion);
+    }
+}
