@@ -1063,11 +1063,10 @@ public abstract class AbstractEntryClient<T> {
      * @param args Arguments entered into the CLI
      */
     private void processWesCommands(final List<String> args) {
-        this.aggregateWesRequestData(args);
-
         if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
             wesHelp();
         } else {
+            this.aggregateWesRequestData(args);
             final String cmd = args.remove(0);
             switch (cmd) {
             case "launch":
