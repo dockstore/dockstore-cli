@@ -40,10 +40,10 @@ public class ApiClientExtended extends ApiClient {
     static final String AWS_WES_SERVICE_NAME = "execute-api";
 
 
-    final WesCredentials wesCredentials;
+    final WesRequestData wesRequestData;
 
-    public ApiClientExtended(WesCredentials wesCredentials) {
-        this.wesCredentials = wesCredentials;
+    public ApiClientExtended(WesRequestData wesRequestData) {
+        this.wesRequestData = wesRequestData;
     }
 
     /**
@@ -172,7 +172,7 @@ public class ApiClientExtended extends ApiClient {
             }
         }
 
-        final boolean requiresAwsHeaders = this.wesCredentials.getCredentialType() == WesCredentials.CredentialType.AWS_PERMANENT_CREDENTIALS;
+        final boolean requiresAwsHeaders = this.wesRequestData.getCredentialType() == WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS;
         Invocation.Builder invocationBuilder = createInvocation(requiresAwsHeaders, target, method, headerParams);
 
         Entity<?> entity = serialize(body, formParams, contentType);
@@ -293,8 +293,8 @@ public class ApiClientExtended extends ApiClient {
             request = new HttpRequest(method, target.getUri());
             awsAuthSignature = Signer.builder()
                 // TODO this currently only supports permanent AWS credentials
-                .awsCredentials(new AwsCredentials(this.wesCredentials.getAwsAccessKey(), this.wesCredentials.getAwsSecretKey()))
-                .region(this.wesCredentials.getAwsRegion())
+                .awsCredentials(new AwsCredentials(this.wesRequestData.getAwsAccessKey(), this.wesRequestData.getAwsSecretKey()))
+                .region(this.wesRequestData.getAwsRegion())
                 .header(HttpHeaders.HOST, target.getUri().getHost()); // Have to manually set the Host header
         }
 
@@ -319,7 +319,7 @@ public class ApiClientExtended extends ApiClient {
             // Add to the invocation builder.
             invocationBuilder.header(HttpHeaders.AUTHORIZATION, signature);
         } else {
-            invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + this.wesCredentials.getBearerToken());
+            invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + this.wesRequestData.getBearerToken());
         }
 
         return invocationBuilder;
