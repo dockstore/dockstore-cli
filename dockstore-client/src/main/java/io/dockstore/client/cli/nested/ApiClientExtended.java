@@ -319,8 +319,7 @@ public class ApiClientExtended extends ApiClient {
             // Add to the invocation builder.
             invocationBuilder.header(HttpHeaders.AUTHORIZATION, signature);
         } else {
-            // TODO probably shouldn't be adding 'Bearer' here... But we need to make it consistent elsewhere and with the docs https://docs.dockstore.org/en/develop/advanced-topics/advanced-features.html#wes-endpoint-and-authorization
-            invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + this.wesRequestData.getBearerToken());
+            invocationBuilder.header(HttpHeaders.AUTHORIZATION, this.wesRequestData.getBearerToken());
         }
 
         return invocationBuilder;

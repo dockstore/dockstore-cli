@@ -2,4 +2,4 @@ server-url: http://localhost:8080
 
 [WES]
 url: https://fake.wes.endpoint
-authorization: myfaketoken
+authorization: Bearer myfaketoken
