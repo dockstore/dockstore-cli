@@ -17,6 +17,7 @@ public class WesCredentials {
     // AWS permanent credentials auth
     private String awsAccessKey;
     private String awsSecretKey;
+    private String region;
 
     // TODO AWS temporary session credentials
 
@@ -37,9 +38,10 @@ public class WesCredentials {
      * @param awsAccessKey The permanent access key
      * @param awsSecretKey The permanent secret access key
      */
-    public WesCredentials(String awsAccessKey, String awsSecretKey) {
+    public WesCredentials(String awsAccessKey, String awsSecretKey, String region) {
         this.awsAccessKey = awsAccessKey;
         this.awsSecretKey = awsSecretKey;
+        this.region = region;
 
         this.credentialType = CredentialType.AWS_PERMANENT_CREDENTIALS;
     }
@@ -71,6 +73,15 @@ public class WesCredentials {
             return this.awsSecretKey;
         } else {
             errorMessage("Unable to locate a AWS secret access key, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
+            return null;
+        }
+    }
+
+    public String getAwsRegion() {
+        if (credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS) {
+            return this.region;
+        } else {
+            errorMessage("Unable to locate a AWS region, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
             return null;
         }
     }
