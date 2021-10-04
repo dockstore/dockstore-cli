@@ -155,6 +155,7 @@ public class ApiClientExtended extends ApiClient {
      * @return The response body in type of string
      * @throws ApiException API exception
      */
+    @Override
     public <T> T invokeAPI(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String accept, String contentType, String[] authNames, GenericType<T> returnType) throws ApiException {
         updateParamsForAuth(authNames, queryParams, headerParams);
 
