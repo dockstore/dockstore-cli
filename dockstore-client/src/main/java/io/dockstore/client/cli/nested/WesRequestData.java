@@ -66,19 +66,19 @@ public class WesRequestData {
         this(url);
 
         if (awsAccessKey == null) {
-            errorMessage("No AWS access key found in config file and no AWS access key entered on command line."
+            errorMessage("No AWS access key found in config file and no AWS access key entered on command line. "
                 + "Please add 'authorization: <type> <credentials> to config file in WES section or "
                 + "use --aws-access-key '<type> <credentials>' option on the command line if authorization credentials are needed", CLIENT_ERROR);
         }
 
         if (awsSecretKey == null) {
-            errorMessage("No AWS secret access key found in config file and no AWS secret access key entered on command line."
+            errorMessage("No AWS secret access key found in config file and no AWS secret access key entered on command line. "
                 + "Please add 'authorization: <type> <credentials> to config file in WES section or "
                 + "use --aws-secret-key '<type> <credentials>' option on the command line if authorization credentials are needed", CLIENT_ERROR);
         }
 
         if (region == null) {
-            errorMessage("No AWS region key found in config file and no AWS region entered on command line."
+            errorMessage("No AWS region key found in config file and no AWS region entered on command line. "
                 + "Please add 'region: <type> <credentials> to config file in WES section or "
                 + "use --aws-region '<region>' option on the command line if region specifications are needed", CLIENT_ERROR);
         }
