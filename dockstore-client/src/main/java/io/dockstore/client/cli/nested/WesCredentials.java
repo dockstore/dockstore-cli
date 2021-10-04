@@ -6,7 +6,7 @@ import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 
 public class WesCredentials {
 
-    public enum CredentialType {BEARER_TOKEN, AWS_PERMANENT_CREDENTIALS}
+    public enum CredentialType { BEARER_TOKEN, AWS_PERMANENT_CREDENTIALS }
 
     // Type of credentials that are set
     private final CredentialType credentialType;

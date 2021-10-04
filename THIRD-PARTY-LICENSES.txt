@@ -1,5 +1,5 @@
 
-Lists of 380 third-party dependencies.
+Lists of 381 third-party dependencies.
      (The Apache Software License, Version 2.0) "Java Concurrency in Practice" book annotations (net.jcip:jcip-annotations:1.0 - http://jcip.net/)
      (Apache License, Version 2.0) akka-actor (com.typesafe.akka:akka-actor_2.12:2.5.31 - https://akka.io/)
      (Apache License, Version 2.0) akka-protobuf (com.typesafe.akka:akka-protobuf_2.12:2.5.31 - https://akka.io/)
@@ -72,6 +72,7 @@ Lists of 380 third-party dependencies.
      (Apache License, Version 2.0) AWS Java SDK for Amazon S3 (com.amazonaws:aws-java-sdk-s3:1.11.86 - https://aws.amazon.com/sdkforjava)
      (Apache License, Version 2.0) AWS Java SDK for AWS KMS (com.amazonaws:aws-java-sdk-kms:1.11.86 - https://aws.amazon.com/sdkforjava)
      (Apache License, Version 2.0) AWS SDK for Java - Core (com.amazonaws:aws-java-sdk-core:1.11.86 - https://aws.amazon.com/sdkforjava)
+     (The Apache Software License, Version 2.0) AWS V4 Signer for Java (uk.co.lucasweb:aws-v4-signer-java:1.3 - https://github.com/lucasweb78/aws-v4-signer-java)
      (The Apache Software License, Version 2.0) Bean Validation API (javax.validation:validation-api:1.1.0.Final - http://beanvalidation.org)
      (MIT) better-files (com.github.pathikrit:better-files_2.12:3.9.1 - https://github.com/pathikrit/better-files)
      (Bouncy Castle Licence) Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs (org.bouncycastle:bcpkix-jdk15on:1.64 - https://www.bouncycastle.org/java.html)

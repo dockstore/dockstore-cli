@@ -1,15 +1,12 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
-import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
@@ -25,12 +22,15 @@ import javax.ws.rs.core.Response;
 import io.openapi.wes.client.ApiClient;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.Pair;
+import org.apache.http.HttpStatus;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import uk.co.lucasweb.aws.v4.signer.HttpRequest;
 import uk.co.lucasweb.aws.v4.signer.Signer;
 import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
+
+import static io.dockstore.client.cli.ArgumentUtility.out;
 
 public class ApiClientExtended extends ApiClient {
 
@@ -156,6 +156,7 @@ public class ApiClientExtended extends ApiClient {
      * @throws ApiException API exception
      */
     @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public <T> T invokeAPI(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String accept, String contentType, String[] authNames, GenericType<T> returnType) throws ApiException {
         updateParamsForAuth(authNames, queryParams, headerParams);
 
@@ -192,7 +193,7 @@ public class ApiClientExtended extends ApiClient {
             } else if ("HEAD".equals(method)) {
                 response = invocationBuilder.head();
             } else {
-                throw new ApiException(500, "unknown method type " + method);
+                throw new ApiException(HttpStatus.SC_INTERNAL_SERVER_ERROR, "unknown method type " + method);
             }
 
             statusCode = response.getStatusInfo().getStatusCode();
@@ -201,10 +202,11 @@ public class ApiClientExtended extends ApiClient {
             if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
                 return null;
             } else if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-                if (returnType == null)
+                if (returnType == null) {
                     return null;
-                else
+                } else {
                     return deserialize(response, returnType);
+                }
             } else {
                 String message = "error";
                 String respBody = null;
@@ -213,7 +215,7 @@ public class ApiClientExtended extends ApiClient {
                         respBody = String.valueOf(response.readEntity(String.class));
                         message = respBody;
                     } catch (RuntimeException e) {
-                        // e.printStackTrace();
+                        out(e.getMessage()); // Not in original generated code, placing this here for checkstyle
                     }
                 }
                 throw new ApiException(
@@ -226,7 +228,7 @@ public class ApiClientExtended extends ApiClient {
             try {
                 response.close();
             } catch (Exception e) {
-                // it's not critical, since the response object is local in method invokeAPI; that's fine, just continue
+                out(e.getMessage()); // Not in original generated code, placing this here for checkstyle
             }
         }
     }
@@ -240,9 +242,9 @@ public class ApiClientExtended extends ApiClient {
      * @param headerParams The header parameters passed to the original invokeAPI function
      * @return A merged map of multiple headers.
      */
-    private TreeMap<String, String> mergeHeaders(boolean requiresAwsHeaders, Map<String, String> headerParams) {
+    private Map<String, String> mergeHeaders(boolean requiresAwsHeaders, Map<String, String> headerParams) {
         // We need the map to be sorted, as AWS requires header orders to be alphabetical
-        TreeMap<String, String> mergedHeaderMap = new TreeMap<>();
+        Map<String, String> mergedHeaderMap = new TreeMap<>();
 
         // Note: If 2 maps have duplicate keys, the key/value pair of the last map merged into the
         // mergedMap is the one that will be kept, the rest will be clobbered.
@@ -284,7 +286,7 @@ public class ApiClientExtended extends ApiClient {
         HttpRequest request = null;
 
         // Merge all our different headers into a single object for easier handling
-        TreeMap<String, String> mergedHeaderMap = mergeHeaders(requiresAwsHeaders, headerParams);
+        Map<String, String> mergedHeaderMap = mergeHeaders(requiresAwsHeaders, headerParams);
 
         // If this request is to an AWS endpoint, we'll need to take some extra steps to create the AWS SIGv4 header
         if (requiresAwsHeaders) {

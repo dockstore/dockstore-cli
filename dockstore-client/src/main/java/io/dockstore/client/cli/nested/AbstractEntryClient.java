@@ -36,8 +36,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.HttpHeaders;
-
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
