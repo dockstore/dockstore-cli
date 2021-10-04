@@ -108,6 +108,7 @@ import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
+import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
@@ -1034,6 +1035,11 @@ public abstract class AbstractEntryClient<T> {
      * Creates a WES API object and sets the endpoint.
      */
     WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
+
+        if (wesRequestData == null) {
+            errorMessage("No credentials object located. Unable to create the client API", GENERIC_ERROR);
+        }
+        
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = new WorkflowExecutionServiceApi();
 
         // Uncomment this code when Swagger Codegen generates correct Java
