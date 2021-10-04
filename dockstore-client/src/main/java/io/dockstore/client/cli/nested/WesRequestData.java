@@ -132,4 +132,8 @@ public class WesRequestData {
             return null;
         }
     }
+
+    public boolean requiresAwsHeaders() {
+        return this.credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS;
+    }
 }

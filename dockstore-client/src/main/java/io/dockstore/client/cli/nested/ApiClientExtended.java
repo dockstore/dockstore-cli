@@ -171,8 +171,7 @@ public class ApiClientExtended extends ApiClient {
             }
         }
 
-        final boolean requiresAwsHeaders = this.wesRequestData.getCredentialType() == WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS;
-        Invocation.Builder invocationBuilder = createInvocation(requiresAwsHeaders, target, method, headerParams);
+        Invocation.Builder invocationBuilder = createInvocation(this.wesRequestData.requiresAwsHeaders(), target, method, headerParams);
 
         Entity<?> entity = serialize(body, formParams, contentType);
 
