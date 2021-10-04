@@ -1,15 +1,24 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
+import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TimeZone;
+import java.util.TreeMap;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -19,8 +28,17 @@ import io.openapi.wes.client.Pair;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.MultiPart;
+import uk.co.lucasweb.aws.v4.signer.HttpRequest;
+import uk.co.lucasweb.aws.v4.signer.Signer;
+import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
 
 public class ApiClientExtended extends ApiClient {
+
+    static final String TIME_ZONE = "UTC";
+    static final String DATA_FORMAT = "yyyyMMdd'T'HHmmss'Z'";
+    static final String AWS_DATE_HEADER = "x-amz-date";
+    static final String AWS_WES_SERVICE_NAME = "execute-api";
+
 
     final WesCredentials wesCredentials;
 
@@ -152,24 +170,8 @@ public class ApiClientExtended extends ApiClient {
             }
         }
 
-        Invocation.Builder invocationBuilder = target.request().accept(accept);
-
-        for (Map.Entry<String, String> entry : headerParams.entrySet()) {
-            String value = entry.getValue();
-            if (value != null) {
-                invocationBuilder = invocationBuilder.header(entry.getKey(), value);
-            }
-        }
-
-        for (Map.Entry<String, String> entry : defaultHeaderMap.entrySet()) {
-            String key = entry.getKey();
-            if (!headerParams.containsKey(key)) {
-                String value = entry.getValue();
-                if (value != null) {
-                    invocationBuilder = invocationBuilder.header(key, value);
-                }
-            }
-        }
+        final boolean requiresAwsHeaders = this.wesCredentials.getCredentialType() == WesCredentials.CredentialType.AWS_PERMANENT_CREDENTIALS;
+        Invocation.Builder invocationBuilder = createInvocation(requiresAwsHeaders, target, method, headerParams);
 
         Entity<?> entity = serialize(body, formParams, contentType);
 
@@ -226,6 +228,82 @@ public class ApiClientExtended extends ApiClient {
                 // it's not critical, since the response object is local in method invokeAPI; that's fine, just continue
             }
         }
+    }
+
+    /**
+     * We have 3 different sets of header values we need to consider
+     *  1. The headerParams passed into the invokeApi function
+     *  2. The defaultHeaderMap that is set when the Client is created
+     *  3. The required AWS headers for AWS SIGv4 signing
+     *
+     * @param headerParams The header parameters passed to the original invokeAPI function
+     * @return A merged map of multiple headers.
+     */
+    private TreeMap<String, String> mergeHeaders(boolean requiresAwsHeaders, Map<String, String> headerParams) {
+        // We need the map to be sorted, as AWS requires header orders to be alphabetical
+        TreeMap<String, String> mergedHeaderMap = new TreeMap<>();
+
+        // Note: If 2 maps have duplicate keys, the key/value pair of the last map merged into the
+        // mergedMap is the one that will be kept, the rest will be clobbered.
+        mergedHeaderMap.putAll(defaultHeaderMap);
+        mergedHeaderMap.putAll(headerParams);
+
+        if (requiresAwsHeaders) {
+            DateFormat dateFormat = new SimpleDateFormat(DATA_FORMAT);
+            dateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
+
+            mergedHeaderMap.put(AWS_DATE_HEADER, dateFormat.format(new Date()));
+            // Don't want to calculate our Authorization header off of another Authorization that will subsequently get overridden
+            mergedHeaderMap.remove(HttpHeaders.AUTHORIZATION);
+        }
+
+        return mergedHeaderMap;
+    }
+
+    // TODO: Handle requests with body content.
+    private Invocation.Builder createInvocation(boolean requiresAwsHeaders, WebTarget target, String method, Map<String, String> headerParams) {
+
+        Signer.Builder awsAuthSignature = null;
+        HttpRequest request = null;
+
+        // Merge all our different headers into a single object for easier handling
+        TreeMap<String, String> mergedHeaderMap = mergeHeaders(requiresAwsHeaders, headerParams);
+
+        // If this request is to an AWS endpoint, we'll need to take some extra steps to create the AWS SIGv4 header
+        if (requiresAwsHeaders) {
+            request = new HttpRequest(method, target.getUri());
+            awsAuthSignature = Signer.builder()
+                // TODO this currently only supports permanent AWS credentials
+                .awsCredentials(new AwsCredentials(this.wesCredentials.getAwsAccessKey(), this.wesCredentials.getAwsSecretKey()))
+                .region(this.wesCredentials.getAwsRegion())
+                .header(HttpHeaders.HOST, target.getUri().getHost()); // Have to manually set the Host header
+        }
+
+        Invocation.Builder invocationBuilder = target.request();
+
+        // Populate the Invocation.Builder object with headers. The 'Host' parameter cannot be manually set.
+        // It is inferred from the WebTarget object. If this is an AWS request, populate the headers there as well.
+        for (Map.Entry<String, String> mapEntry : mergedHeaderMap.entrySet()) {
+            invocationBuilder.header(mapEntry.getKey(), mapEntry.getValue());
+            if (requiresAwsHeaders) {
+                awsAuthSignature.header(mapEntry.getKey(), mapEntry.getValue());
+            }
+        }
+
+        // Finally, if this is an AWS request, we calculate the SIGv4 signature and add it to the Invocation.Builder, otherwise
+        // add the bearer token
+        if (requiresAwsHeaders) {
+            // TODO: Remove this once we are making requests with a body.
+            String contentSha256 = org.apache.commons.codec.digest.DigestUtils.sha256Hex("");
+            String signature = awsAuthSignature.build(request, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
+
+            // Add to the invocation builder.
+            invocationBuilder.header(HttpHeaders.AUTHORIZATION, signature);
+        } else {
+            invocationBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + this.wesCredentials.getBearerToken());
+        }
+
+        return invocationBuilder;
     }
 
 
