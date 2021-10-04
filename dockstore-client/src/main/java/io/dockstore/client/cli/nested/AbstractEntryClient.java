@@ -1092,7 +1092,7 @@ public abstract class AbstractEntryClient<T> {
         this.wesUri = optVal(args, "--wes-url", null);
 
         if (isAwsWes) {
-            this.wesAuth = new WesCredentials(reqVal(args, "--aws-access-key"), reqVal(args, "--aws-secret-key"));
+            this.wesAuth = new WesCredentials(reqVal(args, "--aws-access-key"), reqVal(args, "--aws-secret-key"), reqVal(args, "--region"));
         } else {
             this.wesAuth = new WesCredentials(reqVal(args, "--wes-auth"));
         }
