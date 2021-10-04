@@ -1072,7 +1072,7 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
             wesHelp();
         } else {
-            this.aggregateWesRequestData(args);
+            this.wesRequestData = this.aggregateWesRequestData(args);
             final String cmd = args.remove(0);
             switch (cmd) {
             case "launch":
@@ -1150,7 +1150,7 @@ public abstract class AbstractEntryClient<T> {
      * This will aggregate the WES request URI and credentials into a single object for use down the line
      * @param args The commaand line arguments
      */
-    private void aggregateWesRequestData(final List<String> args) {
+    private WesRequestData aggregateWesRequestData(final List<String> args) {
 
         // Get the config file to see if credentials are there
         INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
@@ -1172,10 +1172,10 @@ public abstract class AbstractEntryClient<T> {
             final String accessKey = ObjectUtils.firstNonNull(optVal(args, "--aws-access-key", null), Objects.requireNonNull(configSubNode).getString("aws-access-key"));
             final String secretKey = ObjectUtils.firstNonNull(optVal(args, "--aws-secret-key", null), Objects.requireNonNull(configSubNode).getString("aws-secret-key"));
             final String region = ObjectUtils.firstNonNull(optVal(args, "--aws-region", null), Objects.requireNonNull(configSubNode).getString("aws-region"));
-            this.wesRequestData = new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
+            return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
         } else {
             final String wesToken = ObjectUtils.firstNonNull(optVal(args, "--wes-auth", null), Objects.requireNonNull(configSubNode).getString("authorization"));
-            this.wesRequestData = new WesRequestData(wesEndpointUrl, wesToken);
+            return new WesRequestData(wesEndpointUrl, wesToken);
         }
     }
     /**
