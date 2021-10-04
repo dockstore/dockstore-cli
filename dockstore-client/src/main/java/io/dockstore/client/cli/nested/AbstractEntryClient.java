@@ -1141,11 +1141,13 @@ public abstract class AbstractEntryClient<T> {
 
     }
 
+    /**
+     * This will aggregate the WES request URI and credentials into a single object for use down the line
+     * @param args The commaand line arguments
+     */
     private void aggregateWesRequestData(final List<String> args) {
-        // TODO should probably have the config sections all defined within a single class. At least have enums.
-        final boolean isAwsWes = flagPresent(args, "--aws");
-        final String wesUri = optVal(args, "--wes-url", null);
 
+        // Get the config file to see if credentials are there
         INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
         SubnodeConfiguration configSubNode = null;
         try {
@@ -1154,14 +1156,20 @@ public abstract class AbstractEntryClient<T> {
             out("Could not get WES section from config file");
         }
 
-        String wesEndpointUrl = ObjectUtils.firstNonNull(wesUri, Objects.requireNonNull(configSubNode).getString("url"));
+        // Attempt to find the WES URI
+        final String wesUri = optVal(args, "--wes-url", null);
+        final String wesEndpointUrl = ObjectUtils.firstNonNull(wesUri, Objects.requireNonNull(configSubNode).getString("url"));
+
+        // Depending on the endpoint (AWS/non-AWS) we need to look for a different set of credentials
+        final boolean isAwsWes = flagPresent(args, "--aws");
         if (isAwsWes) {
-            String accessKey = ObjectUtils.firstNonNull(optVal(args, "--aws-access-key", null), Objects.requireNonNull(configSubNode).getString("aws-access-key"));
-            String secretKey = ObjectUtils.firstNonNull(optVal(args, "--aws-secret-key", null), Objects.requireNonNull(configSubNode).getString("aws-secret-key"));
-            String region = ObjectUtils.firstNonNull(optVal(args, "--aws-region", null), Objects.requireNonNull(configSubNode).getString("aws-region"));
+            // TODO should probably have the config sections all defined within a single class. At least have enums.
+            final String accessKey = ObjectUtils.firstNonNull(optVal(args, "--aws-access-key", null), Objects.requireNonNull(configSubNode).getString("aws-access-key"));
+            final String secretKey = ObjectUtils.firstNonNull(optVal(args, "--aws-secret-key", null), Objects.requireNonNull(configSubNode).getString("aws-secret-key"));
+            final String region = ObjectUtils.firstNonNull(optVal(args, "--aws-region", null), Objects.requireNonNull(configSubNode).getString("aws-region"));
             this.wesRequestData = new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
         } else {
-            String wesToken = ObjectUtils.firstNonNull(optVal(args, "--wes-auth", null), Objects.requireNonNull(configSubNode).getString("authorization"));
+            final String wesToken = ObjectUtils.firstNonNull(optVal(args, "--wes-auth", null), Objects.requireNonNull(configSubNode).getString("authorization"));
             this.wesRequestData = new WesRequestData(wesEndpointUrl, wesToken);
         }
     }
