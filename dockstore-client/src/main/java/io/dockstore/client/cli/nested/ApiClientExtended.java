@@ -245,14 +245,15 @@ public class ApiClientExtended extends ApiClient {
 
         // Note: If 2 maps have duplicate keys, the key/value pair of the last map merged into the
         // mergedMap is the one that will be kept, the rest will be clobbered.
-        mergedHeaderMap.putAll(defaultHeaderMap);
+        //mergedHeaderMap.putAll(defaultHeaderMap);
         mergedHeaderMap.putAll(headerParams);
 
         if (requiresAwsHeaders) {
+            // Calculate the date header
             DateFormat dateFormat = new SimpleDateFormat(DATA_FORMAT);
             dateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
-
             mergedHeaderMap.put(AWS_DATE_HEADER, dateFormat.format(new Date()));
+
             // Don't want to calculate our Authorization header off of another Authorization that will subsequently get overridden
             mergedHeaderMap.remove(HttpHeaders.AUTHORIZATION);
         }
