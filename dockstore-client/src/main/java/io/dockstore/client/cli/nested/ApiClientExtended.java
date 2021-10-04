@@ -245,7 +245,7 @@ public class ApiClientExtended extends ApiClient {
 
         // Note: If 2 maps have duplicate keys, the key/value pair of the last map merged into the
         // mergedMap is the one that will be kept, the rest will be clobbered.
-        //mergedHeaderMap.putAll(defaultHeaderMap);
+        mergedHeaderMap.putAll(defaultHeaderMap);
         mergedHeaderMap.putAll(headerParams);
 
         if (requiresAwsHeaders) {
@@ -256,6 +256,10 @@ public class ApiClientExtended extends ApiClient {
 
             // Don't want to calculate our Authorization header off of another Authorization that will subsequently get overridden
             mergedHeaderMap.remove(HttpHeaders.AUTHORIZATION);
+
+            // TODO decide how to handle this header. The 'Expect' header should only be sent for requests with a body, and might(?) impact signing
+            // It is currently part of the 'defaultHeaderMap', and is set in AbstractEntryClient.
+            mergedHeaderMap.remove("Expect");
         }
 
         return mergedHeaderMap;
