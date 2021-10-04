@@ -237,7 +237,7 @@ public class ApiClientExtended extends ApiClient {
      * We have 3 different sets of header values we need to consider
      *  1. The headerParams passed into the invokeApi function
      *  2. The defaultHeaderMap that is set when the Client is created
-     *  3. The required AWS headers for AWS SIGv4 signing
+     *  3. The required AWS headers for AWS SigV4 signing
      *
      * @param headerParams The header parameters passed to the original invokeAPI function
      * @return A merged map of multiple headers.
@@ -272,7 +272,7 @@ public class ApiClientExtended extends ApiClient {
 
     /**
      * Creates an Invocation.Builder that will be used to make a WES request. If the request is to be sent to an AWS endpoint
-     * a SIGv4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
+     * a SigV4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
      * @param requiresAwsHeaders Boolean value indicating if this request requires AWS-specific headers
      * @param target The target endpoint
      * @param method The HTTP method (GET, POST, etc ...)
@@ -288,7 +288,7 @@ public class ApiClientExtended extends ApiClient {
         // Merge all our different headers into a single object for easier handling
         Map<String, String> mergedHeaderMap = mergeHeaders(requiresAwsHeaders, headerParams);
 
-        // If this request is to an AWS endpoint, we'll need to take some extra steps to create the AWS SIGv4 header
+        // If this request is to an AWS endpoint, we'll need to take some extra steps to create the AWS SigV4 header
         if (requiresAwsHeaders) {
             request = new HttpRequest(method, target.getUri());
             awsAuthSignature = Signer.builder()
@@ -309,7 +309,7 @@ public class ApiClientExtended extends ApiClient {
             }
         }
 
-        // Finally, if this is an AWS request, we calculate the SIGv4 signature and add it to the Invocation.Builder, otherwise
+        // Finally, if this is an AWS request, we calculate the SigV4 signature and add it to the Invocation.Builder, otherwise
         // add the bearer token
         if (requiresAwsHeaders) {
             // TODO: Remove this once we are making requests with a body.
