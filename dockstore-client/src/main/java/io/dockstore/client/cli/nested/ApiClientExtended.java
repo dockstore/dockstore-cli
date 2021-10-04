@@ -257,8 +257,8 @@ public class ApiClientExtended extends ApiClient {
             // Don't want to calculate our Authorization header off of another Authorization that will subsequently get overridden
             mergedHeaderMap.remove(HttpHeaders.AUTHORIZATION);
 
-            // TODO decide how to handle this header. The 'Expect' header should only be sent for requests with a body, and might(?) impact signing
-            // It is currently part of the 'defaultHeaderMap', and is set in AbstractEntryClient.
+            // TODO decide how to handle this header. The 'Expect' header should only be sent for requests with a body, and might(?) impact signing based on how the 'Expect' header modifies how requests are sent
+            // It is currently part of the 'defaultHeaderMap', and is set in AbstractEntryClient, and seems to work fine for non-AWS WES requests
             mergedHeaderMap.remove("Expect");
         }
 
@@ -266,8 +266,19 @@ public class ApiClientExtended extends ApiClient {
     }
 
     // TODO: Handle requests with body content.
+
+    /**
+     * Creates an Invocation.Builder that will be used to make a WES request. If the request is to be sent to an AWS endpoint
+     * a SIGv4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
+     * @param requiresAwsHeaders Boolean value indicating if this request requires AWS-specific headers
+     * @param target The target endpoint
+     * @param method The HTTP method (GET, POST, etc ...)
+     * @param headerParams A list of header parameters custom to this request
+     * @return An Invocation.Builder that can be used to make an HTTP request
+     */
     private Invocation.Builder createInvocation(boolean requiresAwsHeaders, WebTarget target, String method, Map<String, String> headerParams) {
 
+        // These will only get used if this request requires AWS headers.
         Signer.Builder awsAuthSignature = null;
         HttpRequest request = null;
 
