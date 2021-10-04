@@ -38,8 +38,7 @@ public class WESLauncher extends BaseLauncher {
      */
     @Override
     public void initialize() {
-        WesRequestData wesRequestData = abstractEntryClient.getWesRequestData();
-        clientWorkflowExecutionServiceApi = abstractEntryClient.getWorkflowExecutionServiceApi(wesRequestData);
+        clientWorkflowExecutionServiceApi = abstractEntryClient.getWorkflowExecutionServiceApi();
     }
 
     /**

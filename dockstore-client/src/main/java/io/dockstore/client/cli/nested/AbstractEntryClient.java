@@ -1032,10 +1032,8 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * Creates a WES API object and sets the endpoint.
-     *
-     * @param wesRequestData Includes the credentials and WES URL that will be used for the request
      */
-    WorkflowExecutionServiceApi getWorkflowExecutionServiceApi(WesRequestData wesRequestData) {
+    WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = new WorkflowExecutionServiceApi();
 
         // Uncomment this code when Swagger Codegen generates correct Java
@@ -1087,7 +1085,7 @@ public abstract class AbstractEntryClient<T> {
                 if (args.isEmpty() || containsHelpRequest(args)) {
                     wesStatusHelp();
                 } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(getWesRequestData());
+                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
                     String workflowId = reqVal(args, "--id");
                     out("Getting status of WES workflow");
                     if (args.contains("--verbose")) {
@@ -1111,7 +1109,7 @@ public abstract class AbstractEntryClient<T> {
                 if (args.isEmpty() || containsHelpRequest(args)) {
                     wesCancelHelp();
                 } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(getWesRequestData());
+                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
                     out("Canceling WES workflow");
                     String workflowId = reqVal(args, "--id");
                     try {
@@ -1126,7 +1124,7 @@ public abstract class AbstractEntryClient<T> {
                 if (containsHelpRequest(args)) {
                     wesServiceInfoHelp();
                 } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(getWesRequestData());
+                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
                     try {
                         ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
                         out("WES server info: " + response.toString());
