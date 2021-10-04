@@ -284,6 +284,7 @@ public class ApiClientExtended extends ApiClient {
 
         Invocation.Builder invocationBuilder = target.request();
 
+        // If the request is to an AWS endpoint, we need to take some extra steps to calculate a SigV4 Authorization header.
         if (requiresAwsHeaders) {
             HttpRequest request = new HttpRequest(method, target.getUri());
             Signer.Builder awsAuthSignature = Signer.builder()
