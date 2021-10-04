@@ -39,7 +39,6 @@ public class ApiClientExtended extends ApiClient {
     static final String AWS_DATE_HEADER = "x-amz-date";
     static final String AWS_WES_SERVICE_NAME = "execute-api";
 
-
     final WesRequestData wesRequestData;
 
     public ApiClientExtended(WesRequestData wesRequestData) {
@@ -281,44 +280,39 @@ public class ApiClientExtended extends ApiClient {
      */
     private Invocation.Builder createInvocation(boolean requiresAwsHeaders, WebTarget target, String method, Map<String, String> headerParams) {
 
-        // These will only get used if this request requires AWS headers.
-        Signer.Builder awsAuthSignature = null;
-        HttpRequest request = null;
-
         // Merge all our different headers into a single object for easier handling
         Map<String, String> mergedHeaderMap = mergeHeaders(requiresAwsHeaders, headerParams);
 
-        // If this request is to an AWS endpoint, we'll need to take some extra steps to create the AWS SigV4 header
+        Invocation.Builder invocationBuilder = target.request();
+
         if (requiresAwsHeaders) {
-            request = new HttpRequest(method, target.getUri());
-            awsAuthSignature = Signer.builder()
+            HttpRequest request = new HttpRequest(method, target.getUri());
+            Signer.Builder awsAuthSignature = Signer.builder()
                 // TODO this currently only supports permanent AWS credentials
                 .awsCredentials(new AwsCredentials(this.wesRequestData.getAwsAccessKey(), this.wesRequestData.getAwsSecretKey()))
                 .region(this.wesRequestData.getAwsRegion())
-                .header(HttpHeaders.HOST, target.getUri().getHost()); // Have to manually set the Host header
-        }
+                .header(HttpHeaders.HOST, target.getUri().getHost()); // Have to manually set the Host header as it's required when signing
 
-        Invocation.Builder invocationBuilder = target.request();
-
-        // Populate the Invocation.Builder object with headers. The 'Host' parameter cannot be manually set.
-        // It is inferred from the WebTarget object. If this is an AWS request, populate the headers there as well.
-        for (Map.Entry<String, String> mapEntry : mergedHeaderMap.entrySet()) {
-            invocationBuilder.header(mapEntry.getKey(), mapEntry.getValue());
-            if (requiresAwsHeaders) {
+            // add all the non-Authorization headers to both request objects simultaneously
+            for (Map.Entry<String, String> mapEntry : mergedHeaderMap.entrySet()) {
+                invocationBuilder.header(mapEntry.getKey(), mapEntry.getValue());
                 awsAuthSignature.header(mapEntry.getKey(), mapEntry.getValue());
             }
-        }
 
-        // Finally, if this is an AWS request, we calculate the SigV4 signature and add it to the Invocation.Builder, otherwise
-        // add the bearer token
-        if (requiresAwsHeaders) {
             // TODO: Remove this once we are making requests with a body.
             String contentSha256 = org.apache.commons.codec.digest.DigestUtils.sha256Hex("");
             String signature = awsAuthSignature.build(request, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
 
-            // Add to the invocation builder.
+            // Add the new Authorization header SigV4 signature to the invocation
             invocationBuilder.header(HttpHeaders.AUTHORIZATION, signature);
+
         } else {
+            // add all the non-Authorization headers to the invocation object
+            for (Map.Entry<String, String> mapEntry : mergedHeaderMap.entrySet()) {
+                invocationBuilder.header(mapEntry.getKey(), mapEntry.getValue());
+            }
+
+            // Add the standard bearer token under the Authorization header to the invocation
             invocationBuilder.header(HttpHeaders.AUTHORIZATION, this.wesRequestData.getBearerToken());
         }
 
