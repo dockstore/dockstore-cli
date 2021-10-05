@@ -40,7 +40,7 @@ public class AbstractEntryClientTestIT {
     static final String AWS_CONFIG_RESOURCE = "clientConfigAws";
 
     // These constants also match the data in clientConfig
-    static final String FAKE_BEARER_TOKEN = "SmokeyTheBearToken";
+    static final String FAKE_BEARER_TOKEN = "Bearer SmokeyTheBearToken";
     static final String BEARER_CONFIG_RESOURCE = "clientConfig";
 
     /**
@@ -225,5 +225,59 @@ public class AbstractEntryClientTestIT {
         systemExit.expectSystemExit();
         requestData.getBearerToken();
         assertFalse("No Bearer token should be set", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAggregateApiCredentialDataWithNoConfig() {
+        AbstractEntryClient workflowClient = testAggregateHelper(null);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info",
+            "--wes-url", FAKE_WES_URL,
+            "--wes-auth", FAKE_BEARER_TOKEN));
+
+        WesRequestData requestData = workflowClient.aggregateWesRequestData(args);
+        assertFalse("The data parsed should not be AWS credentials", requestData.requiresAwsHeaders());
+        assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
+        assertEquals("The data should have parsed a bearer token", FAKE_BEARER_TOKEN, requestData.getBearerToken());
+
+        systemExit.expectSystemExit();
+        requestData.getAwsAccessKey();
+        assertFalse("No AWS credentials should be set", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAggregateApiCredentialDataWithConfigPartial1() {
+        AbstractEntryClient workflowClient = testAggregateHelper(BEARER_CONFIG_RESOURCE);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info",
+            "--wes-url", FAKE_WES_URL));
+
+        WesRequestData requestData = workflowClient.aggregateWesRequestData(args);
+        assertFalse("The data parsed should not be AWS credentials", requestData.requiresAwsHeaders());
+        assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
+        assertEquals("The data should have parsed a bearer token", FAKE_BEARER_TOKEN, requestData.getBearerToken());
+
+        systemExit.expectSystemExit();
+        requestData.getAwsAccessKey();
+        assertFalse("No AWS credentials should be set", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAggregateApiCredentialDataWithConfigPartial2() {
+        AbstractEntryClient workflowClient = testAggregateHelper(BEARER_CONFIG_RESOURCE);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info"));
+
+        WesRequestData requestData = workflowClient.aggregateWesRequestData(args);
+        assertFalse("The data parsed should not be AWS credentials", requestData.requiresAwsHeaders());
+        assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
+        assertEquals("The data should have parsed a bearer token", FAKE_BEARER_TOKEN, requestData.getBearerToken());
+
+        systemExit.expectSystemExit();
+        requestData.getAwsAccessKey();
+        assertFalse("No AWS credentials should be set", systemErrRule.getLog().isBlank());
     }
 }
