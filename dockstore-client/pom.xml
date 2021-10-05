@@ -279,6 +279,11 @@
             <artifactId>jersey-media-multipart</artifactId>
         </dependency>
 
+        <!--
+        This is a zero-dependency package for calculating AWS SigV4 headers.
+        GitHub: https://github.com/lucasweb78/aws-v4-signer-java
+        This repo seems to be slightly abandoned, it was last modified in 2017 and has open PRs from 2018.
+        -->
         <dependency>
             <groupId>uk.co.lucasweb</groupId>
             <artifactId>aws-v4-signer-java</artifactId>
