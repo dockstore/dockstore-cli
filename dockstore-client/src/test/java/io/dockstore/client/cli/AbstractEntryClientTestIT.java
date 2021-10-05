@@ -8,12 +8,6 @@ import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.WesRequestData;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dropwizard.testing.ResourceHelpers;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import org.junit.Rule;
@@ -22,15 +16,13 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
 public class AbstractEntryClientTestIT {
-
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
-    @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
-    @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
-
+    
     static final String FAKE_WES_URL = "veryveryfakeurl";
 
     // These constants also match the data in clientConfigAws
@@ -42,6 +34,13 @@ public class AbstractEntryClientTestIT {
     // These constants also match the data in clientConfig
     static final String FAKE_BEARER_TOKEN = "Bearer SmokeyTheBearToken";
     static final String BEARER_CONFIG_RESOURCE = "clientConfig";
+
+    @Rule
+    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
+    @Rule
+    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+    @Rule
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     /**
      * Tests the help messages for each of the WES command options
