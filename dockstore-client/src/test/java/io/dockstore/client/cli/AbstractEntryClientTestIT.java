@@ -31,12 +31,17 @@ public class AbstractEntryClientTestIT {
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
-    // These constants also match the data in clientConfigAws
     static final String FAKE_WES_URL = "veryveryfakeurl";
+
+    // These constants also match the data in clientConfigAws
     static final String FAKE_AWS_ACCESS_KEY = "123456789";
     static final String FAKE_AWS_SECRET_KEY = "987654321";
     static final String FAKE_AWS_REGION = "space-jupyter-7";
     static final String AWS_CONFIG_RESOURCE = "clientConfigAws";
+
+    // These constants also match the data in clientConfig
+    static final String FAKE_BEARER_TOKEN = "SmokeyTheBearToken";
+    static final String BEARER_CONFIG_RESOURCE = "clientConfig";
 
     /**
      * Tests the help messages for each of the WES command options
@@ -60,87 +65,114 @@ public class AbstractEntryClientTestIT {
         }
     }
 
-    @Test
-    public void testAggregateCredentialDataNoConfig() {
-
+    public AbstractEntryClient testAggregateHelper(String configPath) {
         WorkflowsApi api = mock(WorkflowsApi.class);
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
 
-        // client.setConfigFile(ResourceHelpers.resourceFilePath("clientConfig"));
+        if (configPath != null) {
+            client.setConfigFile(ResourceHelpers.resourceFilePath(configPath));
+        }
 
         AbstractEntryClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-
-        final List<String> command_starter_aws = Arrays.asList("workflow", "wes", "service-info", "--aws");
-        final List<String> wes_url = Arrays.asList("--wes-url", FAKE_WES_URL);
-        final List<String> aws_access = Arrays.asList("--aws-access-key", FAKE_AWS_ACCESS_KEY);
-        final List<String> aws_secret = Arrays.asList("--aws-secret-key", FAKE_AWS_SECRET_KEY);
-        final List<String> aws_region = Arrays.asList("--aws-region", FAKE_AWS_REGION);
-
-        // Tests complete command
-        List<String> args = new ArrayList<>(command_starter_aws);
-        args.addAll(aws_access);
-        args.addAll(aws_secret);
-        args.addAll(aws_region);
-        args.addAll(wes_url);
-
-        WesRequestData requestData = workflowClient.aggregateWesRequestData(args);
-        assertTrue("The data parsed should be AWS credentials", requestData.requiresAwsHeaders());
-        assertEquals("The data should have parsed an access key", FAKE_AWS_ACCESS_KEY, requestData.getAwsAccessKey());
-        assertEquals("The data should have parsed a secret key", FAKE_AWS_SECRET_KEY, requestData.getAwsSecretKey());
-        assertEquals("The data should have parsed a region", FAKE_AWS_REGION, requestData.getAwsRegion());
-        assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
-
-        // Test incomplete commands, no url
-        args = new ArrayList<>(command_starter_aws);
-        args.addAll(aws_access);
-        args.addAll(aws_secret);
-        args.addAll(aws_region);
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(args);
-        assertFalse("No URL was passed in", systemErrRule.getLog().isBlank());
-
-        // Test incomplete command, missing AWS creds
-        args = new ArrayList<>(command_starter_aws);
-        args.addAll(aws_access);
-        args.addAll(aws_region);
-        args.addAll(wes_url);
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(args);
-        assertFalse("No secret was passed in", systemErrRule.getLog().isBlank());
-
-        // Test incomplete command, missing AWS region
-        args = new ArrayList<>(command_starter_aws);
-        args.addAll(aws_access);
-        args.addAll(aws_secret);
-        args.addAll(wes_url);
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(args);
-        assertFalse("No region was passed in", systemErrRule.getLog().isBlank());
+        return workflowClient;
     }
 
     @Test
-    public void testAggregateCredentialDataWithConfig() {
-        WorkflowsApi api = mock(WorkflowsApi.class);
-        UsersApi usersApi = mock(UsersApi.class);
-        Client client = new Client();
+    public void testAggregateAWSCredentialDataNoUrl() {
 
-        client.setConfigFile(ResourceHelpers.resourceFilePath(AWS_CONFIG_RESOURCE));
-
-        AbstractEntryClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-
-        final List<String> command_starter_aws = Arrays.asList("workflow", "wes", "service-info", "--aws");
-        final List<String> wes_url = Arrays.asList("--wes-url", FAKE_WES_URL);
-        final List<String> aws_access = Arrays.asList("--aws-access-key", FAKE_AWS_ACCESS_KEY);
-        final List<String> aws_secret = Arrays.asList("--aws-secret-key", FAKE_AWS_SECRET_KEY);
-        final List<String> aws_region = Arrays.asList("--aws-region", FAKE_AWS_REGION);
+        AbstractEntryClient workflowClient = testAggregateHelper(null);
 
         // Tests complete command
-        List<String> args = new ArrayList<>(command_starter_aws);
-        args.addAll(aws_access);
-        args.addAll(aws_secret);
-        args.addAll(aws_region);
-        args.addAll(wes_url);
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info", "--aws",
+            "--aws-access-key", FAKE_AWS_ACCESS_KEY,
+            "--aws-secret-key", FAKE_AWS_SECRET_KEY,
+            "--aws-region", FAKE_AWS_REGION));
+        systemExit.expectSystemExit();
+        workflowClient.aggregateWesRequestData(args);
+        assertFalse("No URL was passed in", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAggregateAWSCredentialDataNoSecret() {
+
+        AbstractEntryClient workflowClient = testAggregateHelper(null);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info", "--aws",
+            "--wes-url", FAKE_WES_URL,
+            "--aws-access-key", FAKE_AWS_ACCESS_KEY,
+            "--aws-region", FAKE_AWS_REGION));
+        systemExit.expectSystemExit();
+        workflowClient.aggregateWesRequestData(args);
+        assertFalse("No secret was passed in", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAggregateAWSCredentialDataNoAccess() {
+
+        AbstractEntryClient workflowClient = testAggregateHelper(null);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info", "--aws",
+            "--wes-url", FAKE_WES_URL,
+            "--aws-secret-key", FAKE_AWS_SECRET_KEY,
+            "--aws-region", FAKE_AWS_REGION));
+        systemExit.expectSystemExit();
+        workflowClient.aggregateWesRequestData(args);
+        assertFalse("No access was passed in", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAggregateAWSCredentialDataNoConfigFull() {
+
+        AbstractEntryClient workflowClient = testAggregateHelper(null);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info", "--aws",
+            "--wes-url", FAKE_WES_URL,
+            "--aws-access-key", FAKE_AWS_ACCESS_KEY,
+            "--aws-secret-key", FAKE_AWS_SECRET_KEY,
+            "--aws-region", FAKE_AWS_REGION));
+
+        WesRequestData requestData = workflowClient.aggregateWesRequestData(args);
+        assertTrue("The data parsed should be AWS credentials", requestData.requiresAwsHeaders());
+        assertEquals("The data should have parsed an access key", FAKE_AWS_ACCESS_KEY, requestData.getAwsAccessKey());
+        assertEquals("The data should have parsed a secret key", FAKE_AWS_SECRET_KEY, requestData.getAwsSecretKey());
+        assertEquals("The data should have parsed a region", FAKE_AWS_REGION, requestData.getAwsRegion());
+        assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
+        systemExit.expectSystemExit();
+        requestData.getBearerToken();
+        assertFalse("No Bearer token should be set", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAggregateAWSCredentialDataWithConfigPartial1() {
+        AbstractEntryClient workflowClient = testAggregateHelper(AWS_CONFIG_RESOURCE);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info", "--aws",
+            "--wes-url", FAKE_WES_URL,
+            "--aws-access-key", FAKE_AWS_ACCESS_KEY,
+            "--aws-secret-key", FAKE_AWS_SECRET_KEY));
+
+        WesRequestData requestData = workflowClient.aggregateWesRequestData(args);
+        assertTrue("The data parsed should be AWS credentials", requestData.requiresAwsHeaders());
+        assertEquals("The data should have parsed an access key", FAKE_AWS_ACCESS_KEY, requestData.getAwsAccessKey());
+        assertEquals("The data should have parsed a secret key", FAKE_AWS_SECRET_KEY, requestData.getAwsSecretKey());
+        assertEquals("The data should have parsed a region", FAKE_AWS_REGION, requestData.getAwsRegion());
+        assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
+    }
+
+    @Test
+    public void testAggregateAWSCredentialDataWithConfigPartial2() {
+        AbstractEntryClient workflowClient = testAggregateHelper(AWS_CONFIG_RESOURCE);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info", "--aws",
+            "--wes-url", FAKE_WES_URL,
+            "--aws-region", FAKE_AWS_REGION));
+
         WesRequestData requestData = workflowClient.aggregateWesRequestData(args);
         assertTrue("The data parsed should be AWS credentials", requestData.requiresAwsHeaders());
         assertEquals("The data should have parsed an access key", FAKE_AWS_ACCESS_KEY, requestData.getAwsAccessKey());
@@ -148,35 +180,50 @@ public class AbstractEntryClientTestIT {
         assertEquals("The data should have parsed a region", FAKE_AWS_REGION, requestData.getAwsRegion());
         assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
 
-        // Tests complete command with data from config
-        args = new ArrayList<>(command_starter_aws);
-        args.addAll(aws_access);
-        args.addAll(aws_secret);
-        args.addAll(aws_region);
-        requestData = workflowClient.aggregateWesRequestData(args);
+        systemExit.expectSystemExit();
+        requestData.getBearerToken();
+        assertFalse("No Bearer token should be set", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAggregateAWSCredentialDataWithConfigPartial3() {
+        AbstractEntryClient workflowClient = testAggregateHelper(AWS_CONFIG_RESOURCE);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info", "--aws"));
+
+        WesRequestData requestData = workflowClient.aggregateWesRequestData(args);
         assertTrue("The data parsed should be AWS credentials", requestData.requiresAwsHeaders());
         assertEquals("The data should have parsed an access key", FAKE_AWS_ACCESS_KEY, requestData.getAwsAccessKey());
         assertEquals("The data should have parsed a secret key", FAKE_AWS_SECRET_KEY, requestData.getAwsSecretKey());
         assertEquals("The data should have parsed a region", FAKE_AWS_REGION, requestData.getAwsRegion());
         assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
 
-        // Tests complete command with data from config
-        args = new ArrayList<>(command_starter_aws);
-        args.addAll(aws_access);
-        requestData = workflowClient.aggregateWesRequestData(args);
+        systemExit.expectSystemExit();
+        requestData.getBearerToken();
+        assertFalse("No Bearer token should be set", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testAggregateAWSCredentialDataWithConfigFull() {
+        AbstractEntryClient workflowClient = testAggregateHelper(AWS_CONFIG_RESOURCE);
+
+        // Tests complete command
+        List<String> args = new ArrayList<>(Arrays.asList("workflow", "wes", "service-info", "--aws",
+            "--wes-url", FAKE_WES_URL,
+            "--aws-access-key", FAKE_AWS_ACCESS_KEY,
+            "--aws-secret-key", FAKE_AWS_SECRET_KEY,
+            "--aws-region", FAKE_AWS_REGION));
+
+        WesRequestData requestData = workflowClient.aggregateWesRequestData(args);
         assertTrue("The data parsed should be AWS credentials", requestData.requiresAwsHeaders());
         assertEquals("The data should have parsed an access key", FAKE_AWS_ACCESS_KEY, requestData.getAwsAccessKey());
         assertEquals("The data should have parsed a secret key", FAKE_AWS_SECRET_KEY, requestData.getAwsSecretKey());
         assertEquals("The data should have parsed a region", FAKE_AWS_REGION, requestData.getAwsRegion());
         assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
 
-        // Tests complete command with data from config
-        args = new ArrayList<>(command_starter_aws);
-        requestData = workflowClient.aggregateWesRequestData(args);
-        assertTrue("The data parsed should be AWS credentials", requestData.requiresAwsHeaders());
-        assertEquals("The data should have parsed an access key", FAKE_AWS_ACCESS_KEY, requestData.getAwsAccessKey());
-        assertEquals("The data should have parsed a secret key", FAKE_AWS_SECRET_KEY, requestData.getAwsSecretKey());
-        assertEquals("The data should have parsed a region", FAKE_AWS_REGION, requestData.getAwsRegion());
-        assertEquals("The data should have parsed a url", FAKE_WES_URL, requestData.getUrl());
+        systemExit.expectSystemExit();
+        requestData.getBearerToken();
+        assertFalse("No Bearer token should be set", systemErrRule.getLog().isBlank());
     }
 }
