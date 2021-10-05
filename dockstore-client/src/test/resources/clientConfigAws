@@ -1,0 +1,5 @@
+[WES]
+url: veryveryfakeurl
+aws-access-key: 123456789
+aws-secret-key: 987654321
+aws-region: space-jupyter-7

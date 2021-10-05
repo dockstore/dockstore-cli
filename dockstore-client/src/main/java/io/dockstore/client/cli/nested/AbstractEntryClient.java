@@ -1150,7 +1150,7 @@ public abstract class AbstractEntryClient<T> {
      * This will aggregate the WES request URI and credentials into a single object for use down the line
      * @param args The commaand line arguments
      */
-    private WesRequestData aggregateWesRequestData(final List<String> args) {
+    public WesRequestData aggregateWesRequestData(final List<String> args) {
 
         // Get the config file to see if credentials are there
         INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
