@@ -30,18 +30,6 @@ public class WesRequestDataTest {
         systemExit.expectSystemExit();
         wrd.getBearerToken();
         assertFalse("There should be error logs as no token exists but there aren't", systemErrRule.getLog().isBlank());
-
-        systemExit.expectSystemExit();
-        wrd.getAwsAccessKey();
-        assertFalse("There should be error logs as no access key exists but there aren't", systemErrRule.getLog().isBlank());
-
-        systemExit.expectSystemExit();
-        wrd.getAwsSecretKey();
-        assertFalse("There should be error logs as no secret key exists but there aren't", systemErrRule.getLog().isBlank());
-
-        systemExit.expectSystemExit();
-        wrd.getAwsRegion();
-        assertFalse("There should be error logs as no region exists but there aren't", systemErrRule.getLog().isBlank());
     }
 
     @Test
@@ -57,14 +45,6 @@ public class WesRequestDataTest {
         systemExit.expectSystemExit();
         wrd.getAwsAccessKey();
         assertFalse("There should be error logs as no access key exists but there aren't", systemErrRule.getLog().isBlank());
-
-        systemExit.expectSystemExit();
-        wrd.getAwsSecretKey();
-        assertFalse("There should be error logs as no secret key exists but there aren't", systemErrRule.getLog().isBlank());
-
-        systemExit.expectSystemExit();
-        wrd.getAwsRegion();
-        assertFalse("There should be error logs as no region exists but there aren't", systemErrRule.getLog().isBlank());
     }
 
     @Test
@@ -74,44 +54,58 @@ public class WesRequestDataTest {
             WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS);
         assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
 
-        systemExit.expectSystemExit();
-        wrd.getBearerToken();
-        assertFalse("There should be error logs as no token exists but there aren't", systemErrRule.getLog().isBlank());
-
         wrd.getAwsAccessKey();
         wrd.getAwsSecretKey();
         wrd.getAwsRegion();
         assertTrue("There should be no error logs for accessing any of the AWS credentials", systemErrRule.getLog().isBlank());
+
+        systemExit.expectSystemExit();
+        wrd.getBearerToken();
+        assertFalse("There should be error logs as no token exists but there aren't", systemErrRule.getLog().isBlank());
+
     }
 
     @Test
-    public void testNullAndEmptyURI() {
+    public void testNullURI() {
         systemExit.expectSystemExit();
-        WesRequestData wrd = new WesRequestData("");
-        assertFalse("An empty URI should not be accepted", systemErrRule.getLog().isBlank());
-
-        systemExit.expectSystemExit();
-        WesRequestData wrd2 = new WesRequestData(null);
+        WesRequestData wrd = new WesRequestData(null);
         assertFalse("A null URI should not be accepted", systemErrRule.getLog().isBlank());
 
     }
 
     @Test
-    public void testNullCredentials() {
+    public void testEmptyURI() {
+        systemExit.expectSystemExit();
+        WesRequestData wrd = new WesRequestData("");
+        assertFalse("An empty URI should not be accepted", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testNullCredentials1() {
         systemExit.expectSystemExit();
         WesRequestData wrd = new WesRequestData("myFakeUri", null);
         assertFalse("A null bearer token should not be accepted", systemErrRule.getLog().isBlank());
+    }
 
+    @Test
+    public void testNullCredentials2() {
         systemExit.expectSystemExit();
-        WesRequestData wrd2 = new WesRequestData("myFakeUri", null, null, null);
+        WesRequestData wrd = new WesRequestData("myFakeUri", null, null, null);
         assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
 
-        systemExit.expectSystemExit();
-        WesRequestData wrd3 = new WesRequestData("myFakeUri", null, "whatIfIPassInJustOne?", null);
-        assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
+    }
 
+    @Test
+    public void testNullCredentials3() {
         systemExit.expectSystemExit();
-        WesRequestData wrd4 = new WesRequestData("myFakeUri", "whatIfIPassInJustOne?", "howAboutTwo?", null);
+        WesRequestData wrd = new WesRequestData("myFakeUri", null, "whatIfIPassInJustOne?", null);
+        assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
+    public void testNullCredentials4() {
+        systemExit.expectSystemExit();
+        WesRequestData wrd = new WesRequestData("myFakeUri", "whatIfIPassInJustOne?", "howAboutTwo?", null);
         assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
 
     }
