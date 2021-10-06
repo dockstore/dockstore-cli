@@ -1037,7 +1037,7 @@ public abstract class AbstractEntryClient<T> {
     WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
 
         if (wesRequestData == null) {
-            errorMessage("No credentials object located. Unable to create the client API", GENERIC_ERROR);
+            errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);
         }
         
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = new WorkflowExecutionServiceApi();
