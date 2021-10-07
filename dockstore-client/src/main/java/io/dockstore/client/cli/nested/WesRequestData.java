@@ -78,7 +78,7 @@ public class WesRequestData {
         }
 
         if (region == null) {
-            errorMessage("No AWS region key found in config file and no AWS region entered on command line. "
+            errorMessage("No AWS region found in config file and no AWS region entered on command line. "
                 + "Please add 'region: <type> <credentials> to config file in WES section or "
                 + "use --aws-region '<region>' option on the command line if region specifications are needed", CLIENT_ERROR);
         }
