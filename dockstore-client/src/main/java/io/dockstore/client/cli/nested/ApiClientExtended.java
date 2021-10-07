@@ -275,6 +275,9 @@ public class ApiClientExtended extends ApiClient {
      */
     public String generateAwsSignature(WebTarget target, String method, Map<String, String> allHeaders) {
         HttpRequest request = new HttpRequest(method, target.getUri());
+
+        // Our signature object. We will add all necessary headers to this request that comprise the 'canonical' HTTP request.
+        // This will then be signed alongside a hash of the body content (if there is a body).
         Signer.Builder awsAuthSignature = Signer.builder()
             // TODO this currently only supports permanent AWS credentials
             .awsCredentials(new AwsCredentials(this.wesRequestData.getAwsAccessKey(), this.wesRequestData.getAwsSecretKey()))
@@ -314,7 +317,7 @@ public class ApiClientExtended extends ApiClient {
         // If the request requires AWS auth headers, calculate the signature, otherwise just get the standard bearer token
         final String authorizationHeader = requiresAwsHeaders
             ? generateAwsSignature(target, method, mergedHeaderMap) : this.wesRequestData.getBearerToken();
-        
+
         // Add the Authorization header. This should be the last modification to the InvocationBuilder to ensure the signature remains valid
         invocationBuilder.header(HttpHeaders.AUTHORIZATION, authorizationHeader);
 
