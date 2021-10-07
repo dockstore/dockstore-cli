@@ -1169,9 +1169,10 @@ public abstract class AbstractEntryClient<T> {
         final boolean isAwsWes = flagPresent(args, "--aws");
         if (isAwsWes) {
             // TODO should probably have the config sections all defined within a single class. At least have enums.
-            final String accessKey = ObjectUtils.firstNonNull(optVal(args, "--aws-access-key", null), Objects.requireNonNull(configSubNode).getString("aws-access-key"));
-            final String secretKey = ObjectUtils.firstNonNull(optVal(args, "--aws-secret-key", null), Objects.requireNonNull(configSubNode).getString("aws-secret-key"));
-            final String region = ObjectUtils.firstNonNull(optVal(args, "--aws-region", null), Objects.requireNonNull(configSubNode).getString("aws-region"));
+            // AWS credentials shouldn't be stored in the dockstore config, so we wont check for it there.
+            final String accessKey = reqVal(args, "--aws-access-key");
+            final String secretKey = reqVal(args, "--aws-secret-key");
+            final String region = reqVal(args, "--aws-region");
             return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
         } else {
             final String wesToken = ObjectUtils.firstNonNull(optVal(args, "--wes-auth", null), Objects.requireNonNull(configSubNode).getString("authorization"));
