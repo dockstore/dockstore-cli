@@ -1,0 +1,3 @@
+# Each line is a regular expression against the output of git-secrets
+# swagger-java-bitbucket-client/swagger.yaml:.*
+# Can match on the content of the string
