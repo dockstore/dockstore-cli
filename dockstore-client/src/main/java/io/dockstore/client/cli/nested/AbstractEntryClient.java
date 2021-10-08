@@ -36,8 +36,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.HttpHeaders;
-
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -95,6 +93,7 @@ import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.flagPresent;
 import static io.dockstore.client.cli.ArgumentUtility.invalid;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
 import static io.dockstore.client.cli.ArgumentUtility.optVals;
@@ -109,6 +108,7 @@ import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
+import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
@@ -141,8 +141,7 @@ public abstract class AbstractEntryClient<T> {
     boolean ignoreChecksums = false;
 
     private boolean isWesCommand = false;
-    private String wesUri = null;
-    private String wesAuth = null;
+    private WesRequestData wesRequestData = null;
 
     static String getCleanedDescription(String description) {
         description = MoreObjects.firstNonNull(description, "");
@@ -154,12 +153,8 @@ public abstract class AbstractEntryClient<T> {
         return description;
     }
 
-    String getWesUri() {
-        return wesUri;
-    }
-
-    String getWesAuth() {
-        return wesAuth;
+    WesRequestData getWesRequestData() {
+        return wesRequestData;
     }
 
     public boolean isWesCommand() {
@@ -1038,10 +1033,13 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * Creates a WES API object and sets the endpoint.
-     *
-     * @param wesUrl URL to WES endpoint
      */
-    WorkflowExecutionServiceApi getWorkflowExecutionServiceApi(String wesUrl, String wesCred) {
+    WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
+
+        if (wesRequestData == null) {
+            errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);
+        }
+        
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = new WorkflowExecutionServiceApi();
 
         // Uncomment this code when Swagger Codegen generates correct Java
@@ -1052,37 +1050,10 @@ public abstract class AbstractEntryClient<T> {
         // Since Swagger Codegen does not create correct code for the
         // workflow attachment
         // Delete these next two lines when Swagger Codegen is fixed
-        ApiClientExtended wesApiClient = new ApiClientExtended();
+        ApiClientExtended wesApiClient = new ApiClientExtended(wesRequestData);
         clientWorkflowExecutionServiceApi.setApiClient(wesApiClient);
 
-        INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
-        SubnodeConfiguration configSubNode = null;
-        try {
-            configSubNode = config.getSection("WES");
-        } catch (Exception e) {
-            out("Could not get WES section from config file");
-        }
-
-        String wesEndpointUrl = ObjectUtils.firstNonNull(wesUrl, Objects.requireNonNull(configSubNode).getString("url"));
-        if (wesEndpointUrl == null || wesEndpointUrl.isEmpty()) {
-            errorMessage("No WES URL found in config file and no WES URL entered on command line. Please add url: <url> to "
-                    + "config file in a WES section or use --wes-url <url> option on the command line", CLIENT_ERROR);
-        } else {
-            out("WES endpoint url is: " + wesEndpointUrl);
-            wesApiClient.setBasePath(wesEndpointUrl);
-        }
-
-        /*
-         * Setup authentication credentials for the WES URL
-         */
-        String wesAuthorizationCredentials = ObjectUtils.firstNonNull(wesCred, configSubNode.getString("authorization"));
-        if (wesAuthorizationCredentials == null) {
-            out("Could not set Authorization header. Authorization key not found in config file and not provided on the command line. "
-                    + "Please add 'authorization: <type> <credentials> to config file in WES section or "
-                    + "use --wes-auth '<type> <credentials>' option on the command line if authorization credentials are needed");
-        } else {
-            wesApiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, wesAuthorizationCredentials);
-        }
+        wesApiClient.setBasePath(wesRequestData.getUrl());
 
         // Add these headers to the http request. Are these needed?
         wesApiClient.addDefaultHeader("Accept", "*/*");
@@ -1098,12 +1069,10 @@ public abstract class AbstractEntryClient<T> {
      * @param args Arguments entered into the CLI
      */
     private void processWesCommands(final List<String> args) {
-        this.wesUri = optVal(args, "--wes-url", null);
-        this.wesAuth = optVal(args, "--wes-auth", null);
-
         if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
             wesHelp();
         } else {
+            this.wesRequestData = this.aggregateWesRequestData(args);
             final String cmd = args.remove(0);
             switch (cmd) {
             case "launch":
@@ -1121,7 +1090,7 @@ public abstract class AbstractEntryClient<T> {
                 if (args.isEmpty() || containsHelpRequest(args)) {
                     wesStatusHelp();
                 } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(getWesUri(), getWesAuth());
+                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
                     String workflowId = reqVal(args, "--id");
                     out("Getting status of WES workflow");
                     if (args.contains("--verbose")) {
@@ -1145,7 +1114,7 @@ public abstract class AbstractEntryClient<T> {
                 if (args.isEmpty() || containsHelpRequest(args)) {
                     wesCancelHelp();
                 } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(getWesUri(), getWesAuth());
+                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
                     out("Canceling WES workflow");
                     String workflowId = reqVal(args, "--id");
                     try {
@@ -1160,7 +1129,7 @@ public abstract class AbstractEntryClient<T> {
                 if (containsHelpRequest(args)) {
                     wesServiceInfoHelp();
                 } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(getWesUri(), getWesAuth());
+                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
                     try {
                         ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
                         out("WES server info: " + response.toString());
@@ -1177,6 +1146,39 @@ public abstract class AbstractEntryClient<T> {
 
     }
 
+    /**
+     * This will aggregate the WES request URI and credentials into a single object for use down the line
+     * @param args The commaand line arguments
+     */
+    public WesRequestData aggregateWesRequestData(final List<String> args) {
+
+        // Get the config file to see if credentials are there
+        INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
+        SubnodeConfiguration configSubNode = null;
+        try {
+            configSubNode = config.getSection("WES");
+        } catch (Exception e) {
+            out("Could not get WES section from config file");
+        }
+
+        // Attempt to find the WES URI
+        final String wesUri = optVal(args, "--wes-url", null);
+        final String wesEndpointUrl = ObjectUtils.firstNonNull(wesUri, Objects.requireNonNull(configSubNode).getString("url"));
+
+        // Depending on the endpoint (AWS/non-AWS) we need to look for a different set of credentials
+        final boolean isAwsWes = flagPresent(args, "--aws");
+        if (isAwsWes) {
+            // TODO should probably have the config sections all defined within a single class. At least have enums.
+            // AWS credentials shouldn't be stored in the dockstore config, so we wont check for it there.
+            final String accessKey = reqVal(args, "--aws-access-key");
+            final String secretKey = reqVal(args, "--aws-secret-key");
+            final String region = reqVal(args, "--aws-region");
+            return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
+        } else {
+            final String wesToken = ObjectUtils.firstNonNull(optVal(args, "--wes-auth", null), Objects.requireNonNull(configSubNode).getString("authorization"));
+            return new WesRequestData(wesEndpointUrl, wesToken);
+        }
+    }
     /**
      * Prints a warning if Docker isn't running. Docker is not always needed. If a workflow or tool uses Docker and
      * it is not running, it fails with a cryptic error. This should make the problem more obvious.
@@ -1459,6 +1461,10 @@ public abstract class AbstractEntryClient<T> {
         out("Global Optional Parameters:");
         out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
         out("  --wes-auth <auth>                   Authorization credentials for the WES endpoint, e.g. 'Bearer 12345'");
+        out("  --aws                               Flag indicating whether the WES request will be to an AWS endpoint");
+        out("  --aws-access-key <key>              The AWS access key associated with an IAM user/profile.");
+        out("  --aws-secret-key <key>              The AWS secret key associated with an IAM user/profile.");
+        out("  --aws-region <region>               The AWS region the WES endpoint is located in, e.g. 'us-east-1'.");
         out("");
         out("NOTE: WES SUPPORT IS IN BETA AT THIS TIME. RESULTS MAY BE UNPREDICTABLE.");
     }
