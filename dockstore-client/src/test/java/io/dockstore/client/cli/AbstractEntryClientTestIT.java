@@ -32,6 +32,7 @@ public class AbstractEntryClientTestIT {
     // These constants also match the data in clientConfig
     static final String FAKE_BEARER_TOKEN = "Bearer SmokeyTheBearToken";
     static final String BEARER_CONFIG_RESOURCE = "clientConfig";
+    static final String CONFIG_NO_CONTENT_RESOURCE = "configNoContent";
 
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
@@ -67,9 +68,9 @@ public class AbstractEntryClientTestIT {
             String[] commandStatement;
 
             if (command.length() == 0) {
-                commandStatement = new String[]{ "workflow", "wes", "--help"};
+                commandStatement = new String[]{ "workflow", "wes", "--help", "--config", CONFIG_NO_CONTENT_RESOURCE};
             } else {
-                commandStatement = new String[]{ "workflow", "wes", command, "--help"};
+                commandStatement = new String[]{ "workflow", "wes", command, "--help", "--config", CONFIG_NO_CONTENT_RESOURCE};
             }
 
             Client.main(commandStatement);
