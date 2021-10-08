@@ -1063,6 +1063,10 @@ public abstract class AbstractEntryClient<T> {
         return clientWorkflowExecutionServiceApi;
     }
 
+    private boolean shouldDisplayHelp(final List<String> args) {
+        return args.isEmpty() || containsHelpRequest(args);
+    }
+
     /**
      * Processes Workflow Execution Schema (WES) commands.
      *
@@ -1072,11 +1076,14 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
             wesHelp();
         } else {
-            this.wesRequestData = this.aggregateWesRequestData(args);
+            // only parse credentials if this isn't a help command
+            if (!shouldDisplayHelp(args)) {
+                this.wesRequestData = this.aggregateWesRequestData(args);
+            }
             final String cmd = args.remove(0);
             switch (cmd) {
             case "launch":
-                if (args.isEmpty() || containsHelpRequest(args)) {
+                if (shouldDisplayHelp(args)) {
                     wesLaunchHelp();
                 } else {
                     if (args.contains("--local-entry")) {
@@ -1087,7 +1094,7 @@ public abstract class AbstractEntryClient<T> {
                 }
                 break;
             case "status":
-                if (args.isEmpty() || containsHelpRequest(args)) {
+                if (shouldDisplayHelp(args)) {
                     wesStatusHelp();
                 } else {
                     WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
@@ -1111,7 +1118,7 @@ public abstract class AbstractEntryClient<T> {
                 }
                 break;
             case "cancel":
-                if (args.isEmpty() || containsHelpRequest(args)) {
+                if (shouldDisplayHelp(args)) {
                     wesCancelHelp();
                 } else {
                     WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
@@ -1126,7 +1133,7 @@ public abstract class AbstractEntryClient<T> {
                 }
                 break;
             case "service-info":
-                if (containsHelpRequest(args)) {
+                if (shouldDisplayHelp(args)) {
                     wesServiceInfoHelp();
                 } else {
                     WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();

@@ -48,6 +48,7 @@ public class AbstractEntryClientTestIT {
         final String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
         final String[] commandNames = {"", "launch", "status", "cancel", "service-info"};
 
+        // has config file
         for (String command : commandNames) {
             String[] commandStatement;
 
@@ -55,6 +56,20 @@ public class AbstractEntryClientTestIT {
                 commandStatement = new String[]{ "workflow", "wes", "--help", "--config", clientConfig };
             } else {
                 commandStatement = new String[]{ "workflow", "wes", command, "--help", "--config", clientConfig };
+            }
+
+            Client.main(commandStatement);
+            assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+        }
+
+        // No config file
+        for (String command : commandNames) {
+            String[] commandStatement;
+
+            if (command.length() == 0) {
+                commandStatement = new String[]{ "workflow", "wes", "--help"};
+            } else {
+                commandStatement = new String[]{ "workflow", "wes", command, "--help"};
             }
 
             Client.main(commandStatement);
