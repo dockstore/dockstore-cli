@@ -1067,90 +1067,114 @@ public abstract class AbstractEntryClient<T> {
         return args.isEmpty() || containsHelpRequest(args);
     }
 
+    private void displayWesHelp(final List<String> args) {
+
+        // print the help message for general WES commands
+        if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
+            wesHelp();
+            return;
+        }
+
+        // print the help message for a specific command type
+        final String cmd = args.get(0);
+        switch (cmd) {
+        case "launch":
+            wesLaunchHelp();
+            break;
+        case "status":
+            wesStatusHelp();
+            break;
+        case "cancel":
+            wesCancelHelp();
+            break;
+        case "service-info":
+            wesServiceInfoHelp();
+            break;
+        default:
+            invalid(cmd);
+            break;
+        }
+    }
+
+    public void wesLaunch(final List<String> args) {
+        if (args.contains("--local-entry")) {
+            errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
+        } else {
+            launch(args);
+        }
+    }
+
+    public void wesStatus(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+        final String workflowId = reqVal(args, "--id");
+        out("Getting status of WES workflow");
+        if (args.contains("--verbose")) {
+            try {
+                RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
+                out("Verbose run status is: " + response.toString());
+            } catch (io.openapi.wes.client.ApiException e) {
+                LOG.error("Error getting verbose WES run status", e);
+            }
+        } else {
+            try {
+                RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
+                out("Brief run status is: " + response.toString());
+            } catch (io.openapi.wes.client.ApiException e) {
+                LOG.error("Error getting brief WES run status", e);
+            }
+        }
+    }
+
+    public void wesCancel(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+        out("Canceling WES workflow");
+        final String workflowId = reqVal(args, "--id");
+        try {
+            RunId response = clientWorkflowExecutionServiceApi.cancelRun(workflowId);
+            out("Cancelled run with id: " + response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error canceling WES run", e);
+        }
+    }
+
+    public void wesServiceInfo(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+        try {
+            ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
+            out("WES server info: " + response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting WES server info", e);
+        }
+    }
+
     /**
      * Processes Workflow Execution Schema (WES) commands.
      *
      * @param args Arguments entered into the CLI
      */
     private void processWesCommands(final List<String> args) {
-        if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
-            wesHelp();
+        if (shouldDisplayHelp(args)) {
+            displayWesHelp(args);
         } else {
-            // only parse credentials if this isn't a help command
-            if (!shouldDisplayHelp(args)) {
-                this.wesRequestData = this.aggregateWesRequestData(args);
-            }
+            this.wesRequestData = this.aggregateWesRequestData(args);
+            WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
+
             final String cmd = args.remove(0);
             switch (cmd) {
             case "launch":
-                if (shouldDisplayHelp(args)) {
-                    wesLaunchHelp();
-                } else {
-                    if (args.contains("--local-entry")) {
-                        errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
-                    } else {
-                        launch(args);
-                    }
-                }
+                wesLaunch(args);
                 break;
             case "status":
-                if (shouldDisplayHelp(args)) {
-                    wesStatusHelp();
-                } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
-                    String workflowId = reqVal(args, "--id");
-                    out("Getting status of WES workflow");
-                    if (args.contains("--verbose")) {
-                        try {
-                            RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
-                            out("Verbose run status is: " + response.toString());
-                        } catch (io.openapi.wes.client.ApiException e) {
-                            LOG.error("Error getting verbose WES run status", e);
-                        }
-                    } else {
-                        try {
-                            RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
-                            out("Brief run status is: " + response.toString());
-                        } catch (io.openapi.wes.client.ApiException e) {
-                            LOG.error("Error getting brief WES run status", e);
-                        }
-                    }
-                }
+                wesStatus(args, clientWorkflowExecutionServiceApi);
                 break;
             case "cancel":
-                if (shouldDisplayHelp(args)) {
-                    wesCancelHelp();
-                } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
-                    out("Canceling WES workflow");
-                    String workflowId = reqVal(args, "--id");
-                    try {
-                        RunId response = clientWorkflowExecutionServiceApi.cancelRun(workflowId);
-                        out("Cancelled run with id: " + response.toString());
-                    } catch (io.openapi.wes.client.ApiException e) {
-                        LOG.error("Error canceling WES run", e);
-                    }
-                }
+                wesCancel(args, clientWorkflowExecutionServiceApi);
                 break;
             case "service-info":
-                if (shouldDisplayHelp(args)) {
-                    wesServiceInfoHelp();
-                } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
-                    try {
-                        ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
-                        out("WES server info: " + response.toString());
-                    } catch (io.openapi.wes.client.ApiException e) {
-                        LOG.error("Error getting WES server info", e);
-                    }
-                }
+                wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
             default:
                 invalid(cmd);
                 break;
             }
         }
-
     }
 
     /**
