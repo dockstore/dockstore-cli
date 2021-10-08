@@ -1063,10 +1063,19 @@ public abstract class AbstractEntryClient<T> {
         return clientWorkflowExecutionServiceApi;
     }
 
+    /**
+     * Determines if we should display a help message
+     * @param args Command arguments for this WES command
+     * @return
+     */
     private boolean shouldDisplayHelp(final List<String> args) {
         return args.isEmpty() || containsHelpRequest(args);
     }
 
+    /**
+     * This will print the appropriate help message depending on the input arguments.
+     * @param args Command arguments for this WES command
+     */
     private void displayWesHelp(final List<String> args) {
 
         // print the help message for general WES commands
@@ -1096,7 +1105,11 @@ public abstract class AbstractEntryClient<T> {
         }
     }
 
-    public void wesLaunch(final List<String> args) {
+    /**
+     * This will attempt to launch a workflow given the command arguments
+     * @param args Command arguments for this WES command
+     */
+    private void wesLaunch(final List<String> args) {
         if (args.contains("--local-entry")) {
             errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
         } else {
@@ -1104,7 +1117,12 @@ public abstract class AbstractEntryClient<T> {
         }
     }
 
-    public void wesStatus(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+    /**
+     *  This will attempt to retrieve the status of a workflow run
+     * @param args Command arguments for this WES command
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesStatus(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
         final String workflowId = reqVal(args, "--id");
         out("Getting status of WES workflow");
         if (args.contains("--verbose")) {
@@ -1124,7 +1142,12 @@ public abstract class AbstractEntryClient<T> {
         }
     }
 
-    public void wesCancel(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+    /**
+     * This will attempt to cancel a WES run
+     * @param args Command arguments for this WES command
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesCancel(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
         out("Canceling WES workflow");
         final String workflowId = reqVal(args, "--id");
         try {
@@ -1135,7 +1158,11 @@ public abstract class AbstractEntryClient<T> {
         }
     }
 
-    public void wesServiceInfo(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+    /**
+     * This will attempt to retrieve information regarding the WES server
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesServiceInfo(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
         try {
             ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
             out("WES server info: " + response.toString());
