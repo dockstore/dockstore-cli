@@ -63,7 +63,7 @@ public class AbstractEntryClientTestIT {
             assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
         }
 
-        // No config file
+        // Empty config file
         for (String command : commandNames) {
             String[] commandStatement;
 
