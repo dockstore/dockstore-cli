@@ -47,14 +47,13 @@ public class WesRequestData {
     public WesRequestData(String url, String bearerToken) {
         this(url);
 
-        if (bearerToken == null) {
-            errorMessage("No WES API token found in config file and no WES API token entered on command line."
-                + "Please add 'authorization: <type> <credentials> to config file in WES section or "
-                + "use --wes-auth '<type> <credentials>' option on the command line if authorization credentials are needed", CLIENT_ERROR);
-        }
-
         this.bearerToken = bearerToken;
-        this.credentialType = CredentialType.BEARER_TOKEN;
+
+        if (bearerToken == null) {
+            this.credentialType = CredentialType.NO_CREDENTIALS;
+        } else {
+            this.credentialType = CredentialType.BEARER_TOKEN;
+        }
     }
 
     /**
@@ -65,28 +64,17 @@ public class WesRequestData {
     public WesRequestData(String url, String awsAccessKey, String awsSecretKey, String region) {
         this(url);
 
-        if (awsAccessKey == null) {
-            errorMessage("No AWS access key entered on command line. "
-                + "Please add 'authorization: <type> <credentials> to config file in WES section or "
-                + "use --aws-access-key '<type> <credentials>' option on the command line if authorization credentials are needed", CLIENT_ERROR);
-        }
-
-        if (awsSecretKey == null) {
-            errorMessage("No AWS secret access key entered on command line. "
-                + "Please add 'authorization: <type> <credentials> to config file in WES section or "
-                + "use --aws-secret-key '<type> <credentials>' option on the command line if authorization credentials are needed", CLIENT_ERROR);
-        }
-
-        if (region == null) {
-            errorMessage("No AWS region entered on command line. "
-                + "Please add 'region: <type> <credentials> to config file in WES section or "
-                + "use --aws-region '<region>' option on the command line if region specifications are needed", CLIENT_ERROR);
-        }
-
         this.awsAccessKey = awsAccessKey;
         this.awsSecretKey = awsSecretKey;
         this.region = region;
-        this.credentialType = CredentialType.AWS_PERMANENT_CREDENTIALS;
+
+        // The credentials that were passed in are null, so we are assuming they are within an authorized environment (such as an EC2 instance)
+        // This also assumes there is no scenario where just one of the keys is sufficient.
+        if (awsAccessKey == null || awsSecretKey == null) {
+            this.credentialType = CredentialType.NO_CREDENTIALS;
+        } else {
+            this.credentialType = CredentialType.AWS_PERMANENT_CREDENTIALS;
+        }
     }
 
     public CredentialType getCredentialType() {
@@ -126,7 +114,7 @@ public class WesRequestData {
 
     public String getAwsRegion() {
         if (credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS) {
-            return this.region;
+            return this.region == null ? "" : this.region; // regions don't need to be specified if you are in an AWS environment
         } else {
             errorMessage("Unable to locate a AWS region, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
             return null;
@@ -135,5 +123,9 @@ public class WesRequestData {
 
     public boolean requiresAwsHeaders() {
         return this.credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS;
+    }
+
+    public boolean hasCredentials() {
+        return this.credentialType != CredentialType.NO_CREDENTIALS;
     }
 }
