@@ -117,7 +117,8 @@ public class AbstractEntryClientTestIT {
             "--aws-access-key", FAKE_AWS_ACCESS_KEY,
             "--aws-region", FAKE_AWS_REGION));
         systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(args);
+        WesRequestData wrd = workflowClient.aggregateWesRequestData(args);
+        wrd.getAwsSecretKey();
         assertFalse("No secret was passed in", systemErrRule.getLog().isBlank());
     }
 
@@ -132,8 +133,9 @@ public class AbstractEntryClientTestIT {
             "--aws-secret-key", FAKE_AWS_SECRET_KEY,
             "--aws-region", FAKE_AWS_REGION));
         systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(args);
-        assertFalse("No access was passed in", systemErrRule.getLog().isBlank());
+        WesRequestData wrd = workflowClient.aggregateWesRequestData(args);
+        wrd.getAwsAccessKey();
+        assertFalse("No access key was passed in", systemErrRule.getLog().isBlank());
     }
 
     @Test
