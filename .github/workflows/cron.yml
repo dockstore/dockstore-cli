@@ -23,3 +23,12 @@ jobs:
         run: ./mvnw clean test -Punit-tests -Ddockstore-core.version=${{ env.LATEST_VERSION }}-SNAPSHOT -B -ntp -U
       - name: Check what changed
         run: git diff
+      - name: Post to a Slack channel
+        if: failure()
+        id: slack
+        uses: slackapi/slack-github-action@v1.14.0
+        with:
+            slack-message: 'posting from a github action!'
+        env:
+            SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
