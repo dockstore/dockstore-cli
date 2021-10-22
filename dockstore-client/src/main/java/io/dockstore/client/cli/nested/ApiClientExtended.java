@@ -314,12 +314,15 @@ public class ApiClientExtended extends ApiClient {
             invocationBuilder.header(mapEntry.getKey(), mapEntry.getValue());
         }
 
-        // If the request requires AWS auth headers, calculate the signature, otherwise just get the standard bearer token
-        final String authorizationHeader = requiresAwsHeaders
-            ? generateAwsSignature(target, method, mergedHeaderMap) : this.wesRequestData.getBearerToken();
+        // If credentials were passed in, then we want to add an Authorization header, otherwise skip
+        if (this.wesRequestData.hasCredentials()) {
+            // If the request requires AWS auth headers, calculate the signature, otherwise just get the standard bearer token
+            final String authorizationHeader = requiresAwsHeaders
+                ? generateAwsSignature(target, method, mergedHeaderMap) : this.wesRequestData.getBearerToken();
 
-        // Add the Authorization header. This should be the last modification to the InvocationBuilder to ensure the signature remains valid
-        invocationBuilder.header(HttpHeaders.AUTHORIZATION, authorizationHeader);
+            // Add the Authorization header. This should be the last modification to the InvocationBuilder to ensure the signature remains valid
+            invocationBuilder.header(HttpHeaders.AUTHORIZATION, authorizationHeader);
+        }
 
         return invocationBuilder;
     }

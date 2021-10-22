@@ -7,6 +7,7 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -84,14 +85,18 @@ public class WesRequestDataTest {
     public void testNullCredentials1() {
         systemExit.expectSystemExit();
         WesRequestData wrd = new WesRequestData("myFakeUri", null);
-        assertFalse("A null bearer token should not be accepted", systemErrRule.getLog().isBlank());
+        assertFalse("WES request object should report no credentials", wrd.hasCredentials());
+        wrd.getBearerToken();
+        assertFalse("A null bearer token should not be requested", systemErrRule.getLog().isBlank());
     }
 
     @Test
     public void testNullCredentials2() {
         systemExit.expectSystemExit();
         WesRequestData wrd = new WesRequestData("myFakeUri", null, null, null);
-        assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
+        assertFalse("WES request object should report no credentials", wrd.hasCredentials());
+        wrd.getAwsSecretKey();
+        assertFalse("Null AWS credentials should not be requested", systemErrRule.getLog().isBlank());
 
     }
 
@@ -99,15 +104,16 @@ public class WesRequestDataTest {
     public void testNullCredentials3() {
         systemExit.expectSystemExit();
         WesRequestData wrd = new WesRequestData("myFakeUri", null, "whatIfIPassInJustOne?", null);
-        assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
+        assertFalse("WES request object should report no credentials", wrd.hasCredentials());
+        wrd.getAwsAccessKey();
+        assertFalse("Null AWS credentials should not be requested", systemErrRule.getLog().isBlank());
     }
 
     @Test
-    public void testNullCredentials4() {
-        systemExit.expectSystemExit();
+    public void testNullRegion() {
         WesRequestData wrd = new WesRequestData("myFakeUri", "whatIfIPassInJustOne?", "howAboutTwo?", null);
-        assertFalse("Null AWS credentials should not be accepted", systemErrRule.getLog().isBlank());
-
+        assertTrue("WES request object should report credentials", wrd.hasCredentials());
+        assertEquals("A null region should be returned as an empty string", "", wrd.getAwsRegion());
     }
 
     @Test

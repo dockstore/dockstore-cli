@@ -1064,86 +1064,144 @@ public abstract class AbstractEntryClient<T> {
     }
 
     /**
+     * Determines if we should display a help message
+     * @param args Command arguments for this WES command
+     * @return
+     */
+    private boolean shouldDisplayHelp(final List<String> args) {
+        return args.isEmpty() || containsHelpRequest(args);
+    }
+
+    /**
+     * This will print the appropriate help message depending on the input arguments.
+     * @param args Command arguments for this WES command
+     */
+    private void displayWesHelp(final List<String> args) {
+
+        // print the help message for general WES commands
+        if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
+            wesHelp();
+            return;
+        }
+
+        // print the help message for a specific command type
+        final String cmd = args.get(0);
+        switch (cmd) {
+        case "launch":
+            wesLaunchHelp();
+            break;
+        case "status":
+            wesStatusHelp();
+            break;
+        case "cancel":
+            wesCancelHelp();
+            break;
+        case "service-info":
+            wesServiceInfoHelp();
+            break;
+        default:
+            invalid(cmd);
+            break;
+        }
+    }
+
+    /**
+     * This will attempt to launch a workflow given the command arguments
+     * @param args Command arguments for this WES command
+     */
+    private void wesLaunch(final List<String> args) {
+        if (args.contains("--local-entry")) {
+            errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
+        } else {
+            launch(args);
+        }
+    }
+
+    /**
+     *  This will attempt to retrieve the status of a workflow run
+     * @param args Command arguments for this WES command
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesStatus(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+        final String workflowId = reqVal(args, "--id");
+        out("Getting status of WES workflow");
+        if (args.contains("--verbose")) {
+            try {
+                RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
+                out("Verbose run status is: " + response.toString());
+            } catch (io.openapi.wes.client.ApiException e) {
+                LOG.error("Error getting verbose WES run status", e);
+            }
+        } else {
+            try {
+                RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
+                out("Brief run status is: " + response.toString());
+            } catch (io.openapi.wes.client.ApiException e) {
+                LOG.error("Error getting brief WES run status", e);
+            }
+        }
+    }
+
+    /**
+     * This will attempt to cancel a WES run
+     * @param args Command arguments for this WES command
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesCancel(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+        out("Canceling WES workflow");
+        final String workflowId = reqVal(args, "--id");
+        try {
+            RunId response = clientWorkflowExecutionServiceApi.cancelRun(workflowId);
+            out("Cancelled run with id: " + response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error canceling WES run", e);
+        }
+    }
+
+    /**
+     * This will attempt to retrieve information regarding the WES server
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesServiceInfo(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+        try {
+            ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
+            out("WES server info: " + response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting WES server info", e);
+        }
+    }
+
+    /**
      * Processes Workflow Execution Schema (WES) commands.
      *
      * @param args Arguments entered into the CLI
      */
     private void processWesCommands(final List<String> args) {
-        if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
-            wesHelp();
+        if (shouldDisplayHelp(args)) {
+            displayWesHelp(args);
         } else {
             this.wesRequestData = this.aggregateWesRequestData(args);
+            WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
+
             final String cmd = args.remove(0);
             switch (cmd) {
             case "launch":
-                if (args.isEmpty() || containsHelpRequest(args)) {
-                    wesLaunchHelp();
-                } else {
-                    if (args.contains("--local-entry")) {
-                        errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
-                    } else {
-                        launch(args);
-                    }
-                }
+                wesLaunch(args);
                 break;
             case "status":
-                if (args.isEmpty() || containsHelpRequest(args)) {
-                    wesStatusHelp();
-                } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
-                    String workflowId = reqVal(args, "--id");
-                    out("Getting status of WES workflow");
-                    if (args.contains("--verbose")) {
-                        try {
-                            RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
-                            out("Verbose run status is: " + response.toString());
-                        } catch (io.openapi.wes.client.ApiException e) {
-                            LOG.error("Error getting verbose WES run status", e);
-                        }
-                    } else {
-                        try {
-                            RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
-                            out("Brief run status is: " + response.toString());
-                        } catch (io.openapi.wes.client.ApiException e) {
-                            LOG.error("Error getting brief WES run status", e);
-                        }
-                    }
-                }
+                wesStatus(args, clientWorkflowExecutionServiceApi);
                 break;
             case "cancel":
-                if (args.isEmpty() || containsHelpRequest(args)) {
-                    wesCancelHelp();
-                } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
-                    out("Canceling WES workflow");
-                    String workflowId = reqVal(args, "--id");
-                    try {
-                        RunId response = clientWorkflowExecutionServiceApi.cancelRun(workflowId);
-                        out("Cancelled run with id: " + response.toString());
-                    } catch (io.openapi.wes.client.ApiException e) {
-                        LOG.error("Error canceling WES run", e);
-                    }
-                }
+                wesCancel(args, clientWorkflowExecutionServiceApi);
                 break;
             case "service-info":
-                if (containsHelpRequest(args)) {
-                    wesServiceInfoHelp();
-                } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
-                    try {
-                        ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
-                        out("WES server info: " + response.toString());
-                    } catch (io.openapi.wes.client.ApiException e) {
-                        LOG.error("Error getting WES server info", e);
-                    }
-                }
+                wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
             default:
                 invalid(cmd);
                 break;
             }
         }
-
     }
 
     /**
@@ -1170,9 +1228,9 @@ public abstract class AbstractEntryClient<T> {
         if (isAwsWes) {
             // TODO should probably have the config sections all defined within a single class. At least have enums.
             // AWS credentials shouldn't be stored in the dockstore config, so we wont check for it there.
-            final String accessKey = reqVal(args, "--aws-access-key");
-            final String secretKey = reqVal(args, "--aws-secret-key");
-            final String region = reqVal(args, "--aws-region");
+            final String accessKey = optVal(args, "--aws-access-key", null);
+            final String secretKey = optVal(args, "--aws-secret-key", null);
+            final String region = optVal(args, "--aws-region", null);
             return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
         } else {
             final String wesToken = ObjectUtils.firstNonNull(optVal(args, "--wes-auth", null), Objects.requireNonNull(configSubNode).getString("authorization"));
