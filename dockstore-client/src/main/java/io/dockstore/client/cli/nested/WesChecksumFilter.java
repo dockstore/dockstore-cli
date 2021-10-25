@@ -14,17 +14,13 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import uk.co.lucasweb.aws.v4.signer.HttpRequest;
-import uk.co.lucasweb.aws.v4.signer.Signer;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class WesChecksumFilter implements ClientRequestFilter {
 
-    // This filter is a singleton, so these static variables shouldn't cause any issues, but this is not thread safe.
-    public static Signer.Builder signatureBuilder = null;
-    public static HttpRequest httpRequest = null;
-    public static String serviceName = null;
+    // This filter is a singleton, so the static variable shouldn't cause any issues, but this is not thread safe.
+    private static ApiClientExtended clientExtended = null;
 
     /**
      * Injectable helper to look up appropriate {@link Provider}s
@@ -33,11 +29,22 @@ public class WesChecksumFilter implements ClientRequestFilter {
     @Context
     private Providers providers;
 
+    /**
+     * Sets the static variables for this filter.
+     *
+     * @param clientExtended The extended WES API client. We will call back to this client to get our final Authorization header.
+     *
+     */
+    public static void setClientExtended(ApiClientExtended clientExtended) {
+        WesChecksumFilter.clientExtended = clientExtended;
+    }
+
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
 
-        // If the request doesn't have an entity (no body content) we don't need to calculate a checksum
-        if (requestContext.getEntity() == null) {
+        // If the request doesn't have an entity (no body content) we don't need to calculate a checksum based on body content.
+        // If the extended client field is null, then we don't need to calculate a signature.
+        if (requestContext.getEntity() == null || clientExtended == null) {
             return;
         }
 
@@ -58,13 +65,13 @@ public class WesChecksumFilter implements ClientRequestFilter {
             requestContext.getHeaders(),
             buffer);
 
-        // Close the buffer
+        // Close the buffer, nothing else should be written to it.
         buffer.close();
 
-        // Calculate the sha256 of the content
-        byte[] data = buffer.toByteArray();
-        String contentSha256 = DigestUtils.sha256Hex(data);
-        String AwsAuthHeader = signatureBuilder.build(httpRequest, serviceName, contentSha256).getSignature();
+        // Calculate a sha256 of the content in the buffer
+        byte[] content = buffer.toByteArray();
+        String contentSha256 = DigestUtils.sha256Hex(content);
+        String AwsAuthHeader = clientExtended.generateAwsContentSignature(contentSha256);
 
         // Add this as the Authorization header to the request object
         requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, AwsAuthHeader);

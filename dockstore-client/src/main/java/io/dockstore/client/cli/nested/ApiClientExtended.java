@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import io.openapi.wes.client.ApiClient;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.Pair;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -40,6 +41,8 @@ public class ApiClientExtended extends ApiClient {
     static final String AWS_WES_SERVICE_NAME = "execute-api";
 
     final WesRequestData wesRequestData;
+    private Signer.Builder awsAuthSignature = null;
+    private HttpRequest awsHttpRequest = null;
 
     public ApiClientExtended(WesRequestData wesRequestData) {
         this.wesRequestData = wesRequestData;
@@ -274,7 +277,7 @@ public class ApiClientExtended extends ApiClient {
      * @return A string the should be set under the Authorization header for AWS HTTP requests
      */
     public String generateAwsSignature(WebTarget target, String method, Map<String, String> allHeaders) {
-        HttpRequest request = new HttpRequest(method, target.getUri());
+        HttpRequest awsHttpRequest = new HttpRequest(method, target.getUri());
 
         // Our signature object. We will add all necessary headers to this request that comprise the 'canonical' HTTP request.
         // This will then be signed alongside a hash of the body content (if there is a body).
@@ -289,12 +292,25 @@ public class ApiClientExtended extends ApiClient {
             awsAuthSignature.header(mapEntry.getKey(), mapEntry.getValue());
         }
 
-        // TODO: Remove this once we are making requests with a body.
-        String contentSha256 = org.apache.commons.codec.digest.DigestUtils.sha256Hex("");
-        return awsAuthSignature.build(request, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
+        // Point the jersey filter to this object so we can calculate the final AWS authorization header if needed
+        WesChecksumFilter.setClientExtended(this);
+
+        // Not ideal, but we need to save some of the signature creation objects so we have the necessary information
+        // to calculate the Authorization header for requests with a payload. This isn't calculable until we're already
+        // making the request with jersey.
+        this.awsAuthSignature = awsAuthSignature;
+        this.awsHttpRequest = awsHttpRequest;
+
+        // Set the Authorization header for a bodiless request. This may get overridden by a jersey filter, if this
+        // request as a payload.
+        String contentSha256 = DigestUtils.sha256Hex("");
+        return awsAuthSignature.build(awsHttpRequest, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
     }
 
-    // TODO: Handle requests with body content.
+    public String generateAwsContentSignature(String contentSha256) {
+        return awsAuthSignature.build(awsHttpRequest, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
+    }
+    
     /**
      * Creates an Invocation.Builder that will be used to make a WES request. If the request is to be sent to an AWS endpoint
      * a SigV4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
