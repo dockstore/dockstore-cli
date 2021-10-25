@@ -1036,7 +1036,7 @@ public abstract class AbstractEntryClient<T> {
      */
     WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
 
-        if (wesRequestData == null) {
+        if (this.getWesRequestData() == null) {
             errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);
         }
         
@@ -1052,6 +1052,7 @@ public abstract class AbstractEntryClient<T> {
         // Delete these next two lines when Swagger Codegen is fixed
         ApiClientExtended wesApiClient = new ApiClientExtended(wesRequestData);
         clientWorkflowExecutionServiceApi.setApiClient(wesApiClient);
+        wesApiClient.getHttpClient().register(WesChecksumFilter.class);
 
         wesApiClient.setBasePath(wesRequestData.getUrl());
 
