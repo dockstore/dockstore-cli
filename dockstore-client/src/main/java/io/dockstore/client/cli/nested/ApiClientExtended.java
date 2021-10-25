@@ -277,11 +277,11 @@ public class ApiClientExtended extends ApiClient {
      * @return A string the should be set under the Authorization header for AWS HTTP requests
      */
     public String generateAwsSignature(WebTarget target, String method, Map<String, String> allHeaders) {
-        HttpRequest awsHttpRequest = new HttpRequest(method, target.getUri());
+        HttpRequest request = new HttpRequest(method, target.getUri());
 
         // Our signature object. We will add all necessary headers to this request that comprise the 'canonical' HTTP request.
         // This will then be signed alongside a hash of the body content (if there is a body).
-        Signer.Builder awsAuthSignature = Signer.builder()
+        Signer.Builder authSignature = Signer.builder()
             // TODO this currently only supports permanent AWS credentials
             .awsCredentials(new AwsCredentials(this.wesRequestData.getAwsAccessKey(), this.wesRequestData.getAwsSecretKey()))
             .region(this.wesRequestData.getAwsRegion())
@@ -289,7 +289,7 @@ public class ApiClientExtended extends ApiClient {
 
         // add all the headers to the signature object
         for (Map.Entry<String, String> mapEntry : allHeaders.entrySet()) {
-            awsAuthSignature.header(mapEntry.getKey(), mapEntry.getValue());
+            authSignature.header(mapEntry.getKey(), mapEntry.getValue());
         }
 
         // Point the jersey filter to this object so we can calculate the final AWS authorization header if needed
@@ -298,8 +298,7 @@ public class ApiClientExtended extends ApiClient {
         // Not ideal, but we need to save some of the signature creation objects so we have the necessary information
         // to calculate the Authorization header for requests with a payload. This isn't calculable until we're already
         // making the request with jersey.
-        this.awsAuthSignature = awsAuthSignature;
-        this.awsHttpRequest = awsHttpRequest;
+        setAwsAuthMetadata(authSignature, request);
 
         // Set the Authorization header for a bodiless request. This may get overridden by a jersey filter, if this
         // request as a payload.
@@ -307,10 +306,27 @@ public class ApiClientExtended extends ApiClient {
         return awsAuthSignature.build(awsHttpRequest, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
     }
 
+    /**
+     * Sets metadata for calculating an AWS Authorization header later in the request process.
+     *
+     * @param authSignature The builder which creates the final request
+     * @param request An HttpRequest object that holds the AWS service type and URI
+     */
+    private void setAwsAuthMetadata(Signer.Builder authSignature, HttpRequest request) {
+        this.awsAuthSignature = authSignature;
+        this.awsHttpRequest = request;
+    }
+
+    /**
+     * Returns an AWS SigV4 String based on some request metadata and a sha256 of the payload content.
+     *
+     * @param contentSha256 A sha256 checksum of the request payload.
+     * @return A SigV4 string that should be set as the Authorization header of an AWS HTTP request
+     */
     public String generateAwsContentSignature(String contentSha256) {
         return awsAuthSignature.build(awsHttpRequest, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
     }
-    
+
     /**
      * Creates an Invocation.Builder that will be used to make a WES request. If the request is to be sent to an AWS endpoint
      * a SigV4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).

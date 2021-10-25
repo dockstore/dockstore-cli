@@ -39,6 +39,14 @@ public class WesChecksumFilter implements ClientRequestFilter {
         WesChecksumFilter.clientExtended = clientExtended;
     }
 
+    /**
+     * This filter intercepts the jersey request before it is sent and attempts to calculate an AWS SigV4 Authorization header if needed.
+     * If the request does not have a body, or if the static class variable clientExtended is not set, this filter will not do anything. This
+     * Covers scenarios where the request has no payload and/or is not to an AWS endpoint.
+     *
+     * @param requestContext jersey requestContext
+     * @throws IOException
+     */
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
 
@@ -71,9 +79,9 @@ public class WesChecksumFilter implements ClientRequestFilter {
         // Calculate a sha256 of the content in the buffer
         byte[] content = buffer.toByteArray();
         String contentSha256 = DigestUtils.sha256Hex(content);
-        String AwsAuthHeader = clientExtended.generateAwsContentSignature(contentSha256);
+        String awsAuthHeader = clientExtended.generateAwsContentSignature(contentSha256);
 
         // Add this as the Authorization header to the request object
-        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, AwsAuthHeader);
+        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, awsAuthHeader);
     }
 }
