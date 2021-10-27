@@ -67,13 +67,13 @@ public abstract class BaseLauncher {
      * @param originalParameters
      * @param workDir
      */
-    public void setFiles(File descriptor, File entryZip, File provisionedParameters, String originalParameters, String workDir, String entryVal) {
+    public void setFiles(File descriptor, File entryZip, File provisionedParameters, String originalParameters, String workDir, String entry) {
         this.primaryDescriptor = descriptor;
         this.zippedEntry = entryZip;
         this.provisionedParameterFile = provisionedParameters;
         this.originalParameterFile = originalParameters;
         this.workingDirectory = workDir;
-        this.entryVal = entryVal;
+        this.entryVal = entry;
     }
 
     /**
