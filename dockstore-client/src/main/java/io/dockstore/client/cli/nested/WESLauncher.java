@@ -2,6 +2,7 @@ package io.dockstore.client.cli.nested;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 import com.google.common.io.Files;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
+import io.openapi.wes.client.ApiClient;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
 import org.apache.commons.io.FileUtils;
@@ -94,6 +96,26 @@ public class WESLauncher extends BaseLauncher {
         return workflowAttachment;
     }
 
+
+    public String createTrsUrl(String basePath, String id, String versionId, String type, String relativePath) {
+        // ApiClient for url escaping
+        final ApiClient client = this.clientWorkflowExecutionServiceApi.getApiClient();
+
+        // Escape each of the URL path values
+        final String escapedId = client.escapeString(id);
+        final String escapedVersionId = client.escapeString(versionId);
+        final String escapedType = client.escapeString(type);
+        final String escapedRelativePath = client.escapeString(relativePath);
+
+        // Return the TRS URL for a given entry
+        return MessageFormat.format("{0}/ga4gh/trs/v2/tools/{1}/versions/{2}/{3}/descriptor/{4}",
+            basePath,
+            escapedId,
+            escapedVersionId,
+            escapedType,
+            escapedRelativePath);
+    }
+
     public void runWESCommand(String jsonInputFilePath, File localPrimaryDescriptorFile, File zippedEntry) {
         File workflowParams = new File(jsonInputFilePath);
 
@@ -105,7 +127,24 @@ public class WESLauncher extends BaseLauncher {
             workflowTypeVersion = "v" + WORKFLOW_TYPE_VERSION;
         }
 
-        String workflowURL = localPrimaryDescriptorFile.getName();
+        final String workflowRelativePath = localPrimaryDescriptorFile.getName();
+        String workflowURL;
+        if (true) {
+            // Entries are passed in the form {PATH}:{VERSION} or {PATH}
+            final String[] pathAndVersion = entryVal.split(":");
+            final String path = pathAndVersion[0];
+
+            // Calculate the values needed to supply a TRS URL
+            final String basePath = this.abstractEntryClient.getClient().getGa4Ghv20Api().getApiClient().getBasePath();
+            final String versionId = this.abstractEntryClient.getVersionID(entryVal);
+            final String trsId = this.abstractEntryClient.getTrsId(path);
+            final String plainType = "PLAIN_" + languageType;
+
+            workflowURL = createTrsUrl(basePath, trsId, versionId, plainType, workflowRelativePath);
+        } else {
+            workflowURL = workflowRelativePath;
+        }
+
 
         final File tempDir = Files.createTempDir();
         List<File> workflowAttachment = addFilesToWorkflowAttachment(zippedEntry, tempDir);

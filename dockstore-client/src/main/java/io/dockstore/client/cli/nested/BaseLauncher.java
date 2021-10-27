@@ -33,6 +33,9 @@ public abstract class BaseLauncher {
     // For remote entries this is the tmp dir where workflow files are downloaded to
     protected String workingDirectory;
 
+    // The entry's name (i.e. github.com/my-org/my-repo:master)
+    protected String entryVal;
+
     // CWL, WDL, NEXTFLOW
     protected DescriptorLanguage languageType;
     protected File executionFile;
@@ -64,12 +67,13 @@ public abstract class BaseLauncher {
      * @param originalParameters
      * @param workDir
      */
-    public void setFiles(File descriptor, File entryZip, File provisionedParameters, String originalParameters, String workDir) {
+    public void setFiles(File descriptor, File entryZip, File provisionedParameters, String originalParameters, String workDir, String entryVal) {
         this.primaryDescriptor = descriptor;
         this.zippedEntry = entryZip;
         this.provisionedParameterFile = provisionedParameters;
         this.originalParameterFile = originalParameters;
         this.workingDirectory = workDir;
+        this.entryVal = entryVal;
     }
 
     /**
