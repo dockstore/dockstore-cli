@@ -96,13 +96,23 @@ public class WESLauncher extends BaseLauncher {
         return workflowAttachment;
     }
 
-
-    public String createTrsUrl(String basePath, String id, String versionId, String type, String relativePath) {
+    /**
+     * Calculates the expected TRS URL for an entry. This can be passed under the 'workflow_url' section of the WES request
+     * in place of inlining the workflow under 'workflow_attachment'
+     *
+     * @param basePath The path to the Dockstore service (e.g. https://dockstore.org)
+     * @param entryId The entry id (e.g. github.com/org/repo)
+     * @param versionId The version of the entry
+     * @param type The entry type (WDL / CWL / NEXTFLOW / etc..)
+     * @param relativePath The relative path to the primary descriptor file
+     * @return a TRS URL
+     */
+    public String createTrsUrl(String basePath, String entryId, String versionId, String type, String relativePath) {
         // ApiClient for url escaping
         final ApiClient client = this.clientWorkflowExecutionServiceApi.getApiClient();
 
         // Escape each of the URL path values
-        final String escapedId = client.escapeString(id);
+        final String escapedId = client.escapeString(entryId);
         final String escapedVersionId = client.escapeString(versionId);
         final String escapedType = client.escapeString(type);
         final String escapedRelativePath = client.escapeString(relativePath);
