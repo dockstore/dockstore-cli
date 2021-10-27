@@ -153,8 +153,12 @@ public abstract class AbstractEntryClient<T> {
         return description;
     }
 
-    WesRequestData getWesRequestData() {
+    public WesRequestData getWesRequestData() {
         return wesRequestData;
+    }
+
+    public void setWesRequestData(WesRequestData wrd) {
+        this.wesRequestData = wrd;
     }
 
     public boolean isWesCommand() {
@@ -1181,7 +1185,8 @@ public abstract class AbstractEntryClient<T> {
         if (shouldDisplayHelp(args)) {
             displayWesHelp(args);
         } else {
-            this.wesRequestData = this.aggregateWesRequestData(args);
+            final WesRequestData requestData = this.aggregateWesRequestData(args);
+            setWesRequestData(requestData);
             WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
 
             final String cmd = args.remove(0);
