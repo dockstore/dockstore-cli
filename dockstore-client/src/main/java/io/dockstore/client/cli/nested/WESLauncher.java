@@ -138,6 +138,9 @@ public class WESLauncher extends BaseLauncher {
         }
 
         final String workflowRelativePath = localPrimaryDescriptorFile.getName();
+        List<File> workflowAttachment = null;
+        File tempDir = null;
+
         String workflowURL;
         if (true) {
             // Entries are passed in the form {PATH}:{VERSION} or {PATH}
@@ -153,11 +156,9 @@ public class WESLauncher extends BaseLauncher {
             workflowURL = createTrsUrl(basePath, trsId, versionId, plainType, workflowRelativePath);
         } else {
             workflowURL = workflowRelativePath;
+            tempDir = Files.createTempDir();
+            workflowAttachment = addFilesToWorkflowAttachment(zippedEntry, tempDir);
         }
-
-
-        final File tempDir = Files.createTempDir();
-        List<File> workflowAttachment = addFilesToWorkflowAttachment(zippedEntry, tempDir);
 
         try {
             RunId response = clientWorkflowExecutionServiceApi.runWorkflow(workflowParams, languageType, workflowTypeVersion, TAGS,
@@ -168,10 +169,14 @@ public class WESLauncher extends BaseLauncher {
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error launching WES run", e);
         } finally {
-            try {
-                FileUtils.deleteDirectory(tempDir);
-            } catch (IOException ioe) {
-                LOG.error("Could not delete temporary directory" + tempDir + " for workflow attachment files", ioe);
+
+            // Only attempt to cleanup the temporary directory if we created it in the first place
+            if (tempDir != null) {
+                try {
+                    FileUtils.deleteDirectory(tempDir);
+                } catch (IOException ioe) {
+                    LOG.error("Could not delete temporary directory" + tempDir + " for workflow attachment files", ioe);
+                }
             }
         }
     }
