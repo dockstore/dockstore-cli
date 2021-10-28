@@ -52,7 +52,7 @@ public class WESLauncherTest {
         assertTrue("workflow path should be encoded", trsUrl.contains("github.com%2Forg%2Frepo"));
 
         // Ensure the #workflow prefix is correctly encoded
-        final String trsWorkflowUrl = launcher.createTrsUrl(basePath, "#workflow/"+entryId, versionId, type, relativePath);
+        final String trsWorkflowUrl = launcher.createTrsUrl(basePath, "#workflow/" + entryId, versionId, type, relativePath);
 
         final String expectedWorkflowResult = "https://dockstore.org/ga4gh/trs/v2/tools/%23workflow%2Fgithub.com%2Forg%2Frepo/versions/master/PLAIN_WDL/descriptor/rightHere.wdl";
         assertEquals("Checking the entire URL", expectedWorkflowResult, trsWorkflowUrl);
