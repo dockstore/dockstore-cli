@@ -103,7 +103,7 @@ public class WESLauncher extends BaseLauncher {
      * @param basePath The path to the Dockstore service (e.g. https://dockstore.org)
      * @param entryId The entry id (e.g. github.com/org/repo)
      * @param versionId The version of the entry
-     * @param type The entry type (WDL / CWL / NEXTFLOW / etc..)
+     * @param type The entry type (PLAIN_WDL / PLAIN_CWL / PLAIN_NEXTFLOW / etc..)
      * @param relativePath The relative path to the primary descriptor file
      * @return a TRS URL
      */
