@@ -1063,6 +1063,7 @@ public abstract class AbstractEntryClient<T> {
         // Add these headers to the http request. Are these needed?
         wesApiClient.addDefaultHeader("Accept", "*/*");
         wesApiClient.addDefaultHeader("Expect", "100-continue");
+        // TODO Might want to override the default User Agent header with a custom one to make tracking WES requests easier.
 
         clientWorkflowExecutionServiceApi.setApiClient(wesApiClient);
         return clientWorkflowExecutionServiceApi;
