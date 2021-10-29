@@ -50,38 +50,56 @@ public class WesChecksumFilter implements ClientRequestFilter {
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
 
-        // If the request doesn't have an entity (no body content) we don't need to calculate a checksum based on body content.
-        // If the extended client field is null, then we don't need to calculate a signature.
-        if (requestContext.getEntity() == null || clientExtended == null) {
-            return;
+        // Get the credentials object for this request
+        final WesRequestData wesRequestData = clientExtended.getWesRequestData();
+
+        // If credentials were passed in, then we want to add an Authorization header, otherwise do nothing
+        if (wesRequestData.hasCredentials()) {
+
+            // If the request requires AWS auth headers, calculate the signature, otherwise just get the standard bearer token
+            final String authorizationHeader = wesRequestData.requiresAwsHeaders()
+                ? generateAwsSignature(requestContext) : wesRequestData.getBearerToken();
+
+            // Add this as the Authorization header to the request object
+            requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, authorizationHeader);
+        }
+    }
+
+    private String generateAwsSignature(ClientRequestContext requestContext) throws IOException {
+
+        String contentSha256;
+
+        // If this request does not have a body, then we calculate a checksum based off an empty string
+        // See: https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
+        if (requestContext.getEntity() == null) {
+            contentSha256 = DigestUtils.sha256Hex("");
+        } else {
+            // Get the message body writer based on the entity type
+            final MessageBodyWriter bodyWriter = providers.getMessageBodyWriter(
+                requestContext.getEntity().getClass(),
+                requestContext.getEntity().getClass(),
+                requestContext.getEntityAnnotations(),
+                requestContext.getMediaType());
+
+            // Write the Entity to a byte stream using the MessageBodyWriter for our entity type
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            bodyWriter.writeTo(requestContext.getEntity(),
+                requestContext.getEntity().getClass(),
+                requestContext.getEntity().getClass(),
+                requestContext.getEntityAnnotations(),
+                requestContext.getMediaType(),
+                requestContext.getHeaders(),
+                buffer);
+
+            // Close the buffer, nothing else should be written to it.
+            buffer.close();
+
+            // Calculate a sha256 of the content in the buffer
+            byte[] content = buffer.toByteArray();
+            contentSha256 = DigestUtils.sha256Hex(content);
         }
 
-        // Get the message body writer based on the entity type
-        final MessageBodyWriter bodyWriter = providers.getMessageBodyWriter(
-            requestContext.getEntity().getClass(),
-            requestContext.getEntity().getClass(),
-            requestContext.getEntityAnnotations(),
-            requestContext.getMediaType());
-
-        // Write the Entity to a byte stream using the MessageBodyWriter for our entity type
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        bodyWriter.writeTo(requestContext.getEntity(),
-            requestContext.getEntity().getClass(),
-            requestContext.getEntity().getClass(),
-            requestContext.getEntityAnnotations(),
-            requestContext.getMediaType(),
-            requestContext.getHeaders(),
-            buffer);
-
-        // Close the buffer, nothing else should be written to it.
-        buffer.close();
-
-        // Calculate a sha256 of the content in the buffer
-        byte[] content = buffer.toByteArray();
-        String contentSha256 = DigestUtils.sha256Hex(content);
-        String awsAuthHeader = clientExtended.generateAwsContentSignature(contentSha256);
-
-        // Add this as the Authorization header to the request object
-        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, awsAuthHeader);
+        // Return the AWS Authorization header calculated from the content sha
+        return clientExtended.generateAwsContentSignature(contentSha256);
     }
 }

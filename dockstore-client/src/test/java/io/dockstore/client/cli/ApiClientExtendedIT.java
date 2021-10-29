@@ -12,7 +12,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 public class ApiClientExtendedIT {
 
@@ -40,7 +39,8 @@ public class ApiClientExtendedIT {
         allHeaders.put("x-amz-date", "20211007T171738Z"); // Don't change this date setting
 
         final String expectedHeader = "AWS4-HMAC-SHA256 Credential=AKIAZHZQVUMXJASEFDT4/20211007/us-west-2/execute-api/aws4_request, SignedHeaders=accept;host;user-agent;x-amz-date, Signature=abc30f57ec627a809f6c3b4f738b2863ee8c242f8d4cdd653a37bf47e7bffc0f";
-        final String newlyCalculatedHeader = ace.generateAwsSignature(target, method, allHeaders);
+        ace.setAwsHeaderCalculationData(target, method, allHeaders);
+        final String newlyCalculatedHeader = ace.generateAwsContentSignature(DigestUtils.sha256Hex(""));
 
         assertEquals("The calculated header should match the original request that was made", expectedHeader, newlyCalculatedHeader);
     }
@@ -57,7 +57,8 @@ public class ApiClientExtendedIT {
         allHeaders.put(HttpHeaders.USER_AGENT, "Swagger-Codegen/1.0.0/java");
         allHeaders.put("x-amz-date", "20211027T163015Z"); // Don't change this date setting
 
-        final String expectedSignature = ace.generateAwsSignature(target, method, allHeaders); // This needs to be executed so the Jersey filter interceptor can generate the final header.
+        ace.setAwsHeaderCalculationData(target, method, allHeaders);
+        final String expectedSignature = ace.generateAwsContentSignature(DigestUtils.sha256Hex("")); // This needs to be executed so the Jersey filter interceptor can generate the final header.
         final String fakeBodyChecksum = DigestUtils.sha256Hex("".getBytes());
         final String newlyCalculatedContentHeader = ace.generateAwsContentSignature(fakeBodyChecksum);
 
@@ -77,13 +78,12 @@ public class ApiClientExtendedIT {
         allHeaders.put("x-amz-date", "20211027T163927Z"); // Don't change this date setting
 
         final String expectedHeader = "AWS4-HMAC-SHA256 Credential=AKIAZHZQVUMXJASEFDT4/20211027/us-west-2/execute-api/aws4_request, SignedHeaders=accept;host;user-agent;x-amz-date, Signature=dab4ce2c5ff35cc2a99d57b03fb3ed0ece24630d97bfaf1676967b60b5171831";
-        final String originalHeader = ace.generateAwsSignature(target, method, allHeaders); // This needs to be executed so the Jersey filter interceptor can generate the final header.
+        ace.setAwsHeaderCalculationData(target, method, allHeaders); // This needs to be executed so the Jersey filter interceptor can generate the final header.
 
         // The checksum of a multipart body request.
         final String fakeBodyChecksum = "bf918205a9d2ce0cf8a0d1c7cc0eb2ecf42fdefc4ab387eaa1a7958edf26face";
         final String newlyCalculatedContentHeader = ace.generateAwsContentSignature(fakeBodyChecksum);
 
-        assertNotEquals("The original header should not match the header after the body checksum has been calculated.", originalHeader, newlyCalculatedContentHeader);
         assertEquals("The calculated header should match the original request that was made", expectedHeader, newlyCalculatedContentHeader);
     }
 }
