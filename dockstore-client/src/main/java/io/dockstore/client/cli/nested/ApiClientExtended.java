@@ -278,7 +278,6 @@ public class ApiClientExtended extends ApiClient {
      * @param target The target endpoint
      * @param method The HTTP method (GET, POST, etc ...)
      * @param allHeaders A list of header parameters custom to this request
-     * @return A string the should be set under the Authorization header for AWS HTTP requests
      */
     public void setAwsHeaderCalculationData(WebTarget target, String method, Map<String, String> allHeaders) {
         HttpRequest request = new HttpRequest(method, target.getUri());
@@ -326,6 +325,8 @@ public class ApiClientExtended extends ApiClient {
     /**
      * Creates an Invocation.Builder that will be used to make a WES request. If the request is to be sent to an AWS endpoint
      * a SigV4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
+     * The first step to calculating the AWS Authorization header is made here, but the Authorization header isn't set until later (In a Jersey hook)
+     * 
      * @param requiresAwsHeaders Boolean value indicating if this request requires AWS-specific headers
      * @param target The target endpoint
      * @param method The HTTP method (GET, POST, etc ...)

@@ -65,6 +65,13 @@ public class WesChecksumFilter implements ClientRequestFilter {
         }
     }
 
+    /**
+     * This will calculate the appropriate AWS SigV4 signature for the current request
+     *
+     * @param requestContext The request context
+     * @return A string signature that should be set as the Authorization for this HTTP request
+     * @throws IOException
+     */
     private String generateAwsSignature(ClientRequestContext requestContext) throws IOException {
 
         String contentSha256;
