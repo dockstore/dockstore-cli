@@ -13,7 +13,10 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 
+import io.dockstore.client.cli.Client;
 import org.apache.commons.codec.digest.DigestUtils;
+
+import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
@@ -72,7 +75,7 @@ public class WesChecksumFilter implements ClientRequestFilter {
      * @return A string signature that should be set as the Authorization for this HTTP request
      * @throws IOException
      */
-    private String generateAwsSignature(ClientRequestContext requestContext) throws IOException {
+    private String generateAwsSignature(ClientRequestContext requestContext) {
 
         String contentSha256;
 
@@ -89,21 +92,22 @@ public class WesChecksumFilter implements ClientRequestFilter {
                 requestContext.getMediaType());
 
             // Write the Entity to a byte stream using the MessageBodyWriter for our entity type
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            bodyWriter.writeTo(requestContext.getEntity(),
-                requestContext.getEntity().getClass(),
-                requestContext.getEntity().getClass(),
-                requestContext.getEntityAnnotations(),
-                requestContext.getMediaType(),
-                requestContext.getHeaders(),
-                buffer);
+            try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+                bodyWriter.writeTo(requestContext.getEntity(),
+                    requestContext.getEntity().getClass(),
+                    requestContext.getEntity().getClass(),
+                    requestContext.getEntityAnnotations(),
+                    requestContext.getMediaType(),
+                    requestContext.getHeaders(),
+                    buffer);
 
-            // Close the buffer, nothing else should be written to it.
-            buffer.close();
 
-            // Calculate a sha256 of the content in the buffer
-            byte[] content = buffer.toByteArray();
-            contentSha256 = DigestUtils.sha256Hex(content);
+                // Calculate a sha256 of the content in the buffer
+                byte[] content = buffer.toByteArray();
+                contentSha256 = DigestUtils.sha256Hex(content);
+            } catch (IOException ioe) {
+                throw new RuntimeException("Unable to write content body to buffer.", ioe);
+            }
         }
 
         // Return the AWS Authorization header calculated from the content sha
