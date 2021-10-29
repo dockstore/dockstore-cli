@@ -22,7 +22,6 @@ import javax.ws.rs.core.Response;
 import io.openapi.wes.client.ApiClient;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.Pair;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -46,6 +45,10 @@ public class ApiClientExtended extends ApiClient {
 
     public ApiClientExtended(WesRequestData wesRequestData) {
         this.wesRequestData = wesRequestData;
+    }
+
+    public WesRequestData getWesRequestData() {
+        return wesRequestData;
     }
 
     /**
@@ -270,13 +273,13 @@ public class ApiClientExtended extends ApiClient {
     }
 
     /**
-     * This will calculate the appropriate AWS signature for a request.
+     * This will set the appropriate variables so the final Authorization header may be calculated in a Jersey hook
+     *
      * @param target The target endpoint
      * @param method The HTTP method (GET, POST, etc ...)
      * @param allHeaders A list of header parameters custom to this request
-     * @return A string the should be set under the Authorization header for AWS HTTP requests
      */
-    public String generateAwsSignature(WebTarget target, String method, Map<String, String> allHeaders) {
+    public void setAwsHeaderCalculationData(WebTarget target, String method, Map<String, String> allHeaders) {
         HttpRequest request = new HttpRequest(method, target.getUri());
 
         // Our signature object. We will add all necessary headers to this request that comprise the 'canonical' HTTP request.
@@ -292,18 +295,10 @@ public class ApiClientExtended extends ApiClient {
             authSignature.header(mapEntry.getKey(), mapEntry.getValue());
         }
 
-        // Point the jersey filter to this object so we can calculate the final AWS authorization header if needed
-        WesChecksumFilter.setClientExtended(this);
-
         // Not ideal, but we need to save some of the signature creation objects so we have the necessary information
         // to calculate the Authorization header for requests with a payload. This isn't calculable until we're already
         // making the request with jersey.
         setAwsAuthMetadata(authSignature, request);
-
-        // Set the Authorization header for a bodiless request. This may get overridden by a jersey filter, if this
-        // request as a payload.
-        String contentSha256 = DigestUtils.sha256Hex("");
-        return awsAuthSignature.build(awsHttpRequest, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
     }
 
     /**
@@ -330,6 +325,8 @@ public class ApiClientExtended extends ApiClient {
     /**
      * Creates an Invocation.Builder that will be used to make a WES request. If the request is to be sent to an AWS endpoint
      * a SigV4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
+     * The first step to calculating the AWS Authorization header is made here, but the Authorization header isn't set until later (In a Jersey hook)
+     * 
      * @param requiresAwsHeaders Boolean value indicating if this request requires AWS-specific headers
      * @param target The target endpoint
      * @param method The HTTP method (GET, POST, etc ...)
@@ -346,16 +343,16 @@ public class ApiClientExtended extends ApiClient {
             invocationBuilder.header(mapEntry.getKey(), mapEntry.getValue());
         }
 
-        // If credentials were passed in, then we want to add an Authorization header, otherwise skip
-        if (this.wesRequestData.hasCredentials()) {
-            // If the request requires AWS auth headers, calculate the signature, otherwise just get the standard bearer token
-            final String authorizationHeader = requiresAwsHeaders
-                ? generateAwsSignature(target, method, mergedHeaderMap) : this.wesRequestData.getBearerToken();
-
-            // Add the Authorization header. This should be the last modification to the InvocationBuilder to ensure the signature remains valid
-            invocationBuilder.header(HttpHeaders.AUTHORIZATION, authorizationHeader);
+        // If this request has credentials and is to an AWS endpoint, we need to set some signature calculation data.
+        // This will allow the jersey hook (WesChecksumFilter.java) to correctly calculate the Authorization header.
+        if (this.wesRequestData.hasCredentials() && requiresAwsHeaders) {
+            setAwsHeaderCalculationData(target, method, mergedHeaderMap);
         }
 
+        // Point the jersey filter to this object so we can calculate the Authorization header if needed
+        WesChecksumFilter.setClientExtended(this);
+
+        // This invocation has no Authorization header set, that is handle in a Jersey hook
         return invocationBuilder;
     }
 
