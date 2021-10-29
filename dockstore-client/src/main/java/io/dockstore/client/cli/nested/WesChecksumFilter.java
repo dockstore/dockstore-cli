@@ -13,10 +13,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 
-import io.dockstore.client.cli.Client;
 import org.apache.commons.codec.digest.DigestUtils;
-
-import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
