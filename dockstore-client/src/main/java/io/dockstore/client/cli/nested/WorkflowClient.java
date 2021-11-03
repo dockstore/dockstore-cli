@@ -1208,6 +1208,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         private boolean help = false;
         @Parameter(names = "--uuid", description = "Allows you to specify a uuid for 3rd party notifications")
         private String uuid;
+        @Parameter(names = "--aws", description = "Indicates this command is to an AWS endpoint")
+        private boolean isAws = false;
     }
 
 }

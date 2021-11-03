@@ -1036,7 +1036,7 @@ public abstract class AbstractEntryClient<T> {
      */
     WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
 
-        if (wesRequestData == null) {
+        if (this.getWesRequestData() == null) {
             errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);
         }
         
@@ -1052,12 +1052,14 @@ public abstract class AbstractEntryClient<T> {
         // Delete these next two lines when Swagger Codegen is fixed
         ApiClientExtended wesApiClient = new ApiClientExtended(wesRequestData);
         clientWorkflowExecutionServiceApi.setApiClient(wesApiClient);
+        wesApiClient.getHttpClient().register(WesChecksumFilter.class);
 
         wesApiClient.setBasePath(wesRequestData.getUrl());
 
         // Add these headers to the http request. Are these needed?
         wesApiClient.addDefaultHeader("Accept", "*/*");
         wesApiClient.addDefaultHeader("Expect", "100-continue");
+        // TODO Might want to override the default User Agent header with a custom one to make tracking WES requests easier.
 
         clientWorkflowExecutionServiceApi.setApiClient(wesApiClient);
         return clientWorkflowExecutionServiceApi;

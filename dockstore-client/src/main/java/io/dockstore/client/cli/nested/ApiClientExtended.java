@@ -40,9 +40,15 @@ public class ApiClientExtended extends ApiClient {
     static final String AWS_WES_SERVICE_NAME = "execute-api";
 
     final WesRequestData wesRequestData;
+    private Signer.Builder awsAuthSignature = null;
+    private HttpRequest awsHttpRequest = null;
 
     public ApiClientExtended(WesRequestData wesRequestData) {
         this.wesRequestData = wesRequestData;
+    }
+
+    public WesRequestData getWesRequestData() {
+        return wesRequestData;
     }
 
     /**
@@ -267,18 +273,18 @@ public class ApiClientExtended extends ApiClient {
     }
 
     /**
-     * This will calculate the appropriate AWS signature for a request.
+     * This will set the appropriate variables so the final Authorization header may be calculated in a Jersey hook
+     *
      * @param target The target endpoint
      * @param method The HTTP method (GET, POST, etc ...)
      * @param allHeaders A list of header parameters custom to this request
-     * @return A string the should be set under the Authorization header for AWS HTTP requests
      */
-    public String generateAwsSignature(WebTarget target, String method, Map<String, String> allHeaders) {
+    public void setAwsHeaderCalculationData(WebTarget target, String method, Map<String, String> allHeaders) {
         HttpRequest request = new HttpRequest(method, target.getUri());
 
         // Our signature object. We will add all necessary headers to this request that comprise the 'canonical' HTTP request.
         // This will then be signed alongside a hash of the body content (if there is a body).
-        Signer.Builder awsAuthSignature = Signer.builder()
+        Signer.Builder authSignature = Signer.builder()
             // TODO this currently only supports permanent AWS credentials
             .awsCredentials(new AwsCredentials(this.wesRequestData.getAwsAccessKey(), this.wesRequestData.getAwsSecretKey()))
             .region(this.wesRequestData.getAwsRegion())
@@ -286,18 +292,41 @@ public class ApiClientExtended extends ApiClient {
 
         // add all the headers to the signature object
         for (Map.Entry<String, String> mapEntry : allHeaders.entrySet()) {
-            awsAuthSignature.header(mapEntry.getKey(), mapEntry.getValue());
+            authSignature.header(mapEntry.getKey(), mapEntry.getValue());
         }
 
-        // TODO: Remove this once we are making requests with a body.
-        String contentSha256 = org.apache.commons.codec.digest.DigestUtils.sha256Hex("");
-        return awsAuthSignature.build(request, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
+        // Not ideal, but we need to save some of the signature creation objects so we have the necessary information
+        // to calculate the Authorization header for requests with a payload. This isn't calculable until we're already
+        // making the request with jersey.
+        setAwsAuthMetadata(authSignature, request);
     }
 
-    // TODO: Handle requests with body content.
+    /**
+     * Sets metadata for calculating an AWS Authorization header later in the request process.
+     *
+     * @param authSignature The builder which creates the final request
+     * @param request An HttpRequest object that holds the AWS service type and URI
+     */
+    private void setAwsAuthMetadata(Signer.Builder authSignature, HttpRequest request) {
+        this.awsAuthSignature = authSignature;
+        this.awsHttpRequest = request;
+    }
+
+    /**
+     * Returns an AWS SigV4 String based on some request metadata and a sha256 of the payload content.
+     *
+     * @param contentSha256 A sha256 checksum of the request payload.
+     * @return A SigV4 string that should be set as the Authorization header of an AWS HTTP request
+     */
+    public String generateAwsContentSignature(String contentSha256) {
+        return awsAuthSignature.build(awsHttpRequest, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
+    }
+
     /**
      * Creates an Invocation.Builder that will be used to make a WES request. If the request is to be sent to an AWS endpoint
      * a SigV4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
+     * The first step to calculating the AWS Authorization header is made here, but the Authorization header isn't set until later (In a Jersey hook)
+     * 
      * @param requiresAwsHeaders Boolean value indicating if this request requires AWS-specific headers
      * @param target The target endpoint
      * @param method The HTTP method (GET, POST, etc ...)
@@ -314,16 +343,16 @@ public class ApiClientExtended extends ApiClient {
             invocationBuilder.header(mapEntry.getKey(), mapEntry.getValue());
         }
 
-        // If credentials were passed in, then we want to add an Authorization header, otherwise skip
-        if (this.wesRequestData.hasCredentials()) {
-            // If the request requires AWS auth headers, calculate the signature, otherwise just get the standard bearer token
-            final String authorizationHeader = requiresAwsHeaders
-                ? generateAwsSignature(target, method, mergedHeaderMap) : this.wesRequestData.getBearerToken();
-
-            // Add the Authorization header. This should be the last modification to the InvocationBuilder to ensure the signature remains valid
-            invocationBuilder.header(HttpHeaders.AUTHORIZATION, authorizationHeader);
+        // If this request has credentials and is to an AWS endpoint, we need to set some signature calculation data.
+        // This will allow the jersey hook (WesChecksumFilter.java) to correctly calculate the Authorization header.
+        if (this.wesRequestData.hasCredentials() && requiresAwsHeaders) {
+            setAwsHeaderCalculationData(target, method, mergedHeaderMap);
         }
 
+        // Point the jersey filter to this object so we can calculate the Authorization header if needed
+        WesChecksumFilter.setClientExtended(this);
+
+        // This invocation has no Authorization header set, that is handle in a Jersey hook
         return invocationBuilder;
     }
 
