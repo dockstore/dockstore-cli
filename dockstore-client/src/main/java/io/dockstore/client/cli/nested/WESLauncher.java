@@ -2,6 +2,7 @@ package io.dockstore.client.cli.nested;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 import com.google.common.io.Files;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
+import io.openapi.wes.client.ApiClient;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
 import org.apache.commons.io.FileUtils;
@@ -94,6 +96,36 @@ public class WESLauncher extends BaseLauncher {
         return workflowAttachment;
     }
 
+    /**
+     * Calculates the expected TRS URL for an entry. This can be passed under the 'workflow_url' section of the WES request
+     * in place of inlining the workflow under 'workflow_attachment'
+     *
+     * @param basePath The path to the Dockstore service (e.g. https://dockstore.org)
+     * @param entryId The entry id (e.g. github.com/org/repo)
+     * @param versionId The version of the entry
+     * @param type The entry type (PLAIN_WDL / PLAIN_CWL / PLAIN_NEXTFLOW / etc..)
+     * @param relativePath The relative path to the primary descriptor file
+     * @return a TRS URL
+     */
+    public String createTrsUrl(String basePath, String entryId, String versionId, String type, String relativePath) {
+        // ApiClient for url escaping
+        final ApiClient client = this.clientWorkflowExecutionServiceApi.getApiClient();
+
+        // Escape each of the URL path values
+        final String escapedId = client.escapeString(entryId);
+        final String escapedVersionId = client.escapeString(versionId);
+        final String escapedType = client.escapeString(type);
+        final String escapedRelativePath = client.escapeString(relativePath);
+
+        // Return the TRS URL for a given entry
+        return MessageFormat.format("{0}/ga4gh/trs/v2/tools/{1}/versions/{2}/{3}/descriptor/{4}",
+            basePath,
+            escapedId,
+            escapedVersionId,
+            escapedType,
+            escapedRelativePath);
+    }
+
     public void runWESCommand(String jsonInputFilePath, File localPrimaryDescriptorFile, File zippedEntry) {
         File workflowParams = new File(jsonInputFilePath);
 
@@ -105,10 +137,28 @@ public class WESLauncher extends BaseLauncher {
             workflowTypeVersion = "v" + WORKFLOW_TYPE_VERSION;
         }
 
-        String workflowURL = localPrimaryDescriptorFile.getName();
+        final String workflowRelativePath = localPrimaryDescriptorFile.getName();
+        List<File> workflowAttachment = null;
+        File tempDir = null;
 
-        final File tempDir = Files.createTempDir();
-        List<File> workflowAttachment = addFilesToWorkflowAttachment(zippedEntry, tempDir);
+        String workflowURL;
+        if (true) {
+            // Entries are passed in the form {PATH}:{VERSION} or {PATH}
+            final String[] pathAndVersion = entryVal.split(":");
+            final String path = pathAndVersion[0];
+
+            // Calculate the values needed to supply a TRS URL
+            final String basePath = this.abstractEntryClient.getClient().getGa4Ghv20Api().getApiClient().getBasePath();
+            final String versionId = this.abstractEntryClient.getVersionID(entryVal);
+            final String trsId = this.abstractEntryClient.getTrsId(path);
+            final String plainType = "PLAIN_" + languageType;
+
+            workflowURL = createTrsUrl(basePath, trsId, versionId, plainType, workflowRelativePath);
+        } else {
+            workflowURL = workflowRelativePath;
+            tempDir = Files.createTempDir();
+            workflowAttachment = addFilesToWorkflowAttachment(zippedEntry, tempDir);
+        }
 
         try {
             RunId response = clientWorkflowExecutionServiceApi.runWorkflow(workflowParams, languageType, workflowTypeVersion, TAGS,
@@ -119,10 +169,14 @@ public class WESLauncher extends BaseLauncher {
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error launching WES run", e);
         } finally {
-            try {
-                FileUtils.deleteDirectory(tempDir);
-            } catch (IOException ioe) {
-                LOG.error("Could not delete temporary directory" + tempDir + " for workflow attachment files", ioe);
+
+            // Only attempt to cleanup the temporary directory if we created it in the first place
+            if (tempDir != null) {
+                try {
+                    FileUtils.deleteDirectory(tempDir);
+                } catch (IOException ioe) {
+                    LOG.error("Could not delete temporary directory" + tempDir + " for workflow attachment files", ioe);
+                }
             }
         }
     }
