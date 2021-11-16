@@ -37,5 +37,5 @@ jobs:
             slack-message: 'dockstore-cli/.github/workflows/cron.yml has failed!'
             channel-id: 'CTWPH9Q03'  # Slack channel id to post message
         env:
-            SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
