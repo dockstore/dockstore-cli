@@ -38,4 +38,5 @@ jobs:
             channel-id: 'CTWPH9Q03'  # Slack channel id to post message
         env:
             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
