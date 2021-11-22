@@ -1,34 +1,39 @@
 package io.dockstore.client.cli.nested;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.beust.jcommander.SubParameter;
-import org.apache.commons.lang3.EnumUtils;
-
-import static io.dockstore.client.cli.ArgumentUtility.out;
 
 public class WesCommandParser {
 
     public WesMain wesMain;
     public CommandLaunch commandLaunch;
+    public CommandCancel commandCancel;
+    public CommandStatus commandStatus;
+    public CommandServiceInfo commandServiceInfo;
+    public JCommander jCommander;
 
     public WesCommandParser() {
         this.wesMain = new WesMain();
         this.commandLaunch = new CommandLaunch();
+        this.commandCancel = new CommandCancel();
+        this.commandStatus = new CommandStatus();
+        this.commandServiceInfo = new CommandServiceInfo();
+
+        this.jCommander = buildWesCommandParser();
     }
 
-    public JCommander buildWesCommandParser() {
+    private JCommander buildWesCommandParser() {
 
         // Build JCommander
         return JCommander.newBuilder()
             .addObject(this.wesMain)
             .addCommand("launch", this.commandLaunch)
+            .addCommand("cancel", this.commandCancel)
+            .addCommand("status", this.commandStatus)
+            .addCommand("service-info", this.commandServiceInfo)
             .build();
     }
 
@@ -45,7 +50,7 @@ public class WesCommandParser {
         private List<String> wesAuth = null;
         @Parameter(names = "--aws-config", description = "A path to an AWS configuration file containing AWS profile credentials.", required = false)
         private String awsConfig = null;
-        @Parameter(names = "--aws-region", description = "The AWS region of the WES server.", required = true)
+        @Parameter(names = "--aws-region", description = "The AWS region of the WES server.", required = false)
         private String awsRegion = null;
         @Parameter(names = "--help", description = "Prints help for launch command", help = true)
         private boolean help = false;
@@ -59,7 +64,7 @@ public class WesCommandParser {
         }
 
         /**
-         * Returns the WES authorization type (bearer or aws)
+         * Returns the WES authorization type (bearer or aws). If no auth type was provided, return null
          * @return
          */
         public String getWesAuthType() {
@@ -70,7 +75,7 @@ public class WesCommandParser {
         }
 
         /**
-         * Returns the WES authorization value (token or AWS profile).
+         * Returns the WES authorization value (token or AWS profile). If no auth value was provided, return null.
          * @return
          */
         public String getWesAuthValue() {
@@ -79,11 +84,23 @@ public class WesCommandParser {
             }
             return null;
         }
+
+        public String getAwsConfig() {
+            return awsConfig;
+        }
+
+        public String getAwsRegion() {
+            return awsRegion;
+        }
+
+        public boolean isHelp() {
+            return help;
+        }
     }
 
-    @Parameters(separators = "=", commandDescription = "Launch an entry locally or remotely.")
+    @Parameters(separators = "=", commandDescription = "Launch a workflow using WES.")
     public static class CommandLaunch {
-        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)")
+        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
         @Parameter(names = "--json", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
         private String json;
@@ -93,8 +110,74 @@ public class WesCommandParser {
         private boolean help = false;
         @Parameter(names = "--uuid", description = "Allows you to specify a uuid for 3rd party notifications")
         private String uuid;
-        @Parameter(names = "--aws", description = "Indicates this command is to an AWS endpoint")
-        private boolean isAws = false;
+
+        public String getEntry() {
+            return entry;
+        }
+
+        public String getJson() {
+            return json;
+        }
+
+        public String getYaml() {
+            return yaml;
+        }
+
+        public boolean isHelp() {
+            return help;
+        }
+
+        public String getUuid() {
+            return uuid;
+        }
+    }
+
+    @Parameters(separators = "=", commandDescription = "Cancel a remote WES entry")
+    public static class CommandCancel {
+        @Parameter(names = "--help", description = "Prints help for the cancel command", help = true)
+        private boolean help = false;
+        @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
+        private String id;
+
+        public boolean isHelp() {
+            return help;
+        }
+
+        public String getId() {
+            return id;
+        }
+    }
+
+    @Parameters(separators = "=", commandDescription = "Retrieve the status of a workflow")
+    public static class CommandStatus {
+        @Parameter(names = "--help", description = "Prints help for the cancel command", help = true)
+        private boolean help = false;
+        @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
+        private String id;
+        @Parameter(names = "--verbose", description = "Flag indicating to print verbose logs", required = false)
+        private boolean verbose = false;
+
+        public boolean isHelp() {
+            return help;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public boolean isVerbose() {
+            return verbose;
+        }
+    }
+
+    @Parameters(separators = "=", commandDescription = "Retrieve info about a WES server")
+    public static class CommandServiceInfo {
+        @Parameter(names = "--help", description = "Prints help for the cancel command", help = true)
+        private boolean help = false;
+
+        public boolean isHelp() {
+            return help;
+        }
     }
 
 }
