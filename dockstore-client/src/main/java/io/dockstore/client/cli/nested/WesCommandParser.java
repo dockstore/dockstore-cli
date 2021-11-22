@@ -2,8 +2,10 @@ package io.dockstore.client.cli.nested;
 
 import java.util.List;
 
+import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 
 public class WesCommandParser {
@@ -40,20 +42,20 @@ public class WesCommandParser {
     @Parameters(separators = "=", commandDescription = "Execute WES commands")
     public static class WesMain {
         @Parameter(names = "--wes-url", description = "The URL of the WES server.", required = false)
-        private String wesUrl = null;
+        private static String wesUrl = null;
         @Parameter(names = "--wes-auth",
             description = "The authorization type and value of this wes request. --wes-auth <type> <value>. "
                 + "Type can be 'bearer' or 'aws'. "
                 + "Value can be a token if the type is 'bearer', or an AWS profile if the type is 'aws'",
             variableArity = true,
             required = false)
-        private List<String> wesAuth = null;
+        private static List<String> wesAuth = null;
         @Parameter(names = "--aws-config", description = "A path to an AWS configuration file containing AWS profile credentials.", required = false)
-        private String awsConfig = null;
+        private static String awsConfig = null;
         @Parameter(names = "--aws-region", description = "The AWS region of the WES server.", required = false)
-        private String awsRegion = null;
+        private static String awsRegion = null;
         @Parameter(names = "--help", description = "Prints help for launch command", help = true)
-        private boolean help = false;
+        private static boolean help = false;
 
         /**
          * Returns the WES authorization type (bearer or aws). If no auth type was provided, return null
