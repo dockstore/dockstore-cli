@@ -56,14 +56,6 @@ public class WesCommandParser {
         private boolean help = false;
 
         /**
-         * Returns the URL for the WES request, if provided on the command line.
-         * @return
-         */
-        public String getWesUrl() {
-            return wesUrl;
-        }
-
-        /**
          * Returns the WES authorization type (bearer or aws). If no auth type was provided, return null
          * @return
          */
@@ -71,7 +63,7 @@ public class WesCommandParser {
             if (wesAuth != null && !wesAuth.isEmpty()) {
                 return wesAuth.get(0);
             }
-                return null;
+            return null;
         }
 
         /**
@@ -83,6 +75,10 @@ public class WesCommandParser {
                 return wesAuth.get(1);
             }
             return null;
+        }
+
+        public String getWesUrl() {
+            return wesUrl;
         }
 
         public String getAwsConfig() {
@@ -98,7 +94,7 @@ public class WesCommandParser {
         }
     }
 
-    @Parameters(separators = "=", commandDescription = "Launch a workflow using WES.")
+    @Parameters(separators = "=", commandDescription = "Launch a workflow using WES")
     public static class CommandLaunch {
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;

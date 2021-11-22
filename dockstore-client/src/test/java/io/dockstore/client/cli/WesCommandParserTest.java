@@ -1,19 +1,16 @@
 package io.dockstore.client.cli;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import io.dockstore.client.cli.nested.WesCommandParser;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class WesCommandParserTest {
-
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
 
     @Test
     public void testWesMainHelp() {
@@ -34,9 +31,7 @@ public class WesCommandParserTest {
         final String wesUrl = "my.wes.url.com/ga4gh/v1/";
         final String[] args = {
             "--wes-url",
-            wesUrl,
-            "--aws-region",
-            "space-mars-2"
+            wesUrl
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -65,6 +60,7 @@ public class WesCommandParserTest {
         parser.parse(args);
 
         assertNull("Parsed command should be null", parser.getParsedCommand());
+        assertEquals("The parsed region should be 'space-mars-2'", "space-mars-2", wesCommandParser.wesMain.getAwsRegion());
         assertEquals("The parsed auth type should be 'aws'", wesAuthType, wesCommandParser.wesMain.getWesAuthType());
         assertEquals("The parsed auth value should be 'my-profile'", wesAuthValue, wesCommandParser.wesMain.getWesAuthValue());
     }
@@ -85,13 +81,10 @@ public class WesCommandParserTest {
 
         assertNull("Parsed command should be null", parser.getParsedCommand());
         assertEquals("The parsed auth type should be 'aws'", wesAuthType, wesCommandParser.wesMain.getWesAuthType());
-        assertEquals("The parsed auth value should be null", null, wesCommandParser.wesMain.getWesAuthValue());
+        assertNull("The parsed auth value should be null", wesCommandParser.wesMain.getWesAuthValue());
     }
 
     @Test
-    /**
-     * Similar to testWesMainAuthPartial2, but just double checks that 'aws' and 'bearer' types are both parsed correctly.
-     */
     public void testWesMainAuthPartial2() {
         final String wesAuthType = "bearer";
         final String[] args = {
@@ -184,6 +177,28 @@ public class WesCommandParserTest {
     }
 
     @Test
+    public void testCommandLaunchNoEntry() {
+        final String[] args = {
+            "--wes-auth",
+            "bearer",
+            "123456",
+            "launch",
+            "--yaml",
+            "path/to/yaml.yaml"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+
+        try {
+            parser.parse(args);
+            fail("The parser should throw an exception for missing '--entry' parameter");
+        } catch (ParameterException e) {
+            assertTrue(true);
+        }
+    }
+
+    @Test
     public void testCommandCancel() {
         final String[] args = {
             "--wes-auth",
@@ -200,5 +215,133 @@ public class WesCommandParserTest {
 
         assertEquals("Parsed command should be 'cancel'", "cancel", parser.getParsedCommand());
         assertEquals("The parsed entry should be '123456'", "123456", wesCommandParser.commandCancel.getId());
+    }
+
+    @Test
+    public void testCommandCancelNoID() {
+        final String[] args = {
+            "--wes-auth",
+            "bearer",
+            "123456",
+            "cancel"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        try {
+            parser.parse(args);
+            fail("The parser should throw an exception for missing '--id' parameter");
+        } catch (ParameterException e) {
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCommandCancelHelp() {
+        final String[] args = {
+            "cancel",
+            "--help"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+        assertTrue("Help should be set", wesCommandParser.commandCancel.isHelp());
+    }
+
+    @Test
+    public void testCommandStatus1() {
+        final String[] args = {
+            "--wes-auth",
+            "bearer",
+            "123456",
+            "status",
+            "--id",
+            "123456"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+
+        assertEquals("Parsed command should be 'status'", "status", parser.getParsedCommand());
+        assertEquals("The parsed entry should be '123456'", "123456", wesCommandParser.commandStatus.getId());
+    }
+
+    @Test
+    public void testCommandStatus2() {
+        final String[] args = {
+            "--wes-auth",
+            "bearer",
+            "123456",
+            "status",
+            "--id",
+            "123456",
+            "--verbose"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+
+        assertEquals("Parsed command should be 'status'", "status", parser.getParsedCommand());
+        assertEquals("The parsed entry should be '123456'", "123456", wesCommandParser.commandStatus.getId());
+        assertTrue("verbose flag should be set", wesCommandParser.commandStatus.isVerbose());
+    }
+
+    @Test
+    public void testCommandStatusNoID() {
+        final String[] args = {
+            "--wes-auth",
+            "bearer",
+            "123456",
+            "status"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        try {
+            parser.parse(args);
+            fail("The parser should throw an exception for missing '--id' parameter");
+        } catch (ParameterException e) {
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCommandStatusHelp() {
+        final String[] args = {
+            "status",
+            "--help"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+        assertTrue("Help should be set", wesCommandParser.commandStatus.isHelp());
+    }
+
+    @Test
+    public void testCommandServiceInfo() {
+        final String[] args = {
+            "service-info"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+    }
+
+    @Test
+    public void testCommandServiceInfoHelp() {
+        final String[] args = {
+            "service-info",
+            "--help"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+        assertTrue("Help should be set", wesCommandParser.commandServiceInfo.isHelp());
     }
 }
