@@ -36,6 +36,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.auth.profile.ProfilesConfigFile;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -1043,7 +1045,7 @@ public abstract class AbstractEntryClient<T> {
         if (this.getWesRequestData() == null) {
             errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);
         }
-        
+
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = new WorkflowExecutionServiceApi();
 
         // Uncomment this code when Swagger Codegen generates correct Java
@@ -1076,39 +1078,6 @@ public abstract class AbstractEntryClient<T> {
      */
     private boolean shouldDisplayHelp(final List<String> args) {
         return args.isEmpty() || containsHelpRequest(args);
-    }
-
-    /**
-     * This will print the appropriate help message depending on the input arguments.
-     * @param args Command arguments for this WES command
-     */
-    private void displayWesHelp(final List<String> args) {
-
-        // print the help message for general WES commands
-        if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
-            wesHelp();
-            return;
-        }
-
-        // print the help message for a specific command type
-        final String cmd = args.get(0);
-        switch (cmd) {
-        case "launch":
-            wesLaunchHelp();
-            break;
-        case "status":
-            wesStatusHelp();
-            break;
-        case "cancel":
-            wesCancelHelp();
-            break;
-        case "service-info":
-            wesServiceInfoHelp();
-            break;
-        default:
-            invalid(cmd);
-            break;
-        }
     }
 
     /**
@@ -1183,29 +1152,44 @@ public abstract class AbstractEntryClient<T> {
      * @param args Arguments entered into the CLI
      */
     private void processWesCommands(final List<String> args) {
-        if (shouldDisplayHelp(args)) {
-            displayWesHelp(args);
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        wesCommandParser.jCommander.parse(args.toArray(new String[0]));
+
+        if (wesCommandParser.wesMain.isHelp()) {
+            wesHelp();
         } else {
-            final WesRequestData requestData = this.aggregateWesRequestData(args);
+            final WesRequestData requestData = this.aggregateWesRequestData(wesCommandParser);
             setWesRequestData(requestData);
             WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
 
-            final String cmd = args.remove(0);
-            switch (cmd) {
+            switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
-                wesLaunch(args);
+                if (wesCommandParser.commandLaunch.isHelp()) {
+                    wesLaunchHelp();
+                } else {
+                    wesLaunch(args);
+                }
                 break;
             case "status":
-                wesStatus(args, clientWorkflowExecutionServiceApi);
+                if (wesCommandParser.commandStatus.isHelp()) {
+                    wesStatusHelp();
+                } else {
+                    wesStatus(args, clientWorkflowExecutionServiceApi);
+                }
                 break;
             case "cancel":
-                wesCancel(args, clientWorkflowExecutionServiceApi);
+                if (wesCommandParser.commandCancel.isHelp()) {
+                    wesCancelHelp();
+                } else {
+                    wesCancel(args, clientWorkflowExecutionServiceApi);
+                }
                 break;
             case "service-info":
-                wesServiceInfo(clientWorkflowExecutionServiceApi);
-                break;
-            default:
-                invalid(cmd);
+                if (wesCommandParser.commandServiceInfo.isHelp()) {
+                    wesServiceInfoHelp();
+                } else {
+                    wesServiceInfo(clientWorkflowExecutionServiceApi);
+                }
                 break;
             }
         }
@@ -1213,9 +1197,9 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * This will aggregate the WES request URI and credentials into a single object for use down the line
-     * @param args The commaand line arguments
+     * @param wesCommandParser The parsed command line arguments
      */
-    public WesRequestData aggregateWesRequestData(final List<String> args) {
+    public WesRequestData aggregateWesRequestData(final WesCommandParser wesCommandParser) {
 
         // Get the config file to see if credentials are there
         INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
@@ -1227,21 +1211,44 @@ public abstract class AbstractEntryClient<T> {
         }
 
         // Attempt to find the WES URI
-        final String wesUri = optVal(args, "--wes-url", null);
+        final String wesUri = wesCommandParser.wesMain.getWesUrl();
         final String wesEndpointUrl = ObjectUtils.firstNonNull(wesUri, Objects.requireNonNull(configSubNode).getString("url"));
 
+        // Determine the authorization method used by the user
+        final String authType = ObjectUtils.firstNonNull(
+            wesCommandParser.wesMain.getWesAuthType(),
+            Objects.requireNonNull(configSubNode).getString("authorizationType"));
+
+        // The auth value is either a bearer token or AWS profile
+        final String authValue = ObjectUtils.firstNonNull(
+            wesCommandParser.wesMain.getWesAuthValue(),
+            Objects.requireNonNull(configSubNode).getString("authorization"));
+
         // Depending on the endpoint (AWS/non-AWS) we need to look for a different set of credentials
-        final boolean isAwsWes = flagPresent(args, "--aws");
+        final boolean isAwsWes = "aws".equals(authType);
         if (isAwsWes) {
-            // TODO should probably have the config sections all defined within a single class. At least have enums.
-            // AWS credentials shouldn't be stored in the dockstore config, so we wont check for it there.
-            final String accessKey = optVal(args, "--aws-access-key", null);
-            final String secretKey = optVal(args, "--aws-secret-key", null);
-            final String region = optVal(args, "--aws-region", null);
+
+            // Get the AWS config path
+            final String awsConfigPath = ObjectUtils.firstNonNull(
+                wesCommandParser.wesMain.getAwsConfig(),
+                Objects.requireNonNull(configSubNode).getString("config"));
+
+            // Parse AWS credentials from the provided config file
+            ProfilesConfigFile profilesConfigFile = new ProfilesConfigFile(awsConfigPath);
+            ProfileCredentialsProvider awsProfile = new ProfileCredentialsProvider(profilesConfigFile, authValue);
+
+            // Get the access credentials from the AWS config file.
+            final String accessKey = awsProfile.getCredentials().getAWSAccessKeyId();
+            final String secretKey = awsProfile.getCredentials().getAWSSecretKey();
+
+            // Get the AWS region we are send the request to
+            final String region = ObjectUtils.firstNonNull(
+                wesCommandParser.wesMain.getAwsRegion(),
+                Objects.requireNonNull(configSubNode).getString("region"));
+
             return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
         } else {
-            final String wesToken = ObjectUtils.firstNonNull(optVal(args, "--wes-auth", null), Objects.requireNonNull(configSubNode).getString("authorization"));
-            return new WesRequestData(wesEndpointUrl, wesToken);
+            return new WesRequestData(wesEndpointUrl, authValue);
         }
     }
     /**
