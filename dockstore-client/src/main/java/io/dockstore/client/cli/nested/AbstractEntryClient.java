@@ -1211,13 +1211,14 @@ public abstract class AbstractEntryClient<T> {
         }
 
         // Attempt to find the WES URI
-        final String wesUri = wesCommandParser.wesMain.getWesUrl();
-        final String wesEndpointUrl = ObjectUtils.firstNonNull(wesUri, Objects.requireNonNull(configSubNode).getString("url"));
+        final String wesEndpointUrl = ObjectUtils.firstNonNull(
+            wesCommandParser.wesMain.getWesUrl(),
+            Objects.requireNonNull(configSubNode).getString("url"));
 
         // Determine the authorization method used by the user
         final String authType = ObjectUtils.firstNonNull(
             wesCommandParser.wesMain.getWesAuthType(),
-            Objects.requireNonNull(configSubNode).getString("authorizationType"));
+            Objects.requireNonNull(configSubNode).getString("type"));
 
         // The auth value is either a bearer token or AWS profile
         final String authValue = ObjectUtils.firstNonNull(
