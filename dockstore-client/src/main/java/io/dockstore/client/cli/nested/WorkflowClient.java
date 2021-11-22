@@ -427,7 +427,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
      * @param args Arguments entered into the CLI
      */
     @Override
-    public void launch(final List<String> args) {
+    public void launch(final List<String> args ) {
         String commandName = "launch";
         preValidateLaunchArguments(args);
         String[] argv = args.toArray(new String[0]);
@@ -442,8 +442,18 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         boolean ignoreChecksumFlag = commandLaunch.ignoreChecksums;
         String uuid = commandLaunch.uuid;
 
+        if (this.commandLaunch.help) {
+            JCommanderUtility.printJCommanderHelpLaunch(jCommander, "dockstore workflow", commandName);
+        } else {
+            launchWithArgs(commandName, entry, localEntry, jsonRun, yamlRun, wdlOutputTarget, ignoreChecksumFlag, uuid);
+        }
+    }
+
+    @Override
+    public void launchWithArgs(final String commandName, final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
+
         // trim the final slash on output if it is present, probably an error ( https://github.com/aws/aws-cli/issues/421 ) causes a double slash which can fail
-        wdlOutputTarget = wdlOutputTarget != null ? wdlOutputTarget.replaceAll("/$", "") : null;
+        final String wdlOutputTarget = wdlOutput != null ? wdlOutput.replaceAll("/$", "") : null;
 
         if (this.commandLaunch.help) {
             JCommanderUtility.printJCommanderHelpLaunch(jCommander, "dockstore workflow", commandName);

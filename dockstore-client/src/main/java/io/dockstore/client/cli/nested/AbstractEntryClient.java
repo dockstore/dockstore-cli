@@ -1072,25 +1072,17 @@ public abstract class AbstractEntryClient<T> {
     }
 
     /**
-     * Determines if we should display a help message
-     * @param args Command arguments for this WES command
-     * @return
+     * This will attempt to launch a workflow given the command arguments
+     *
      */
-    private boolean shouldDisplayHelp(final List<String> args) {
-        return args.isEmpty() || containsHelpRequest(args);
+    private void wesLaunch(final String commandName, final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
+        launchWithArgs(commandName, entry, localEntry, jsonRun, yamlRun, wdlOutput, ignoreChecksumFlag, uuid);
     }
 
-    /**
-     * This will attempt to launch a workflow given the command arguments
-     * @param args Command arguments for this WES command
-     */
-    private void wesLaunch(final List<String> args) {
-        if (args.contains("--local-entry")) {
-            errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
-        } else {
-            launch(args);
-        }
+    public void launchWithArgs(final String commandName, final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
+        // Does nothing for tools.
     }
+
 
     /**
      *  This will attempt to retrieve the status of a workflow run
@@ -1167,7 +1159,14 @@ public abstract class AbstractEntryClient<T> {
                 if (wesCommandParser.commandLaunch.isHelp()) {
                     wesLaunchHelp();
                 } else {
-                    wesLaunch(args);
+                    wesLaunch(wesCommandParser.jCommander.getParsedCommand(),
+                        wesCommandParser.commandLaunch.getEntry(),
+                        null,
+                        wesCommandParser.commandLaunch.getJson(),
+                        wesCommandParser.commandLaunch.getYaml(),
+                        null,
+                        true,
+                        null);
                 }
                 break;
             case "status":
