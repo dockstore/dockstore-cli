@@ -1233,8 +1233,9 @@ public abstract class AbstractEntryClient<T> {
                 wesCommandParser.wesMain.getAwsConfig(),
                 Objects.requireNonNull(configSubNode).getString("config"));
 
-            // Parse AWS credentials from the provided config file
-            ProfilesConfigFile profilesConfigFile = new ProfilesConfigFile(awsConfigPath);
+            // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
+            // the default home/.aws/credentials file.
+            ProfilesConfigFile profilesConfigFile = awsConfigPath == null ? new ProfilesConfigFile() : new ProfilesConfigFile(awsConfigPath);
             ProfileCredentialsProvider awsProfile = new ProfileCredentialsProvider(profilesConfigFile, authValue);
 
             // Get the access credentials from the AWS config file.
