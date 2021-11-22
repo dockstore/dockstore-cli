@@ -95,15 +95,13 @@ public class WesCommandParser {
     }
 
     @Parameters(separators = "=", commandDescription = "Launch a workflow using WES")
-    public static class CommandLaunch {
+    public static class CommandLaunch extends WesMain {
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
         @Parameter(names = "--json", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
         private String json;
         @Parameter(names = "--yaml", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
         private String yaml;
-        @Parameter(names = "--help", description = "Prints help for launch command", help = true)
-        private boolean help = false;
         @Parameter(names = "--uuid", description = "Allows you to specify a uuid for 3rd party notifications")
         private String uuid;
 
@@ -119,25 +117,15 @@ public class WesCommandParser {
             return yaml;
         }
 
-        public boolean isHelp() {
-            return help;
-        }
-
         public String getUuid() {
             return uuid;
         }
     }
 
     @Parameters(separators = "=", commandDescription = "Cancel a remote WES entry")
-    public static class CommandCancel {
-        @Parameter(names = "--help", description = "Prints help for the cancel command", help = true)
-        private boolean help = false;
+    public static class CommandCancel extends WesMain {
         @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
         private String id;
-
-        public boolean isHelp() {
-            return help;
-        }
 
         public String getId() {
             return id;
@@ -145,17 +133,11 @@ public class WesCommandParser {
     }
 
     @Parameters(separators = "=", commandDescription = "Retrieve the status of a workflow")
-    public static class CommandStatus {
-        @Parameter(names = "--help", description = "Prints help for the cancel command", help = true)
-        private boolean help = false;
+    public static class CommandStatus extends WesMain {
         @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
         private String id;
         @Parameter(names = "--verbose", description = "Flag indicating to print verbose logs", required = false)
         private boolean verbose = false;
-
-        public boolean isHelp() {
-            return help;
-        }
 
         public String getId() {
             return id;
@@ -167,13 +149,7 @@ public class WesCommandParser {
     }
 
     @Parameters(separators = "=", commandDescription = "Retrieve info about a WES server")
-    public static class CommandServiceInfo {
-        @Parameter(names = "--help", description = "Prints help for the cancel command", help = true)
-        private boolean help = false;
-
-        public boolean isHelp() {
-            return help;
-        }
+    public static class CommandServiceInfo extends WesMain {
     }
 
 }
