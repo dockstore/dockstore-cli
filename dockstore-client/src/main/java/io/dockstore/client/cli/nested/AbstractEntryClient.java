@@ -1137,6 +1137,32 @@ public abstract class AbstractEntryClient<T> {
     }
 
     /**
+     * Given the parsed command object, determine if we are to print help commands
+     * @param wesCommandParser Parse commands
+     * @return
+     */
+    private boolean displayWesHelp(WesCommandParser wesCommandParser) {
+        if (wesCommandParser.wesMain.isHelp()) {
+            wesHelp();
+            return true;
+        } else if (wesCommandParser.commandLaunch.isHelp()) {
+            wesLaunchHelp();
+            return true;
+        } else if (wesCommandParser.commandStatus.isHelp()) {
+            wesStatusHelp();
+            return true;
+        } else if (wesCommandParser.commandCancel.isHelp()) {
+            wesCancelHelp();
+            return true;
+        } else if (wesCommandParser.commandServiceInfo.isHelp()) {
+            wesServiceInfoHelp();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Processes Workflow Execution Schema (WES) commands.
      *
      * @param args Arguments entered into the CLI
@@ -1145,50 +1171,33 @@ public abstract class AbstractEntryClient<T> {
         WesCommandParser wesCommandParser = new WesCommandParser();
         wesCommandParser.jCommander.parse(args.toArray(new String[0]));
 
-        if (wesCommandParser.wesMain.isHelp()) {
-            wesHelp();
-        } else {
+        final boolean isHelp = displayWesHelp(wesCommandParser);
+        if (!isHelp) {
             final WesRequestData requestData = this.aggregateWesRequestData(wesCommandParser);
             setWesRequestData(requestData);
             WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
 
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
-                if (wesCommandParser.wesMain.isHelp()) {
-                    wesLaunchHelp();
-                } else {
-                    wesLaunch(wesCommandParser.jCommander.getParsedCommand(),
-                        wesCommandParser.commandLaunch.getEntry(),
-                        null,
-                        wesCommandParser.commandLaunch.getJson(),
-                        wesCommandParser.commandLaunch.getYaml(),
-                        null,
-                        true,
-                        null);
-                }
+                wesLaunch(wesCommandParser.jCommander.getParsedCommand(),
+                    wesCommandParser.commandLaunch.getEntry(),
+                    null,
+                    wesCommandParser.commandLaunch.getJson(),
+                    wesCommandParser.commandLaunch.getYaml(),
+                    null,
+                    true,
+                    null);
                 break;
             case "status":
-                if (wesCommandParser.wesMain.isHelp()) {
-                    wesStatusHelp();
-                } else {
-                    wesStatus(wesCommandParser.commandStatus.getId(),
-                        wesCommandParser.commandStatus.isVerbose(),
-                        clientWorkflowExecutionServiceApi);
-                }
+                wesStatus(wesCommandParser.commandStatus.getId(),
+                    wesCommandParser.commandStatus.isVerbose(),
+                    clientWorkflowExecutionServiceApi);
                 break;
             case "cancel":
-                if (wesCommandParser.wesMain.isHelp()) {
-                    wesCancelHelp();
-                } else {
-                    wesCancel(wesCommandParser.commandCancel.getId(), clientWorkflowExecutionServiceApi);
-                }
+                wesCancel(wesCommandParser.commandCancel.getId(), clientWorkflowExecutionServiceApi);
                 break;
             case "service-info":
-                if (wesCommandParser.wesMain.isHelp()) {
-                    wesServiceInfoHelp();
-                } else {
-                    wesServiceInfo(clientWorkflowExecutionServiceApi);
-                }
+                wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
             }
         }
