@@ -32,9 +32,9 @@ jobs:
       - name: Post to a Slack channel on failure
         if: failure()
         id: slack
-        uses: slackapi/slack-github-action@v1.14.0
+        uses: slackapi/slack-github-action@v1.16.0
         with:
-            slack-message: 'dockstore-cli/.github/workflows/cron.yml has failed!'
+            payload: "{\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"dockstore-cli/.github/workflows/cron.yml has failed!\"}}]}"
             channel-id: 'CTWPH9Q03'  # Slack channel id to post message
         env:
             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
