@@ -1083,16 +1083,15 @@ public abstract class AbstractEntryClient<T> {
         // Does nothing for tools.
     }
 
-
     /**
      *  This will attempt to retrieve the status of a workflow run
-     * @param args Command arguments for this WES command
+     * @param workflowId The ID of the workflow we are getting status info for
+     * @param verbose Whether or not we want verbose logs
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesStatus(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
-        final String workflowId = reqVal(args, "--id");
+    private void wesStatus(final String workflowId, final boolean verbose, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
         out("Getting status of WES workflow");
-        if (args.contains("--verbose")) {
+        if (verbose) {
             try {
                 RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
                 out("Verbose run status is: " + response.toString());
@@ -1111,14 +1110,13 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * This will attempt to cancel a WES run
-     * @param args Command arguments for this WES command
+     * @param runId The ID of the run we are cancelling
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesCancel(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+    private void wesCancel(final String runId, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
         out("Canceling WES workflow");
-        final String workflowId = reqVal(args, "--id");
         try {
-            RunId response = clientWorkflowExecutionServiceApi.cancelRun(workflowId);
+            RunId response = clientWorkflowExecutionServiceApi.cancelRun(runId);
             out("Cancelled run with id: " + response.toString());
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error canceling WES run", e);
@@ -1156,7 +1154,7 @@ public abstract class AbstractEntryClient<T> {
 
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
-                if (wesCommandParser.commandLaunch.isHelp()) {
+                if (wesCommandParser.wesMain.isHelp()) {
                     wesLaunchHelp();
                 } else {
                     wesLaunch(wesCommandParser.jCommander.getParsedCommand(),
@@ -1170,21 +1168,23 @@ public abstract class AbstractEntryClient<T> {
                 }
                 break;
             case "status":
-                if (wesCommandParser.commandStatus.isHelp()) {
+                if (wesCommandParser.wesMain.isHelp()) {
                     wesStatusHelp();
                 } else {
-                    wesStatus(args, clientWorkflowExecutionServiceApi);
+                    wesStatus(wesCommandParser.commandStatus.getId(),
+                        wesCommandParser.commandStatus.isVerbose(),
+                        clientWorkflowExecutionServiceApi);
                 }
                 break;
             case "cancel":
-                if (wesCommandParser.commandCancel.isHelp()) {
+                if (wesCommandParser.wesMain.isHelp()) {
                     wesCancelHelp();
                 } else {
-                    wesCancel(args, clientWorkflowExecutionServiceApi);
+                    wesCancel(wesCommandParser.commandCancel.getId(), clientWorkflowExecutionServiceApi);
                 }
                 break;
             case "service-info":
-                if (wesCommandParser.commandServiceInfo.isHelp()) {
+                if (wesCommandParser.wesMain.isHelp()) {
                     wesServiceInfoHelp();
                 } else {
                     wesServiceInfo(clientWorkflowExecutionServiceApi);
@@ -1228,19 +1228,31 @@ public abstract class AbstractEntryClient<T> {
         final boolean isAwsWes = "aws".equals(authType);
         if (isAwsWes) {
 
-            // Get the AWS config path
-            final String awsConfigPath = ObjectUtils.firstNonNull(
-                wesCommandParser.wesMain.getAwsConfig(),
-                Objects.requireNonNull(configSubNode).getString("config"));
+            String accessKey = null;
+            String secretKey = null;
 
-            // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
-            // the default home/.aws/credentials file.
-            ProfilesConfigFile profilesConfigFile = awsConfigPath == null ? new ProfilesConfigFile() : new ProfilesConfigFile(awsConfigPath);
-            ProfileCredentialsProvider awsProfile = new ProfileCredentialsProvider(profilesConfigFile, authValue);
+            // If the user specified AWS as their intended target, but provided no profile name, assume they don't want to pass credentials
+            // in this request.
+            if (authValue != null) {
 
-            // Get the access credentials from the AWS config file.
-            final String accessKey = awsProfile.getCredentials().getAWSAccessKeyId();
-            final String secretKey = awsProfile.getCredentials().getAWSSecretKey();
+                try {
+                    // Get the AWS config path
+                    final String awsConfigPath = ObjectUtils.firstNonNull(
+                        wesCommandParser.wesMain.getAwsConfig(),
+                        Objects.requireNonNull(configSubNode).getString("config"));
+
+                    // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
+                    // the default home/.aws/credentials file.
+                    ProfilesConfigFile profilesConfigFile = awsConfigPath == null ? new ProfilesConfigFile() : new ProfilesConfigFile(awsConfigPath);
+                    ProfileCredentialsProvider awsProfile = new ProfileCredentialsProvider(profilesConfigFile, authValue);
+
+                    accessKey = awsProfile.getCredentials().getAWSAccessKeyId();
+                    secretKey = awsProfile.getCredentials().getAWSSecretKey();
+                } catch (IllegalArgumentException e) {
+                    // This could either be 1) The path to the config file is invalid or 2) The profile name is invalid
+                    errorMessage(e.getMessage(), CLIENT_ERROR);
+                }
+            }
 
             // Get the AWS region we are send the request to
             final String region = ObjectUtils.firstNonNull(
