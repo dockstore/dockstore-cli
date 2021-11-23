@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.auth.profile.ProfilesConfigFile;
+import com.beust.jcommander.JCommander;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -95,7 +96,6 @@ import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
-import static io.dockstore.client.cli.ArgumentUtility.flagPresent;
 import static io.dockstore.client.cli.ArgumentUtility.invalid;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
 import static io.dockstore.client.cli.ArgumentUtility.optVals;
@@ -1218,19 +1218,24 @@ public abstract class AbstractEntryClient<T> {
             out("Could not get WES section from config file");
         }
 
-        // Attempt to find the WES URI
+        // Obtain the WES command object
+        JCommander parsedCommand = wesCommandParser.jCommander
+            .findCommandByAlias(wesCommandParser.jCommander.getParsedCommand());
+        WesCommandParser.WesMain command = (WesCommandParser.WesMain) parsedCommand.getObjects().get(0);
+
+        // Attempt to find the WES URL
         final String wesEndpointUrl = ObjectUtils.firstNonNull(
-            wesCommandParser.wesMain.getWesUrl(),
+            command.getWesUrl(),
             Objects.requireNonNull(configSubNode).getString("url"));
 
         // Determine the authorization method used by the user
         final String authType = ObjectUtils.firstNonNull(
-            wesCommandParser.wesMain.getWesAuthType(),
+            command.getWesAuthType(),
             Objects.requireNonNull(configSubNode).getString("type"));
 
         // The auth value is either a bearer token or AWS profile
         final String authValue = ObjectUtils.firstNonNull(
-            wesCommandParser.wesMain.getWesAuthValue(),
+            command.getWesAuthValue(),
             Objects.requireNonNull(configSubNode).getString("authorization"));
 
         // Depending on the endpoint (AWS/non-AWS) we need to look for a different set of credentials
@@ -1247,7 +1252,7 @@ public abstract class AbstractEntryClient<T> {
                 try {
                     // Get the AWS config path
                     final String awsConfigPath = ObjectUtils.firstNonNull(
-                        wesCommandParser.wesMain.getAwsConfig(),
+                        command.getAwsConfig(),
                         Objects.requireNonNull(configSubNode).getString("config"));
 
                     // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
@@ -1265,7 +1270,7 @@ public abstract class AbstractEntryClient<T> {
 
             // Get the AWS region we are send the request to
             final String region = ObjectUtils.firstNonNull(
-                wesCommandParser.wesMain.getAwsRegion(),
+                command.getAwsRegion(),
                 Objects.requireNonNull(configSubNode).getString("region"));
 
             return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
