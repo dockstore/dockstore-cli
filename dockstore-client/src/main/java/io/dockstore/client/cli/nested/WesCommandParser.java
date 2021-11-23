@@ -2,10 +2,8 @@ package io.dockstore.client.cli.nested;
 
 import java.util.List;
 
-import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 
 public class WesCommandParser {
