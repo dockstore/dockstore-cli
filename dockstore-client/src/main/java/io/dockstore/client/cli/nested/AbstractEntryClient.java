@@ -1561,11 +1561,7 @@ public abstract class AbstractEntryClient<T> {
     private void printWesHelpFooter() {
         out("Global Optional Parameters:");
         out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
-        out("  --wes-auth <auth>                   Authorization credentials for the WES endpoint, e.g. 'Bearer 12345'");
-        out("  --aws                               Flag indicating whether the WES request will be to an AWS endpoint");
-        out("  --aws-access-key <key>              The AWS access key associated with an IAM user/profile.");
-        out("  --aws-secret-key <key>              The AWS secret key associated with an IAM user/profile.");
-        out("  --aws-region <region>               The AWS region the WES endpoint is located in, e.g. 'us-east-1'.");
+        out("  --wes-auth <authType> <authValue>   Authorization credentials for the WES endpoint, e.g. 'Bearer 12345' or 'aws myProfile'");
         out("");
         out("NOTE: WES SUPPORT IS IN BETA AT THIS TIME. RESULTS MAY BE UNPREDICTABLE.");
     }
