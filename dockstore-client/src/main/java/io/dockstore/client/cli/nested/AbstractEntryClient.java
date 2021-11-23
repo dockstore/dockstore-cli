@@ -1075,11 +1075,11 @@ public abstract class AbstractEntryClient<T> {
      * This will attempt to launch a workflow given the command arguments
      *
      */
-    private void wesLaunch(final String commandName, final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
-        launchWithArgs(commandName, entry, localEntry, jsonRun, yamlRun, wdlOutput, ignoreChecksumFlag, uuid);
+    private void wesLaunch(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
+        launchWithArgs(entry, localEntry, jsonRun, yamlRun, wdlOutput, ignoreChecksumFlag, uuid);
     }
 
-    public void launchWithArgs(final String commandName, final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
+    public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
         // Does nothing for tools.
     }
 
@@ -1179,8 +1179,7 @@ public abstract class AbstractEntryClient<T> {
 
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
-                wesLaunch(wesCommandParser.jCommander.getParsedCommand(),
-                    wesCommandParser.commandLaunch.getEntry(),
+                wesLaunch(wesCommandParser.commandLaunch.getEntry(),
                     null,
                     wesCommandParser.commandLaunch.getJson(),
                     wesCommandParser.commandLaunch.getYaml(),
@@ -1199,6 +1198,9 @@ public abstract class AbstractEntryClient<T> {
             case "service-info":
                 wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
+            default:
+                errorMessage("Unknown WES command.", CLIENT_ERROR);
+                wesHelp();
             }
         }
     }

@@ -327,7 +327,7 @@
     </dependency>
     <dependency>
       <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk</artifactId>
+      <artifactId>aws-java-sdk-core</artifactId>
       <version>1.11.86</version>
       <scope>compile</scope>
     </dependency>

@@ -1,9 +1,5 @@
 package io.dockstore.client.cli;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.WesCommandParser;
 import io.dockstore.client.cli.nested.WesRequestData;
@@ -24,16 +20,7 @@ import static org.mockito.Mockito.mock;
 
 public class AbstractEntryClientTestIT {
 
-    static final String FAKE_WES_URL = "veryveryfakeurl";
-
-    static final String FAKE_AWS_ACCESS_KEY = "123456789";
-    static final String FAKE_AWS_SECRET_KEY = "987654321";
     static final String FAKE_AWS_REGION = "space-jupyter-7";
-
-    // These constants also match the data in clientConfig
-    static final String FAKE_BEARER_TOKEN = "Bearer SmokeyTheBearToken";
-    static final String BEARER_CONFIG_RESOURCE = "clientConfig";
-    static final String CONFIG_NO_CONTENT_RESOURCE = "configNoContent";
 
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
