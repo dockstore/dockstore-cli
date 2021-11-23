@@ -42,20 +42,20 @@ public class WesCommandParser {
     @Parameters(separators = "=", commandDescription = "Execute WES commands")
     public static class WesMain {
         @Parameter(names = "--wes-url", description = "The URL of the WES server.", required = false)
-        private static String wesUrl = null;
+        private String wesUrl = null;
         @Parameter(names = "--wes-auth",
             description = "The authorization type and value of this wes request. --wes-auth <type> <value>. "
                 + "Type can be 'bearer' or 'aws'. "
                 + "Value can be a token if the type is 'bearer', or an AWS profile if the type is 'aws'",
             variableArity = true,
             required = false)
-        private static List<String> wesAuth = null;
+        private List<String> wesAuth = null;
         @Parameter(names = "--aws-config", description = "A path to an AWS configuration file containing AWS profile credentials.", required = false)
-        private static String awsConfig = null;
+        private String awsConfig = null;
         @Parameter(names = "--aws-region", description = "The AWS region of the WES server.", required = false)
-        private static String awsRegion = null;
+        private String awsRegion = null;
         @Parameter(names = "--help", description = "Prints help for launch command", help = true)
-        private static boolean help = false;
+        private boolean help = false;
 
         /**
          * Returns the WES authorization type (bearer or aws). If no auth type was provided, return null
