@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.auth.profile.ProfilesConfigFile;
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -1169,7 +1170,13 @@ public abstract class AbstractEntryClient<T> {
      */
     private void processWesCommands(final List<String> args) {
         WesCommandParser wesCommandParser = new WesCommandParser();
-        wesCommandParser.jCommander.parse(args.toArray(new String[0]));
+
+        // JCommander throws a parameter exception for invalid parameters. Catch this an print the error cleanly.
+        try {
+            wesCommandParser.jCommander.parse(args.toArray(new String[0]));
+        } catch (ParameterException e) {
+            errorMessage(e.getMessage(), CLIENT_ERROR);
+        }
 
         final boolean isHelp = displayWesHelp(wesCommandParser);
         if (!isHelp) {
@@ -1223,7 +1230,7 @@ public abstract class AbstractEntryClient<T> {
         // Obtain the WES command object
         JCommander parsedCommand = wesCommandParser.jCommander
             .findCommandByAlias(wesCommandParser.jCommander.getParsedCommand());
-        WesCommandParser.WesMain command = (WesCommandParser.WesMain) parsedCommand.getObjects().get(0);
+        WesCommandParser.WesMain command = parsedCommand == null ?  new WesCommandParser.WesMain() : (WesCommandParser.WesMain) parsedCommand.getObjects().get(0);
 
         // Attempt to find the WES URL
         final String wesEndpointUrl = ObjectUtils.firstNonNull(

@@ -65,6 +65,20 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
+    public void testNoArgs() {
+
+        AbstractEntryClient workflowClient = testAggregateHelper(null);
+
+        String[] args = {};
+        WesCommandParser parser = new WesCommandParser();
+        parser.jCommander.parse(args);
+
+        systemExit.expectSystemExit();
+        workflowClient.aggregateWesRequestData(parser);
+        assertFalse("The config file doesn't exist", systemErrRule.getLog().isBlank());
+    }
+
+    @Test
     public void testAggregateAWSCredentialBadConfigPath() {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);
