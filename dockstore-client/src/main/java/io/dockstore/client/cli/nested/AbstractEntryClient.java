@@ -36,6 +36,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.auth.profile.ProfilesConfigFile;
 import com.beust.jcommander.JCommander;
@@ -1271,10 +1272,12 @@ public abstract class AbstractEntryClient<T> {
 
                     accessKey = awsProfile.getCredentials().getAWSAccessKeyId();
                     secretKey = awsProfile.getCredentials().getAWSSecretKey();
-                } catch (IllegalArgumentException e) {
-                    // This could either be 1) The path to the config file is invalid or 2) The profile name is invalid
+                } catch (IllegalArgumentException | SdkClientException e) {
+                    // Some potential reasons for this exception are:
+                    // 1) The path to the config file is invalid or 2) the profile name is invalid or 3) The config file is malformed
                     errorMessage(e.getMessage(), CLIENT_ERROR);
                 }
+
             }
 
             // Get the AWS region we are send the request to

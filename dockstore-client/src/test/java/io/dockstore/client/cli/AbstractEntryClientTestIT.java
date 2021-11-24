@@ -16,6 +16,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 public class AbstractEntryClientTestIT {
@@ -193,6 +194,33 @@ public class AbstractEntryClientTestIT {
         assertEquals("AWS secret key should be parsed", "SECRET_KEY", data.getAwsSecretKey());
         assertEquals("AWS region should be parsed", "somewhere-in-space", data.getAwsRegion());
         assertEquals("AWS region should be parsed", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
+
+    }
+
+    @Test
+    public void testAggregateAWSCredentialCompleteCommandMalformed() {
+
+        AbstractEntryClient workflowClient = testAggregateHelper(null);
+
+        String config = ResourceHelpers.resourceFilePath("fakeMalformedAwsCredentials");
+        String[] args = {
+            "service-info",
+            "--wes-url",
+            "myUrl",
+            "--wes-auth",
+            "aws",
+            "myProfile",
+            "--aws-config",
+            config,
+            "--aws-region",
+            "somewhere-in-space"
+        };
+
+        WesCommandParser parser = new WesCommandParser();
+        parser.jCommander.parse(args);
+        systemExit.expectSystemExit();
+        workflowClient.aggregateWesRequestData(parser);
+        fail("An exception should've been thrown for an improperly formatted AWS config file");
 
     }
 
