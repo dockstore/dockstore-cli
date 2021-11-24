@@ -1573,6 +1573,8 @@ public abstract class AbstractEntryClient<T> {
         out("Global Optional Parameters:");
         out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
         out("  --wes-auth <authType> <authValue>   Authorization credentials for the WES endpoint, e.g. 'Bearer 12345' or 'aws myProfile'");
+        out("  --aws-region <region>               An AWS region, e.g. 'us-east-1', only required for requests to AWS WES servers.");
+        out("  --aws-config <config>               Path to an AWS credentials file. Defaults to ~/.aws/credentials");
         out("");
         out("NOTE: WES SUPPORT IS IN BETA AT THIS TIME. RESULTS MAY BE UNPREDICTABLE.");
     }
