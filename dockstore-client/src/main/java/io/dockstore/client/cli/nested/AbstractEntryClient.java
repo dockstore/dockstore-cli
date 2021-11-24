@@ -1144,7 +1144,8 @@ public abstract class AbstractEntryClient<T> {
      * @return
      */
     private boolean displayWesHelp(WesCommandParser wesCommandParser) {
-        if (wesCommandParser.wesMain.isHelp()) {
+        // Print the main help section if 'dockstore workflow wes' was the command
+        if (wesCommandParser.wesMain.isHelp() || wesCommandParser.jCommander.getParsedCommand() == null) {
             wesHelp();
             return true;
         } else if (wesCommandParser.commandLaunch.isHelp()) {
