@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.auth.profile.ProfilesConfigFile;
+import com.amazonaws.regions.AwsProfileRegionProvider;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.github.dockerjava.api.DockerClient;
@@ -1250,9 +1251,8 @@ public abstract class AbstractEntryClient<T> {
 
             String accessKey = null;
             String secretKey = null;
+            String region = null;
 
-            // If the user specified AWS as their intended target, but provided no profile name, assume they don't want to pass credentials
-            // in this request.
             try {
                 // Get the AWS config path
                 final String awsConfigPath = ObjectUtils.firstNonNull(
@@ -1261,12 +1261,20 @@ public abstract class AbstractEntryClient<T> {
 
                 // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
                 // the default home/.aws/credentials file.
-                ProfilesConfigFile profilesConfigFile = awsConfigPath == null ? new ProfilesConfigFile() : new ProfilesConfigFile(awsConfigPath);
-                ProfileCredentialsProvider awsProfile = new ProfileCredentialsProvider(profilesConfigFile,
-                    authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE);
+                final String profileToRead = authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE;
+                final ProfilesConfigFile profilesConfigFile = awsConfigPath == null ? new ProfilesConfigFile() : new ProfilesConfigFile(awsConfigPath);
+                final ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider(profilesConfigFile, profileToRead);
+                final AwsProfileRegionProvider regionProvider = new AwsProfileRegionProvider(profileToRead);
 
-                accessKey = awsProfile.getCredentials().getAWSAccessKeyId();
-                secretKey = awsProfile.getCredentials().getAWSSecretKey();
+                // Get the AWS region we are send the request to. First check the command line, then the Dockstore config file,
+                // then the AWS profile
+                region = ObjectUtils.firstNonNull(
+                    command.getAwsRegion(),
+                    configSubNode.getString(WesConfigOptions.AWS_REGION_KEY),
+                    regionProvider.getRegion());
+
+                accessKey = credentialsProvider.getCredentials().getAWSAccessKeyId();
+                secretKey = credentialsProvider.getCredentials().getAWSSecretKey();
             } catch (IllegalArgumentException e) {
                 // Some potential reasons for this exception are:
                 // 1) The path to the config file is invalid or 2) The profile doesn't exist
@@ -1275,11 +1283,6 @@ public abstract class AbstractEntryClient<T> {
                 // The config file is malformed
                 errorMessage(e.getMessage(), CLIENT_ERROR);
             }
-
-            // Get the AWS region we are send the request to
-            final String region = ObjectUtils.firstNonNull(
-                command.getAwsRegion(),
-                configSubNode.getString(WesConfigOptions.AWS_REGION_KEY));
 
             return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
         } else {
