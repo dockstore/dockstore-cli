@@ -46,8 +46,8 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <groupId>org.liquibase</groupId>
           <artifactId>liquibase-core</artifactId>
+          <groupId>org.liquibase</groupId>
         </exclusion>
       </exclusions>
     </dependency>
