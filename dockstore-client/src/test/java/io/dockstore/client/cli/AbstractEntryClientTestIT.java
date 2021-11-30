@@ -1,6 +1,5 @@
 package io.dockstore.client.cli;
 
-import com.amazonaws.SdkClientException;
 import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.WesCommandParser;
 import io.dockstore.client.cli.nested.WesRequestData;
@@ -18,7 +17,6 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 public class AbstractEntryClientTestIT {
@@ -112,12 +110,9 @@ public class AbstractEntryClientTestIT {
         };
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
-
-        try {
-            workflowClient.aggregateWesRequestData(parser);
-        } catch (IllegalArgumentException e) {
-            assertTrue("The config file doesn't exist", true);
-        }
+        systemExit.expectSystemExit();
+        workflowClient.aggregateWesRequestData(parser);
+        assertFalse("There should be error logs", systemErrRule.getLog().isEmpty());
     }
 
     @Test
@@ -133,13 +128,9 @@ public class AbstractEntryClientTestIT {
         };
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
-
-        try {
-            workflowClient.aggregateWesRequestData(parser);
-        } catch (IllegalArgumentException e) {
-            assertTrue("The profile doesn't exist", true);
-        }
-
+        systemExit.expectSystemExit();
+        workflowClient.aggregateWesRequestData(parser);
+        assertFalse("There should be error logs", systemErrRule.getLog().isEmpty());
     }
 
     @Test
@@ -219,12 +210,9 @@ public class AbstractEntryClientTestIT {
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
-        try {
-            workflowClient.aggregateWesRequestData(parser);
-            fail("An exception should've been thrown for an improperly formatted AWS config file");
-        } catch (SdkClientException e) {
-            assertTrue(true); //checkstyle
-        }
+        systemExit.expectSystemExit();
+        workflowClient.aggregateWesRequestData(parser);
+        assertFalse("There should be error logs", systemErrRule.getLog().isEmpty());
     }
 
     @Test
