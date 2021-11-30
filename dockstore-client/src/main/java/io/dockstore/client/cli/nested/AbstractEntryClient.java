@@ -1254,33 +1254,19 @@ public abstract class AbstractEntryClient<T> {
             String region = null;
 
             try {
-                // Get the AWS config path
-                final String awsConfigPath = ObjectUtils.firstNonNull(
-                    command.getAwsConfig(),
-                    configSubNode.getString(WesConfigOptions.AWS_CREDENTIALS_KEY));
-
                 // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
                 // the default home/.aws/credentials file.
                 final String profileToRead = authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE;
-                final ProfilesConfigFile profilesConfigFile = awsConfigPath == null ? new ProfilesConfigFile() : new ProfilesConfigFile(awsConfigPath);
+                final ProfilesConfigFile profilesConfigFile = new ProfilesConfigFile();
                 final ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider(profilesConfigFile, profileToRead);
                 final AwsProfileRegionProvider regionProvider = new AwsProfileRegionProvider(profileToRead);
 
-                // Get the AWS region we are send the request to. First check the command line, then the Dockstore config file,
-                // then the AWS profile
-                region = ObjectUtils.firstNonNull(
-                    command.getAwsRegion(),
-                    configSubNode.getString(WesConfigOptions.AWS_REGION_KEY),
-                    regionProvider.getRegion());
-
                 accessKey = credentialsProvider.getCredentials().getAWSAccessKeyId();
                 secretKey = credentialsProvider.getCredentials().getAWSSecretKey();
-            } catch (IllegalArgumentException e) {
+                region = regionProvider.getRegion();
+            }  catch (IllegalArgumentException | SdkClientException e) {
                 // Some potential reasons for this exception are:
-                // 1) The path to the config file is invalid or 2) The profile doesn't exist
-                out("Unable to locate AWS credentials. Attempting a credential-free WES request. " + e.getMessage());
-            } catch (SdkClientException e) {
-                // The config file is malformed
+                // 1) The path to the config file is invalid or 2) The profile doesn't exist or 3) The config file is malformed
                 errorMessage(e.getMessage(), CLIENT_ERROR);
             }
 
@@ -1289,6 +1275,7 @@ public abstract class AbstractEntryClient<T> {
             return new WesRequestData(wesEndpointUrl, authValue);
         }
     }
+
     /**
      * Prints a warning if Docker isn't running. Docker is not always needed. If a workflow or tool uses Docker and
      * it is not running, it fails with a cryptic error. This should make the problem more obvious.

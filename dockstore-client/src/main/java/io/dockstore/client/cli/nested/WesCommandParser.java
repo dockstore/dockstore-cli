@@ -48,10 +48,6 @@ public class WesCommandParser {
             variableArity = true,
             required = false)
         private List<String> wesAuth = null;
-        @Parameter(names = "--aws-config", description = "A path to an AWS configuration file containing AWS profile credentials.", required = false)
-        private String awsConfig = null;
-        @Parameter(names = "--aws-region", description = "The AWS region of the WES server.", required = false)
-        private String awsRegion = null;
         @Parameter(names = "--help", description = "Prints help for launch command", help = true)
         private boolean help = false;
 
@@ -79,14 +75,6 @@ public class WesCommandParser {
 
         public String getWesUrl() {
             return wesUrl;
-        }
-
-        public String getAwsConfig() {
-            return awsConfig;
-        }
-
-        public String getAwsRegion() {
-            return awsRegion;
         }
 
         public boolean isHelp() {

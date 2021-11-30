@@ -47,8 +47,6 @@ public class WesCommandParserTest {
         final String wesAuthType = "aws";
         final String wesAuthValue = "my-profile";
         final String[] args = {
-            "--aws-region",
-            "space-mars-2",
             "--wes-auth",
             wesAuthType,
             wesAuthValue,
@@ -60,7 +58,6 @@ public class WesCommandParserTest {
         parser.parse(args);
 
         assertNull("Parsed command should be null", parser.getParsedCommand());
-        assertEquals("The parsed region should be 'space-mars-2'", "space-mars-2", wesCommandParser.wesMain.getAwsRegion());
         assertEquals("The parsed auth type should be 'aws'", wesAuthType, wesCommandParser.wesMain.getWesAuthType());
         assertEquals("The parsed auth value should be 'my-profile'", wesAuthValue, wesCommandParser.wesMain.getWesAuthValue());
     }
@@ -69,8 +66,6 @@ public class WesCommandParserTest {
     public void testWesMainAuthPartial() {
         final String wesAuthType = "aws";
         final String[] args = {
-            "--aws-region",
-            "space-mars-2",
             "--wes-auth",
             wesAuthType
         };

@@ -70,8 +70,12 @@ public class WesRequestData {
 
         // The credentials that were passed in are null, so we are assuming they are within an authorized environment (such as an EC2 instance)
         // This also assumes there is no scenario where just one of the keys is sufficient.
-        if (awsAccessKey == null || awsSecretKey == null) {
-            this.credentialType = CredentialType.NO_CREDENTIALS;
+        if (awsAccessKey == null) {
+            errorMessage("Unable to locate an AWS access key. Specify an AWS access key under your AWS profile in ~/.aws/credentials.", Client.COMMAND_ERROR);
+        } else if (awsSecretKey == null) {
+            errorMessage("Unable to locate an AWS secret key. Specify an AWS secret key under your AWS profile in ~/.aws/credentials.", Client.COMMAND_ERROR);
+        } else if (region == null) {
+            errorMessage("Unable to locate an AWS region. Specify an AWS region under your AWS profile in ~/.aws/config.", Client.COMMAND_ERROR);
         } else {
             this.credentialType = CredentialType.AWS_PERMANENT_CREDENTIALS;
         }
@@ -114,7 +118,7 @@ public class WesRequestData {
 
     public String getAwsRegion() {
         if (credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS) {
-            return this.region == null ? "" : this.region; // regions don't need to be specified if you are in an AWS environment
+            return this.region;
         } else {
             errorMessage("Unable to locate a AWS region, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
             return null;
