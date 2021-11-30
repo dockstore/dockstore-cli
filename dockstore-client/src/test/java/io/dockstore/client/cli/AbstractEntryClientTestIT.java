@@ -250,6 +250,34 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
+    public void testAggregateAWSCredentialNoProfileAuthDefault() {
+
+        AbstractEntryClient workflowClient = testAggregateHelper(null);
+
+        String config = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
+        String[] args = {
+            "service-info",
+            "--wes-url",
+            "myUrl",
+            "--wes-auth",
+            "aws",
+            "--aws-config",
+            config,
+            "--aws-region",
+            "somewhere-in-space"
+        };
+
+        WesCommandParser parser = new WesCommandParser();
+        parser.jCommander.parse(args);
+        WesRequestData data = workflowClient.aggregateWesRequestData(parser);
+
+        assertEquals("AWS access key should be parsed", "KEY2", data.getAwsAccessKey());
+        assertEquals("AWS secret key should be parsed", "SECRET_KEY2", data.getAwsSecretKey());
+        assertEquals("AWS region should be parsed", "somewhere-in-space", data.getAwsRegion());
+        assertEquals("AWS region should be parsed", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
+    }
+
+    @Test
     public void testAggregateBearerCredentialCompleteCommand() {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);

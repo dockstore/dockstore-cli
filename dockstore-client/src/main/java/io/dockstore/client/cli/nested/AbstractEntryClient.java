@@ -1253,27 +1253,27 @@ public abstract class AbstractEntryClient<T> {
 
             // If the user specified AWS as their intended target, but provided no profile name, assume they don't want to pass credentials
             // in this request.
-            if (authValue != null) {
+            try {
+                // Get the AWS config path
+                final String awsConfigPath = ObjectUtils.firstNonNull(
+                    command.getAwsConfig(),
+                    configSubNode.getString(WesConfigOptions.AWS_CREDENTIALS_KEY));
 
-                try {
-                    // Get the AWS config path
-                    final String awsConfigPath = ObjectUtils.firstNonNull(
-                        command.getAwsConfig(),
-                        configSubNode.getString(WesConfigOptions.AWS_CREDENTIALS_KEY));
+                // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
+                // the default home/.aws/credentials file.
+                ProfilesConfigFile profilesConfigFile = awsConfigPath == null ? new ProfilesConfigFile() : new ProfilesConfigFile(awsConfigPath);
+                ProfileCredentialsProvider awsProfile = new ProfileCredentialsProvider(profilesConfigFile,
+                    authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE);
 
-                    // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
-                    // the default home/.aws/credentials file.
-                    ProfilesConfigFile profilesConfigFile = awsConfigPath == null ? new ProfilesConfigFile() : new ProfilesConfigFile(awsConfigPath);
-                    ProfileCredentialsProvider awsProfile = new ProfileCredentialsProvider(profilesConfigFile, authValue);
-
-                    accessKey = awsProfile.getCredentials().getAWSAccessKeyId();
-                    secretKey = awsProfile.getCredentials().getAWSSecretKey();
-                } catch (IllegalArgumentException | SdkClientException e) {
-                    // Some potential reasons for this exception are:
-                    // 1) The path to the config file is invalid or 2) the profile name is invalid or 3) The config file is malformed
-                    errorMessage(e.getMessage(), CLIENT_ERROR);
-                }
-
+                accessKey = awsProfile.getCredentials().getAWSAccessKeyId();
+                secretKey = awsProfile.getCredentials().getAWSSecretKey();
+            } catch (IllegalArgumentException e) {
+                // Some potential reasons for this exception are:
+                // 1) The path to the config file is invalid or 2) The profile doesn't exist
+                out("Unable to locate AWS credentials. Attempting a credential-free WES request. " + e.getMessage());
+            } catch (SdkClientException e) {
+                // The config file is malformed
+                errorMessage(e.getMessage(), CLIENT_ERROR);
             }
 
             // Get the AWS region we are send the request to
