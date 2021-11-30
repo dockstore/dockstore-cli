@@ -15,12 +15,6 @@ public final class WesConfigOptions {
     /**
      * AWS-specific values. These are only used in the case AUTHORIZATION_TYPE_KEY is set to "aws"
      */
-    // The AWS region we are sending the WES request to.
-    public static final String AWS_REGION_KEY = "region";
-
-    // A path to an AWS credentials file. By default, AWS searches your home directory at '~/.aws/credentials'.
-    public static final String AWS_CREDENTIALS_KEY = "config";
-
     // The AWS profile named 'default' is commonly used if another profile is not explicitly specified.
     public static final String AWS_DEFAULT_PROFILE_VALUE = "default";
 
