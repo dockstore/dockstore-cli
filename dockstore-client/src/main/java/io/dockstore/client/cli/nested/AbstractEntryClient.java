@@ -1222,12 +1222,7 @@ public abstract class AbstractEntryClient<T> {
 
         // Get the config file to see if credentials are there
         INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
-        SubnodeConfiguration configSubNode = null;
-        try {
-            configSubNode = config.getSection("WES");
-        } catch (Exception e) {
-            out("Could not get WES section from config file");
-        }
+        SubnodeConfiguration configSubNode = config.getSection("WES");
 
         // Obtain the WES command object
         JCommander parsedCommand = wesCommandParser.jCommander
@@ -1237,17 +1232,17 @@ public abstract class AbstractEntryClient<T> {
         // Attempt to find the WES URL
         final String wesEndpointUrl = ObjectUtils.firstNonNull(
             command.getWesUrl(),
-            Objects.requireNonNull(configSubNode).getString("url"));
+            configSubNode.getString("url"));
 
         // Determine the authorization method used by the user
         final String authType = ObjectUtils.firstNonNull(
             command.getWesAuthType(),
-            Objects.requireNonNull(configSubNode).getString("type"));
+            configSubNode.getString("type"));
 
         // The auth value is either a bearer token or AWS profile
         final String authValue = ObjectUtils.firstNonNull(
             command.getWesAuthValue(),
-            Objects.requireNonNull(configSubNode).getString("authorization"));
+            configSubNode.getString("authorization"));
 
         // Depending on the endpoint (AWS/non-AWS) we need to look for a different set of credentials
         final boolean isAwsWes = "aws".equals(authType);
@@ -1264,7 +1259,7 @@ public abstract class AbstractEntryClient<T> {
                     // Get the AWS config path
                     final String awsConfigPath = ObjectUtils.firstNonNull(
                         command.getAwsConfig(),
-                        Objects.requireNonNull(configSubNode).getString("config"));
+                        configSubNode.getString("config"));
 
                     // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
                     // the default home/.aws/credentials file.
@@ -1284,7 +1279,7 @@ public abstract class AbstractEntryClient<T> {
             // Get the AWS region we are send the request to
             final String region = ObjectUtils.firstNonNull(
                 command.getAwsRegion(),
-                Objects.requireNonNull(configSubNode).getString("region"));
+                configSubNode.getString("region"));
 
             return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
         } else {
