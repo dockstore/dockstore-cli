@@ -38,6 +38,7 @@
         <dockstore-core.version>1.12.0-alpha.0</dockstore-core.version>
         <maven-failsafe.version>2.21.0</maven-failsafe.version>
         <maven-surefire.version>2.21.0</maven-surefire.version>
+        <aws-java-sdk.version>1.11.86</aws-java-sdk.version>
         <skipTests>false</skipTests>
         <skipITs>true</skipITs>
 
@@ -149,7 +150,7 @@
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-simpleworkflow</artifactId>
-                <version>1.11.86</version>
+                <version>${aws-java-sdk.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
