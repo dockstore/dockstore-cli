@@ -1249,10 +1249,6 @@ public abstract class AbstractEntryClient<T> {
         final boolean isAwsWes = "aws".equals(authType);
         if (isAwsWes) {
 
-            String accessKey = null;
-            String secretKey = null;
-            String region = null;
-
             try {
                 // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
                 // the default home/.aws/credentials file.
@@ -1261,16 +1257,20 @@ public abstract class AbstractEntryClient<T> {
                 final ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider(profilesConfigFile, profileToRead);
                 final AwsProfileRegionProvider regionProvider = new AwsProfileRegionProvider(profileToRead);
 
-                accessKey = credentialsProvider.getCredentials().getAWSAccessKeyId();
-                secretKey = credentialsProvider.getCredentials().getAWSSecretKey();
-                region = regionProvider.getRegion();
-            }  catch (IllegalArgumentException | SdkClientException e) {
+                // Build and return the request data
+                return new WesRequestData(wesEndpointUrl,
+                    credentialsProvider.getCredentials().getAWSAccessKeyId(),
+                    credentialsProvider.getCredentials().getAWSSecretKey(),
+                    regionProvider.getRegion());
+
+            } catch (IllegalArgumentException | SdkClientException e) {
                 // Some potential reasons for this exception are:
                 // 1) The path to the config file is invalid or 2) The profile doesn't exist or 3) The config file is malformed
                 errorMessage(e.getMessage(), CLIENT_ERROR);
             }
 
-            return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
+            // Let the WesRequestData class handle missing credentials
+            return new WesRequestData(wesEndpointUrl, null, null, null);
         } else {
             return new WesRequestData(wesEndpointUrl, authValue);
         }
@@ -1558,8 +1558,6 @@ public abstract class AbstractEntryClient<T> {
         out("Global Optional Parameters:");
         out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
         out("  --wes-auth <authType> <authValue>   Authorization credentials for the WES endpoint, e.g. 'Bearer 12345' or 'aws myProfile'");
-        out("  --aws-region <region>               An AWS region, e.g. 'us-east-1', only required for requests to AWS WES servers.");
-        out("  --aws-config <config>               Path to an AWS credentials file. Defaults to ~/.aws/credentials");
         out("");
         out("NOTE: WES SUPPORT IS IN BETA AT THIS TIME. RESULTS MAY BE UNPREDICTABLE.");
     }

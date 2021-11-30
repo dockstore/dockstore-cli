@@ -1,5 +1,6 @@
 package io.dockstore.client.cli;
 
+import com.amazonaws.SdkClientException;
 import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.WesCommandParser;
 import io.dockstore.client.cli.nested.WesRequestData;
@@ -9,6 +10,7 @@ import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -21,7 +23,6 @@ import static org.mockito.Mockito.mock;
 
 public class AbstractEntryClientTestIT {
 
-    static final String FAKE_AWS_REGION = "space-jupyter-7";
     static final String CONFIG_NO_CONTENT_RESOURCE = "configNoContent";
 
 
@@ -31,6 +32,8 @@ public class AbstractEntryClientTestIT {
     public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     /**
      * Tests the help messages for each of the WES command options
@@ -103,20 +106,18 @@ public class AbstractEntryClientTestIT {
 
         String[] args = {
             "service-info",
-            "--aws-region",
-            FAKE_AWS_REGION,
             "--wes-auth",
             "aws",
-            "myProfile",
-            "--aws-config",
-            "bad/path/to/nowehere"
+            "myProfile"
         };
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
 
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(parser);
-        assertFalse("The config file doesn't exist", systemErrRule.getLog().isBlank());
+        try {
+            workflowClient.aggregateWesRequestData(parser);
+        } catch (IllegalArgumentException e) {
+            assertTrue("The config file doesn't exist", true);
+        }
     }
 
     @Test
@@ -124,23 +125,21 @@ public class AbstractEntryClientTestIT {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);
 
-        String config = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
         String[] args = {
             "service-info",
-            "--aws-region",
-            FAKE_AWS_REGION,
             "--wes-auth",
             "aws",
-            "badProfile",
-            "--aws-config",
-            config
+            "badProfile"
         };
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
 
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(parser);
-        assertFalse("The profile doesn't exist", systemErrRule.getLog().isBlank());
+        try {
+            workflowClient.aggregateWesRequestData(parser);
+        } catch (IllegalArgumentException e) {
+            assertTrue("The profile doesn't exist", true);
+        }
+
     }
 
     @Test
@@ -148,23 +147,25 @@ public class AbstractEntryClientTestIT {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);
 
-        String config = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
         String[] args = {
             "service-info",
             "--wes-url",
             "myUrl",
             "--wes-auth",
             "aws",
-            "myProfile",
-            "--aws-config",
-            config
+            "myProfile"
         };
+
+        String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
+        String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
+        environmentVariables.set("AWS_CONFIG_FILE", config);
+        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("No AWS region should've been parsed, an empty string should be return in its place", "", data.getAwsRegion());
+        assertEquals("AWS region should be parsed", "REGION", data.getAwsRegion());
     }
 
     @Test
@@ -172,19 +173,19 @@ public class AbstractEntryClientTestIT {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);
 
-        String config = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
         String[] args = {
             "service-info",
             "--wes-url",
             "myUrl",
             "--wes-auth",
             "aws",
-            "myProfile",
-            "--aws-config",
-            config,
-            "--aws-region",
-            "somewhere-in-space"
+            "myProfile"
         };
+
+        String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
+        String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
+        environmentVariables.set("AWS_CONFIG_FILE", config);
+        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -192,7 +193,7 @@ public class AbstractEntryClientTestIT {
 
         assertEquals("AWS access key should be parsed", "KEY", data.getAwsAccessKey());
         assertEquals("AWS secret key should be parsed", "SECRET_KEY", data.getAwsSecretKey());
-        assertEquals("AWS region should be parsed", "somewhere-in-space", data.getAwsRegion());
+        assertEquals("AWS region should be parsed", "REGION", data.getAwsRegion());
         assertEquals("AWS region should be parsed", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
 
     }
@@ -202,26 +203,28 @@ public class AbstractEntryClientTestIT {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);
 
-        String config = ResourceHelpers.resourceFilePath("fakeMalformedAwsCredentials");
         String[] args = {
             "service-info",
             "--wes-url",
             "myUrl",
             "--wes-auth",
             "aws",
-            "myProfile",
-            "--aws-config",
-            config,
-            "--aws-region",
-            "somewhere-in-space"
+            "myProfile"
         };
+
+        String credentials  = ResourceHelpers.resourceFilePath("fakeMalformedAwsCredentials");
+        String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
+        environmentVariables.set("AWS_CONFIG_FILE", config);
+        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(parser);
-        fail("An exception should've been thrown for an improperly formatted AWS config file");
-
+        try {
+            workflowClient.aggregateWesRequestData(parser);
+            fail("An exception should've been thrown for an improperly formatted AWS config file");
+        } catch (SdkClientException e) {
+            assertTrue(true); //checkstyle
+        }
     }
 
     @Test
@@ -229,24 +232,26 @@ public class AbstractEntryClientTestIT {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);
 
-        String config = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
         String[] args = {
             "service-info",
             "--wes-url",
             "myUrl",
             "--wes-auth",
-            "aws",
-            "--aws-config",
-            config,
-            "--aws-region",
-            "somewhere-in-space"
+            "aws"
         };
+
+        String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
+        String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
+        environmentVariables.set("AWS_CONFIG_FILE", config);
+        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("AWS region should be parsed", WesRequestData.CredentialType.NO_CREDENTIALS, data.getCredentialType());
+        assertEquals("AWS credential type should be set", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
+        assertEquals("AWS region should be parsed", "REGION2", data.getAwsRegion());
+
     }
 
     @Test
@@ -254,18 +259,18 @@ public class AbstractEntryClientTestIT {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);
 
-        String config = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
+        String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
+        String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
         String[] args = {
             "service-info",
             "--wes-url",
             "myUrl",
             "--wes-auth",
-            "aws",
-            "--aws-config",
-            config,
-            "--aws-region",
-            "somewhere-in-space"
+            "aws"
         };
+
+        environmentVariables.set("AWS_CONFIG_FILE", config);
+        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -273,7 +278,7 @@ public class AbstractEntryClientTestIT {
 
         assertEquals("AWS access key should be parsed", "KEY2", data.getAwsAccessKey());
         assertEquals("AWS secret key should be parsed", "SECRET_KEY2", data.getAwsSecretKey());
-        assertEquals("AWS region should be parsed", "somewhere-in-space", data.getAwsRegion());
+        assertEquals("AWS region should be parsed", "REGION2", data.getAwsRegion());
         assertEquals("AWS region should be parsed", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
     }
 
@@ -303,13 +308,15 @@ public class AbstractEntryClientTestIT {
     public void testAggregateBearerCredentialAWSConfigFile() {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
-        String config = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
 
         String[] args = {
-            "service-info",
-            "--aws-config",
-            config
+            "service-info"
         };
+
+        String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
+        String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
+        environmentVariables.set("AWS_CONFIG_FILE", config);
+        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -317,7 +324,7 @@ public class AbstractEntryClientTestIT {
 
         assertEquals("AWS access key should be parsed", "KEY", data.getAwsAccessKey());
         assertEquals("AWS secret key should be parsed", "SECRET_KEY", data.getAwsSecretKey());
-        assertEquals("AWS region should be parsed", "somewhere-in-space", data.getAwsRegion());
+        assertEquals("AWS region should be parsed", "REGION", data.getAwsRegion());
         assertEquals("AWS region should be parsed", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
 
     }
