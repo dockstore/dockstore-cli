@@ -1141,9 +1141,9 @@ public abstract class AbstractEntryClient<T> {
     /**
      * Given the parsed command object, determine if we are to print help commands
      * @param wesCommandParser Parse commands
-     * @return
+     * @return true if help was displayed, false otherwise
      */
-    private boolean displayWesHelp(WesCommandParser wesCommandParser) {
+    private boolean displayWesHelpWhenNecessary(WesCommandParser wesCommandParser) {
         // Print the main help section if 'dockstore workflow wes' was the command
         if (wesCommandParser.wesMain.isHelp() || wesCommandParser.jCommander.getParsedCommand() == null) {
             wesHelp();
@@ -1180,8 +1180,8 @@ public abstract class AbstractEntryClient<T> {
             errorMessage(e.getMessage(), CLIENT_ERROR);
         }
 
-        final boolean isHelp = displayWesHelp(wesCommandParser);
-        if (!isHelp) {
+        final boolean helpDisplayed = displayWesHelpWhenNecessary(wesCommandParser);
+        if (!helpDisplayed) {
             final WesRequestData requestData = this.aggregateWesRequestData(wesCommandParser);
             setWesRequestData(requestData);
             WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
