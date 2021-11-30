@@ -1232,17 +1232,17 @@ public abstract class AbstractEntryClient<T> {
         // Attempt to find the WES URL
         final String wesEndpointUrl = ObjectUtils.firstNonNull(
             command.getWesUrl(),
-            configSubNode.getString("url"));
+            configSubNode.getString(WesConfigOptions.URL_KEY));
 
         // Determine the authorization method used by the user
         final String authType = ObjectUtils.firstNonNull(
             command.getWesAuthType(),
-            configSubNode.getString("type"));
+            configSubNode.getString(WesConfigOptions.AUTHORIZATION_TYPE_KEY));
 
         // The auth value is either a bearer token or AWS profile
         final String authValue = ObjectUtils.firstNonNull(
             command.getWesAuthValue(),
-            configSubNode.getString("authorization"));
+            configSubNode.getString(WesConfigOptions.AUTHORIZATION_VALUE_KEY));
 
         // Depending on the endpoint (AWS/non-AWS) we need to look for a different set of credentials
         final boolean isAwsWes = "aws".equals(authType);
@@ -1259,7 +1259,7 @@ public abstract class AbstractEntryClient<T> {
                     // Get the AWS config path
                     final String awsConfigPath = ObjectUtils.firstNonNull(
                         command.getAwsConfig(),
-                        configSubNode.getString("config"));
+                        configSubNode.getString(WesConfigOptions.AWS_CREDENTIALS_KEY));
 
                     // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
                     // the default home/.aws/credentials file.
@@ -1279,7 +1279,7 @@ public abstract class AbstractEntryClient<T> {
             // Get the AWS region we are send the request to
             final String region = ObjectUtils.firstNonNull(
                 command.getAwsRegion(),
-                configSubNode.getString("region"));
+                configSubNode.getString(WesConfigOptions.AWS_REGION_KEY));
 
             return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
         } else {
