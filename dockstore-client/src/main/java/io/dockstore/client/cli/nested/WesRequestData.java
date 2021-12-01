@@ -68,8 +68,7 @@ public class WesRequestData {
         this.awsSecretKey = awsSecretKey;
         this.region = region;
 
-        // The credentials that were passed in are null, so we are assuming they are within an authorized environment (such as an EC2 instance)
-        // This also assumes there is no scenario where just one of the keys is sufficient.
+        // AWS credentials are required to make a complete API call. If any of the parameters are null, throw an error for the user.
         if (awsAccessKey == null) {
             errorMessage("Unable to locate an AWS access key. Specify an AWS access key under your AWS profile in ~/.aws/credentials.", Client.COMMAND_ERROR);
         } else if (awsSecretKey == null) {
