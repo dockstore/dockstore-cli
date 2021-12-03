@@ -188,9 +188,9 @@ public class WESLauncher extends BaseLauncher {
         String wesEntryType = abstractEntryClient.getEntryType().toString().toLowerCase();
         out("");
         out("To get status for this run: dockstore " + wesEntryType + " wes status --id " + runId
-                + " [--verbose][--wes-url <WES URL>][--wes-auth <auth>]");
+                + " [--verbose][--wes-url <WES URL>]");
         out("To cancel this run: dockstore " + wesEntryType + " wes cancel --id " + runId
-                + " [--wes-url <WES URL>][--wes-auth <auth>]");
+                + " [--wes-url <WES URL>]");
     }
 
 }

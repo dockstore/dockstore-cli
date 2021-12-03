@@ -98,33 +98,12 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testAggregateAWSCredentialBadConfigPath() {
-
-        AbstractEntryClient workflowClient = testAggregateHelper(null);
-
-        String[] args = {
-            "service-info",
-            "--wes-auth",
-            "aws",
-            "myProfile"
-        };
-        WesCommandParser parser = new WesCommandParser();
-        parser.jCommander.parse(args);
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(parser);
-        assertFalse("There should be error logs", systemErrRule.getLog().isEmpty());
-    }
-
-    @Test
     public void testAggregateAWSCredentialBadProfile() {
 
-        AbstractEntryClient workflowClient = testAggregateHelper(null);
+        AbstractEntryClient workflowClient = testAggregateHelper("configNoContent");
 
         String[] args = {
-            "service-info",
-            "--wes-auth",
-            "aws",
-            "badProfile"
+            "service-info"
         };
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -141,10 +120,7 @@ public class AbstractEntryClientTestIT {
         String[] args = {
             "service-info",
             "--wes-url",
-            "myUrl",
-            "--wes-auth",
-            "aws",
-            "myProfile"
+            "myUrl"
         };
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
@@ -162,15 +138,12 @@ public class AbstractEntryClientTestIT {
     @Test
     public void testAggregateAWSCredentialCompleteCommand() {
 
-        AbstractEntryClient workflowClient = testAggregateHelper(null);
+        AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
         String[] args = {
             "service-info",
             "--wes-url",
-            "myUrl",
-            "--wes-auth",
-            "aws",
-            "myProfile"
+            "myUrl"
         };
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
@@ -192,15 +165,12 @@ public class AbstractEntryClientTestIT {
     @Test
     public void testAggregateAWSCredentialCompleteCommandMalformed() {
 
-        AbstractEntryClient workflowClient = testAggregateHelper(null);
+        AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
         String[] args = {
             "service-info",
             "--wes-url",
-            "myUrl",
-            "--wes-auth",
-            "aws",
-            "myProfile"
+            "myUrl"
         };
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeMalformedAwsCredentials");
@@ -218,14 +188,12 @@ public class AbstractEntryClientTestIT {
     @Test
     public void testAggregateAWSCredentialNoProfileAuth() {
 
-        AbstractEntryClient workflowClient = testAggregateHelper(null);
+        AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfileNoAuth");
 
         String[] args = {
             "service-info",
             "--wes-url",
-            "myUrl",
-            "--wes-auth",
-            "aws"
+            "myUrl"
         };
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
@@ -245,16 +213,14 @@ public class AbstractEntryClientTestIT {
     @Test
     public void testAggregateAWSCredentialNoProfileAuthDefault() {
 
-        AbstractEntryClient workflowClient = testAggregateHelper(null);
+        AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfileNoAuth");
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
         String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
         String[] args = {
             "service-info",
             "--wes-url",
-            "myUrl",
-            "--wes-auth",
-            "aws"
+            "myUrl"
         };
 
         environmentVariables.set("AWS_CONFIG_FILE", config);
@@ -273,15 +239,12 @@ public class AbstractEntryClientTestIT {
     @Test
     public void testAggregateBearerCredentialCompleteCommand() {
 
-        AbstractEntryClient workflowClient = testAggregateHelper(null);
+        AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
         
         String[] args = {
             "service-info",
             "--wes-url",
-            "myUrl",
-            "--wes-auth",
-            "bearer",
-            "myToken",
+            "myUrl"
         };
 
         WesCommandParser parser = new WesCommandParser();

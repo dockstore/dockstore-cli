@@ -1236,14 +1236,10 @@ public abstract class AbstractEntryClient<T> {
             configSubNode.getString(WesConfigOptions.URL_KEY));
 
         // Determine the authorization method used by the user
-        final String authType = ObjectUtils.firstNonNull(
-            command.getWesAuthType(),
-            configSubNode.getString(WesConfigOptions.AUTHORIZATION_TYPE_KEY));
+        final String authType = configSubNode.getString(WesConfigOptions.AUTHORIZATION_TYPE_KEY);
 
         // The auth value is either a bearer token or AWS profile
-        final String authValue = ObjectUtils.firstNonNull(
-            command.getWesAuthValue(),
-            configSubNode.getString(WesConfigOptions.AUTHORIZATION_VALUE_KEY));
+        final String authValue = configSubNode.getString(WesConfigOptions.AUTHORIZATION_VALUE_KEY);
 
         // Depending on the endpoint (AWS/non-AWS) we need to look for a different set of credentials
         final boolean isAwsWes = "aws".equals(authType);
@@ -1557,7 +1553,6 @@ public abstract class AbstractEntryClient<T> {
     private void printWesHelpFooter() {
         out("Global Optional Parameters:");
         out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
-        out("  --wes-auth <authType> <authValue>   Authorization credentials for the WES endpoint, e.g. 'Bearer 12345' or 'aws myProfile'");
         out("");
         out("NOTE: WES SUPPORT IS IN BETA AT THIS TIME. RESULTS MAY BE UNPREDICTABLE.");
     }
