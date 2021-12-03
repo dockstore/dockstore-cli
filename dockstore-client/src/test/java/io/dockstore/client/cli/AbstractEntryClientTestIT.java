@@ -115,7 +115,7 @@ public class AbstractEntryClientTestIT {
     @Test
     public void testAggregateAWSCredentialNoRegion() {
 
-        AbstractEntryClient workflowClient = testAggregateHelper(null);
+        AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
         String[] args = {
             "service-info",
@@ -239,7 +239,7 @@ public class AbstractEntryClientTestIT {
     @Test
     public void testAggregateBearerCredentialCompleteCommand() {
 
-        AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
+        AbstractEntryClient workflowClient = testAggregateHelper("configWithBearerToken");
         
         String[] args = {
             "service-info",
@@ -251,7 +251,8 @@ public class AbstractEntryClientTestIT {
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("AWS access key should be parsed", "myToken", data.getBearerToken());
+        assertEquals("Bearer token should be parsed", "myToken", data.getBearerToken());
+        assertEquals("WES URL should be parsed", "myUrl", data.getUrl());
         assertEquals("AWS region should be parsed", WesRequestData.CredentialType.BEARER_TOKEN, data.getCredentialType());
     }
 
