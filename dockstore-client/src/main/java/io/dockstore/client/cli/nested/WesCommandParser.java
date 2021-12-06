@@ -1,7 +1,5 @@
 package io.dockstore.client.cli.nested;
 
-import java.util.List;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -41,52 +39,11 @@ public class WesCommandParser {
     public static class WesMain {
         @Parameter(names = "--wes-url", description = "The URL of the WES server.", required = false)
         private String wesUrl = null;
-        @Parameter(names = "--wes-auth",
-            description = "The authorization type and value of this wes request. --wes-auth <type> <value>. "
-                + "Type can be 'bearer' or 'aws'. "
-                + "Value can be a token if the type is 'bearer', or an AWS profile if the type is 'aws'",
-            variableArity = true,
-            required = false)
-        private List<String> wesAuth = null;
-        @Parameter(names = "--aws-config", description = "A path to an AWS configuration file containing AWS profile credentials.", required = false)
-        private String awsConfig = null;
-        @Parameter(names = "--aws-region", description = "The AWS region of the WES server.", required = false)
-        private String awsRegion = null;
         @Parameter(names = "--help", description = "Prints help for launch command", help = true)
         private boolean help = false;
 
-        /**
-         * Returns the WES authorization type (bearer or aws). If no auth type was provided, return null
-         * @return
-         */
-        public String getWesAuthType() {
-            if (wesAuth != null && !wesAuth.isEmpty()) {
-                return wesAuth.get(0);
-            }
-            return null;
-        }
-
-        /**
-         * Returns the WES authorization value (token or AWS profile). If no auth value was provided, return null.
-         * @return
-         */
-        public String getWesAuthValue() {
-            if (wesAuth != null && wesAuth.size() > 1) {
-                return wesAuth.get(1);
-            }
-            return null;
-        }
-
         public String getWesUrl() {
             return wesUrl;
-        }
-
-        public String getAwsConfig() {
-            return awsConfig;
-        }
-
-        public String getAwsRegion() {
-            return awsRegion;
         }
 
         public boolean isHelp() {

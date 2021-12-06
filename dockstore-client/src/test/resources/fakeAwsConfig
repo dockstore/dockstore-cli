@@ -1,0 +1,5 @@
+[myProfile]
+region = REGION
+
+[default]
+region = REGION2

@@ -7,7 +7,6 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -111,9 +110,10 @@ public class WesRequestDataTest {
 
     @Test
     public void testNullRegion() {
+        systemExit.expectSystemExit();
         WesRequestData wrd = new WesRequestData("myFakeUri", "whatIfIPassInJustOne?", "howAboutTwo?", null);
         assertTrue("WES request object should report credentials", wrd.hasCredentials());
-        assertEquals("A null region should be returned as an empty string", "", wrd.getAwsRegion());
+        assertFalse("Null AWS regions should not be requested", systemErrRule.getLog().isBlank());
     }
 
     @Test

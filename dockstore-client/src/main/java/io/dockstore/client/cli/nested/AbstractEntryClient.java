@@ -36,6 +36,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.amazonaws.SdkClientException;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.auth.profile.ProfilesConfigFile;
+import com.amazonaws.regions.AwsProfileRegionProvider;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -93,7 +99,6 @@ import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
-import static io.dockstore.client.cli.ArgumentUtility.flagPresent;
 import static io.dockstore.client.cli.ArgumentUtility.invalid;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
 import static io.dockstore.client.cli.ArgumentUtility.optVals;
@@ -1043,7 +1048,7 @@ public abstract class AbstractEntryClient<T> {
         if (this.getWesRequestData() == null) {
             errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);
         }
-        
+
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = new WorkflowExecutionServiceApi();
 
         // Uncomment this code when Swagger Codegen generates correct Java
@@ -1070,68 +1075,26 @@ public abstract class AbstractEntryClient<T> {
     }
 
     /**
-     * Determines if we should display a help message
-     * @param args Command arguments for this WES command
-     * @return
-     */
-    private boolean shouldDisplayHelp(final List<String> args) {
-        return args.isEmpty() || containsHelpRequest(args);
-    }
-
-    /**
-     * This will print the appropriate help message depending on the input arguments.
-     * @param args Command arguments for this WES command
-     */
-    private void displayWesHelp(final List<String> args) {
-
-        // print the help message for general WES commands
-        if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
-            wesHelp();
-            return;
-        }
-
-        // print the help message for a specific command type
-        final String cmd = args.get(0);
-        switch (cmd) {
-        case "launch":
-            wesLaunchHelp();
-            break;
-        case "status":
-            wesStatusHelp();
-            break;
-        case "cancel":
-            wesCancelHelp();
-            break;
-        case "service-info":
-            wesServiceInfoHelp();
-            break;
-        default:
-            invalid(cmd);
-            break;
-        }
-    }
-
-    /**
      * This will attempt to launch a workflow given the command arguments
-     * @param args Command arguments for this WES command
+     *
      */
-    private void wesLaunch(final List<String> args) {
-        if (args.contains("--local-entry")) {
-            errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
-        } else {
-            launch(args);
-        }
+    private void wesLaunch(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
+        launchWithArgs(entry, localEntry, jsonRun, yamlRun, wdlOutput, ignoreChecksumFlag, uuid);
+    }
+
+    public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
+        // Does nothing for tools.
     }
 
     /**
      *  This will attempt to retrieve the status of a workflow run
-     * @param args Command arguments for this WES command
+     * @param workflowId The ID of the workflow we are getting status info for
+     * @param verbose Whether or not we want verbose logs
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesStatus(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
-        final String workflowId = reqVal(args, "--id");
+    private void wesStatus(final String workflowId, final boolean verbose, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
         out("Getting status of WES workflow");
-        if (args.contains("--verbose")) {
+        if (verbose) {
             try {
                 RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
                 out("Verbose run status is: " + response.toString());
@@ -1150,14 +1113,13 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * This will attempt to cancel a WES run
-     * @param args Command arguments for this WES command
+     * @param runId The ID of the run we are cancelling
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesCancel(final List<String> args, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+    private void wesCancel(final String runId, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
         out("Canceling WES workflow");
-        final String workflowId = reqVal(args, "--id");
         try {
-            RunId response = clientWorkflowExecutionServiceApi.cancelRun(workflowId);
+            RunId response = clientWorkflowExecutionServiceApi.cancelRun(runId);
             out("Cancelled run with id: " + response.toString());
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error canceling WES run", e);
@@ -1178,72 +1140,138 @@ public abstract class AbstractEntryClient<T> {
     }
 
     /**
+     * Given the parsed command object, determine if we are to print help commands
+     * @param wesCommandParser Parse commands
+     * @return true if help was displayed, false otherwise
+     */
+    private boolean displayWesHelpWhenNecessary(WesCommandParser wesCommandParser) {
+        // Print the main help section if 'dockstore workflow wes' was the command
+        if (wesCommandParser.wesMain.isHelp() || wesCommandParser.jCommander.getParsedCommand() == null) {
+            wesHelp();
+            return true;
+        } else if (wesCommandParser.commandLaunch.isHelp()) {
+            wesLaunchHelp();
+            return true;
+        } else if (wesCommandParser.commandStatus.isHelp()) {
+            wesStatusHelp();
+            return true;
+        } else if (wesCommandParser.commandCancel.isHelp()) {
+            wesCancelHelp();
+            return true;
+        } else if (wesCommandParser.commandServiceInfo.isHelp()) {
+            wesServiceInfoHelp();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Processes Workflow Execution Schema (WES) commands.
      *
      * @param args Arguments entered into the CLI
      */
     private void processWesCommands(final List<String> args) {
-        if (shouldDisplayHelp(args)) {
-            displayWesHelp(args);
-        } else {
-            final WesRequestData requestData = this.aggregateWesRequestData(args);
+        WesCommandParser wesCommandParser = new WesCommandParser();
+
+        // JCommander throws a parameter exception for invalid parameters. Catch this an print the error cleanly.
+        try {
+            wesCommandParser.jCommander.parse(args.toArray(new String[0]));
+        } catch (ParameterException e) {
+            errorMessage(e.getMessage(), CLIENT_ERROR);
+        }
+
+        final boolean helpDisplayed = displayWesHelpWhenNecessary(wesCommandParser);
+        if (!helpDisplayed) {
+            final WesRequestData requestData = this.aggregateWesRequestData(wesCommandParser);
             setWesRequestData(requestData);
             WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
 
-            final String cmd = args.remove(0);
-            switch (cmd) {
+            switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
-                wesLaunch(args);
+                wesLaunch(wesCommandParser.commandLaunch.getEntry(),
+                    null,
+                    wesCommandParser.commandLaunch.getJson(),
+                    wesCommandParser.commandLaunch.getYaml(),
+                    null,
+                    true,
+                    null);
                 break;
             case "status":
-                wesStatus(args, clientWorkflowExecutionServiceApi);
+                wesStatus(wesCommandParser.commandStatus.getId(),
+                    wesCommandParser.commandStatus.isVerbose(),
+                    clientWorkflowExecutionServiceApi);
                 break;
             case "cancel":
-                wesCancel(args, clientWorkflowExecutionServiceApi);
+                wesCancel(wesCommandParser.commandCancel.getId(), clientWorkflowExecutionServiceApi);
                 break;
             case "service-info":
                 wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
             default:
-                invalid(cmd);
-                break;
+                errorMessage("Unknown WES command.", CLIENT_ERROR);
+                wesHelp();
             }
         }
     }
 
     /**
      * This will aggregate the WES request URI and credentials into a single object for use down the line
-     * @param args The commaand line arguments
+     * @param wesCommandParser The parsed command line arguments
      */
-    public WesRequestData aggregateWesRequestData(final List<String> args) {
+    public WesRequestData aggregateWesRequestData(final WesCommandParser wesCommandParser) {
 
         // Get the config file to see if credentials are there
         INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
-        SubnodeConfiguration configSubNode = null;
-        try {
-            configSubNode = config.getSection("WES");
-        } catch (Exception e) {
-            out("Could not get WES section from config file");
-        }
+        SubnodeConfiguration configSubNode = config.getSection("WES");
 
-        // Attempt to find the WES URI
-        final String wesUri = optVal(args, "--wes-url", null);
-        final String wesEndpointUrl = ObjectUtils.firstNonNull(wesUri, Objects.requireNonNull(configSubNode).getString("url"));
+        // Obtain the WES command object
+        JCommander parsedCommand = wesCommandParser.jCommander
+            .findCommandByAlias(wesCommandParser.jCommander.getParsedCommand());
+        WesCommandParser.WesMain command = parsedCommand == null ?  new WesCommandParser.WesMain() : (WesCommandParser.WesMain) parsedCommand.getObjects().get(0);
+
+        // Attempt to find the WES URL
+        final String wesEndpointUrl = ObjectUtils.firstNonNull(
+            command.getWesUrl(),
+            configSubNode.getString(WesConfigOptions.URL_KEY));
+
+        // Determine the authorization method used by the user
+        final String authType = configSubNode.getString(WesConfigOptions.AUTHORIZATION_TYPE_KEY);
+
+        // The auth value is either a bearer token or AWS profile
+        final String authValue = configSubNode.getString(WesConfigOptions.AUTHORIZATION_VALUE_KEY);
 
         // Depending on the endpoint (AWS/non-AWS) we need to look for a different set of credentials
-        final boolean isAwsWes = flagPresent(args, "--aws");
+        final boolean isAwsWes = "aws".equals(authType);
         if (isAwsWes) {
-            // TODO should probably have the config sections all defined within a single class. At least have enums.
-            // AWS credentials shouldn't be stored in the dockstore config, so we wont check for it there.
-            final String accessKey = optVal(args, "--aws-access-key", null);
-            final String secretKey = optVal(args, "--aws-secret-key", null);
-            final String region = optVal(args, "--aws-region", null);
-            return new WesRequestData(wesEndpointUrl, accessKey, secretKey, region);
+
+            try {
+                // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
+                // the default home/.aws/credentials file.
+                final String profileToRead = authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE;
+                final ProfilesConfigFile profilesConfigFile = new ProfilesConfigFile();
+                final ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider(profilesConfigFile, profileToRead);
+                final AwsProfileRegionProvider regionProvider = new AwsProfileRegionProvider(profileToRead);
+
+                // Build and return the request data
+                return new WesRequestData(wesEndpointUrl,
+                    credentialsProvider.getCredentials().getAWSAccessKeyId(),
+                    credentialsProvider.getCredentials().getAWSSecretKey(),
+                    regionProvider.getRegion());
+
+            } catch (IllegalArgumentException | SdkClientException e) {
+                // Some potential reasons for this exception are:
+                // 1) The path to the config file is invalid or 2) The profile doesn't exist or 3) The config file is malformed
+                errorMessage(e.getMessage(), CLIENT_ERROR);
+            }
+
+            // Let the WesRequestData class handle missing credentials
+            return new WesRequestData(wesEndpointUrl, null, null, null);
         } else {
-            final String wesToken = ObjectUtils.firstNonNull(optVal(args, "--wes-auth", null), Objects.requireNonNull(configSubNode).getString("authorization"));
-            return new WesRequestData(wesEndpointUrl, wesToken);
+            return new WesRequestData(wesEndpointUrl, authValue);
         }
     }
+
     /**
      * Prints a warning if Docker isn't running. Docker is not always needed. If a workflow or tool uses Docker and
      * it is not running, it fails with a cryptic error. This should make the problem more obvious.
@@ -1525,11 +1553,6 @@ public abstract class AbstractEntryClient<T> {
     private void printWesHelpFooter() {
         out("Global Optional Parameters:");
         out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
-        out("  --wes-auth <auth>                   Authorization credentials for the WES endpoint, e.g. 'Bearer 12345'");
-        out("  --aws                               Flag indicating whether the WES request will be to an AWS endpoint");
-        out("  --aws-access-key <key>              The AWS access key associated with an IAM user/profile.");
-        out("  --aws-secret-key <key>              The AWS secret key associated with an IAM user/profile.");
-        out("  --aws-region <region>               The AWS region the WES endpoint is located in, e.g. 'us-east-1'.");
         out("");
         out("NOTE: WES SUPPORT IS IN BETA AT THIS TIME. RESULTS MAY BE UNPREDICTABLE.");
     }

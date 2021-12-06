@@ -92,6 +92,7 @@ import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     public static final String BIOWORKFLOW = "bioworkflow";
+    public static final String LAUNCH_COMMAND_NAME = "launch";
     protected static final Logger LOG = LoggerFactory.getLogger(WorkflowClient.class);
     private static final String UPDATE_WORKFLOW = "update_workflow";
     protected final WorkflowsApi workflowsApi;
@@ -428,10 +429,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
      */
     @Override
     public void launch(final List<String> args) {
-        String commandName = "launch";
         preValidateLaunchArguments(args);
         String[] argv = args.toArray(new String[0]);
-        String[] argv1 = { commandName };
+        String[] argv1 = { LAUNCH_COMMAND_NAME };
         String[] both = ArrayUtils.addAll(argv1, argv);
         this.jCommander.parse(both);
         String entry = commandLaunch.entry;
@@ -442,11 +442,21 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         boolean ignoreChecksumFlag = commandLaunch.ignoreChecksums;
         String uuid = commandLaunch.uuid;
 
+        if (this.commandLaunch.help) {
+            JCommanderUtility.printJCommanderHelpLaunch(jCommander, "dockstore workflow", LAUNCH_COMMAND_NAME);
+        } else {
+            launchWithArgs(entry, localEntry, jsonRun, yamlRun, wdlOutputTarget, ignoreChecksumFlag, uuid);
+        }
+    }
+
+    @Override
+    public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
+
         // trim the final slash on output if it is present, probably an error ( https://github.com/aws/aws-cli/issues/421 ) causes a double slash which can fail
-        wdlOutputTarget = wdlOutputTarget != null ? wdlOutputTarget.replaceAll("/$", "") : null;
+        final String wdlOutputTarget = wdlOutput != null ? wdlOutput.replaceAll("/$", "") : null;
 
         if (this.commandLaunch.help) {
-            JCommanderUtility.printJCommanderHelpLaunch(jCommander, "dockstore workflow", commandName);
+            JCommanderUtility.printJCommanderHelpLaunch(jCommander, "dockstore workflow", LAUNCH_COMMAND_NAME);
         } else {
             checkIfDockerRunning(); // print a warning message if Docker is not running
             if ((entry == null) != (localEntry == null)) {
@@ -499,7 +509,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 }
             } else {
                 out("You can only use one of --local-entry and --entry at a time.");
-                JCommanderUtility.printJCommanderHelpLaunch(jCommander, "dockstore workflow", commandName);
+                JCommanderUtility.printJCommanderHelpLaunch(jCommander, "dockstore workflow", LAUNCH_COMMAND_NAME);
             }
         }
     }

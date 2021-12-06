@@ -44,82 +44,18 @@ public class WesCommandParserTest {
 
     @Test
     public void testWesMainAuth() {
-        final String wesAuthType = "aws";
-        final String wesAuthValue = "my-profile";
-        final String[] args = {
-            "--aws-region",
-            "space-mars-2",
-            "--wes-auth",
-            wesAuthType,
-            wesAuthValue,
-            "banana"
-        };
+        final String[] args = {};
 
         WesCommandParser wesCommandParser = new WesCommandParser();
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
 
         assertNull("Parsed command should be null", parser.getParsedCommand());
-        assertEquals("The parsed region should be 'space-mars-2'", "space-mars-2", wesCommandParser.wesMain.getAwsRegion());
-        assertEquals("The parsed auth type should be 'aws'", wesAuthType, wesCommandParser.wesMain.getWesAuthType());
-        assertEquals("The parsed auth value should be 'my-profile'", wesAuthValue, wesCommandParser.wesMain.getWesAuthValue());
-    }
-
-    @Test
-    public void testWesMainAuthPartial() {
-        final String wesAuthType = "aws";
-        final String[] args = {
-            "--aws-region",
-            "space-mars-2",
-            "--wes-auth",
-            wesAuthType
-        };
-
-        WesCommandParser wesCommandParser = new WesCommandParser();
-        JCommander parser = wesCommandParser.jCommander;
-        parser.parse(args);
-
-        assertNull("Parsed command should be null", parser.getParsedCommand());
-        assertEquals("The parsed auth type should be 'aws'", wesAuthType, wesCommandParser.wesMain.getWesAuthType());
-        assertNull("The parsed auth value should be null", wesCommandParser.wesMain.getWesAuthValue());
-    }
-
-    @Test
-    public void testWesMainAuthPartial2() {
-        final String wesAuthType = "bearer";
-        final String[] args = {
-            "--wes-auth",
-            wesAuthType
-        };
-
-        WesCommandParser wesCommandParser = new WesCommandParser();
-        JCommander parser = wesCommandParser.jCommander;
-        parser.parse(args);
-
-        assertNull("Parsed command should be null", parser.getParsedCommand());
-        assertEquals("The parsed auth type should be 'bearer'", wesAuthType, wesCommandParser.wesMain.getWesAuthType());
-        assertNull("The parsed auth value should be null", wesCommandParser.wesMain.getWesAuthValue());
-    }
-
-    @Test
-    public void testWesMainAuthPartial3() {
-        final String[] args = {}; // make sure we don't crash on no auth provided
-
-        WesCommandParser wesCommandParser = new WesCommandParser();
-        JCommander parser = wesCommandParser.jCommander;
-        parser.parse(args);
-
-        assertNull("Parsed command should be null", parser.getParsedCommand());
-        assertNull("The parsed auth type should be 'null'", wesCommandParser.wesMain.getWesAuthType());
-        assertNull("The parsed auth value should be null", wesCommandParser.wesMain.getWesAuthValue());
     }
 
     @Test
     public void testCommandLaunchHelp() {
         final String[] args = {
-            "--wes-auth",
-            "bearer",
-            "123456",
             "launch",
             "--help"
         };
@@ -135,9 +71,6 @@ public class WesCommandParserTest {
     @Test
     public void testCommandLaunch1() {
         final String[] args = {
-            "--wes-auth",
-            "bearer",
-            "123456",
             "launch",
             "--entry",
             "my/fake/entry",
@@ -157,9 +90,6 @@ public class WesCommandParserTest {
     @Test
     public void testCommandLaunch2() {
         final String[] args = {
-            "--wes-auth",
-            "bearer",
-            "123456",
             "launch",
             "--entry",
             "my/fake/entry",
@@ -182,9 +112,6 @@ public class WesCommandParserTest {
             "launch",
             "--wes-url",
             "banana",
-            "--wes-auth",
-            "bearer",
-            "123456",
             "--entry",
             "my/fake/entry",
             "--yaml",
@@ -204,9 +131,6 @@ public class WesCommandParserTest {
     @Test
     public void testCommandLaunchNoEntry() {
         final String[] args = {
-            "--wes-auth",
-            "bearer",
-            "123456",
             "launch",
             "--yaml",
             "path/to/yaml.yaml"
@@ -226,9 +150,6 @@ public class WesCommandParserTest {
     @Test
     public void testCommandCancel() {
         final String[] args = {
-            "--wes-auth",
-            "bearer",
-            "123456",
             "cancel",
             "--id",
             "123456"
@@ -245,9 +166,6 @@ public class WesCommandParserTest {
     @Test
     public void testCommandCancelNoID() {
         final String[] args = {
-            "--wes-auth",
-            "bearer",
-            "123456",
             "cancel"
         };
 
@@ -277,9 +195,6 @@ public class WesCommandParserTest {
     @Test
     public void testCommandStatus1() {
         final String[] args = {
-            "--wes-auth",
-            "bearer",
-            "123456",
             "status",
             "--id",
             "123456"
@@ -296,9 +211,6 @@ public class WesCommandParserTest {
     @Test
     public void testCommandStatus2() {
         final String[] args = {
-            "--wes-auth",
-            "bearer",
-            "123456",
             "status",
             "--id",
             "123456",
@@ -317,9 +229,6 @@ public class WesCommandParserTest {
     @Test
     public void testCommandStatusNoID() {
         final String[] args = {
-            "--wes-auth",
-            "bearer",
-            "123456",
             "status"
         };
 
