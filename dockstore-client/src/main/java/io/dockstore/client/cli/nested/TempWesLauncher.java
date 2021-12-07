@@ -2,9 +2,12 @@ package io.dockstore.client.cli.nested;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.openapi.client.ApiClient;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.model.RunId;
 import io.swagger.client.model.Workflow;
@@ -31,18 +34,18 @@ public class TempWesLauncher {
         // 2. TODO: A relative path to a value in the 'attachments' list
         // 3. TODO: An absolute path to a value in the 'attachments' list
         // User may enter the version, so we have to extract the path
-        String workflowUrl = workflow.getWorkflowPath();
+        String workflowUrl = combineTrsUrlComponents(workflowClient, workflowEntry, workflow);
 
         // A JSON object containing a key/value pair that points to the test parameter file in the 'attachments' list
         // The key is WES server implementation specific. e.g. {"workflowInput":"params.json"}.
-        File workflowParams = null;
+        File workflowParams = loadFile(workflowParamPath);
 
         // A list of supplementary files that are required to run the workflow. This may include any/all of the following:
         // 1. The primary descriptor file
         // 2. Secondary descriptor files
         // 3. Test parameter files
         // 4. Any other files referenced by the primary descriptor
-        List<File> workflowAttachment = null;
+        List<File> workflowAttachment = loadAttachments(attachments);
 
         // The descriptor type
         String workflowType = workflow.getDescriptorType().getValue();
@@ -67,18 +70,7 @@ public class TempWesLauncher {
             wesCommandSuggestions(runID);
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error launching WES run", e);
-        } finally {
-
-            // Only attempt to cleanup the temporary directory if we created it in the first place
-//            if (tempDir != null) {
-//                try {
-//                    FileUtils.deleteDirectory(tempDir);
-//                } catch (IOException ioe) {
-//                    LOG.error("Could not delete temporary directory" + tempDir + " for workflow attachment files", ioe);
-//                }
-//            }
         }
-
     }
 
     private static Workflow getWorkflowForEntry(WorkflowClient workflowClient, String entry) {
@@ -86,6 +78,51 @@ public class TempWesLauncher {
         String path = parts[0];
         String version = workflowClient.getVersionID(entry);
         return workflowClient.workflowsApi.getPublishedWorkflowByPath(path, null, null, version);
+    }
+
+    private static String combineTrsUrlComponents(WorkflowClient workflowClient, String workflowEntry, Workflow workflow) {
+        ApiClient client = workflowClient.getClient().getGa4Ghv20Api().getApiClient();
+
+        // Entries are passed in the form {PATH}:{VERSION} or {PATH}
+        final String[] pathAndVersion = workflowEntry.split(":");
+        final String path = pathAndVersion[0];
+
+        // Calculate the values needed to supply a TRS URL
+        final String basePath = workflowClient.getClient().getGa4Ghv20Api().getApiClient().getBasePath();
+        final String versionId = workflowClient.getVersionID(workflowEntry);
+        final String entryId = workflowClient.getTrsId(path);
+        final String type = "PLAIN_" + workflow.getDescriptorType().getValue();
+
+        // Escape each of the URL path values
+        final String escapedId = client.escapeString(entryId);
+        final String escapedVersionId = client.escapeString(versionId);
+        final String escapedType = client.escapeString(type);
+        final String escapedRelativePath = client.escapeString(workflow.getWorkflowPath());
+
+        // Return the TRS URL for a given entry
+        return MessageFormat.format("{0}/ga4gh/trs/v2/tools/{1}/versions/{2}/{3}/descriptor/{4}",
+            basePath,
+            escapedId,
+            escapedVersionId,
+            escapedType,
+            escapedRelativePath);
+    }
+
+    private static File loadFile(String workflowParamPath) {
+        return workflowParamPath == null ? null : new File(workflowParamPath);
+    }
+
+    private static List<File> loadAttachments(List<String> attachments) {
+        if (attachments == null) {
+            return null;
+        }
+
+        List<File> workflowAttachments = new ArrayList<>();
+        attachments.forEach(path -> {
+            final File attachmentFile = loadFile(path);
+            workflowAttachments.add(attachmentFile);
+        });
+        return workflowAttachments;
     }
 
     private static String createWorkflowTypeVersion(String workflowType) {
