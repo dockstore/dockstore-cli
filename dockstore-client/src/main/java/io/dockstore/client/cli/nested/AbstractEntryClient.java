@@ -1078,8 +1078,8 @@ public abstract class AbstractEntryClient<T> {
      * This will attempt to launch a workflow given the command arguments
      *
      */
-    private void wesLaunch(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
-        launchWithArgs(entry, localEntry, jsonRun, yamlRun, wdlOutput, ignoreChecksumFlag, uuid);
+    private void wesLaunch(String workflowEntry, String workflowParams, List<String> workflowAttachment) {
+        TempWesLauncher.launchWesCommand(workflowEntry, workflowParams, workflowAttachment);
     }
 
     public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
@@ -1190,12 +1190,8 @@ public abstract class AbstractEntryClient<T> {
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
                 wesLaunch(wesCommandParser.commandLaunch.getEntry(),
-                    null,
-                    wesCommandParser.commandLaunch.getJson(),
-                    wesCommandParser.commandLaunch.getYaml(),
-                    null,
-                    true,
-                    null);
+                    wesCommandParser.commandLaunch.getInput(),
+                    wesCommandParser.commandLaunch.getAttachments());
                 break;
             case "status":
                 wesStatus(wesCommandParser.commandStatus.getId(),
