@@ -1079,7 +1079,8 @@ public abstract class AbstractEntryClient<T> {
      *
      */
     private void wesLaunch(String workflowEntry, String workflowParams, List<String> workflowAttachment) {
-        TempWesLauncher.launchWesCommand(workflowEntry, workflowParams, workflowAttachment);
+        // Only supports workflows at the moment
+        TempWesLauncher.launchWesCommand((WorkflowClient) this, workflowEntry, workflowParams, workflowAttachment);
     }
 
     public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {

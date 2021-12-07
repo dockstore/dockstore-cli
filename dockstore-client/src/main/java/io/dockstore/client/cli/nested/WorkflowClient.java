@@ -301,7 +301,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         return languageCLient.generateInputJson(entry, json);
     }
 
-    private Workflow getDockstoreWorkflowByPath(String path) {
+    public Workflow getDockstoreWorkflowByPath(String path) {
         // simply getting published descriptors does not require permissions
         Workflow workflow = null;
         try {
