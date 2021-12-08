@@ -1,28 +1,28 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.openapi.client.ApiClient;
-import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.model.RunId;
 import io.swagger.client.model.Workflow;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.out;
 
-public class TempWesLauncher {
+public final class TempWesLauncher {
 
     private static final Logger LOG = LoggerFactory.getLogger(WESLauncher.class);
     private static final String TAGS = "{\"Client\":\"Dockstore\"}";
     private static final String WORKFLOW_TYPE_VERSION = "1.0";
     private static final String WORKFLOW_ENGINE_PARAMETERS = "{}";
+
+    private TempWesLauncher() {
+
+    }
 
     public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, String workflowParamPath, List<String> attachments) {
 
@@ -122,6 +122,7 @@ public class TempWesLauncher {
             final File attachmentFile = loadFile(path);
             workflowAttachments.add(attachmentFile);
         });
+
         return workflowAttachments;
     }
 
