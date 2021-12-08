@@ -18,14 +18,14 @@ import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 
-public final class TempWesLauncher {
+public final class WesLauncher {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WESLauncher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WesLauncher.class);
     private static final String TAGS = "{\"Client\":\"Dockstore\"}";
     private static final String WORKFLOW_TYPE_VERSION = "1.0";
     private static final String WORKFLOW_ENGINE_PARAMETERS = "{}";
 
-    private TempWesLauncher() {
+    private WesLauncher() {
 
     }
 
