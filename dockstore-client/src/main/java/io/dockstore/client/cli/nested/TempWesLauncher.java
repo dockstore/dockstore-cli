@@ -131,6 +131,8 @@ public final class TempWesLauncher {
     }
 
     private static void wesCommandSuggestions(String runId) {
-        out("TODO");
+        out("To view the workflow run status, execute: ");
+        out(MessageFormat.format("\tdockstore workflow wes status --id {0}", runId));
+        out(MessageFormat.format("\tdockstore workflow wes status --id {0} --verbose", runId));
     }
 }
