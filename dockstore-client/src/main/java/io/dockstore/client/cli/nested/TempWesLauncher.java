@@ -1,6 +1,9 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +14,9 @@ import io.swagger.client.model.Workflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 
 public final class TempWesLauncher {
 
@@ -31,9 +36,7 @@ public final class TempWesLauncher {
 
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
-        // 2. TODO: A relative path to a value in the 'attachments' list
-        // 3. TODO: An absolute path to a value in the 'attachments' list
-        // User may enter the version, so we have to extract the path
+        // 2. TODO: A path to a file in the 'attachments' list
         String workflowUrl = combineTrsUrlComponents(workflowClient, workflowEntry, workflow);
 
         // A JSON object containing a key/value pair that points to the test parameter file in the 'attachments' list
@@ -44,7 +47,9 @@ public final class TempWesLauncher {
         // 1. The primary descriptor file
         // 2. Secondary descriptor files
         // 3. Test parameter files
-        // 4. Any other files referenced by the primary descriptor
+        // 4. Any other files referenced by the workflow
+        // TODO: Allow users to specify a directory to upload?
+        // TODO: Automatically attach all files referenced in remote Dockstore entry?
         List<File> workflowAttachment = loadAttachments(attachments);
 
         // The descriptor type
@@ -109,7 +114,18 @@ public final class TempWesLauncher {
     }
 
     private static File loadFile(String workflowParamPath) {
-        return workflowParamPath == null ? null : new File(workflowParamPath);
+        if (workflowParamPath == null) {
+            return null;
+        }
+
+        // Verify the file path exists
+        Path path = Paths.get(workflowParamPath);
+        if (!Files.exists(path)) {
+            errorMessage(MessageFormat.format("Unable to locate file: {0}", workflowParamPath), CLIENT_ERROR);
+        }
+
+        // TODO: Handle path expansions? i.e. '~/my/file.txt'
+        return new File(workflowParamPath);
     }
 
     private static List<File> loadAttachments(List<String> attachments) {
