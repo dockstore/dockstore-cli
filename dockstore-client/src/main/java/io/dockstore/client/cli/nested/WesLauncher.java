@@ -158,7 +158,7 @@ public final class WesLauncher {
     }
 
     /**
-     * Given a list of string paths, this attempts to convert it to a list of files (i.e. List<File>)
+     * Given a list of string paths, this attempts to convert it to a list of files.
      *
      * @param attachments A list of paths that correspond to files that need to be attached to the WES request
      * @return A list of File objects
