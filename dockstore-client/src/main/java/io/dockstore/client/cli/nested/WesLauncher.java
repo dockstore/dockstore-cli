@@ -29,6 +29,14 @@ public final class WesLauncher {
 
     }
 
+    /**
+     * This creates all the necessary parts of a WES launch, and then passes it on to the GA4GH WES client for the actual launch.
+     *
+     * @param workflowClient The WorkflowClient for the request
+     * @param workflowEntry The entry path, (i.e. github.com/myRepo/myWorkflow:version)
+     * @param workflowParamPath The path to a file to be used as an input JSON. (i.e. /path/to/file.json)
+     * @param attachments A list of paths to files to be attached to the request.
+     */
     public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, String workflowParamPath, List<String> attachments) {
 
         // Get the workflow object associated with the provided entry path
@@ -78,13 +86,28 @@ public final class WesLauncher {
         }
     }
 
-    private static Workflow getWorkflowForEntry(WorkflowClient workflowClient, String entry) {
-        String[] parts = entry.split(":");
+    /**
+     * Obtains the workflow on Dockstore
+     *
+     * @param workflowClient The WorkflowClient
+     * @param workflowEntry The workflow entry (i.e. github.com/myRepo/myWorkflow:version)
+     * @return A Workflow object for the corresponding workflow+version
+     */
+    private static Workflow getWorkflowForEntry(WorkflowClient workflowClient, String workflowEntry) {
+        String[] parts = workflowEntry.split(":");
         String path = parts[0];
-        String version = workflowClient.getVersionID(entry);
+        String version = workflowClient.getVersionID(workflowEntry);
         return workflowClient.workflowsApi.getPublishedWorkflowByPath(path, null, null, version);
     }
 
+    /**
+     * Creates a TRS url for a Dockstore entry
+     *
+     * @param workflowClient The WorkflowClient
+     * @param workflowEntry The workflow entry (i.e. github.com/myRepo/myWorkflow:version)
+     * @param workflow The workflow object we are creating a TRS url for
+     * @return A string representing a TRS URL for an entry
+     */
     private static String combineTrsUrlComponents(WorkflowClient workflowClient, String workflowEntry, Workflow workflow) {
         ApiClient client = workflowClient.getClient().getGa4Ghv20Api().getApiClient();
 
@@ -113,6 +136,12 @@ public final class WesLauncher {
             escapedRelativePath);
     }
 
+    /**
+     * Attempts to load a file from the provided path. Errors out if the file doesn't exist.
+     *
+     * @param workflowParamPath Path to a file
+     * @return A File object
+     */
     private static File loadFile(String workflowParamPath) {
         if (workflowParamPath == null) {
             return null;
@@ -128,6 +157,12 @@ public final class WesLauncher {
         return new File(workflowParamPath);
     }
 
+    /**
+     * Given a list of string paths, this attempts to convert it to a list of files (i.e. List<File>)
+     *
+     * @param attachments A list of paths that correspond to files that need to be attached to the WES request
+     * @return A list of File objects
+     */
     private static List<File> loadAttachments(List<String> attachments) {
         if (attachments == null) {
             return null;
@@ -142,10 +177,21 @@ public final class WesLauncher {
         return workflowAttachments;
     }
 
+    /**
+     * Calculates the proper versioning for a workflow
+     *
+     * @param workflowType WDL/CWL/NEXTFLOW/etc...
+     * @return A String type
+     */
     private static String createWorkflowTypeVersion(String workflowType) {
         return "CWL".equalsIgnoreCase(workflowType) ? "v" + WORKFLOW_TYPE_VERSION : WORKFLOW_TYPE_VERSION;
     }
 
+    /**
+     * After a workflow is successfully launched, this will print an easy-to-use command to get the workflow status.
+     *
+     * @param runId The ID of the launched workflow. This ID is provided from the WES server.
+     */
     private static void wesCommandSuggestions(String runId) {
         out("To view the workflow run status, execute: ");
         out(MessageFormat.format("\tdockstore workflow wes status --id {0}", runId));
