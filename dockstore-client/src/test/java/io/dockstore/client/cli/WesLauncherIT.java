@@ -90,6 +90,16 @@ public class WesLauncherIT {
             any(List.class)
         )).thenReturn(runId);
 
+        when(fakeApi.runWorkflow(
+            ArgumentMatchers.isNull(),
+            any(String.class),
+            any(String.class),
+            any(String.class),
+            any(String.class),
+            any(String.class),
+            ArgumentMatchers.isNull()
+        )).thenReturn(runId);
+
         // WorkflowsApi Function mocks
         when(workflowApi.getPublishedWorkflowByPath(
             any(String.class),
@@ -106,6 +116,15 @@ public class WesLauncherIT {
         when(workflowClient.getWorkflowExecutionServiceApi()).thenReturn(fakeApi);
 
         return workflowClient;
+    }
+
+    @Test
+    public void testLaunchWithNoFiles() throws ApiException {
+        WorkflowClient workflowClient = mockWorkflowClient(null);
+        String workflowEntry = "my/entry/path";
+
+        WesLauncher.launchWesCommand(workflowClient, workflowEntry, null, null);
+        assertTrue("The runId should be printed out", systemOutRule.getLog().contains(RUN_ID));
     }
 
     @Test
