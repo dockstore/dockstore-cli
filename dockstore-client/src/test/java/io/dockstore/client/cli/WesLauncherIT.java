@@ -4,13 +4,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.WesLauncher;
 import io.dockstore.client.cli.nested.WesRequestData;
 import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.DescriptorLanguage;
 import io.dropwizard.testing.ResourceHelpers;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
+import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
@@ -21,6 +24,7 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.mockito.ArgumentMatchers;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -29,8 +33,8 @@ import static org.mockito.Mockito.when;
 public class WesLauncherIT {
 
     public static final String RUN_ID = "123456-098765-123123-04983782";
-    public static final String WORKFLOW_PATH = "github.com/myTestRepo/myTestWorkflow";
-    public static final String DESCRIPTOR_PATH = "fake.wdl";
+    public static final String WORKFLOW_PATH = "github.com/org/repo";
+    public static final String DESCRIPTOR_PATH = "rightHere.wdl";
 
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
@@ -178,5 +182,29 @@ public class WesLauncherIT {
         WesLauncher.launchWesCommand(workflowClient, workflowEntry, workflowParamPath, attachments);
         assertTrue("The file doesn't exist, so an error should be thrown",
             systemErrRule.getLog().contains("Unable to locate file: uh/oh/this/is/a/typo"));
+    }
+
+    @Test
+    public void testTrsUrlCreation() throws ApiException {
+
+        // Create client + launcher
+        WorkflowClient aec = mockWorkflowClient(null);
+        WesRequestData wrd = new WesRequestData("myWesUrl");
+        aec.setWesRequestData(wrd);
+
+        Workflow workflow = new Workflow();
+        workflow.setWorkflowPath("rightHere.wdl");
+        workflow.setDefaultVersion("v1");
+        workflow.setDescriptorType(Workflow.DescriptorTypeEnum.WDL);
+        workflow.setRepository("repo");
+        workflow.setOrganization("org");
+        workflow.setRepository("github.com");
+
+        // Ensure the #workflow prefix is correctly encoded
+        final String trsWorkflowUrl = WesLauncher.combineTrsUrlComponents(aec, "github.com/org/repo:master", workflow);
+
+        final String expectedWorkflowResult = "https://dockstore.org/api/ga4gh/trs/v2/tools/%23workflow%2Fgithub.com%2Forg%2Frepo/versions/v1/PLAIN_WDL/descriptor/rightHere.wdl";
+        assertEquals("Checking the entire URL", expectedWorkflowResult, trsWorkflowUrl);
+
     }
 }
