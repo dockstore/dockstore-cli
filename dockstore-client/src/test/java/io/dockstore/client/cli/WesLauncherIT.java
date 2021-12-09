@@ -4,16 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.WesLauncher;
 import io.dockstore.client.cli.nested.WesRequestData;
 import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.DescriptorLanguage;
 import io.dropwizard.testing.ResourceHelpers;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
-import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;

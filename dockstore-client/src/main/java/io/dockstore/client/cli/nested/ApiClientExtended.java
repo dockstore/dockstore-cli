@@ -39,6 +39,8 @@ public class ApiClientExtended extends ApiClient {
     static final String AWS_DATE_HEADER = "x-amz-date";
     static final String AWS_WES_SERVICE_NAME = "execute-api";
 
+    static final String WORKFLOW_PARAMS = "workflow_params";
+
     final WesRequestData wesRequestData;
     private Signer.Builder awsAuthSignature = null;
     private HttpRequest awsHttpRequest = null;
@@ -88,7 +90,12 @@ public class ApiClientExtended extends ApiClient {
      */
     public void createBodyPart(MultiPart multiPart, String key, Object formObject) {
         Optional<MediaType> optMediaType = getMediaType(Optional.ofNullable(key));
-        if (formObject instanceof File) {
+
+        // Although the GA4GH WES client library expects workflow_params to be passed in as a file, the actual
+        // spec defines a JSON object, which is better represented as an octet-stream (not a file).
+        // This seems to match up with other WES implementations (Toil + AGC). So, in this case,
+        // even if the form object is a File, treat workflow_params as an string JSON object.
+        if (!WORKFLOW_PARAMS.equals(key) && formObject instanceof File) {
             File file = (File)formObject;
             FormDataContentDisposition contentDisp = FormDataContentDisposition.name(key)
                     .fileName(file.getName()).size(file.length()).build();
