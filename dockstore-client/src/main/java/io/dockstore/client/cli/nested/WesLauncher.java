@@ -93,7 +93,7 @@ public final class WesLauncher {
      * @param workflowEntry The workflow entry (i.e. github.com/myRepo/myWorkflow:version)
      * @return A Workflow object for the corresponding workflow+version
      */
-    private static Workflow getWorkflowForEntry(WorkflowClient workflowClient, String workflowEntry) {
+    public static Workflow getWorkflowForEntry(WorkflowClient workflowClient, String workflowEntry) {
         String[] parts = workflowEntry.split(":");
         String path = parts[0];
         String version = workflowClient.getVersionID(workflowEntry);
@@ -108,7 +108,7 @@ public final class WesLauncher {
      * @param workflow The workflow object we are creating a TRS url for
      * @return A string representing a TRS URL for an entry
      */
-    private static String combineTrsUrlComponents(WorkflowClient workflowClient, String workflowEntry, Workflow workflow) {
+    public static String combineTrsUrlComponents(WorkflowClient workflowClient, String workflowEntry, Workflow workflow) {
         ApiClient client = workflowClient.getClient().getGa4Ghv20Api().getApiClient();
 
         // Entries are passed in the form {PATH}:{VERSION} or {PATH}
@@ -142,7 +142,7 @@ public final class WesLauncher {
      * @param workflowParamPath Path to a file
      * @return A File object
      */
-    private static File loadFile(String workflowParamPath) {
+    public static File loadFile(String workflowParamPath) {
         if (workflowParamPath == null) {
             return null;
         }
@@ -163,7 +163,7 @@ public final class WesLauncher {
      * @param attachments A list of paths that correspond to files that need to be attached to the WES request
      * @return A list of File objects
      */
-    private static List<File> loadAttachments(List<String> attachments) {
+    public static List<File> loadAttachments(List<String> attachments) {
         if (attachments == null) {
             return null;
         }
@@ -183,7 +183,7 @@ public final class WesLauncher {
      * @param workflowType WDL/CWL/NEXTFLOW/etc...
      * @return A String type
      */
-    private static String createWorkflowTypeVersion(String workflowType) {
+    public static String createWorkflowTypeVersion(String workflowType) {
         return "CWL".equalsIgnoreCase(workflowType) ? "v" + WORKFLOW_TYPE_VERSION : WORKFLOW_TYPE_VERSION;
     }
 
@@ -192,7 +192,7 @@ public final class WesLauncher {
      *
      * @param runId The ID of the launched workflow. This ID is provided from the WES server.
      */
-    private static void wesCommandSuggestions(String runId) {
+    public static void wesCommandSuggestions(String runId) {
         out("To view the workflow run status, execute: ");
         out(MessageFormat.format("\tdockstore workflow wes status --id {0}", runId));
         out(MessageFormat.format("\tdockstore workflow wes status --id {0} --verbose", runId));
