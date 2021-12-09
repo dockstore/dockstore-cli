@@ -97,7 +97,7 @@ public final class WesLauncher {
         String[] parts = workflowEntry.split(":");
         String path = parts[0];
         String version = workflowClient.getVersionID(workflowEntry);
-        return workflowClient.workflowsApi.getPublishedWorkflowByPath(path, null, null, version);
+        return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, null, null, version);
     }
 
     /**

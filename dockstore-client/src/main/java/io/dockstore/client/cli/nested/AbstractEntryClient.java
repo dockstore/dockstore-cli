@@ -1043,7 +1043,7 @@ public abstract class AbstractEntryClient<T> {
     /**
      * Creates a WES API object and sets the endpoint.
      */
-    WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
+    public WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
 
         if (this.getWesRequestData() == null) {
             errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);

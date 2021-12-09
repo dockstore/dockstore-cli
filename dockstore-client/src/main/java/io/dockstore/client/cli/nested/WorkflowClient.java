@@ -193,6 +193,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         printHelpFooter();
     }
 
+    public WorkflowsApi getWorkflowsApi() {
+        return workflowsApi;
+    }
+
     @Override
     public String getEntryType() {
         return "Workflow";
