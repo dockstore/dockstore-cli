@@ -120,7 +120,7 @@ public class WesLauncherIT {
 
     @Test
     public void testLaunchWithNoFiles() throws ApiException {
-        WorkflowClient workflowClient = mockWorkflowClient(null);
+        WorkflowClient workflowClient = mockWorkflowClient("configNoContent");
         String workflowEntry = "my/entry/path";
 
         WesLauncher.launchWesCommand(workflowClient, workflowEntry, null, null);
@@ -129,7 +129,7 @@ public class WesLauncherIT {
 
     @Test
     public void testLaunchWithExistingFile() throws ApiException {
-        WorkflowClient workflowClient = mockWorkflowClient(null);
+        WorkflowClient workflowClient = mockWorkflowClient("configNoContent");
         String workflowEntry = "my/entry/path";
         String workflowParamPath = ResourceHelpers.resourceFilePath("helloSpaces.json");
         List<String> attachments = new ArrayList<>();
@@ -140,7 +140,7 @@ public class WesLauncherIT {
 
     @Test
     public void testLaunchWithFakeFile() throws ApiException {
-        WorkflowClient workflowClient = mockWorkflowClient(null);
+        WorkflowClient workflowClient = mockWorkflowClient("configNoContent");
         String workflowEntry = "my/entry/path";
         String workflowParamPath = "this/file/doesnt/exist";
         List<String> attachments = new ArrayList<>();
@@ -154,7 +154,7 @@ public class WesLauncherIT {
 
     @Test
     public void testLaunchWithSomeRealAttachments() throws ApiException {
-        WorkflowClient workflowClient = mockWorkflowClient(null);
+        WorkflowClient workflowClient = mockWorkflowClient("configNoContent");
         String workflowEntry = "my/entry/path";
         String workflowParamPath = ResourceHelpers.resourceFilePath("helloSpaces.json");
         List<String> attachments = new ArrayList<>();
@@ -170,7 +170,7 @@ public class WesLauncherIT {
 
     @Test
     public void testLaunchWithFakeAttachments() throws ApiException {
-        WorkflowClient workflowClient = mockWorkflowClient(null);
+        WorkflowClient workflowClient = mockWorkflowClient("configNoContent");
         String workflowEntry = "my/entry/path";
         String workflowParamPath = ResourceHelpers.resourceFilePath("helloSpaces.json");
         List<String> attachments = new ArrayList<>();
@@ -185,7 +185,7 @@ public class WesLauncherIT {
 
     @Test
     public void testLaunchWithSomeFakeAttachments() throws ApiException {
-        WorkflowClient workflowClient = mockWorkflowClient(null);
+        WorkflowClient workflowClient = mockWorkflowClient("configNoContent");
         String workflowEntry = "my/entry/path";
         String workflowParamPath = ResourceHelpers.resourceFilePath("helloSpaces.json");
         List<String> attachments = new ArrayList<>();
@@ -204,7 +204,7 @@ public class WesLauncherIT {
     public void testTrsUrlCreation() throws ApiException {
 
         // Create client + launcher
-        WorkflowClient aec = mockWorkflowClient(null);
+        WorkflowClient aec = mockWorkflowClient("configNoContent");
         WesRequestData wrd = new WesRequestData("myWesUrl");
         aec.setWesRequestData(wrd);
 
