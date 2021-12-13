@@ -72,25 +72,25 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.11.8</version>
+      <version>1.11.10</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>postgresql</artifactId>
           <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>swagger-java-client</artifactId>
-      <version>1.11.8</version>
+      <version>1.11.10</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.11.8</version>
+      <version>1.11.10</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -166,12 +166,12 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>httpclient-osgi</artifactId>
           <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient-osgi</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>httpcore-osgi</artifactId>
           <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpcore-osgi</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -182,12 +182,12 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>httpclient-osgi</artifactId>
           <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient-osgi</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>httpcore-osgi</artifactId>
           <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpcore-osgi</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -283,8 +283,8 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>commons-httpclient</artifactId>
           <groupId>commons-httpclient</groupId>
+          <artifactId>commons-httpclient</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
