@@ -20,7 +20,7 @@
     <parent>
         <groupId>io.dockstore</groupId>
         <artifactId>dockstore-cli</artifactId>
-        <version>1.12.0-alpha.0-SNAPSHOT</version>
+        <version>1.11.1</version>
     </parent>
     <artifactId>dockstore-client</artifactId>
     <packaging>jar</packaging>
@@ -94,12 +94,12 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>openapi-java-wes-client</artifactId>
-            <version>1.12.0-alpha.0-SNAPSHOT</version>
+            <version>1.11.1</version>
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-file-plugin-parent</artifactId>
-            <version>1.12.0-alpha.0-SNAPSHOT</version>
+            <version>1.11.1</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
