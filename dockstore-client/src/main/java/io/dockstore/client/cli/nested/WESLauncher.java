@@ -160,11 +160,6 @@ public class WESLauncher extends BaseLauncher {
             workflowAttachment = addFilesToWorkflowAttachment(zippedEntry, tempDir);
         }
 
-        String workflowURL = localPrimaryDescriptorFile.getName();
-
-        final File tempDir = Files.createTempDir();
-        List<File> workflowAttachment = addFilesToWorkflowAttachment(zippedEntry, tempDir);
-
         try {
             RunId response = clientWorkflowExecutionServiceApi.runWorkflow(workflowParams, languageType, workflowTypeVersion, TAGS,
                     "{}", workflowURL, workflowAttachment);
