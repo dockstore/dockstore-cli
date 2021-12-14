@@ -14,7 +14,7 @@
   ~    See the License for the specific language governing permissions and
   ~    limitations under the License.
   -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.dockstore</groupId>
@@ -76,8 +76,8 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <groupId>org.postgresql</groupId>
           <artifactId>postgresql</artifactId>
+          <groupId>org.postgresql</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -166,12 +166,12 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient-osgi</artifactId>
+          <groupId>org.apache.httpcomponents</groupId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpcore-osgi</artifactId>
+          <groupId>org.apache.httpcomponents</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -182,12 +182,12 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient-osgi</artifactId>
+          <groupId>org.apache.httpcomponents</groupId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpcore-osgi</artifactId>
+          <groupId>org.apache.httpcomponents</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -283,8 +283,8 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <groupId>commons-httpclient</groupId>
           <artifactId>commons-httpclient</artifactId>
+          <groupId>commons-httpclient</groupId>
         </exclusion>
       </exclusions>
     </dependency>
