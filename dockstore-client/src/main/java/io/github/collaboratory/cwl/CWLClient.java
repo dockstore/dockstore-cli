@@ -450,7 +450,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         // if we have a yaml parameter file, convert it into a json
         if (yamlRun != null) {
             final File tempFile = File.createTempFile("temp", "json");
-            Yaml yamlLocal = new Yaml();
+            Yaml yamlLocal = new Yaml(new SafeConstructor());
             final FileInputStream fileInputStream = FileUtils.openInputStream(new File(yamlRun));
             Map<String, Object> map = yamlLocal.load(fileInputStream);
             JSONObject jsonObject = new JSONObject(map);
