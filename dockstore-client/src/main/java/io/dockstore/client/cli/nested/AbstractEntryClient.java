@@ -88,6 +88,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.parser.ParserException;
 import wdl.draft3.parser.WdlParser;
 
@@ -1842,7 +1843,7 @@ public abstract class AbstractEntryClient<T> {
      * @return json string representation of the yaml content
      */
     public String fileToJSON(String yamlRun) throws IOException {
-        Yaml yaml = new Yaml();
+        Yaml yaml = new Yaml(new SafeConstructor());
         try (FileInputStream fileInputStream = FileUtils.openInputStream(new File(yamlRun))) {
             Map<String, Object> map = yaml.load(fileInputStream);
             JSONObject jsonObject = new JSONObject(map);
