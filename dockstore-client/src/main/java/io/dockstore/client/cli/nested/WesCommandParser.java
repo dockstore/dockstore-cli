@@ -57,8 +57,8 @@ public class WesCommandParser {
     public static class CommandLaunch extends WesMain {
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
-        @Parameter(names = "--input", description = "JSON file describing which attached file contains input parameters.")
-        private String input;
+        @Parameter(names = "--json", description = "JSON file describing which attached file contains input parameters.")
+        private String json;
         @Parameter(names = {"--attach", "-a"}, description = "A list of paths to files that should be included in the WES request", variableArity = true)
         private List<String> attachments;
 
@@ -66,8 +66,8 @@ public class WesCommandParser {
             return entry;
         }
 
-        public String getInput() {
-            return input;
+        public String getJson() {
+            return json;
         }
 
         public List<String> getAttachments() {

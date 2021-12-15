@@ -1192,7 +1192,7 @@ public abstract class AbstractEntryClient<T> {
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
                 wesLaunch(wesCommandParser.commandLaunch.getEntry(),
-                    wesCommandParser.commandLaunch.getInput(),
+                    wesCommandParser.commandLaunch.getJson(),
                     wesCommandParser.commandLaunch.getAttachments());
                 break;
             case "status":
@@ -1491,10 +1491,8 @@ public abstract class AbstractEntryClient<T> {
         out("  --entry <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         out("");
         out("Optional parameters:");
-        out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.toString());
-        out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
+        out("  --json <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
+        out("  --attach / -a <file>                Attachment files for the WES request.");
         out("");
     }
 
