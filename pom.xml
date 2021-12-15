@@ -53,7 +53,7 @@
         <connection>${github.url}</connection>
         <developerConnection>${github.url}</developerConnection>
         <url>${github.url}</url>
-        <tag>1.9.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <repositories>
@@ -119,11 +119,6 @@
     <dependencyManagement>
         <dependencies>
             <!-- remove likely when bumping bom-internal -->
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
-                <version>1.64</version>
-            </dependency>
             <dependency>
                 <groupId>io.dockstore</groupId>
                 <artifactId>bom-internal</artifactId>

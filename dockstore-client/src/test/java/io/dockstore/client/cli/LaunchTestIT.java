@@ -241,6 +241,18 @@ public class LaunchTestIT {
         Client.main(args.toArray(new String[0]));
     }
 
+    @Test
+    public void testMaliciousParameterYaml() {
+        File yamlTestParameterFile = new File(ResourceHelpers.resourceFilePath("malicious.input.yaml"));
+
+        List<String> args = getLaunchStringList("workflow");
+        args.add("--yaml");
+        args.add(yamlTestParameterFile.getAbsolutePath());
+        exit.expectSystemExit();
+        exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains("could not determine a constructor for the tag")));
+        Client.main(args.toArray(new String[0]));
+    }
+
     private List<String> getLaunchStringList(String entryType) {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         final List<String> strings = new ArrayList<>();
