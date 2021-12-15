@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import io.dockstore.openapi.client.ApiClient;
 import io.openapi.wes.client.model.RunId;
@@ -35,9 +36,9 @@ public final class WesLauncher {
      * @param workflowClient The WorkflowClient for the request
      * @param workflowEntry The entry path, (i.e. github.com/myRepo/myWorkflow:version)
      * @param workflowParamPath The path to a file to be used as an input JSON. (i.e. /path/to/file.json)
-     * @param attachments A list of paths to files to be attached to the request.
+     * @param filePaths A list of paths to files to be attached to the request.
      */
-    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, String workflowParamPath, List<String> attachments) {
+    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, String workflowParamPath, List<String> filePaths) {
 
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
@@ -49,7 +50,7 @@ public final class WesLauncher {
 
         // A JSON object containing a key/value pair that points to the test parameter file in the 'attachments' list
         // The key is WES server implementation specific. e.g. {"workflowInput":"params.json"}.
-        File workflowParams = loadFile(workflowParamPath);
+        File workflowParams = fetchFile(workflowParamPath).orElse(null);
 
         // A list of supplementary files that are required to run the workflow. This may include any/all of the following:
         // 1. The primary descriptor file
@@ -58,7 +59,7 @@ public final class WesLauncher {
         // 4. Any other files referenced by the workflow
         // TODO: Allow users to specify a directory to upload?
         // TODO: Automatically attach all files referenced in remote Dockstore entry?
-        List<File> workflowAttachment = loadAttachments(attachments);
+        List<File> workflowAttachment = fetchFiles(filePaths);
 
         // The descriptor type
         String workflowType = workflow.getDescriptorType().getValue();
@@ -139,39 +140,41 @@ public final class WesLauncher {
     /**
      * Attempts to load a file from the provided path. Errors out if the file doesn't exist.
      *
-     * @param workflowParamPath Path to a file
-     * @return A File object
+     * @param filePath Path to a file or null
+     * @return An Optional File object, this may be empty if the filepath is null
      */
-    public static File loadFile(String workflowParamPath) {
-        if (workflowParamPath == null) {
-            return null;
+    public static Optional<File> fetchFile(String filePath) {
+        if (filePath == null) {
+            return Optional.empty();
         }
 
         // Verify the file path exists
-        Path path = Paths.get(workflowParamPath);
+        Path path = Paths.get(filePath);
         if (!Files.exists(path)) {
-            errorMessage(MessageFormat.format("Unable to locate file: {0}", workflowParamPath), CLIENT_ERROR);
+            errorMessage(MessageFormat.format("Unable to locate file: {0}", filePath), CLIENT_ERROR);
         }
 
         // TODO: Handle path expansions? i.e. '~/my/file.txt'
-        return new File(workflowParamPath);
+        return Optional.of(new File(filePath));
     }
 
     /**
      * Given a list of string paths, this attempts to convert it to a list of files.
      *
-     * @param attachments A list of paths that correspond to files that need to be attached to the WES request
-     * @return A list of File objects
+     * @param filePaths A list of paths that correspond to files that need to be attached to the WES request, this may be null
+     * @return A list of File objects, which may be empty
      */
-    public static List<File> loadAttachments(List<String> attachments) {
-        if (attachments == null) {
-            return null;
+    public static List<File> fetchFiles(List<String> filePaths) {
+
+        // Return an empty list if no attachments were passed
+        if (filePaths == null) {
+            return new ArrayList<>();
         }
 
         List<File> workflowAttachments = new ArrayList<>();
-        attachments.forEach(path -> {
-            final File attachmentFile = loadFile(path);
-            workflowAttachments.add(attachmentFile);
+        filePaths.forEach(path -> {
+            final Optional<File> attachmentFile = fetchFile(path);
+            attachmentFile.ifPresent(workflowAttachments::add);
         });
 
         return workflowAttachments;
