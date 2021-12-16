@@ -201,6 +201,19 @@ public class WesLauncherIT {
     }
 
     @Test
+    public void testLaunchWithDirectoryNotFile() throws ApiException {
+        WorkflowClient workflowClient = mockWorkflowClient("configNoContent");
+        String workflowEntry = "my/entry/path";
+        String workflowParamPath = ResourceHelpers.resourceFilePath("");
+
+        // Expect an error to be thrown when a file cant be found
+        systemExit.expectSystemExit();
+        WesLauncher.launchWesCommand(workflowClient, workflowEntry, workflowParamPath, null);
+        assertTrue("A directory is passed, not a file. An error should be thrown.",
+            systemErrRule.getLog().contains("Unable to locate file: " + workflowParamPath));
+    }
+
+    @Test
     public void testTrsUrlCreation() throws ApiException {
 
         // Create client + launcher

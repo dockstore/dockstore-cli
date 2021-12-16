@@ -151,7 +151,7 @@ public final class WesLauncher {
 
         // Verify the file path exists
         Path path = Paths.get(filePath);
-        if (!Files.exists(path)) {
+        if (!Files.isRegularFile(path)) {
             errorMessage(MessageFormat.format("Unable to locate file: {0}", filePath), CLIENT_ERROR);
         }
 
