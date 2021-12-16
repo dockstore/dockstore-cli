@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -168,7 +169,7 @@ public final class WesLauncher {
 
         // Return an empty list if no attachments were passed
         if (filePaths == null) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         List<File> workflowAttachments = new ArrayList<>();
