@@ -518,6 +518,14 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         }
     }
 
+    /**
+     * This will attempt to launch a workflow given the command arguments
+     *
+     */
+    void wesLaunch(String entry, String paramsPath, List<String> filePaths) {
+        WesLauncher.launchWesCommand(this, entry, paramsPath, filePaths);
+    }
+
     @Override
     public Client getClient() {
         return this.client;

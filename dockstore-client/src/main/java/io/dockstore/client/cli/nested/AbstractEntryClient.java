@@ -1076,13 +1076,12 @@ public abstract class AbstractEntryClient<T> {
     }
 
     /**
-     * This will attempt to launch a workflow given the command arguments
-     *
+     * Attempts to launch a workflow (tools not currently supported) on a WES server
+     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
+     * @param paramsPath Path to the parameter JSON file
+     * @param filePaths Paths to any other required files for the WES execution
      */
-    private void wesLaunch(String workflowEntry, String workflowParams, List<String> workflowAttachment) {
-        // Only supports workflows at the moment
-        WesLauncher.launchWesCommand((WorkflowClient) this, workflowEntry, workflowParams, workflowAttachment);
-    }
+    abstract void wesLaunch(String entry, String paramsPath, List<String> filePaths);
 
     public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
         // Does nothing for tools.

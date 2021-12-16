@@ -1134,6 +1134,15 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         return container;
     }
 
+    /**
+     * This will attempt to launch a tool given the command arguments
+     *
+     */
+    void wesLaunch(String entry, String paramsPath, List<String> filePaths) {
+        // Only supports workflows for the moment
+        throw new RuntimeException("WES launch does not currently support tools. Please launch a workflow instead.");
+    }
+
     @Override
     public Client getClient() {
         return client;
