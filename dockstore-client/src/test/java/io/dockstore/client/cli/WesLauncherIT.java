@@ -97,7 +97,7 @@ public class WesLauncherIT {
             any(String.class),
             any(String.class),
             any(String.class),
-            ArgumentMatchers.isNull()
+            any(List.class)
         )).thenReturn(runId);
 
         // WorkflowsApi Function mocks
