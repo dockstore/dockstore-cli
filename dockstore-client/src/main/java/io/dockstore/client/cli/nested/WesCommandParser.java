@@ -59,7 +59,7 @@ public class WesCommandParser {
         private String entry;
         @Parameter(names = "--json", description = "JSON file describing which attached file contains input parameters.")
         private String json;
-        @Parameter(names = {"--attach", "-a"}, description = "A list of paths to files that should be included in the WES request", variableArity = true)
+        @Parameter(names = {"--attach", "-a"}, description = "A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)", variableArity = true)
         private List<String> attachments;
 
         public String getEntry() {
