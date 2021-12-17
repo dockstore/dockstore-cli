@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.ApiException;
 import io.openapi.wes.client.model.RunId;
 import io.swagger.client.model.Workflow;
 import org.slf4j.Logger;
@@ -95,7 +96,7 @@ public final class WesLauncher {
      * @param workflowEntry The workflow entry (i.e. github.com/myRepo/myWorkflow:version)
      * @return A Workflow object for the corresponding workflow+version
      */
-    public static Workflow getWorkflowForEntry(WorkflowClient workflowClient, String workflowEntry) {
+    public static Workflow getWorkflowForEntry(WorkflowClient workflowClient, String workflowEntry) throws ApiException {
         String[] parts = workflowEntry.split(":");
         String path = parts[0];
         String version = workflowClient.getVersionID(workflowEntry);
