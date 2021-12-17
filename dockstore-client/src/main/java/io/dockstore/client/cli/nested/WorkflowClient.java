@@ -193,6 +193,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         printHelpFooter();
     }
 
+    public WorkflowsApi getWorkflowsApi() {
+        return workflowsApi;
+    }
+
     @Override
     public String getEntryType() {
         return "Workflow";
@@ -301,7 +305,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         return languageCLient.generateInputJson(entry, json);
     }
 
-    private Workflow getDockstoreWorkflowByPath(String path) {
+    public Workflow getDockstoreWorkflowByPath(String path) {
         // simply getting published descriptors does not require permissions
         Workflow workflow = null;
         try {
@@ -512,6 +516,14 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 JCommanderUtility.printJCommanderHelpLaunch(jCommander, "dockstore workflow", LAUNCH_COMMAND_NAME);
             }
         }
+    }
+
+    /**
+     * This will attempt to launch a workflow given the command arguments
+     *
+     */
+    void wesLaunch(String entry, String paramsPath, List<String> filePaths) {
+        WesLauncher.launchWesCommand(this, entry, paramsPath, filePaths);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package io.dockstore.client.cli.nested;
 
+import java.util.List;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -55,12 +57,10 @@ public class WesCommandParser {
     public static class CommandLaunch extends WesMain {
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
-        @Parameter(names = "--json", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
+        @Parameter(names = "--json", description = "JSON file describing which attached file contains input parameters.")
         private String json;
-        @Parameter(names = "--yaml", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
-        private String yaml;
-        @Parameter(names = "--uuid", description = "Allows you to specify a uuid for 3rd party notifications")
-        private String uuid;
+        @Parameter(names = {"--attach", "-a"}, description = "A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)", variableArity = true)
+        private List<String> attachments;
 
         public String getEntry() {
             return entry;
@@ -70,12 +70,8 @@ public class WesCommandParser {
             return json;
         }
 
-        public String getYaml() {
-            return yaml;
-        }
-
-        public String getUuid() {
-            return uuid;
+        public List<String> getAttachments() {
+            return attachments;
         }
     }
 

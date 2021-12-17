@@ -1044,7 +1044,7 @@ public abstract class AbstractEntryClient<T> {
     /**
      * Creates a WES API object and sets the endpoint.
      */
-    WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
+    public WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
 
         if (this.getWesRequestData() == null) {
             errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);
@@ -1076,12 +1076,12 @@ public abstract class AbstractEntryClient<T> {
     }
 
     /**
-     * This will attempt to launch a workflow given the command arguments
-     *
+     * Attempts to launch a workflow (tools not currently supported) on a WES server
+     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
+     * @param paramsPath Path to the parameter JSON file
+     * @param filePaths Paths to any other required files for the WES execution
      */
-    private void wesLaunch(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
-        launchWithArgs(entry, localEntry, jsonRun, yamlRun, wdlOutput, ignoreChecksumFlag, uuid);
-    }
+    abstract void wesLaunch(String entry, String paramsPath, List<String> filePaths);
 
     public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
         // Does nothing for tools.
@@ -1191,12 +1191,8 @@ public abstract class AbstractEntryClient<T> {
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
                 wesLaunch(wesCommandParser.commandLaunch.getEntry(),
-                    null,
                     wesCommandParser.commandLaunch.getJson(),
-                    wesCommandParser.commandLaunch.getYaml(),
-                    null,
-                    true,
-                    null);
+                    wesCommandParser.commandLaunch.getAttachments());
                 break;
             case "status":
                 wesStatus(wesCommandParser.commandStatus.getId(),
@@ -1494,10 +1490,8 @@ public abstract class AbstractEntryClient<T> {
         out("  --entry <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         out("");
         out("Optional parameters:");
-        out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.toString());
-        out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
+        out("  --json <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
+        out("  --attach <path, -a <path>           A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
         out("");
     }
 

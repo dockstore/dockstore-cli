@@ -73,9 +73,7 @@ public class WesCommandParserTest {
         final String[] args = {
             "launch",
             "--entry",
-            "my/fake/entry",
-            "--json",
-            "path/to/json.json"
+            "my/fake/entry"
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -84,7 +82,6 @@ public class WesCommandParserTest {
 
         assertEquals("Parsed command should be 'launch'", "launch", parser.getParsedCommand());
         assertEquals("The parsed entry should be 'my/fake/entry'", "my/fake/entry", wesCommandParser.commandLaunch.getEntry());
-        assertEquals("The parsed entry should be 'path/to/json.json'", "path/to/json.json", wesCommandParser.commandLaunch.getJson());
     }
 
     @Test
@@ -92,9 +89,7 @@ public class WesCommandParserTest {
         final String[] args = {
             "launch",
             "--entry",
-            "my/fake/entry",
-            "--yaml",
-            "path/to/yaml.yaml"
+            "my/fake/entry"
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -103,7 +98,6 @@ public class WesCommandParserTest {
 
         assertEquals("Parsed command should be 'launch'", "launch", parser.getParsedCommand());
         assertEquals("The parsed entry should be 'my/fake/entry'", "my/fake/entry", wesCommandParser.commandLaunch.getEntry());
-        assertEquals("The parsed entry should be 'path/to/yaml.yaml'", "path/to/yaml.yaml", wesCommandParser.commandLaunch.getYaml());
     }
 
     @Test
@@ -113,9 +107,7 @@ public class WesCommandParserTest {
             "--wes-url",
             "banana",
             "--entry",
-            "my/fake/entry",
-            "--yaml",
-            "path/to/yaml.yaml"
+            "my/fake/entry"
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -125,7 +117,6 @@ public class WesCommandParserTest {
         assertEquals("Parsed command should be 'launch'", "launch", parser.getParsedCommand());
         assertEquals("The parsed URL should be 'banana'", "banana", wesCommandParser.commandLaunch.getWesUrl());
         assertEquals("The parsed entry should be 'my/fake/entry'", "my/fake/entry", wesCommandParser.commandLaunch.getEntry());
-        assertEquals("The parsed entry should be 'path/to/yaml.yaml'", "path/to/yaml.yaml", wesCommandParser.commandLaunch.getYaml());
     }
 
     @Test
