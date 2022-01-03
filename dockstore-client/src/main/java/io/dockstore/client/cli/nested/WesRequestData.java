@@ -150,7 +150,7 @@ public class WesRequestData {
         return this.credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS || this.credentialType == CredentialType.AWS_TEMPORARY_CREDENTIALS;
     }
 
-    public boolean requiresAwsSessionHeaders() {
+    public boolean requiresAwsSessionHeader() {
         return this.credentialType == CredentialType.AWS_TEMPORARY_CREDENTIALS;
     }
 

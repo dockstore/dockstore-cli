@@ -352,7 +352,7 @@ public class ApiClientExtended extends ApiClient {
 
         // boolean values indicating if this request requires AWS-specific headers, and if the request is using temporary AWS credentials
         final boolean requiresAwsHeaders = this.wesRequestData.usesAwsCredentials();
-        final boolean requiresAwsSessionHeader = this.wesRequestData.requiresAwsSessionHeaders();
+        final boolean requiresAwsSessionHeader = this.wesRequestData.requiresAwsSessionHeader();
 
         // Merge all our different headers into a single object for easier handling then add them to the invocation
         final Map<String, String> mergedHeaderMap = mergeHeaders(requiresAwsHeaders, requiresAwsSessionHeader, headerParams);
