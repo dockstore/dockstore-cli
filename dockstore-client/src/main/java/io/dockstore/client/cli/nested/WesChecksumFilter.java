@@ -57,7 +57,7 @@ public class WesChecksumFilter implements ClientRequestFilter {
         if (wesRequestData.hasCredentials()) {
 
             // If the request requires AWS auth headers, calculate the signature, otherwise just get the standard bearer token
-            final String authorizationHeader = wesRequestData.requiresAwsHeaders()
+            final String authorizationHeader = wesRequestData.usesAwsCredentials()
                 ? generateAwsSignature(requestContext) : wesRequestData.getBearerToken();
 
             // Add this as the Authorization header to the request object

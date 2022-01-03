@@ -1,5 +1,7 @@
 package io.dockstore.client.cli.nested;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSSessionCredentials;
 import io.dockstore.client.cli.Client;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
@@ -7,7 +9,7 @@ import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 
 public class WesRequestData {
 
-    public enum CredentialType { NO_CREDENTIALS, BEARER_TOKEN, AWS_PERMANENT_CREDENTIALS }
+    public enum CredentialType { NO_CREDENTIALS, BEARER_TOKEN, AWS_PERMANENT_CREDENTIALS, AWS_TEMPORARY_CREDENTIALS }
 
     // Type of credentials that are set
     private CredentialType credentialType;
@@ -21,6 +23,7 @@ public class WesRequestData {
     // AWS permanent credentials auth
     private String awsAccessKey;
     private String awsSecretKey;
+    private String awsSessionToken;
     private String region;
 
     // TODO AWS temporary session credentials
@@ -53,6 +56,16 @@ public class WesRequestData {
             this.credentialType = CredentialType.NO_CREDENTIALS;
         } else {
             this.credentialType = CredentialType.BEARER_TOKEN;
+        }
+    }
+
+    public WesRequestData(String url, AWSCredentials credentials, String region) {
+        this(url, credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey(), region);
+
+        // Check if the credentials object uses a temporary session token
+        if (credentials instanceof AWSSessionCredentials) {
+            this.awsSessionToken = ((AWSSessionCredentials) credentials).getSessionToken();
+            this.credentialType = CredentialType.AWS_TEMPORARY_CREDENTIALS;
         }
     }
 
@@ -98,7 +111,7 @@ public class WesRequestData {
     }
 
     public String getAwsAccessKey() {
-        if (credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS) {
+        if (usesAwsCredentials()) {
             return this.awsAccessKey;
         } else {
             errorMessage("Unable to locate a AWS access key, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
@@ -107,7 +120,7 @@ public class WesRequestData {
     }
 
     public String getAwsSecretKey() {
-        if (credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS) {
+        if (usesAwsCredentials()) {
             return this.awsSecretKey;
         } else {
             errorMessage("Unable to locate a AWS secret access key, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
@@ -115,8 +128,17 @@ public class WesRequestData {
         }
     }
 
+    public String getAwsSessionToken() {
+        if (credentialType == CredentialType.AWS_TEMPORARY_CREDENTIALS) {
+            return this.awsSessionToken;
+        } else {
+            errorMessage("Unable to locate a AWS session token, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
+            return null;
+        }
+    }
+
     public String getAwsRegion() {
-        if (credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS) {
+        if (usesAwsCredentials()) {
             return this.region;
         } else {
             errorMessage("Unable to locate a AWS region, this credentials object is of type: " + credentialType.toString(), Client.COMMAND_ERROR);
@@ -124,8 +146,12 @@ public class WesRequestData {
         }
     }
 
-    public boolean requiresAwsHeaders() {
-        return this.credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS;
+    public boolean usesAwsCredentials() {
+        return this.credentialType == CredentialType.AWS_PERMANENT_CREDENTIALS || this.credentialType == CredentialType.AWS_TEMPORARY_CREDENTIALS;
+    }
+
+    public boolean requiresAwsSessionHeaders() {
+        return this.credentialType == CredentialType.AWS_TEMPORARY_CREDENTIALS;
     }
 
     public boolean hasCredentials() {
