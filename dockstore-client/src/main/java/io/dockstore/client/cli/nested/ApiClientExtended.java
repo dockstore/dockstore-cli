@@ -251,6 +251,8 @@ public class ApiClientExtended extends ApiClient {
      *  2. The defaultHeaderMap that is set when the Client is created
      *  3. The required AWS headers for AWS SigV4 signing
      *
+     * @param requiresAwsHeaders boolean indicating if the HTTP request needs to be authorized using AWS SigV4
+     * @param requiresAwsSessionHeader boolean indicating if the HTTP request is using temporary AWS credentials (a Session token)
      * @param headerParams The header parameters passed to the original invokeAPI function
      * @return A merged map of multiple headers.
      */
