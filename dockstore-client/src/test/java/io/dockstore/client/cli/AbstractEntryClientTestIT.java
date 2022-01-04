@@ -303,7 +303,7 @@ public class AbstractEntryClientTestIT {
 
         assertEquals("AWS access key should be parsed", "KEY3", data.getAwsAccessKey());
         assertEquals("AWS secret key should be parsed", "SECRET_KEY3", data.getAwsSecretKey());
-        assertEquals("AWS secret key should be parsed", "TOKEN3", data.getAwsSessionToken());
+        assertEquals("AWS session token should be parsed", "TOKEN3", data.getAwsSessionToken());
         assertEquals("AWS region should be parsed", "REGION3", data.getAwsRegion());
         assertEquals("AWS credentials type should be temporary", WesRequestData.CredentialType.AWS_TEMPORARY_CREDENTIALS, data.getCredentialType());
 
