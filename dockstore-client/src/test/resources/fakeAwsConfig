@@ -3,3 +3,6 @@ region = REGION
 
 [default]
 region = REGION2
+
+[temporaryCreds]
+region = REGION3

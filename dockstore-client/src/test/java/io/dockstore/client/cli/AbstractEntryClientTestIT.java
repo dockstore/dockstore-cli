@@ -281,4 +281,32 @@ public class AbstractEntryClientTestIT {
 
     }
 
+    @Test
+    public void testAggregateAWSCredentialSessionToken() {
+
+        AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsSessionProfile");
+
+        String[] args = {
+            "service-info",
+            "--wes-url",
+            "myUrl"
+        };
+
+        String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
+        String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
+        environmentVariables.set("AWS_CONFIG_FILE", config);
+        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
+
+        WesCommandParser parser = new WesCommandParser();
+        parser.jCommander.parse(args);
+        WesRequestData data = workflowClient.aggregateWesRequestData(parser);
+
+        assertEquals("AWS access key should be parsed", "KEY3", data.getAwsAccessKey());
+        assertEquals("AWS secret key should be parsed", "SECRET_KEY3", data.getAwsSecretKey());
+        assertEquals("AWS secret key should be parsed", "TOKEN3", data.getAwsSessionToken());
+        assertEquals("AWS region should be parsed", "REGION3", data.getAwsRegion());
+        assertEquals("AWS credentials type should be temporary", WesRequestData.CredentialType.AWS_TEMPORARY_CREDENTIALS, data.getCredentialType());
+
+    }
+
 }
