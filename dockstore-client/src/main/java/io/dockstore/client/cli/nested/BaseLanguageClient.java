@@ -192,9 +192,9 @@ public abstract class BaseLanguageClient {
             validateDescriptorChecksum(type, entryVal);
         }
 
+
         // Update the launcher with references to the files to be launched
         launcher.setFiles(localPrimaryDescriptorFile, zippedEntryFile, provisionedParameterFile, selectedParameterFile, workingDirectory, entryVal);
-
         try {
             // Attempt to run launcher
             launcher.printLaunchMessage();

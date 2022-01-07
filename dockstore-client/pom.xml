@@ -271,7 +271,6 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
         </dependency>
-
         <!--
         This is a zero-dependency package for calculating AWS SigV4 headers.
         GitHub: https://github.com/lucasweb78/aws-v4-signer-java
