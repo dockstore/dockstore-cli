@@ -37,6 +37,7 @@ public class ApiClientExtended extends ApiClient {
     static final String TIME_ZONE = "UTC";
     static final String DATA_FORMAT = "yyyyMMdd'T'HHmmss'Z'";
     static final String AWS_DATE_HEADER = "x-amz-date";
+    static final String AWS_SESSION_TOKEN_HEADER = "X-Amz-Security-Token";
     static final String AWS_WES_SERVICE_NAME = "execute-api";
 
     static final String WORKFLOW_PARAMS = "workflow_params";
@@ -184,7 +185,7 @@ public class ApiClientExtended extends ApiClient {
             }
         }
 
-        Invocation.Builder invocationBuilder = createInvocation(this.wesRequestData.requiresAwsHeaders(), target, method, headerParams);
+        Invocation.Builder invocationBuilder = createInvocation(target, method, headerParams);
 
         Entity<?> entity = serialize(body, formParams, contentType);
 
@@ -250,10 +251,12 @@ public class ApiClientExtended extends ApiClient {
      *  2. The defaultHeaderMap that is set when the Client is created
      *  3. The required AWS headers for AWS SigV4 signing
      *
+     * @param requiresAwsHeaders boolean indicating if the HTTP request needs to be authorized using AWS SigV4
+     * @param requiresAwsSessionHeader boolean indicating if the HTTP request is using temporary AWS credentials (a Session token)
      * @param headerParams The header parameters passed to the original invokeAPI function
      * @return A merged map of multiple headers.
      */
-    private Map<String, String> mergeHeaders(boolean requiresAwsHeaders, Map<String, String> headerParams) {
+    private Map<String, String> mergeHeaders(boolean requiresAwsHeaders, boolean requiresAwsSessionHeader, Map<String, String> headerParams) {
         // We need the map to be sorted, as AWS requires header orders to be alphabetical
         Map<String, String> mergedHeaderMap = new TreeMap<>();
 
@@ -267,6 +270,11 @@ public class ApiClientExtended extends ApiClient {
             DateFormat dateFormat = new SimpleDateFormat(DATA_FORMAT);
             dateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
             mergedHeaderMap.put(AWS_DATE_HEADER, dateFormat.format(new Date()));
+
+            // Add the session token to the header list if we are validating using temporary AWS session credentials
+            if (requiresAwsSessionHeader) {
+                mergedHeaderMap.put(AWS_SESSION_TOKEN_HEADER, this.wesRequestData.getAwsSessionToken());
+            }
 
             // Don't want to calculate our Authorization header off of another Authorization that will subsequently get overridden
             mergedHeaderMap.remove(HttpHeaders.AUTHORIZATION);
@@ -292,7 +300,6 @@ public class ApiClientExtended extends ApiClient {
         // Our signature object. We will add all necessary headers to this request that comprise the 'canonical' HTTP request.
         // This will then be signed alongside a hash of the body content (if there is a body).
         Signer.Builder authSignature = Signer.builder()
-            // TODO this currently only supports permanent AWS credentials
             .awsCredentials(new AwsCredentials(this.wesRequestData.getAwsAccessKey(), this.wesRequestData.getAwsSecretKey()))
             .region(this.wesRequestData.getAwsRegion())
             .header(HttpHeaders.HOST, target.getUri().getHost()); // Have to manually set the Host header as it's required when signing
@@ -334,18 +341,21 @@ public class ApiClientExtended extends ApiClient {
      * a SigV4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
      * The first step to calculating the AWS Authorization header is made here, but the Authorization header isn't set until later (In a Jersey hook)
      * 
-     * @param requiresAwsHeaders Boolean value indicating if this request requires AWS-specific headers
      * @param target The target endpoint
      * @param method The HTTP method (GET, POST, etc ...)
      * @param headerParams A list of header parameters custom to this request
      * @return An Invocation.Builder that can be used to make an HTTP request
      */
-    private Invocation.Builder createInvocation(boolean requiresAwsHeaders, WebTarget target, String method, Map<String, String> headerParams) {
+    private Invocation.Builder createInvocation(WebTarget target, String method, Map<String, String> headerParams) {
 
         Invocation.Builder invocationBuilder = target.request();
 
+        // boolean values indicating if this request requires AWS-specific headers, and if the request is using temporary AWS credentials
+        final boolean requiresAwsHeaders = this.wesRequestData.usesAwsCredentials();
+        final boolean requiresAwsSessionHeader = this.wesRequestData.requiresAwsSessionHeader();
+
         // Merge all our different headers into a single object for easier handling then add them to the invocation
-        final Map<String, String> mergedHeaderMap = mergeHeaders(requiresAwsHeaders, headerParams);
+        final Map<String, String> mergedHeaderMap = mergeHeaders(requiresAwsHeaders, requiresAwsSessionHeader, headerParams);
         for (Map.Entry<String, String> mapEntry : mergedHeaderMap.entrySet()) {
             invocationBuilder.header(mapEntry.getKey(), mapEntry.getValue());
         }

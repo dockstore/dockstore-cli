@@ -1252,8 +1252,7 @@ public abstract class AbstractEntryClient<T> {
 
                 // Build and return the request data
                 return new WesRequestData(wesEndpointUrl,
-                    credentialsProvider.getCredentials().getAWSAccessKeyId(),
-                    credentialsProvider.getCredentials().getAWSSecretKey(),
+                    credentialsProvider.getCredentials(),
                     regionProvider.getRegion());
 
             } catch (IllegalArgumentException | SdkClientException e) {
