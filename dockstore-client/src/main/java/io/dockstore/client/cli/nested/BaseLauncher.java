@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.FileProvisioning;
@@ -114,7 +115,7 @@ public abstract class BaseLauncher {
      */
     public ImmutablePair<String, String> executeEntry(String runCommand, File workingDir) throws RuntimeException {
         // As of Nextflow version 21.08.0-edge, NXF_HOME appears to be required, setting it for other languages too
-        HashMap<String, String> additionalEnvVars = new HashMap<>();
+        Map<String, String> additionalEnvVars = new HashMap<>();
         String nextflowHome = System.getProperty("user.home") + "/.nextflow";
         additionalEnvVars.put("NXF_HOME", nextflowHome);
         return Utilities.executeCommand(runCommand, System.out, System.err, workingDir, additionalEnvVars);
