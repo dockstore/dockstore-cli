@@ -1131,31 +1131,6 @@ public class GeneralWorkflowIT extends BaseIT {
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
         assertTrue("Output should indicate that checksums have been validated",
             systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
-
-        // replace the checksum with a null value
-        // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
-        testingPostgres.runUpdateStatement("UPDATE sourcefile SET sha256 = '' WHERE path='/checker-workflow-wrapping-tool.cwl';");
-
-        // run workflow again, should still succeed but indicate that checksums were null
-        systemOutRule.clearLog();
-        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
-        assertTrue("Output should indicate that checksums have been validated, but null checksums were present",
-            systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
-
-        // update checksum values to something fake
-        testingPostgres.runUpdateStatement("UPDATE sourcefile SET sha256 = 'SHA-1:VeryFakeChecksum' WHERE path='/checker-workflow-wrapping-tool.cwl';");
-
-        // expect the launch to be exited due to mismatching checksums
-        systemOutRule.clearLog();
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        systemExit.checkAssertionAfterwards(() -> {
-                assertTrue("Checksums did not match, launch should be halted",
-                    systemOutRule.getLog().contains(CHECKSUM_MISMATCH_MESSAGE));
-            }
-        );
-        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
     }
 
     /**

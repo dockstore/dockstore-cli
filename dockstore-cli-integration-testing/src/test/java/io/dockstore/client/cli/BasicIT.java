@@ -1391,7 +1391,7 @@ public class BasicIT extends BaseIT {
         Assert.assertEquals("one tool should be private, published and from amazon, there are " + count, 1, count);
 
         // Update tool to public (shouldn't work)
-        systemExit.expectSystemExitWithStatus(Client.CLIENT_ERROR);
+        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "update_tool", "--entry",
             "test.dkr.ecr.test.amazonaws.com/notarealnamespace/notarealname/alternate", "--private", "false", "--script" });
     }
