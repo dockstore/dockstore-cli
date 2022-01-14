@@ -271,9 +271,9 @@ public class FileProvisioning {
                     }
                 }
 
-                final String sha1 = DigestUtils.sha1Hex(targetPath);
-                final String sha1Prefix = sha1.substring(0, 2);
-                final String sha1Suffix = sha1.substring(2);
+                final String sha256 = DigestUtils.sha256Hex(targetPath);
+                final String sha1Prefix = sha256.substring(0, 2);
+                final String sha1Suffix = sha256.substring(2);
                 potentialCachedFile = Paths.get(cacheDirectory, sha1Prefix, sha1Suffix);
                 if (Files.exists(potentialCachedFile)) {
                     System.out.println("Found file " + targetPath + " in cache, hard-linking");

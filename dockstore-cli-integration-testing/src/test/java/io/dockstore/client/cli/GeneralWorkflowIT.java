@@ -1134,7 +1134,7 @@ public class GeneralWorkflowIT extends BaseIT {
 
         // replace the checksum with a null value
         // TODO: Currently, if a checksum is null the user is presented with a warning instead of throwing an exception. This should be fixed later to be more rigid and error out once checksums are more common.
-        testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = '' WHERE path='/checker-workflow-wrapping-tool.cwl';");
+        testingPostgres.runUpdateStatement("UPDATE sourcefile SET sha256 = '' WHERE path='/checker-workflow-wrapping-tool.cwl';");
 
         // run workflow again, should still succeed but indicate that checksums were null
         systemOutRule.clearLog();
@@ -1144,7 +1144,7 @@ public class GeneralWorkflowIT extends BaseIT {
             systemOutRule.getLog().contains(CHECKSUM_VALIDATED_MESSAGE) && systemOutRule.getLog().contains(CHECKSUM_NULL_MESSAGE));
 
         // update checksum values to something fake
-        testingPostgres.runUpdateStatement("UPDATE sourcefile SET checksums = 'SHA-1:VeryFakeChecksum' WHERE path='/checker-workflow-wrapping-tool.cwl';");
+        testingPostgres.runUpdateStatement("UPDATE sourcefile SET sha256 = 'SHA-1:VeryFakeChecksum' WHERE path='/checker-workflow-wrapping-tool.cwl';");
 
         // expect the launch to be exited due to mismatching checksums
         systemOutRule.clearLog();
