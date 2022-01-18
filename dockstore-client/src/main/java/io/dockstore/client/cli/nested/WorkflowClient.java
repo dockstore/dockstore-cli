@@ -351,7 +351,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
      * @param toolpath  a unique identifier for an entry, called a path for workflows and tools
      * @param unzip     unzip the entry after downloading
      * @param directory directory to unzip descriptors into
-     * @return path to the primary descriptor
+     * @return A path to the primary descriptor if contents were unzipped, otherwise return a path to the zip file itself
      */
     public File downloadTargetEntry(String toolpath, ToolDescriptor.TypeEnum type, boolean unzip, File directory) throws IOException {
         String[] parts = toolpath.split(":");
