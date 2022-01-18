@@ -40,7 +40,7 @@ public final class WesLauncher {
      * @param workflowParamPath The path to a file to be used as an input JSON. (i.e. /path/to/file.json)
      * @param filePaths A list of paths to files to be attached to the request.
      */
-    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, String workflowParamPath, List<String> filePaths) {
+    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, boolean provisionLocally, String workflowParamPath, List<String> filePaths) {
 
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);

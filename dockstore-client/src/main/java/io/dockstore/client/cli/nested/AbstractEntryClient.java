@@ -1081,7 +1081,7 @@ public abstract class AbstractEntryClient<T> {
      * @param paramsPath Path to the parameter JSON file
      * @param filePaths Paths to any other required files for the WES execution
      */
-    abstract void wesLaunch(String entry, String paramsPath, List<String> filePaths);
+    abstract void wesLaunch(String entry, boolean provisionLocally, String paramsPath, List<String> filePaths);
 
     public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
         // Does nothing for tools.
@@ -1191,6 +1191,7 @@ public abstract class AbstractEntryClient<T> {
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
                 wesLaunch(wesCommandParser.commandLaunch.getEntry(),
+                    wesCommandParser.commandLaunch.getProvisionLocally(),
                     wesCommandParser.commandLaunch.getJson(),
                     wesCommandParser.commandLaunch.getAttachments());
                 break;
