@@ -377,10 +377,13 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             workflowsApi.getApiClient().setDebugging(Client.DEBUG.get());
             File zipFile = new File(directory, zipFilename(workflow));
             FileUtils.writeByteArrayToFile(zipFile, arbitraryURL, false);
+
+            // If we unzip the file, we can provide a path to the primary descriptor, otherwise just provide a path to the zip file
             if (unzip) {
                 SwaggerUtility.unzipFile(zipFile, directory);
+                return new File(directory, first.get().getWorkflowPath());
             }
-            return new File(directory, first.get().getWorkflowPath());
+            return zipFile;
         } else {
             throw new RuntimeException("version not found");
         }
