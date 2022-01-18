@@ -53,6 +53,9 @@ public final class WesLauncher {
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
 
+        // The descriptor type
+        String workflowType = workflow.getDescriptorType().getValue();
+
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
         // 2. TODO: A path to a file in the 'attachments' list
@@ -71,13 +74,10 @@ public final class WesLauncher {
         // TODO: Automatically attach all files referenced in remote Dockstore entry?
         List<File> workflowAttachment = new ArrayList<>(fetchFiles(filePaths));
         if (provisionLocally) {
-            // Download all workflow files and place them into a temporary directory, then add them as attachments to the request
-            final File unzippedWorkflowDir = provisionFilesLocally(workflowClient, workflowEntry, workflow.getDescriptorType().toString());
+            // Download all workflow files and place them into a temporary directory, then add them as attachments to the WES request
+            final File unzippedWorkflowDir = provisionFilesLocally(workflowClient, workflowEntry, workflowType);
             workflowAttachment.addAll(fetchFilesFromLocalDirectory(unzippedWorkflowDir.getAbsolutePath()));
         }
-
-        // The descriptor type
-        String workflowType = workflow.getDescriptorType().getValue();
 
         // The workflow version
         String workflowTypeVersion = createWorkflowTypeVersion(workflowType);
