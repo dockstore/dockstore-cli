@@ -20,10 +20,8 @@ import io.swagger.client.model.Workflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 
 public final class WesLauncher {
@@ -55,8 +53,6 @@ public final class WesLauncher {
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
 
-        File zipFile = provisionFilesLocally(workflowClient, workflowEntry, workflow.getDescriptorType().toString());
-
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
         // 2. TODO: A path to a file in the 'attachments' list
@@ -73,7 +69,12 @@ public final class WesLauncher {
         // 4. Any other files referenced by the workflow
         // TODO: Allow users to specify a directory to upload?
         // TODO: Automatically attach all files referenced in remote Dockstore entry?
-        List<File> workflowAttachment = fetchFiles(filePaths);
+        List<File> workflowAttachment = new ArrayList<>(fetchFiles(filePaths));
+        if (provisionLocally) {
+            // Download all workflow files and place them into a temporary directory, then add them as attachments to the request
+            final File unzippedWorkflowDir = provisionFilesLocally(workflowClient, workflowEntry, workflow.getDescriptorType().toString());
+            workflowAttachment.addAll(fetchFilesFromLocalDirectory(unzippedWorkflowDir.getAbsolutePath()));
+        }
 
         // The descriptor type
         String workflowType = workflow.getDescriptorType().getValue();
@@ -134,7 +135,6 @@ public final class WesLauncher {
         try {
             zippedWorkflow = workflowClient.downloadTargetEntry(workflowEntry,
                 ToolDescriptor.TypeEnum.fromValue(descriptorType), false, tempDir);
-            out("Successfully downloaded files for entry '" + workflowEntry + "'");
         } catch (IOException ex) {
             exceptionMessage(ex, "A problem was encountered while downloading the entry.", IO_ERROR);
             throw new RuntimeException(ex);
@@ -152,6 +152,7 @@ public final class WesLauncher {
             throw new RuntimeException(ex);
         }
 
+        out("Successfully downloaded files for entry '" + workflowEntry + "'");
         return unzippedWorkflowDir;
     }
 
@@ -202,10 +203,10 @@ public final class WesLauncher {
             return Optional.empty();
         }
 
-        // Verify the file path exists
+        // Verify the file path exists, if not return an empty Optional
         Path path = Paths.get(filePath);
         if (!Files.isRegularFile(path)) {
-            errorMessage(MessageFormat.format("Unable to locate file: {0}", filePath), CLIENT_ERROR);
+            return Optional.empty();
         }
 
         // TODO: Handle path expansions? i.e. '~/my/file.txt'
@@ -231,6 +232,20 @@ public final class WesLauncher {
             attachmentFile.ifPresent(workflowAttachments::add);
         });
 
+        return workflowAttachments;
+    }
+
+    public static List<File> fetchFilesFromLocalDirectory(String localDirectory) {
+        List<File> workflowAttachments = new ArrayList<>();
+        try {
+            Files.walk(Path.of(localDirectory)).forEach(path -> {
+                final Optional<File> attachmentFile = fetchFile(path.toAbsolutePath().toString());
+                attachmentFile.ifPresent(workflowAttachments::add);
+            });
+        } catch (IOException ex) {
+            exceptionMessage(ex, "A problem was encountered while attaching files from a local directory.", IO_ERROR);
+            throw new RuntimeException(ex);
+        }
         return workflowAttachments;
     }
 
