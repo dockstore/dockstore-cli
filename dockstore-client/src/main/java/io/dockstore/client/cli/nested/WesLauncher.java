@@ -1,6 +1,7 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,13 +14,17 @@ import java.util.Optional;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.ApiException;
 import io.openapi.wes.client.model.RunId;
+import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.Workflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
+import static io.dockstore.client.cli.Client.IO_ERROR;
 
 public final class WesLauncher {
 
@@ -27,6 +32,8 @@ public final class WesLauncher {
     private static final String TAGS = "{\"Client\":\"Dockstore\"}";
     private static final String WORKFLOW_TYPE_VERSION = "1.0";
     private static final String WORKFLOW_ENGINE_PARAMETERS = "{}";
+
+    private static final String DOCKSTORE_TEMP_DIR_PREFIX = "DockstoreWesLaunch";
 
     private WesLauncher() {
 
@@ -37,6 +44,7 @@ public final class WesLauncher {
      *
      * @param workflowClient The WorkflowClient for the request
      * @param workflowEntry The entry path, (i.e. github.com/myRepo/myWorkflow:version)
+     * @param provisionLocally Determines if the entry is locally provisioned or not, this alters the format that the WES request is made in.
      * @param workflowParamPath The path to a file to be used as an input JSON. (i.e. /path/to/file.json)
      * @param filePaths A list of paths to files to be attached to the request.
      */
@@ -44,6 +52,8 @@ public final class WesLauncher {
 
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
+
+        provisionFilesLocally(workflowClient, workflowEntry, workflow.getDescriptorType().toString());
 
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
@@ -101,6 +111,32 @@ public final class WesLauncher {
         String path = parts[0];
         String version = workflowClient.getVersionID(workflowEntry);
         return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, null, null, version);
+    }
+
+    public static void provisionFilesLocally(WorkflowClient workflowClient, String workflowEntry, String descriptorType) {
+        File tempDir;
+        try {
+            tempDir = Files.createTempDirectory(DOCKSTORE_TEMP_DIR_PREFIX).toFile().getAbsoluteFile();
+        } catch (IOException ex) {
+            exceptionMessage(ex, "Could not create a temporary working directory.", IO_ERROR);
+            throw new RuntimeException(ex);
+        }
+
+        File primaryDescriptor;
+        // If not a local entry then download remote descriptors
+        try {
+            primaryDescriptor = workflowClient.downloadTargetEntry(workflowEntry,
+                ToolDescriptor.TypeEnum.fromValue(descriptorType), true, tempDir);
+            out("Successfully downloaded files for entry '" + workflowEntry + "'");
+        } catch (io.swagger.client.ApiException ex) {
+            // We should never get here, as this function takes the workflow object as an input
+            exceptionMessage(ex, "The workflow entry does not exist.", ENTRY_NOT_FOUND);
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            exceptionMessage(ex, "A problem was encountered while downloading and unzipping the entry.", IO_ERROR);
+            throw new RuntimeException(ex);
+        }
+        System.out.println(primaryDescriptor.toString());
     }
 
     /**
