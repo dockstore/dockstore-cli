@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.ApiException;
 import io.openapi.wes.client.model.RunId;
@@ -23,7 +24,6 @@ import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
-import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 
 public final class WesLauncher {
@@ -33,7 +33,9 @@ public final class WesLauncher {
     private static final String WORKFLOW_TYPE_VERSION = "1.0";
     private static final String WORKFLOW_ENGINE_PARAMETERS = "{}";
 
-    private static final String DOCKSTORE_TEMP_DIR_PREFIX = "DockstoreWesLaunch";
+    private static final String DOCKSTORE_ROOT_TEMP_DIR_PREFIX = "DockstoreWesLaunch";
+    private static final String DOCKSTORE_NESTED_TEMP_DIR_PREFIX = "UnzippedWorkflow";
+
 
     private WesLauncher() {
 
@@ -53,7 +55,7 @@ public final class WesLauncher {
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
 
-        provisionFilesLocally(workflowClient, workflowEntry, workflow.getDescriptorType().toString());
+        File zipFile = provisionFilesLocally(workflowClient, workflowEntry, workflow.getDescriptorType().toString());
 
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
@@ -113,30 +115,44 @@ public final class WesLauncher {
         return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, null, null, version);
     }
 
-    public static void provisionFilesLocally(WorkflowClient workflowClient, String workflowEntry, String descriptorType) {
+    public static File provisionFilesLocally(WorkflowClient workflowClient, String workflowEntry, String descriptorType) {
+
+        // A temporary directory which will house all downloaded content
         File tempDir;
+
         try {
-            tempDir = Files.createTempDirectory(DOCKSTORE_TEMP_DIR_PREFIX).toFile().getAbsoluteFile();
+            tempDir = Files.createTempDirectory(DOCKSTORE_ROOT_TEMP_DIR_PREFIX).toFile().getAbsoluteFile();
         } catch (IOException ex) {
             exceptionMessage(ex, "Could not create a temporary working directory.", IO_ERROR);
             throw new RuntimeException(ex);
         }
 
-        File primaryDescriptor;
-        // If not a local entry then download remote descriptors
+        // A zip file containing the content of the provided workflow
+        File zippedWorkflow;
+
+        // Download the contents locally
         try {
-            primaryDescriptor = workflowClient.downloadTargetEntry(workflowEntry,
-                ToolDescriptor.TypeEnum.fromValue(descriptorType), true, tempDir);
+            zippedWorkflow = workflowClient.downloadTargetEntry(workflowEntry,
+                ToolDescriptor.TypeEnum.fromValue(descriptorType), false, tempDir);
             out("Successfully downloaded files for entry '" + workflowEntry + "'");
-        } catch (io.swagger.client.ApiException ex) {
-            // We should never get here, as this function takes the workflow object as an input
-            exceptionMessage(ex, "The workflow entry does not exist.", ENTRY_NOT_FOUND);
-            throw new RuntimeException(ex);
         } catch (IOException ex) {
-            exceptionMessage(ex, "A problem was encountered while downloading and unzipping the entry.", IO_ERROR);
+            exceptionMessage(ex, "A problem was encountered while downloading the entry.", IO_ERROR);
             throw new RuntimeException(ex);
         }
-        System.out.println(primaryDescriptor.toString());
+
+        // The directory where the unzipped workflow contents are located
+        File unzippedWorkflowDir;
+
+        // Unzip the workflow to a nested temporary directory
+        try {
+            unzippedWorkflowDir = Files.createTempDirectory(Path.of(tempDir.getAbsolutePath()), DOCKSTORE_NESTED_TEMP_DIR_PREFIX).toFile().getAbsoluteFile();
+            SwaggerUtility.unzipFile(zippedWorkflow, unzippedWorkflowDir);
+        } catch (IOException ex) {
+            exceptionMessage(ex, "A problem was encountered while unzipping the entry.", IO_ERROR);
+            throw new RuntimeException(ex);
+        }
+
+        return unzippedWorkflowDir;
     }
 
     /**
