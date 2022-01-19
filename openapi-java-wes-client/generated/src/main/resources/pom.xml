@@ -40,20 +40,20 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
+          <groupId>com.fasterxml.jackson.jaxrs</groupId>
           <artifactId>jackson-jaxrs-base</artifactId>
-          <groupId>com.fasterxml.jackson.jaxrs</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>jackson-annotations</artifactId>
           <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-annotations</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>jersey-common</artifactId>
           <groupId>org.glassfish.jersey.core</groupId>
+          <artifactId>jersey-common</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>jackson-jaxrs-json-provider</artifactId>
           <groupId>com.fasterxml.jackson.jaxrs</groupId>
+          <artifactId>jackson-jaxrs-json-provider</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -76,8 +76,8 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>jackson-annotations</artifactId>
           <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-annotations</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -88,8 +88,8 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>jackson-annotations</artifactId>
           <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-annotations</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
