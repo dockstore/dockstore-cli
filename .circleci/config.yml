@@ -1,14 +1,18 @@
 version: 2.1
+parameters:
+  java-tag:
+    type: string
+    default: "11.0.12"
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
   unit_tests_executor:
     docker: # run the steps with Docker
-      - image: cimg/openjdk:11.0.8
+      - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2004:202104-01
     environment:
       PGHOST: 127.0.0.1
     resource_class: medium
@@ -81,7 +85,7 @@ jobs:
 
   build:
     docker: # run the steps with Docker
-      - image: cimg/openjdk:11.0.8
+      - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
         environment:
           # Java can read cgroup. Sadly the cgroup in
           # CircleCI is wrong. Have to manually set. Nothing to do with surefire
@@ -97,7 +101,7 @@ jobs:
       - install_confidential_test_data
       - run:
           name: build
-          command: mvn -B clean install -DskipTests
+          command: ./mvnw -B clean install -DskipTests
 
         # Running scan must occur after build
       - run_git_secrets_scan
@@ -172,7 +176,10 @@ commands:
       - run:
           name: check generated flattened POMs match checked-in files.
           command: |
-            scripts/check_poms.sh
+            # need better solution, but leaving this as-is fouls up the release since the Maven release plugin doesn't know about the flattened poms
+            if [[ -z "${CIRCLE_TAG}" ]]; then
+              scripts/check_poms.sh
+            fi
           environment:
             TESTING_PROFILE: automated-review
 
@@ -243,6 +250,7 @@ commands:
     steps:
       - get_workspace_and_dependencies
       - install_yq
+      - install-git-secrets
 
   setup_for_integration_tests:
     steps:
@@ -265,6 +273,7 @@ commands:
   setup_for_tests:
     steps:
       - install_yq
+      - install-git-secrets
       - install_postgres_sql_client
       - setup_postgres
       - install_dockerize
