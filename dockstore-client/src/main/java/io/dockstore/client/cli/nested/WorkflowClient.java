@@ -352,7 +352,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
      * @param toolpath  a unique identifier for an entry, called a path for workflows and tools
      * @param unzip     unzip the entry after downloading
      * @param directory directory to unzip descriptors into
-     * @return path to the primary descriptor
+     * @return A path to the primary descriptor if contents were unzipped, otherwise return a path to the zip file itself
      */
     public File downloadTargetEntry(String toolpath, ToolDescriptor.TypeEnum type, boolean unzip, File directory) throws IOException {
         String[] parts = toolpath.split(":");
@@ -378,10 +378,13 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             workflowsApi.getApiClient().setDebugging(Client.DEBUG.get());
             File zipFile = new File(directory, zipFilename(workflow));
             FileUtils.writeByteArrayToFile(zipFile, arbitraryURL, false);
+
+            // If we unzip the file, we can provide a path to the primary descriptor, otherwise just provide a path to the zip file
             if (unzip) {
                 SwaggerUtility.unzipFile(zipFile, directory);
+                return new File(directory, first.get().getWorkflowPath());
             }
-            return new File(directory, first.get().getWorkflowPath());
+            return zipFile;
         } else {
             throw new RuntimeException("version not found");
         }
