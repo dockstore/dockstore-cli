@@ -237,7 +237,7 @@ public abstract class BaseLanguageClient {
 
         // All secondary files are located relative to the location of the primary descriptor.
         final String localTemporaryDirectory = localPrimaryDescriptorFile.getParent();
-        final String checksumFunction = "sha1";
+        final String checksumFunction = "sha-256";
 
         // Validate each tool file associated with the entry (Primary and secondary descriptors)
         for (ToolFile toolFile : allDescriptors) {
@@ -264,7 +264,7 @@ public abstract class BaseLanguageClient {
                     // if the toolFile.getPath() is absolute, it is converted to a relative path by File the constructor
                     final File localDescriptor = new File(localTemporaryDirectory, toolFile.getPath());
                     final String fileContents = FileUtils.readFileToString(localDescriptor, StandardCharsets.UTF_8);
-                    final String fileChecksum = DigestUtils.sha1Hex(fileContents);
+                    final String fileChecksum = DigestUtils.sha256Hex(fileContents);
                     localDescriptorChecksum.setChecksum(fileChecksum);
                 } catch (IOException ex) {
                     exceptionMessage(ex, "Unable to locate local descriptor at " + localTemporaryDirectory + "/" + toolFile.getPath(), IO_ERROR);

@@ -101,7 +101,7 @@ jobs:
       - install_confidential_test_data
       - run:
           name: build
-          command: mvn -B clean install -DskipTests
+          command: ./mvnw -B clean install -DskipTests
 
         # Running scan must occur after build
       - run_git_secrets_scan
