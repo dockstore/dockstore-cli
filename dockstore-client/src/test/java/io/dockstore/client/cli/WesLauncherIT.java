@@ -230,7 +230,7 @@ public class WesLauncherIT {
         workflow.setRepository("github.com");
 
         WorkflowVersion workflowVersion = new WorkflowVersion();
-        workflowVersion.setWorkflowPath("righthere.wdl");
+        workflowVersion.setWorkflowPath("rightHere.wdl");
 
         // Ensure the #workflow prefix is correctly encoded
         final String trsWorkflowUrl = WesLauncher.combineTrsUrlComponents(aec, "github.com/org/repo:master", workflow, workflowVersion);
