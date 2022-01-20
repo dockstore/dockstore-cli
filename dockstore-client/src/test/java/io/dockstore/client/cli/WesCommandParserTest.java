@@ -6,6 +6,7 @@ import io.dockstore.client.cli.nested.WesCommandParser;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -268,5 +269,37 @@ public class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
         assertTrue("Help should be set", wesCommandParser.commandServiceInfo.isHelp());
+    }
+
+    @Test
+    public void testCommandRunListHelp() {
+        final String[] args = {
+            "list",
+            "--help"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+        assertTrue("Help should be set", wesCommandParser.commandRunList.isHelp());
+    }
+
+    @Test
+    public void testCommandRunList() {
+        final String[] args = {
+            "list",
+            "--count",
+            "3",
+            "--page-token",
+            "banana"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+        assertFalse("Help should be set", wesCommandParser.commandRunList.isHelp());
+        assertEquals("Count should be set to 3", 3, wesCommandParser.commandRunList.getPageSize());
+        assertEquals("Page token should be set to 'banana'", "banana", wesCommandParser.commandRunList.getPageToken());
+
     }
 }
