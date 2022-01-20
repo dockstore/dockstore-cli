@@ -229,8 +229,11 @@ public class WesLauncherIT {
         workflow.setOrganization("org");
         workflow.setRepository("github.com");
 
+        WorkflowVersion workflowVersion = new WorkflowVersion();
+        workflowVersion.setWorkflowPath("rightHere.wdl");
+
         // Ensure the #workflow prefix is correctly encoded
-        final String trsWorkflowUrl = WesLauncher.combineTrsUrlComponents(aec, "github.com/org/repo:master", workflow);
+        final String trsWorkflowUrl = WesLauncher.combineTrsUrlComponents(aec, "github.com/org/repo:master", workflow, workflowVersion);
 
         final String expectedWorkflowResult = "https://dockstore.org/api/ga4gh/trs/v2/tools/%23workflow%2Fgithub.com%2Forg%2Frepo/versions/v1/PLAIN_WDL/descriptor/rightHere.wdl";
         assertEquals("Checking the entire URL", expectedWorkflowResult, trsWorkflowUrl);
