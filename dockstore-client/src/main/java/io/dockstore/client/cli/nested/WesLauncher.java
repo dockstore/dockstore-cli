@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.openapi.wes.client.model.RunId;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
@@ -113,7 +114,7 @@ public final class WesLauncher {
         String[] parts = workflowEntry.split(":");
         String path = parts[0];
         String version = workflowClient.getVersionID(workflowEntry);
-        return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, WorkflowClient.BIOWORKFLOW, null, version);
+        return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW.toString(), null, version);
     }
 
     /**
