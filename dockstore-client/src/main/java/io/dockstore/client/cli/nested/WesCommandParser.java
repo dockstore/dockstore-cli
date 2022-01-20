@@ -13,6 +13,7 @@ public class WesCommandParser {
     public CommandCancel commandCancel;
     public CommandStatus commandStatus;
     public CommandServiceInfo commandServiceInfo;
+    public CommandRunList commandRunList;
     public JCommander jCommander;
 
     public WesCommandParser() {
@@ -21,6 +22,7 @@ public class WesCommandParser {
         this.commandCancel = new CommandCancel();
         this.commandStatus = new CommandStatus();
         this.commandServiceInfo = new CommandServiceInfo();
+        this.commandRunList = new CommandRunList();
 
         this.jCommander = buildWesCommandParser();
     }
@@ -34,6 +36,7 @@ public class WesCommandParser {
             .addCommand("cancel", this.commandCancel)
             .addCommand("status", this.commandStatus)
             .addCommand("service-info", this.commandServiceInfo)
+            .addCommand("list", this.commandRunList)
             .build();
     }
 
@@ -103,6 +106,24 @@ public class WesCommandParser {
 
     @Parameters(separators = "=", commandDescription = "Retrieve info about a WES server")
     public static class CommandServiceInfo extends WesMain {
+    }
+
+    @Parameters(separators = "=", commandDescription = "Retrieve a list of runs")
+    public static class CommandRunList extends WesMain {
+        private static final int DEFAULT_PAGE_SIZE = 10;
+
+        @Parameter(names = "--count", description = "The number of entries to print")
+        private int pageSize = DEFAULT_PAGE_SIZE;
+        @Parameter(names = "--page-token", description = "The page token returned from a previous list of runs")
+        private String pageToken = null;
+
+        public int getPageSize() {
+            return pageSize;
+        }
+
+        public String getPageToken() {
+            return pageToken;
+        }
     }
 
 }
