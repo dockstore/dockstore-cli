@@ -1143,6 +1143,8 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * This will attempt to retrieve information regarding the WES server
+     * @param pageSize The number of entries to return
+     * @param pageToken The returned page token from a previous call of ListRuns
      * @param clientWorkflowExecutionServiceApi The API client
      */
     private void wesListRuns(int pageSize, String pageToken, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
