@@ -1491,7 +1491,9 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Optional parameters:");
         out("  --json <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
-        out("  --attach <path, -a <path>           A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
+        out("  --attach <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
+        out("  --provision-locally                 Indicates that the following workflow should be launched from locally downloaded files");
+
         out("");
     }
 
