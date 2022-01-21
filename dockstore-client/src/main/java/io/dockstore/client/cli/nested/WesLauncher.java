@@ -229,10 +229,13 @@ public final class WesLauncher {
             return Optional.empty();
         }
 
-        // Verify the file path exists, if not return an empty Optional
+        // Verify the file path exists
+        // 1. If the path is to a directory, return an empty optional
         Path path = Paths.get(filePath);
-        if (!Files.isRegularFile(path)) {
+        if (Files.isDirectory(path)) {
             return Optional.empty();
+        } else if (!Files.isRegularFile(path)) {
+            errorMessage(MessageFormat.format("Unable to locate file: {0}", filePath), CLIENT_ERROR);
         }
 
         // TODO: Handle path expansions? i.e. '~/my/file.txt'
