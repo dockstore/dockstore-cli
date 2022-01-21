@@ -69,6 +69,7 @@ import io.github.collaboratory.nextflow.NextflowClient;
 import io.github.collaboratory.wdl.WDLClient;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
+import io.openapi.wes.client.model.RunListResponse;
 import io.openapi.wes.client.model.RunLog;
 import io.openapi.wes.client.model.RunStatus;
 import io.openapi.wes.client.model.ServiceInfo;
@@ -1141,6 +1142,21 @@ public abstract class AbstractEntryClient<T> {
     }
 
     /**
+     * This will attempt to retrieve information regarding the WES server
+     * @param pageSize The number of entries to return
+     * @param pageToken The returned page token from a previous call of ListRuns
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesListRuns(int pageSize, String pageToken, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+        try {
+            RunListResponse response = clientWorkflowExecutionServiceApi.listRuns((long)pageSize, pageToken);
+            out("WES Run List: " + response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting WES Run List", e);
+        }
+    }
+
+    /**
      * Given the parsed command object, determine if we are to print help commands
      * @param wesCommandParser Parse commands
      * @return true if help was displayed, false otherwise
@@ -1161,6 +1177,9 @@ public abstract class AbstractEntryClient<T> {
             return true;
         } else if (wesCommandParser.commandServiceInfo.isHelp()) {
             wesServiceInfoHelp();
+            return true;
+        } else if (wesCommandParser.commandRunList.isHelp()) {
+            wesRunListHelp();
             return true;
         }
 
@@ -1204,6 +1223,11 @@ public abstract class AbstractEntryClient<T> {
                 break;
             case "service-info":
                 wesServiceInfo(clientWorkflowExecutionServiceApi);
+                break;
+            case "list":
+                wesListRuns(wesCommandParser.commandRunList.getPageSize(),
+                    wesCommandParser.commandRunList.getPageToken(),
+                    clientWorkflowExecutionServiceApi);
                 break;
             default:
                 errorMessage("Unknown WES command.", CLIENT_ERROR);
@@ -1473,6 +1497,7 @@ public abstract class AbstractEntryClient<T> {
         out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes service-info [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes list [parameters]");
         out("");
         out("Description:");
         out(" Sends a request to a Workflow Execution Service (WES) endpoint.");
@@ -1540,6 +1565,21 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Description:");
         out("  Returns descriptive information of the provided WES server. ");
+        printWesHelpFooter();
+        printHelpFooter();
+    }
+
+    private void wesRunListHelp() {
+        printHelpHeader();
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes list --help");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes list");
+        out("");
+        out("Description:");
+        out("  Returns information about past runs. ");
+        out("Optional Parameters:");
+        out("  --count                           The number of runs to list.");
+        out("  --page-token                      A page token provided from a previous list of runs.");
+        out("");
         printWesHelpFooter();
         printHelpFooter();
     }

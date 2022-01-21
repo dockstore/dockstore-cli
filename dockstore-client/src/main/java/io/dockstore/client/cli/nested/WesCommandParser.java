@@ -13,6 +13,7 @@ public class WesCommandParser {
     public CommandCancel commandCancel;
     public CommandStatus commandStatus;
     public CommandServiceInfo commandServiceInfo;
+    public CommandRunList commandRunList;
     public JCommander jCommander;
 
     public WesCommandParser() {
@@ -21,6 +22,7 @@ public class WesCommandParser {
         this.commandCancel = new CommandCancel();
         this.commandStatus = new CommandStatus();
         this.commandServiceInfo = new CommandServiceInfo();
+        this.commandRunList = new CommandRunList();
 
         this.jCommander = buildWesCommandParser();
     }
@@ -34,10 +36,11 @@ public class WesCommandParser {
             .addCommand("cancel", this.commandCancel)
             .addCommand("status", this.commandStatus)
             .addCommand("service-info", this.commandServiceInfo)
+            .addCommand("list", this.commandRunList)
             .build();
     }
 
-    @Parameters(separators = "=", commandDescription = "Execute WES commands")
+    @Parameters(commandDescription = "Execute WES commands")
     public static class WesMain {
         @Parameter(names = "--wes-url", description = "The URL of the WES server.", required = false)
         private String wesUrl = null;
@@ -53,7 +56,7 @@ public class WesCommandParser {
         }
     }
 
-    @Parameters(separators = "=", commandDescription = "Launch a workflow using WES")
+    @Parameters(commandDescription = "Launch a workflow using WES")
     public static class CommandLaunch extends WesMain {
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
@@ -75,7 +78,7 @@ public class WesCommandParser {
         }
     }
 
-    @Parameters(separators = "=", commandDescription = "Cancel a remote WES entry")
+    @Parameters(commandDescription = "Cancel a remote WES entry")
     public static class CommandCancel extends WesMain {
         @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
         private String id;
@@ -85,7 +88,7 @@ public class WesCommandParser {
         }
     }
 
-    @Parameters(separators = "=", commandDescription = "Retrieve the status of a workflow")
+    @Parameters(commandDescription = "Retrieve the status of a workflow")
     public static class CommandStatus extends WesMain {
         @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
         private String id;
@@ -101,8 +104,26 @@ public class WesCommandParser {
         }
     }
 
-    @Parameters(separators = "=", commandDescription = "Retrieve info about a WES server")
+    @Parameters(commandDescription = "Retrieve info about a WES server")
     public static class CommandServiceInfo extends WesMain {
+    }
+
+    @Parameters(commandDescription = "Retrieve a list of runs")
+    public static class CommandRunList extends WesMain {
+        private static final int DEFAULT_PAGE_SIZE = 10;
+
+        @Parameter(names = "--count", description = "The number of entries to print")
+        private int pageSize = DEFAULT_PAGE_SIZE;
+        @Parameter(names = "--page-token", description = "The page token returned from a previous list of runs")
+        private String pageToken = null;
+
+        public int getPageSize() {
+            return pageSize;
+        }
+
+        public String getPageToken() {
+            return pageToken;
+        }
     }
 
 }
