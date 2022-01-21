@@ -103,7 +103,7 @@ public class WesLauncherIT {
         // WorkflowsApi Function mocks
         when(workflowApi.getPublishedWorkflowByPath(
             any(String.class),
-            ArgumentMatchers.isNull(),
+            any(String.class),
             ArgumentMatchers.isNull(),
             any(String.class)
         )).thenReturn(fakeWorkflow);
