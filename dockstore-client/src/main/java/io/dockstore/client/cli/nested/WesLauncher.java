@@ -22,8 +22,10 @@ import io.swagger.client.model.WorkflowVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 
 public final class WesLauncher {
@@ -72,7 +74,7 @@ public final class WesLauncher {
 
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
-        // 2. TODO: A path to a file in the 'attachments' list
+        // 2. A path to a file in the 'attachments' list
         String workflowUrl = provisionLocally ? workflow.getWorkflowPath() : combineTrsUrlComponents(workflowClient, workflowEntry, workflow, workflowVersion);
 
         // A JSON object containing a key/value pair that points to the test parameter file in the 'attachments' list
@@ -85,7 +87,7 @@ public final class WesLauncher {
         // 3. Test parameter files
         // 4. Any other files referenced by the workflow
         // TODO: Allow users to specify a directory to upload?
-        // TODO: Automatically attach all files referenced in remote Dockstore entry?
+        // 6. Automatically attach all files referenced in remote Dockstore entry?
         List<File> workflowAttachment = new ArrayList<>(fetchFiles(filePaths));
         if (provisionLocally) {
             // Download all workflow files and place them into a temporary directory, then add them as attachments to the WES request
