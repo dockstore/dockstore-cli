@@ -134,6 +134,14 @@ public final class WesLauncher {
         return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW.toString(), null, version);
     }
 
+    /**
+     * Provisions a workflow's associated files in a temporary local directory
+     *
+     * @param workflowClient The WorkflowClient
+     * @param workflowEntry The workflow entry (i.e. github.com/myRepo/myWorkflow:version)
+     * @param descriptorType The type of descriptor for this workflow (WDL, CWL, etc...)
+     * @return A zipped File object
+     */
     public static File provisionFilesLocally(WorkflowClient workflowClient, String workflowEntry, String descriptorType) {
 
         // A temporary directory which will house all downloaded content

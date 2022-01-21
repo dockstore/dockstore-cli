@@ -76,8 +76,8 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>postgresql</artifactId>
           <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -166,12 +166,12 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>httpclient-osgi</artifactId>
           <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient-osgi</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>httpcore-osgi</artifactId>
           <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpcore-osgi</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -182,12 +182,12 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>httpclient-osgi</artifactId>
           <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient-osgi</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>httpcore-osgi</artifactId>
           <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpcore-osgi</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -277,8 +277,8 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>commons-httpclient</artifactId>
           <groupId>commons-httpclient</groupId>
+          <artifactId>commons-httpclient</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
