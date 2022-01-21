@@ -286,10 +286,11 @@ public class WesCommandParserTest {
 
     @Test
     public void testCommandRunList() {
+        final int count = 3;
         final String[] args = {
             "list",
             "--count",
-            "3",
+            String.valueOf(count),
             "--page-token",
             "banana"
         };
@@ -298,7 +299,7 @@ public class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
         assertFalse("Help should be set", wesCommandParser.commandRunList.isHelp());
-        assertEquals("Count should be set to 3", 3, wesCommandParser.commandRunList.getPageSize());
+        assertEquals("Count should be set to 3", count, wesCommandParser.commandRunList.getPageSize());
         assertEquals("Page token should be set to 'banana'", "banana", wesCommandParser.commandRunList.getPageToken());
 
     }
