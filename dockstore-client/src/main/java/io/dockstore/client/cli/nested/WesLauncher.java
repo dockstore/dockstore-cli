@@ -74,8 +74,10 @@ public final class WesLauncher {
 
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
-        // 2. A path to a file in the 'attachments' list
-        String workflowUrl = provisionLocally ? workflow.getWorkflowPath() : combineTrsUrlComponents(workflowClient, workflowEntry, workflow, workflowVersion);
+        // 2. The name of a file in the attachments list
+        String workflowUrl = provisionLocally ?
+            workflowVersion.getWorkflowPath().substring(workflowVersion.getWorkflowPath().lastIndexOf("/")+1) :
+            combineTrsUrlComponents(workflowClient, workflowEntry, workflow, workflowVersion);
 
         // A JSON object containing a key/value pair that points to the test parameter file in the 'attachments' list
         // The key is WES server implementation specific. e.g. {"workflowInput":"params.json"}.
