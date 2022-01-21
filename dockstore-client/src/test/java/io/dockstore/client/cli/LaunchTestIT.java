@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.Utilities;
+import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.UsersApi;
@@ -1254,7 +1255,7 @@ public class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
 
-        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq("versions"), eq(false), eq(null));
+        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(WorkflowSubClass.BIOWORKFLOW.toString()), eq("versions"), eq(null));
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
 
@@ -1291,7 +1292,7 @@ public class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
 
-        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq("versions"), eq(false), eq(null));
+        doReturn(workflow).when(api).getPublishedWorkflowByPath(anyString(), eq(WorkflowSubClass.BIOWORKFLOW.toString()), eq("versions"), eq(null));
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
 

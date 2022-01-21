@@ -14,9 +14,11 @@ import java.util.Optional;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.openapi.wes.client.model.RunId;
 import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.Workflow;
+import io.swagger.client.model.WorkflowVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,10 +58,22 @@ public final class WesLauncher {
         // The descriptor type
         String workflowType = workflow.getDescriptorType().getValue();
 
+        // Get the workflow version we are launching
+        final String versionId = workflowClient.getVersionID(workflowEntry);
+        final Optional<WorkflowVersion> workflowVersionOpt = workflow.getWorkflowVersions()
+            .stream()
+            .filter(wv -> wv.getName().equals(versionId))
+            .findFirst();
+
+        if (workflowVersionOpt.isEmpty()) {
+            errorMessage(MessageFormat.format("Unable to locate version: {0}", versionId), CLIENT_ERROR);
+        }
+        final WorkflowVersion workflowVersion = workflowVersionOpt.get();
+
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
         // 2. TODO: A path to a file in the 'attachments' list
-        String workflowUrl = provisionLocally ? workflow.getWorkflowPath() : combineTrsUrlComponents(workflowClient, workflowEntry, workflow);
+        String workflowUrl = provisionLocally ? workflow.getWorkflowPath() : combineTrsUrlComponents(workflowClient, workflowEntry, workflow, workflowVersion);
 
         // A JSON object containing a key/value pair that points to the test parameter file in the 'attachments' list
         // The key is WES server implementation specific. e.g. {"workflowInput":"params.json"}.
@@ -113,7 +127,7 @@ public final class WesLauncher {
         String[] parts = workflowEntry.split(":");
         String path = parts[0];
         String version = workflowClient.getVersionID(workflowEntry);
-        return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, null, null, version);
+        return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW.toString(), null, version);
     }
 
     public static File provisionFilesLocally(WorkflowClient workflowClient, String workflowEntry, String descriptorType) {
@@ -164,7 +178,7 @@ public final class WesLauncher {
      * @param workflow The workflow object we are creating a TRS url for
      * @return A string representing a TRS URL for an entry
      */
-    public static String combineTrsUrlComponents(WorkflowClient workflowClient, String workflowEntry, Workflow workflow) {
+    public static String combineTrsUrlComponents(WorkflowClient workflowClient, String workflowEntry, Workflow workflow, WorkflowVersion workflowVersion) {
         ApiClient client = workflowClient.getClient().getGa4Ghv20Api().getApiClient();
 
         // Entries are passed in the form {PATH}:{VERSION} or {PATH}
@@ -181,7 +195,7 @@ public final class WesLauncher {
         final String escapedId = client.escapeString(entryId);
         final String escapedVersionId = client.escapeString(versionId);
         final String escapedType = client.escapeString(type);
-        final String escapedRelativePath = client.escapeString(workflow.getWorkflowPath());
+        final String escapedRelativePath = client.escapeString(workflowVersion.getWorkflowPath());
 
         // Return the TRS URL for a given entry
         return MessageFormat.format("{0}/ga4gh/trs/v2/tools/{1}/versions/{2}/{3}/descriptor/{4}",

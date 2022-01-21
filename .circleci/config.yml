@@ -2,7 +2,7 @@ version: 2.1
 parameters:
   java-tag:
     type: string
-    default: "11.0.11"
+    default: "11.0.12"
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
@@ -101,7 +101,7 @@ jobs:
       - install_confidential_test_data
       - run:
           name: build
-          command: mvn -B clean install -DskipTests
+          command: ./mvnw -B clean install -DskipTests
 
         # Running scan must occur after build
       - run_git_secrets_scan
