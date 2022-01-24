@@ -22,6 +22,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.mockito.ArgumentMatchers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -206,11 +207,8 @@ public class WesLauncherIT {
         String workflowEntry = "my/entry/path";
         String workflowParamPath = ResourceHelpers.resourceFilePath("");
 
-        // Expect an error to be thrown when a file cant be found
-        systemExit.expectSystemExit();
+        // Directories should be ignored, no error should be thrown
         WesLauncher.launchWesCommand(workflowClient, workflowEntry, false, workflowParamPath, null);
-        assertTrue("A directory is passed, not a file. An error should be thrown.",
-            systemErrRule.getLog().contains("Unable to locate file: " + workflowParamPath));
     }
 
     @Test
