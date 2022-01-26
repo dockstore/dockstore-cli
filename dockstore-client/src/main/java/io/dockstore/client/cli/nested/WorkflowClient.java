@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.GenericType;
@@ -102,6 +103,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     private final JCommander jCommander;
     private final CommandLaunch commandLaunch;
 
+    private boolean isAppTool;
+
     public WorkflowClient(WorkflowsApi workflowApi, UsersApi usersApi, Client client, boolean isAdmin) {
         this.workflowsApi = workflowApi;
         this.usersApi = usersApi;
@@ -110,6 +113,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         this.jCommander = new JCommander();
         this.commandLaunch = new CommandLaunch();
         this.jCommander.addCommand("launch", commandLaunch);
+    }
+
+    public boolean isAppTool() {
+        return isAppTool;
     }
 
     private static void printWorkflowList(List<Workflow> workflows) {
@@ -300,28 +307,70 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         // User may enter the version, so we have to extract the path
         String[] parts = entry.split(":");
         String path = parts[0];
-        Workflow workflow = getDockstoreWorkflowByPath(path);
+        Workflow workflow = findAndGetDockstoreWorkflowByPath(path);
         String descriptor = workflow.getDescriptorType().getValue();
         LanguageClientInterface languageCLient = convertCLIStringToEnum(descriptor);
         return languageCLient.generateInputJson(entry, json);
     }
 
-    public Workflow getDockstoreWorkflowByPath(String path) {
-        // simply getting published descriptors does not require permissions
-        Workflow workflow = null;
-        try {
-            workflow = workflowsApi.getPublishedWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW.toString(), "versions",  null);
-        } catch (ApiException e) {
-            if (e.getResponseBody().contains("Entry not found")) {
-                LOG.info("Unable to locate entry without credentials, trying again as authenticated user");
-                workflow = workflowsApi.getWorkflowByPath(path, BIOWORKFLOW, "versions");
-            }
-        } finally {
-            if (workflow == null) {
-                errorMessage("No workflow found with path " + path, Client.ENTRY_NOT_FOUND);
-            }
+    /**
+     * Try and get the workflow with the path (unauthenticated/authenticated bioworkflow, unauthenticated/authenticated apptool)
+     *
+     * @param path Path of the apptool or bioworkflow
+     * @return
+     */
+    public Workflow findAndGetDockstoreWorkflowByPath(String path) {
+        List<Supplier<Workflow>> workflows = new ArrayList<>();
+        workflows.add(getDockstoreBioworkflowByPath(path));
+        workflows.add(getAuthenticatedDockstoreBioworkflowByPath(path));
+        workflows.add(getDockstoreAppToolByPath(path));
+        workflows.add(getAuthenticatedDockstoreAppToolByPath(path));
+        Workflow workflow = workflows.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+        if (workflow == null) {
+            errorMessage("No workflow found with path " + path, Client.ENTRY_NOT_FOUND);
+            return null;
         }
         return workflow;
+    }
+
+    private Supplier<Workflow> getDockstoreBioworkflowByPath(String path) {
+        return () -> getDockstoreWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW);
+    }
+
+    private Supplier<Workflow> getAuthenticatedDockstoreBioworkflowByPath(String path) {
+        return () -> getAuthenticatedDockstoreWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW);
+    }
+
+    private Supplier<Workflow> getDockstoreAppToolByPath(String path) {
+        return () -> getDockstoreWorkflowByPath(path, WorkflowSubClass.APPTOOL);
+    }
+
+    private Supplier<Workflow> getAuthenticatedDockstoreAppToolByPath(String path) {
+        return () -> getAuthenticatedDockstoreWorkflowByPath(path, WorkflowSubClass.APPTOOL);
+    }
+
+    public Workflow getDockstoreWorkflowByPath(String path, WorkflowSubClass workflowSubClass) {
+        try {
+            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(path, workflowSubClass.toString(), "versions", null);
+            if (workflowSubClass.equals(WorkflowSubClass.APPTOOL)) {
+                this.isAppTool = true;
+            }
+            return workflow;
+        } catch (ApiException e) {
+            return null;
+        }
+    }
+
+    public Workflow getAuthenticatedDockstoreWorkflowByPath(String path, WorkflowSubClass workflowSubClass) {
+        try {
+            Workflow workflow = workflowsApi.getWorkflowByPath(path, workflowSubClass.toString(), "versions");
+            if (workflowSubClass.equals(WorkflowSubClass.APPTOOL)) {
+                this.isAppTool = true;
+            }
+            return workflow;
+        } catch (ApiException e) {
+            return null;
+        }
     }
 
     protected Workflow getDockstoreWorkflowById(Long id) {
@@ -358,7 +407,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String[] parts = toolpath.split(":");
         String path = parts[0];
         // match behaviour from getDescriptorFromServer, use master if no version is provided
-        Workflow workflow = getDockstoreWorkflowByPath(path);
+        Workflow workflow = findAndGetDockstoreWorkflowByPath(path);
         String tag = getVersionID(toolpath);
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(tag))
             .findFirst();
@@ -397,7 +446,11 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
      */
     @Override
     public String getTrsId(String entryPath) {
-        return entryPath.startsWith("#workflow/") ? entryPath : "#workflow/" + entryPath;
+        if (isAppTool) {
+            return entryPath;
+        } else {
+            return entryPath.startsWith("#workflow/") ? entryPath : "#workflow/" + entryPath;
+        }
     }
 
     /**
@@ -410,7 +463,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
         final String versionID = parts.length > 1 ? parts[1] : "master";
 
-        final Workflow workflow = getDockstoreWorkflowByPath(parts[0]);
+        final Workflow workflow = findAndGetDockstoreWorkflowByPath(parts[0]);
 
         // ensure workflow has version
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(versionID))
@@ -474,7 +527,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     String[] parts = entry.split(":");
                     String path = parts[0];
                     try {
-                        Workflow workflow = getDockstoreWorkflowByPath(path);
+                        Workflow workflow = findAndGetDockstoreWorkflowByPath(path);
                         final Workflow.DescriptorTypeEnum descriptorType = workflow.getDescriptorType();
                         final String descriptor = descriptorType.getValue().toLowerCase();
                         LanguageClientInterface languageClientInterface = convertCLIStringToEnum(descriptor);
@@ -1174,7 +1227,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String version = (parts.length > 1) ? parts[1] : "master";
         SourceFile file = new SourceFile();
         // simply getting published descriptors does not require permissions
-        Workflow workflow = getDockstoreWorkflowByPath(path);
+        Workflow workflow = findAndGetDockstoreWorkflowByPath(path);
 
         boolean valid = false;
         for (WorkflowVersion workflowVersion : workflow.getWorkflowVersions()) {
