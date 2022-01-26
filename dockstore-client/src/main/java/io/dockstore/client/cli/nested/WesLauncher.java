@@ -19,6 +19,7 @@ import io.openapi.wes.client.model.RunId;
 import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
+import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,7 @@ public final class WesLauncher {
         // 1. A TRS URL returning the raw primary descriptor file contents
         // 2. The name of a file in the attachments list
         String workflowUrl = provisionLocally
-            ? workflowVersion.getWorkflowPath().substring(workflowVersion.getWorkflowPath().lastIndexOf("/") + 1)
+            ? workflowVersion.getWorkflowPath().replaceAll("^/+", "") // Remove all leading slashes
             : combineTrsUrlComponents(workflowClient, workflowEntry, workflow, workflowVersion);
 
         // A JSON object containing a key/value pair that points to the test parameter file in the 'attachments' list
