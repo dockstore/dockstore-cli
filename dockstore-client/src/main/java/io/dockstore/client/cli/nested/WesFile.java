@@ -7,6 +7,7 @@ import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 
+// This class adds additional functionality to the base File class allowing the WES API to correctly attach files to HTTP requests.
 public class WesFile extends File {
 
     private final String removablePrefix;
