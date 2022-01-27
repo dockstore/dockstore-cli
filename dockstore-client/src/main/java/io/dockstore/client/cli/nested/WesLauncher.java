@@ -19,7 +19,6 @@ import io.openapi.wes.client.model.RunId;
 import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
-import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +81,7 @@ public final class WesLauncher {
 
         // A JSON object containing a key/value pair that points to the test parameter file in the 'attachments' list
         // The key is WES server implementation specific. e.g. {"workflowInput":"params.json"}.
-        File workflowParams = fetchFile(workflowParamPath).orElse(null);
+        File workflowParams = fetchFile(workflowParamPath, null, null).orElse(null);
 
         // A list of supplementary files that are required to run the workflow. This may include any/all of the following:
         // 1. The primary descriptor file
@@ -223,9 +222,11 @@ public final class WesLauncher {
      * Attempts to load a file from the provided path. Errors out if the file doesn't exist.
      *
      * @param filePath Path to a file or null
-     * @return An Optional File object, this may be empty if the filepath is null
+     * @param removablePrefix Used to determine the relative path of the file located at a path that contains the String removablePrefix
+     * @param desiredSuffix Used to determine the relative path of the file, where the desired suffix is the relative path
+     * @return An Optional WesFile object, this may be empty if the filepath is null
      */
-    public static Optional<File> fetchFile(String filePath) {
+    public static Optional<WesFile> fetchFile(String filePath, String removablePrefix, String desiredSuffix) {
         if (filePath == null) {
             return Optional.empty();
         }
@@ -240,7 +241,7 @@ public final class WesLauncher {
         }
 
         // TODO: Handle path expansions? i.e. '~/my/file.txt'
-        return Optional.of(new File(filePath));
+        return Optional.of(new WesFile(filePath, removablePrefix, desiredSuffix));
     }
 
     /**
@@ -249,27 +250,27 @@ public final class WesLauncher {
      * @param filePaths A list of paths that correspond to files that need to be attached to the WES request, this may be null
      * @return A list of File objects, which may be empty
      */
-    public static List<File> fetchFiles(List<String> filePaths) {
+    public static List<WesFile> fetchFiles(List<String> filePaths) {
 
         // Return an empty list if no attachments were passed
         if (filePaths == null) {
             return Collections.emptyList();
         }
 
-        List<File> workflowAttachments = new ArrayList<>();
+        List<WesFile> workflowAttachments = new ArrayList<>();
         filePaths.forEach(path -> {
-            final Optional<File> attachmentFile = fetchFile(path);
+            final Optional<WesFile> attachmentFile = fetchFile(path, null, path);
             attachmentFile.ifPresent(workflowAttachments::add);
         });
 
         return workflowAttachments;
     }
 
-    public static List<File> fetchFilesFromLocalDirectory(String localDirectory) {
-        List<File> workflowAttachments = new ArrayList<>();
+    public static List<WesFile> fetchFilesFromLocalDirectory(String localDirectory) {
+        List<WesFile> workflowAttachments = new ArrayList<>();
         try {
             Files.walk(Path.of(localDirectory)).forEach(path -> {
-                final Optional<File> attachmentFile = fetchFile(path.toAbsolutePath().toString());
+                final Optional<WesFile> attachmentFile = fetchFile(path.toAbsolutePath().toString(), localDirectory, null);
                 attachmentFile.ifPresent(workflowAttachments::add);
             });
         } catch (IOException ex) {
