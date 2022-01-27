@@ -266,6 +266,12 @@ public final class WesLauncher {
         return workflowAttachments;
     }
 
+    /**
+     * Fetches all files from the provided directory path
+     *
+     * @param localDirectory Path of a local directory
+     * @return A list of WesFiles found as child files of the provided directory
+     */
     public static List<WesFile> fetchFilesFromLocalDirectory(String localDirectory) {
         List<WesFile> workflowAttachments = new ArrayList<>();
         try {
