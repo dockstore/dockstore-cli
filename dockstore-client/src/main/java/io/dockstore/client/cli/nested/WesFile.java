@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.MessageFormat;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 
 public class WesFile extends File {
@@ -39,7 +40,8 @@ public class WesFile extends File {
                     this.desiredSuffix), CLIENT_ERROR);
             } else if (!this.getAbsolutePath().endsWith(this.desiredSuffix)) {
                 // This should never occur, but just in case...
-                throw new RuntimeException(MessageFormat.format("Path to file object does not contain the provided suffix {0}", this.desiredSuffix));
+                errorMessage(MessageFormat.format("Path to file object does not contain the provided suffix {0}", this.desiredSuffix),
+                    API_ERROR);
             }
 
             return this.desiredSuffix;
