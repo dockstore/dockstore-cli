@@ -8,6 +8,7 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class WesFileIT {
 
@@ -40,6 +41,7 @@ public class WesFileIT {
         WesFile wesFile = new WesFile(descriptorPath, null, desiredSuffix);
         systemExit.expectSystemExit();
         wesFile.getName();
+        fail("Should have failed when given an absolute path");
     }
 
     @Test
@@ -50,6 +52,8 @@ public class WesFileIT {
         WesFile wesFile = new WesFile(descriptorPath, null, desiredSuffix);
         systemExit.expectSystemExit();
         wesFile.getName();
+        fail("Should have failed when given an absolute path");
+
     }
 
     @Test
@@ -60,6 +64,7 @@ public class WesFileIT {
         WesFile wesFile = new WesFile(descriptorPath, null, desiredSuffix);
         systemExit.expectSystemExit();
         wesFile.getName();
+        fail("Should have failed when given an invalid suffix");
     }
 
     @Test
