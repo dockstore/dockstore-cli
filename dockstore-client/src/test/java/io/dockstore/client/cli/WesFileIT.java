@@ -20,7 +20,7 @@ public class WesFileIT {
     public void testFileSuffixNaming() {
         final String descriptorPath = ResourceHelpers.resourceFilePath("hello.wdl");
 
-        for (int i = descriptorPath.length() - 2; i >= 0 ; i--) {
+        for (int i = descriptorPath.length() - 2; i >= 0; i--) {
             final String desiredSuffix = descriptorPath.substring(i);
 
             // Skip absolute paths, that will be tested elsewhere
