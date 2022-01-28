@@ -161,6 +161,7 @@ public final class WesLauncher {
         try {
             zippedWorkflow = workflowClient.downloadTargetEntry(workflowEntry,
                 ToolDescriptor.TypeEnum.fromValue(descriptorType), false, tempDir);
+            zippedWorkflow.deleteOnExit();
         } catch (IOException ex) {
             exceptionMessage(ex, "A problem was encountered while downloading the entry.", IO_ERROR);
             throw new RuntimeException(ex);
@@ -173,6 +174,7 @@ public final class WesLauncher {
         try {
             unzippedWorkflowDir = Files.createTempDirectory(Path.of(tempDir.getAbsolutePath()), DOCKSTORE_NESTED_TEMP_DIR_PREFIX).toFile().getAbsoluteFile();
             SwaggerUtility.unzipFile(zippedWorkflow, unzippedWorkflowDir);
+            unzippedWorkflowDir.deleteOnExit();
         } catch (IOException ex) {
             exceptionMessage(ex, "A problem was encountered while unzipping the entry.", IO_ERROR);
             throw new RuntimeException(ex);
