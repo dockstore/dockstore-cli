@@ -1135,10 +1135,14 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     /**
-     * This will attempt to launch a tool given the command arguments
+     * Does nothing currently, as tools are not supported in WES
      *
+     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
+     * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
+     * @param paramsPath Path to the parameter JSON file
+     * @param filePaths Paths to any other required files for the WES execution
      */
-    void wesLaunch(String entry, boolean provisionLocally, String paramsPath, List<String> filePaths) {
+    void wesLaunch(String entry, boolean inlineWorkflow, String paramsPath, List<String> filePaths) {
         // Only supports workflows for the moment
         throw new RuntimeException("WES launch does not currently support tools. Please launch a workflow instead.");
     }

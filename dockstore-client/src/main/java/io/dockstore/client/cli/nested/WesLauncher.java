@@ -48,11 +48,11 @@ public final class WesLauncher {
      *
      * @param workflowClient The WorkflowClient for the request
      * @param workflowEntry The entry path, (i.e. github.com/myRepo/myWorkflow:version)
-     * @param provisionLocally Determines if the entry is locally provisioned or not, this alters the format that the WES request is made in.
+     * @param inlineWorkflow Determines if the entry is locally provisioned or not, this alters the format that the WES request is made in.
      * @param workflowParamPath The path to a file to be used as an input JSON. (i.e. /path/to/file.json)
      * @param filePaths A list of paths to files to be attached to the request.
      */
-    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, boolean provisionLocally, String workflowParamPath, List<String> filePaths) {
+    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, boolean inlineWorkflow, String workflowParamPath, List<String> filePaths) {
 
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
@@ -75,7 +75,7 @@ public final class WesLauncher {
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
         // 2. The name of a file in the attachments list
-        String workflowUrl = provisionLocally
+        String workflowUrl = inlineWorkflow
             ? workflowVersion.getWorkflowPath().replaceAll("^/+", "") // Remove all leading slashes
             : combineTrsUrlComponents(workflowClient, workflowEntry, workflow, workflowVersion);
 
@@ -91,7 +91,7 @@ public final class WesLauncher {
         // TODO: Allow users to specify a directory to upload?
         // 6. Automatically attach all files referenced in remote Dockstore entry?
         List<File> workflowAttachment = new ArrayList<>(fetchFiles(filePaths));
-        if (provisionLocally) {
+        if (inlineWorkflow) {
             // Download all workflow files and place them into a temporary directory, then add them as attachments to the WES request
             final File unzippedWorkflowDir = provisionFilesLocally(workflowClient, workflowEntry, workflowType);
             workflowAttachment.addAll(fetchFilesFromLocalDirectory(unzippedWorkflowDir.getAbsolutePath()));

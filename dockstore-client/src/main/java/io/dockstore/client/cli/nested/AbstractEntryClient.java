@@ -1079,10 +1079,11 @@ public abstract class AbstractEntryClient<T> {
     /**
      * Attempts to launch a workflow (tools not currently supported) on a WES server
      * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
+     * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
      * @param paramsPath Path to the parameter JSON file
      * @param filePaths Paths to any other required files for the WES execution
      */
-    abstract void wesLaunch(String entry, boolean provisionLocally, String paramsPath, List<String> filePaths);
+    abstract void wesLaunch(String entry, boolean inlineWorkflow, String paramsPath, List<String> filePaths);
 
     public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
         // Does nothing for tools.
@@ -1210,7 +1211,7 @@ public abstract class AbstractEntryClient<T> {
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
                 wesLaunch(wesCommandParser.commandLaunch.getEntry(),
-                    wesCommandParser.commandLaunch.getProvisionLocally(),
+                    wesCommandParser.commandLaunch.getInlineWorkflow(),
                     wesCommandParser.commandLaunch.getJson(),
                     wesCommandParser.commandLaunch.getAttachments());
                 break;
@@ -1517,7 +1518,7 @@ public abstract class AbstractEntryClient<T> {
         out("Optional parameters:");
         out("  --json <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
         out("  --attach <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
-        out("  --provision-locally                 Indicates that the following workflow should be launched from locally downloaded files");
+        out("  --inline-workflow                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
 
         out("");
     }
