@@ -21,6 +21,9 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 
+/**
+ * Tests every command in the workflow mode with a GitHub App Tool except manual_publish (because it's unrelated) and wes
+ */
 public class GitHubAppToolIT extends BaseIT {
 
     private static final String WORKFLOW_REPO = "DockstoreTestUser2/test-workflows-and-tools";
@@ -35,7 +38,7 @@ public class GitHubAppToolIT extends BaseIT {
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().mute();
+    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
 
 
     @Before
@@ -124,36 +127,26 @@ public class GitHubAppToolIT extends BaseIT {
         Client.main(new String[]{"workflow", "test_parameter", "--version", "main", "--add", "test.json", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
     }
 
-    // TODO: add assertions
     @Test
     public void convert() {
         Client.main(new String[]{"workflow", "convert", "entry2json", "--entry", ENTRY_PATH_WITH_VERSION, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Assert.assertTrue(systemOutRule.getLog().contains("tmp/fill_me_in.txt"));
     }
 
-    // TODO: add assertions
     @Test
     public void launch() throws ApiException {
         Client.main(new String[]{"workflow", "launch", "--entry", ENTRY_PATH_WITH_VERSION, "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script", "--config",
             ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Assert.assertTrue(systemOutRule.getLog().contains("Final process status is success"));
     }
 
-    // TODO: add assertions
     @Test
     public void download() {
         Client.main(new String[]{"workflow", "download", "--entry", ENTRY_PATH_WITH_VERSION, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Assert.assertTrue(systemOutRule.getLog().contains("GET /workflows/1001/zip/1001 HTTP/1.1"));
+        systemOutRule.clearLog();
         Client.main(new String[]{"workflow", "download", "--entry", ENTRY_PATH_WITH_VERSION, "--zip", "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
-    }
-
-    @Ignore("TODO: Possibly covered by other tests")
-    @Test
-    public void wes() {
-        Client.main(new String[]{"workflow", "wes"});
-    }
-
-    @Ignore("Unrelated")
-    @Test
-    public void manualPublish() {
-        Client.main(new String[]{"workflow", "search"});
+        Assert.assertTrue(systemOutRule.getLog().contains("GET /workflows/1001/zip/1001 HTTP/1.1"));
     }
 
     @Test
