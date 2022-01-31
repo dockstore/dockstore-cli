@@ -166,7 +166,7 @@ public class GeneralWorkflowIT extends BaseIT {
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--unpub", "--script" });
 
         // info
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
+        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--script" });
     }
