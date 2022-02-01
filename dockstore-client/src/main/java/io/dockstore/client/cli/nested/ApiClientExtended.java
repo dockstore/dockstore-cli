@@ -1,6 +1,7 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -19,6 +21,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.dockstore.client.cli.Client;
 import io.openapi.wes.client.ApiClient;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.Pair;
@@ -30,6 +33,7 @@ import uk.co.lucasweb.aws.v4.signer.HttpRequest;
 import uk.co.lucasweb.aws.v4.signer.Signer;
 import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
 
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 
 public class ApiClientExtended extends ApiClient {
@@ -236,6 +240,9 @@ public class ApiClientExtended extends ApiClient {
                     buildResponseHeaders(response),
                     respBody);
             }
+        } catch (ProcessingException ex) {
+            errorMessage(ex.getMessage(), Client.CONNECTION_ERROR);
+            return null;
         } finally {
             try {
                 response.close();
