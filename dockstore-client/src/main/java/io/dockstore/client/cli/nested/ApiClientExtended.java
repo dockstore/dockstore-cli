@@ -3,6 +3,7 @@ package io.dockstore.client.cli.nested;
 import java.io.File;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -241,7 +242,36 @@ public class ApiClientExtended extends ApiClient {
                     respBody);
             }
         } catch (ProcessingException ex) {
+            // This could be caused by a failed Jersey Interceptor/filter, missing message body writers, or other IO exceptions.
+            // Mainly, this error is thrown when the provided WES URL is invalid. For more details, see:
+            // https://docs.oracle.com/javaee/7/api/index.html?javax/ws/rs/ProcessingException.html
             errorMessage(ex.getMessage(), Client.CONNECTION_ERROR);
+            return null;
+        } catch (ApiException ex) {
+            // Different WES servers provide error messages with different levels of verbosity/usefulness, so include both a default
+            // message and the message provided from the WES server in the printed error.
+            switch (ex.getCode()) {
+            case HttpStatus.SC_BAD_REQUEST:
+                errorMessage(MessageFormat.format("The WES request was malformed: {0}",
+                    ex.getLocalizedMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_UNAUTHORIZED:
+                errorMessage(MessageFormat.format("The WES request is unauthorized to be performed on the target WES server: {0}",
+                    ex.getLocalizedMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_FORBIDDEN:
+                errorMessage(MessageFormat.format("The provided credentials are not authorized to make this WES request: {0}",
+                    ex.getLocalizedMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_INTERNAL_SERVER_ERROR:
+                errorMessage(MessageFormat.format("There was an internal server error processing this WES request: {0}",
+                    ex.getLocalizedMessage()), Client.API_ERROR);
+                break;
+            default:
+                errorMessage(MessageFormat.format("There was an unknown error processing this WES request: {0}",
+                    ex.getLocalizedMessage()), Client.API_ERROR);
+            }
+
             return null;
         } finally {
             try {
