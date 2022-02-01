@@ -1003,7 +1003,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         } else {
             final String entry = reqVal(args, "--entry");
             try {
-                Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, false, true);
+                Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, "versions", false, true);
                 if (isAppTool) {
                     errorMessage(GITHUB_APP_COMMAND_ERROR, COMMAND_ERROR);
                 }
@@ -1111,7 +1111,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             final String name = reqVal(args, "--name");
 
             try {
-                Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, false, true);
+                Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, "versions", false, true);
                 if (this.isAppTool) {
                     errorMessage(GITHUB_APP_COMMAND_ERROR, COMMAND_ERROR);
                 }
