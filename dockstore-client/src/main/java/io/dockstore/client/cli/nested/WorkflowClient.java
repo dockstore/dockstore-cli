@@ -362,7 +362,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String[] parts = toolpath.split(":");
         String path = parts[0];
         // match behaviour from getDescriptorFromServer, use master if no version is provided
-        Workflow workflow = findAndGetDockstoreWorkflowByPath(path);
+        Workflow workflow = findAndGetDockstoreWorkflowByPath(path, "versions", true, true);
         String tag = getVersionID(toolpath);
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(tag))
             .findFirst();
@@ -419,7 +419,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
         final String versionID = parts.length > 1 ? parts[1] : "master";
 
-        final Workflow workflow = findAndGetDockstoreWorkflowByPath(parts[0]);
+        final Workflow workflow = findAndGetDockstoreWorkflowByPath(parts[0], "versions", true, true);
 
         // ensure workflow has version
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(versionID))
