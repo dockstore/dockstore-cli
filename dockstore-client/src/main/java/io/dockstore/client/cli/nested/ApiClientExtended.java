@@ -262,6 +262,10 @@ public class ApiClientExtended extends ApiClient {
                 errorMessage(MessageFormat.format("The provided credentials are not authorized to make this WES request: {0}",
                     ex.getLocalizedMessage()), Client.API_ERROR);
                 break;
+            case HttpStatus.SC_NOT_FOUND:
+                errorMessage(MessageFormat.format("The WES server was unable to locate the target entry: {0}",
+                    ex.getLocalizedMessage()), Client.API_ERROR);
+                break;
             case HttpStatus.SC_INTERNAL_SERVER_ERROR:
                 errorMessage(MessageFormat.format("There was an internal server error processing this WES request: {0}",
                     ex.getLocalizedMessage()), Client.API_ERROR);
