@@ -1,7 +1,6 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
