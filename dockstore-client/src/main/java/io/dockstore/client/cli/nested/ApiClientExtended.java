@@ -252,28 +252,28 @@ public class ApiClientExtended extends ApiClient {
             // message and the message provided from the WES server in the printed error.
             switch (ex.getCode()) {
             case HttpStatus.SC_BAD_REQUEST:
-                errorMessage(MessageFormat.format("The WES request was malformed: {0}",
-                    ex.getMessage()), Client.API_ERROR);
+                errorMessage(MessageFormat.format("[{0}] The WES request was malformed: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
                 break;
             case HttpStatus.SC_UNAUTHORIZED:
-                errorMessage(MessageFormat.format("The WES request is unauthorized to be performed on the target WES server: {0}",
-                    ex.getMessage()), Client.API_ERROR);
+                errorMessage(MessageFormat.format("[{0}] The WES request is unauthorized to be performed on the target WES server: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
                 break;
             case HttpStatus.SC_FORBIDDEN:
-                errorMessage(MessageFormat.format("The provided credentials are not authorized to make this WES request: {0}",
-                    ex.getMessage()), Client.API_ERROR);
+                errorMessage(MessageFormat.format("[{0}] The provided credentials are not authorized to make this WES request: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
                 break;
             case HttpStatus.SC_NOT_FOUND:
-                errorMessage(MessageFormat.format("The WES server was unable to locate the target entry: {0}",
-                    ex.getMessage()), Client.API_ERROR);
+                errorMessage(MessageFormat.format("[{0}] The WES server was unable to locate the target entry: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
                 break;
             case HttpStatus.SC_INTERNAL_SERVER_ERROR:
-                errorMessage(MessageFormat.format("There was an internal server error processing this WES request: {0}",
-                    ex.getMessage()), Client.API_ERROR);
+                errorMessage(MessageFormat.format("[{0}] There was an internal server error processing this WES request: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
                 break;
             default:
-                errorMessage(MessageFormat.format("There was an unknown error processing this WES request: {0}",
-                    ex.getMessage()), Client.API_ERROR);
+                errorMessage(MessageFormat.format("[{0}] There was an unknown error processing this WES request: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
             }
 
             return null;
