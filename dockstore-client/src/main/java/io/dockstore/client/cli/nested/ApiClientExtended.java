@@ -244,7 +244,7 @@ public class ApiClientExtended extends ApiClient {
             // This could be caused by a failed Jersey Interceptor/filter, missing message body writers, or other IO exceptions.
             // Mainly, this error is thrown when the provided WES URL is invalid. For more details, see:
             // https://docs.oracle.com/javaee/7/api/index.html?javax/ws/rs/ProcessingException.html
-            errorMessage(MessageFormat.format("There was an error processing the HTTP request. This could be caused by an invalid URL: {0}",
+            errorMessage(MessageFormat.format("There was an error processing the HTTP request: {0}",
                 ex.getMessage()), Client.CONNECTION_ERROR);
             return null;
         } catch (ApiException ex) {
