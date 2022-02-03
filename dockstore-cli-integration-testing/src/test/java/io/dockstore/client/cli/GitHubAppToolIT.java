@@ -9,6 +9,7 @@ import io.swagger.client.ApiException;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.PublishRequest;
 import io.swagger.client.model.Workflow;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -144,9 +145,8 @@ public class GitHubAppToolIT extends BaseIT {
     public void download() {
         Client.main(new String[]{"workflow", "download", "--entry", ENTRY_PATH_WITH_VERSION, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
         Assert.assertTrue(systemOutRule.getLog().contains("GET /workflows/1001/zip/1001 HTTP/1.1"));
-        systemOutRule.clearLog();
         Client.main(new String[]{"workflow", "download", "--entry", ENTRY_PATH_WITH_VERSION, "--zip", "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
-        Assert.assertTrue(systemOutRule.getLog().contains("GET /workflows/1001/zip/1001 HTTP/1.1"));
+        Assert.assertEquals(2, StringUtils.countMatches(systemOutRule.getLog(), "GET /workflows/1001/zip/1001 HTTP/1.1"));
     }
 
     @Test
