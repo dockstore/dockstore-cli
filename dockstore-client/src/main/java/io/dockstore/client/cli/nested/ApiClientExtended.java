@@ -264,7 +264,7 @@ public class ApiClientExtended extends ApiClient {
                     ex.getCode(), ex.getMessage()), Client.API_ERROR);
                 break;
             case HttpStatus.SC_NOT_FOUND:
-                errorMessage(MessageFormat.format("[{0}] The WES server was unable to locate the target entry: {1}",
+                errorMessage(MessageFormat.format("[{0}] The WES server was unable to locate an entity: {1}",
                     ex.getCode(), ex.getMessage()), Client.API_ERROR);
                 break;
             case HttpStatus.SC_INTERNAL_SERVER_ERROR:
