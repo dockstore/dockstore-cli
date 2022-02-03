@@ -6,7 +6,7 @@ services:
     image: rabbitmq:3.9.5
     hostname: rabbitmq
   celery:
-    image: ${TOIL_APPLIANCE_SELF}
+    image: quay.io/ucsc_cgl/toil:5.7.0a1-dd3b68001c02f65c5d856a670677b99db07793c8-py3.8
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker:/var/lib/docker
@@ -17,7 +17,7 @@ services:
     depends_on:
       - rabbitmq
   wes-server:
-    image: ${TOIL_APPLIANCE_SELF}
+    image: quay.io/ucsc_cgl/toil:5.7.0a1-dd3b68001c02f65c5d856a670677b99db07793c8-py3.8
     volumes:
       - /tmp/toil-workflows:/tmp/toil-workflows
     environment:
@@ -30,7 +30,7 @@ services:
       - "traefik.http.routers.wes.rule=Host(`localhost`)"
       - "traefik.http.routers.wes.entrypoints=web"
       - "traefik.http.routers.wes.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=test:$$2y$$12$$ci.4U63YX83CwkyUrjqxAucnmi2xXOIlEF6T/KdP9824f1Rf1iyNG"
+      - "traefik.http.middlewares.auth.basicauth.users=test:banana"
       - "traefik.http.routers.wespublic.rule=Host(`localhost`) && Path(`/ga4gh/wes/v1/service-info`)"
     depends_on:
       - rabbitmq
