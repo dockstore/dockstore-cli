@@ -1,6 +1,7 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,18 +11,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.openapi.wes.client.model.RunId;
+import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.IO_ERROR;
 
 public final class WesLauncher {
 
@@ -29,6 +34,10 @@ public final class WesLauncher {
     private static final String TAGS = "{\"Client\":\"Dockstore\"}";
     private static final String WORKFLOW_TYPE_VERSION = "1.0";
     private static final String WORKFLOW_ENGINE_PARAMETERS = "{}";
+
+    private static final String DOCKSTORE_ROOT_TEMP_DIR_PREFIX = "DockstoreWesLaunch";
+    private static final String DOCKSTORE_NESTED_TEMP_DIR_PREFIX = "UnzippedWorkflow";
+
 
     private WesLauncher() {
 
@@ -39,13 +48,17 @@ public final class WesLauncher {
      *
      * @param workflowClient The WorkflowClient for the request
      * @param workflowEntry The entry path, (i.e. github.com/myRepo/myWorkflow:version)
+     * @param inlineWorkflow Determines if the entry is locally provisioned or not, this alters the format that the WES request is made in.
      * @param workflowParamPath The path to a file to be used as an input JSON. (i.e. /path/to/file.json)
      * @param filePaths A list of paths to files to be attached to the request.
      */
-    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, String workflowParamPath, List<String> filePaths) {
+    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, boolean inlineWorkflow, String workflowParamPath, List<String> filePaths) {
 
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
+
+        // The descriptor type
+        String workflowType = workflow.getDescriptorType().getValue();
 
         // Get the workflow version we are launching
         final String versionId = workflowClient.getVersionID(workflowEntry);
@@ -61,12 +74,14 @@ public final class WesLauncher {
 
         // Can take the following values:
         // 1. A TRS URL returning the raw primary descriptor file contents
-        // 2. TODO: A path to a file in the 'attachments' list
-        String workflowUrl = combineTrsUrlComponents(workflowClient, workflowEntry, workflow, workflowVersion);
+        // 2. The name of a file in the attachments list
+        String workflowUrl = inlineWorkflow
+            ? workflowVersion.getWorkflowPath().replaceAll("^/+", "") // Remove all leading slashes
+            : combineTrsUrlComponents(workflowClient, workflowEntry, workflow, workflowVersion);
 
         // A JSON object containing a key/value pair that points to the test parameter file in the 'attachments' list
         // The key is WES server implementation specific. e.g. {"workflowInput":"params.json"}.
-        File workflowParams = fetchFile(workflowParamPath).orElse(null);
+        File workflowParams = fetchFile(workflowParamPath, null, null).orElse(null);
 
         // A list of supplementary files that are required to run the workflow. This may include any/all of the following:
         // 1. The primary descriptor file
@@ -74,11 +89,13 @@ public final class WesLauncher {
         // 3. Test parameter files
         // 4. Any other files referenced by the workflow
         // TODO: Allow users to specify a directory to upload?
-        // TODO: Automatically attach all files referenced in remote Dockstore entry?
-        List<File> workflowAttachment = fetchFiles(filePaths);
-
-        // The descriptor type
-        String workflowType = workflow.getDescriptorType().getValue();
+        // 6. Automatically attach all files referenced in remote Dockstore entry?
+        List<File> workflowAttachment = new ArrayList<>(fetchFiles(filePaths));
+        if (inlineWorkflow) {
+            // Download all workflow files and place them into a temporary directory, then add them as attachments to the WES request
+            final File unzippedWorkflowDir = provisionFilesLocally(workflowClient, workflowEntry, workflowType);
+            workflowAttachment.addAll(fetchFilesFromLocalDirectory(unzippedWorkflowDir.getAbsolutePath()));
+        }
 
         // The workflow version
         String workflowTypeVersion = createWorkflowTypeVersion(workflowType);
@@ -115,6 +132,56 @@ public final class WesLauncher {
         String path = parts[0];
         String version = workflowClient.getVersionID(workflowEntry);
         return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW.toString(), null, version);
+    }
+
+    /**
+     * Provisions a workflow's associated files in a temporary local directory
+     *
+     * @param workflowClient The WorkflowClient
+     * @param workflowEntry The workflow entry (i.e. github.com/myRepo/myWorkflow:version)
+     * @param descriptorType The type of descriptor for this workflow (WDL, CWL, etc...)
+     * @return A zipped File object
+     */
+    public static File provisionFilesLocally(WorkflowClient workflowClient, String workflowEntry, String descriptorType) {
+
+        // A temporary directory which will house all downloaded content
+        File tempDir;
+
+        try {
+            tempDir = Files.createTempDirectory(DOCKSTORE_ROOT_TEMP_DIR_PREFIX).toFile().getAbsoluteFile();
+        } catch (IOException ex) {
+            exceptionMessage(ex, "Could not create a temporary working directory.", IO_ERROR);
+            throw new RuntimeException(ex);
+        }
+
+        // A zip file containing the content of the provided workflow
+        File zippedWorkflow;
+
+        // Download the contents locally
+        try {
+            zippedWorkflow = workflowClient.downloadTargetEntry(workflowEntry,
+                ToolDescriptor.TypeEnum.fromValue(descriptorType), false, tempDir);
+            zippedWorkflow.deleteOnExit();
+        } catch (IOException ex) {
+            exceptionMessage(ex, "A problem was encountered while downloading the entry.", IO_ERROR);
+            throw new RuntimeException(ex);
+        }
+
+        // The directory where the unzipped workflow contents are located
+        File unzippedWorkflowDir;
+
+        // Unzip the workflow to a nested temporary directory
+        try {
+            unzippedWorkflowDir = Files.createTempDirectory(Path.of(tempDir.getAbsolutePath()), DOCKSTORE_NESTED_TEMP_DIR_PREFIX).toFile().getAbsoluteFile();
+            SwaggerUtility.unzipFile(zippedWorkflow, unzippedWorkflowDir);
+            unzippedWorkflowDir.deleteOnExit();
+        } catch (IOException ex) {
+            exceptionMessage(ex, "A problem was encountered while unzipping the entry.", IO_ERROR);
+            throw new RuntimeException(ex);
+        }
+
+        out("Successfully downloaded files for entry '" + workflowEntry + "'");
+        return unzippedWorkflowDir;
     }
 
     /**
@@ -157,21 +224,26 @@ public final class WesLauncher {
      * Attempts to load a file from the provided path. Errors out if the file doesn't exist.
      *
      * @param filePath Path to a file or null
-     * @return An Optional File object, this may be empty if the filepath is null
+     * @param removablePrefix Used to determine the relative path of the file located at a path that contains the String removablePrefix
+     * @param desiredSuffix Used to determine the relative path of the file, where the desired suffix is the relative path
+     * @return An Optional WesFile object, this may be empty if the filepath is null
      */
-    public static Optional<File> fetchFile(String filePath) {
+    public static Optional<WesFile> fetchFile(String filePath, String removablePrefix, String desiredSuffix) {
         if (filePath == null) {
             return Optional.empty();
         }
 
         // Verify the file path exists
+        // 1. If the path is to a directory, return an empty optional
         Path path = Paths.get(filePath);
-        if (!Files.isRegularFile(path)) {
+        if (Files.isDirectory(path)) {
+            return Optional.empty();
+        } else if (!Files.isRegularFile(path)) {
             errorMessage(MessageFormat.format("Unable to locate file: {0}", filePath), CLIENT_ERROR);
         }
 
         // TODO: Handle path expansions? i.e. '~/my/file.txt'
-        return Optional.of(new File(filePath));
+        return Optional.of(new WesFile(filePath, removablePrefix, desiredSuffix));
     }
 
     /**
@@ -180,19 +252,39 @@ public final class WesLauncher {
      * @param filePaths A list of paths that correspond to files that need to be attached to the WES request, this may be null
      * @return A list of File objects, which may be empty
      */
-    public static List<File> fetchFiles(List<String> filePaths) {
+    public static List<WesFile> fetchFiles(List<String> filePaths) {
 
         // Return an empty list if no attachments were passed
         if (filePaths == null) {
             return Collections.emptyList();
         }
 
-        List<File> workflowAttachments = new ArrayList<>();
+        List<WesFile> workflowAttachments = new ArrayList<>();
         filePaths.forEach(path -> {
-            final Optional<File> attachmentFile = fetchFile(path);
+            final Optional<WesFile> attachmentFile = fetchFile(path, null, path);
             attachmentFile.ifPresent(workflowAttachments::add);
         });
 
+        return workflowAttachments;
+    }
+
+    /**
+     * Fetches all files from the provided directory path
+     *
+     * @param localDirectory Path of a local directory
+     * @return A list of WesFiles found as child files of the provided directory
+     */
+    public static List<WesFile> fetchFilesFromLocalDirectory(String localDirectory) {
+        List<WesFile> workflowAttachments = new ArrayList<>();
+        try {
+            Files.walk(Path.of(localDirectory)).forEach(path -> {
+                final Optional<WesFile> attachmentFile = fetchFile(path.toAbsolutePath().toString(), localDirectory, null);
+                attachmentFile.ifPresent(workflowAttachments::add);
+            });
+        } catch (IOException ex) {
+            exceptionMessage(ex, "A problem was encountered while attaching files from a local directory.", IO_ERROR);
+            throw new RuntimeException(ex);
+        }
         return workflowAttachments;
     }
 
