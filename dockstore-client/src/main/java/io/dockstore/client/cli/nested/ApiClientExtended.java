@@ -2,6 +2,7 @@ package io.dockstore.client.cli.nested;
 
 import java.io.File;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -19,6 +21,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.dockstore.client.cli.Client;
 import io.openapi.wes.client.ApiClient;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.Pair;
@@ -30,6 +33,7 @@ import uk.co.lucasweb.aws.v4.signer.HttpRequest;
 import uk.co.lucasweb.aws.v4.signer.Signer;
 import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
 
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 
 public class ApiClientExtended extends ApiClient {
@@ -236,6 +240,43 @@ public class ApiClientExtended extends ApiClient {
                     buildResponseHeaders(response),
                     respBody);
             }
+        } catch (ProcessingException ex) {
+            // This could be caused by a failed Jersey Interceptor/filter, missing message body writers, or other IO exceptions.
+            // Mainly, this error is thrown when the provided WES URL is invalid. For more details, see:
+            // https://docs.oracle.com/javaee/7/api/index.html?javax/ws/rs/ProcessingException.html
+            errorMessage(MessageFormat.format("There was an error processing the HTTP request: {0}",
+                ex.getMessage()), Client.CONNECTION_ERROR);
+            return null;
+        } catch (ApiException ex) {
+            // Different WES servers provide error messages with different levels of verbosity/usefulness, so include both a default
+            // message and the message provided from the WES server in the printed error.
+            switch (ex.getCode()) {
+            case HttpStatus.SC_BAD_REQUEST:
+                errorMessage(MessageFormat.format("[{0}] The WES request was malformed: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_UNAUTHORIZED:
+                errorMessage(MessageFormat.format("[{0}] The WES request is unauthorized to be performed on the target WES server: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_FORBIDDEN:
+                errorMessage(MessageFormat.format("[{0}] The provided credentials are not authorized to make this WES request: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_NOT_FOUND:
+                errorMessage(MessageFormat.format("[{0}] The WES server was unable to locate an entity: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_INTERNAL_SERVER_ERROR:
+                errorMessage(MessageFormat.format("[{0}] There was an internal server error processing this WES request: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            default:
+                errorMessage(MessageFormat.format("[{0}] There was an unknown error processing this WES request: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+            }
+
+            return null;
         } finally {
             try {
                 response.close();
