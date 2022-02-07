@@ -357,3 +357,4 @@ commands:
     steps:
       - run:
           name: run toil WES tests
+          command: ./mvnw -pl dockstore-client -Dtest=WesToilIT test

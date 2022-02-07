@@ -22,13 +22,13 @@ public class WesToilIT {
 
     @Test
     public void testBasicLaunch1() {
-            String[] commandStatement = new String[]{ "workflow", "wes", "launch",
-                "--config", TOIL_CONFIG,
-                "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
-                "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
-                "--inline-workflow"
-            };
-            Client.main(commandStatement);
-            assertTrue("A helper command should be printed to stdout", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+        String[] commandStatement = new String[]{ "workflow", "wes", "launch",
+            "--config", TOIL_CONFIG,
+            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
+            "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
+            "--inline-workflow"
+        };
+        Client.main(commandStatement);
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
     }
 }
