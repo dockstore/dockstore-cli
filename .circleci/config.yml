@@ -80,7 +80,15 @@ jobs:
       - save_test_results
       - send_coverage
 
-
+  wes-toil-test:
+    executor: machine_integration_test_exec
+    environment:
+      TESTING_PROFILE: << parameters.testing_profile >>
+      MAVEN_GOAL: verify
+    steps:
+      - setup_for_unit_tests
+      - setup_toil_wes_server
+      - run_toil_wes_tests
 
 
   build:
@@ -338,3 +346,14 @@ commands:
       - store_artifacts:
           path: /tmp/dockstore-web-cache.misses.log
 
+  setup_toil_wes_server:
+    steps:
+      - run:
+        name: execute toil docker compose
+        command: docker compose up --detach
+        working_directory: toil/
+
+  run_toil_wes_tests:
+    steps:
+      - run:
+          name: run toil WES tests
