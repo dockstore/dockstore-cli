@@ -48,6 +48,11 @@ workflows:
           requires:
             - build
 
+      - wes-toil-test:
+          <<: *common_filters
+          requires:
+            - build
+
 
 jobs:
   unit-tests:
