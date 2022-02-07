@@ -349,9 +349,9 @@ commands:
   setup_toil_wes_server:
     steps:
       - run:
-        name: execute toil docker compose
-        command: docker compose up --detach
-        working_directory: toil/
+          name: execute toil docker compose
+          command: docker compose up --detach
+          working_directory: toil/
 
   run_toil_wes_tests:
     steps:
