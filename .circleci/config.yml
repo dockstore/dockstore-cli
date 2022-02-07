@@ -32,21 +32,21 @@ workflows:
       - build:
           <<: *common_filters
 
-      - unit-tests:
-          <<: *common_filters
-          requires:
-            - build
-
-      - integration-tests:
-          matrix:
-            parameters:
-              testing_profile: ["non-confidential-tests",
-              "confidential-workflow-tests",
-              "confidential-tool-tests",
-              "singularity-tests"]
-          <<: *common_filters
-          requires:
-            - build
+#      - unit-tests:
+#          <<: *common_filters
+#          requires:
+#            - build
+#
+#      - integration-tests:
+#          matrix:
+#            parameters:
+#              testing_profile: ["non-confidential-tests",
+#              "confidential-workflow-tests",
+#              "confidential-tool-tests",
+#              "singularity-tests"]
+#          <<: *common_filters
+#          requires:
+#            - build
 
       - wes-toil-test:
           <<: *common_filters
@@ -355,7 +355,7 @@ commands:
     steps:
       - run:
           name: execute toil docker compose
-          command: docker compose up --detach
+          command: docker compose up
           working_directory: toil/
 
   run_toil_wes_tests:
