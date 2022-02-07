@@ -86,10 +86,10 @@ jobs:
       - send_coverage
 
   wes-toil-test:
-    executor: machine_integration_test_exec
+    executor: unit_tests_executor
     environment:
-      TESTING_PROFILE: << parameters.testing_profile >>
-      MAVEN_GOAL: verify
+      TESTING_PROFILE: unit-tests
+      MAVEN_GOAL: test
     steps:
       - setup_for_unit_tests
       - setup_toil_wes_server
