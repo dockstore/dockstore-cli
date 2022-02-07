@@ -354,6 +354,14 @@ commands:
   setup_toil_wes_server:
     steps:
       - run:
+          name: create required directories to mount. Requires execute permissions.
+          command: |
+            mkdir /var/lib/toil && sudo chmod a+rwx -R /var/lib/toil
+
+            mkdir /var/lib/cwl && sudo chmod a+rwx -R /var/lib/toil
+            
+            mkdir /tmp/toil-workflows && sudo chmod a+rwx -R /var/lib/toil
+      - run:
           name: execute toil docker compose
           command: docker-compose up
           working_directory: toil/
