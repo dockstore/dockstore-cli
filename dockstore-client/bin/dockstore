@@ -157,7 +157,7 @@ if [ "$1" = "self-install" ]; then
     if [ -r "$DOCKSTORE_JAR" ]; then
         echo "The self-install jar already exists at $DOCKSTORE_JAR."
         echo "If you wish to re-download, delete it and rerun \"$0 self-install\"."
-        exit 1
+        exit 0
     fi
 
     (>&2 echo "Downloading Dockstore to $DOCKSTORE_JAR now...")

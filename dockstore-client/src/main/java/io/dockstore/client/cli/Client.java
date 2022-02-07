@@ -354,8 +354,8 @@ public class Client {
             // was run to upgrade the Dockstore version.
             Map<String, String> additionalEnvVarMap =
                     Collections.singletonMap("DOCKSTORE_VERSION", dockstoreVersion);
-            Utilities.executeCommand(file.toPath().toString() + " self-install", ByteStreams.nullOutputStream(),
-                     ByteStreams.nullOutputStream(), null, additionalEnvVarMap);
+            Utilities.executeCommand(file.toPath().toString() + " self-install",
+                    System.out, System.err, null, additionalEnvVarMap);
         } catch (IOException e) {
             exceptionMessage(e, "Could not connect to Github. You may have reached your rate limit.", IO_ERROR);
         }
