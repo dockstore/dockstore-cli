@@ -30,6 +30,7 @@ services:
       - "traefik.http.routers.wes.rule=Host(`localhost`)"
       - "traefik.http.routers.wes.entrypoints=web"
       - "traefik.http.routers.wes.middlewares=auth"
+      # This sets the user as 'test' and the password as 'test'. The authorization for this user should be base64 encoded, i.e. "Authorization: Basic dGVzdDp0ZXN0"
       - "traefik.http.middlewares.auth.basicauth.users=test:$$2y$$12$$ci.4U63YX83CwkyUrjqxAucnmi2xXOIlEF6T/KdP9824f1Rf1iyNG"
       - "traefik.http.routers.wespublic.rule=Host(`localhost`) && Path(`/ga4gh/wes/v1/service-info`)"
     depends_on:
