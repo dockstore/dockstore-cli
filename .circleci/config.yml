@@ -356,11 +356,11 @@ commands:
       - run:
           name: create required directories to mount. Requires execute permissions.
           command: |
-            mkdir /var/lib/toil && sudo chmod a+rwx -R /var/lib/toil
+            sudo mkdir /var/lib/toil && sudo chmod a+rwx -R /var/lib/toil
 
-            mkdir /var/lib/cwl && sudo chmod a+rwx -R /var/lib/toil
-            
-            mkdir /tmp/toil-workflows && sudo chmod a+rwx -R /var/lib/toil
+            sudo mkdir /var/lib/cwl && sudo chmod a+rwx -R /var/lib/toil
+
+            sudo mkdir /tmp/toil-workflows && sudo chmod a+rwx -R /var/lib/toil
       - run:
           name: execute toil docker compose
           command: docker-compose up
