@@ -355,7 +355,7 @@ commands:
     steps:
       - run:
           name: execute toil docker compose
-          command: docker compose up
+          command: docker-compose up
           working_directory: toil/
 
   run_toil_wes_tests:
