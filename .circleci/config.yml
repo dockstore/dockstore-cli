@@ -366,6 +366,9 @@ commands:
           name: execute toil docker compose
           command: docker-compose up -d
           working_directory: toil/
+      - run:
+          name: do we get here?
+          command: echo "Send help?"
 
   run_toil_wes_tests:
     steps:
