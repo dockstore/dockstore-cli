@@ -37,21 +37,21 @@ workflows:
       - build:
           <<: *common_filters
 
-#      - unit-tests:
-#          <<: *common_filters
-#          requires:
-#            - build
-#
-#      - integration-tests:
-#          matrix:
-#            parameters:
-#              testing_profile: ["non-confidential-tests",
-#              "confidential-workflow-tests",
-#              "confidential-tool-tests",
-#              "singularity-tests"]
-#          <<: *common_filters
-#          requires:
-#            - build
+      - unit-tests:
+          <<: *common_filters
+          requires:
+            - build
+
+      - integration-tests:
+          matrix:
+            parameters:
+              testing_profile: ["non-confidential-tests",
+              "confidential-workflow-tests",
+              "confidential-tool-tests",
+              "singularity-tests"]
+          <<: *common_filters
+          requires:
+            - build
 
       - wes-toil-test:
           <<: *common_filters
@@ -376,5 +376,5 @@ commands:
           command: ./mvnw clean install -DskipTests
       - run:
           name: run toil tests
-          command: ./mvnw -pl dockstore-client -Dtest=WesToilIT test
+          command: ./mvnw -pl dockstore-client -P wes-integration-tests integration-test
 

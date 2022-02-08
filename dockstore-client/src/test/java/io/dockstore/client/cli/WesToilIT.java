@@ -6,10 +6,12 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+@Category(WesToilIT.class)
 public class WesToilIT {
 
     public static final String TOIL_CONFIG = ResourceHelpers.resourceFilePath("wesIt/config_toil");

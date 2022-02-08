@@ -644,6 +644,7 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.BenchmarkTest,
                     io.dockstore.common.ToilOnlyTest
+                    io.dockstore.client.cli.WesToilIT
                 </excludeGroups>
             </properties>
 
@@ -676,6 +677,15 @@
             </properties>
         </profile>
         <profile>
+            <id>wes-integration-tests</id>
+            <!-- run only tests that are relevant for WES Integration -->
+            <properties>
+                <skipTests>true</skipTests>
+                <skipITs>false</skipITs>
+                <groups>io.dockstore.client.cli.WesToilIT</groups>
+            </properties>
+        </profile>
+        <profile>
             <id>integration-tests</id>
             <properties>
                 <skipTests>true</skipTests>
@@ -700,6 +710,7 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.WorkflowTest
+                    io.dockstore.client.cli.WesToilIT
                 </excludeGroups>
             </properties>
         </profile>
@@ -715,6 +726,7 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.ToolTest
+                    io.dockstore.client.cli.WesToilIT
                 </excludeGroups>
             </properties>
         </profile>
@@ -729,6 +741,7 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.ConfidentialTest
+                    io.dockstore.client.cli.WesToilIT
                 </excludeGroups>
             </properties>
         </profile>
