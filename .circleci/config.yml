@@ -364,7 +364,7 @@ commands:
             sudo mkdir /tmp/toil-workflows && sudo chmod a+rwx -R /var/lib/toil
       - run:
           name: execute toil docker compose
-          command: docker-compose up
+          command: docker-compose up -d
           working_directory: toil/
 
   run_toil_wes_tests:
