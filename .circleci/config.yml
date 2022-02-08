@@ -49,6 +49,10 @@ workflows:
 #            - build
 
       - wes-toil-test:
+          matrix:
+            parameters:
+              parameters:
+              testing_profile: ["non-confidential-tests"]
           <<: *common_filters
           requires:
             - build
@@ -86,16 +90,17 @@ jobs:
       - send_coverage
 
   wes-toil-test:
-    executor: unit_tests_executor
+    executor: machine_integration_test_exec
     environment:
-      TESTING_PROFILE: unit-tests
-      MAVEN_GOAL: test
+      TESTING_PROFILE: << parameters.testing_profile >>
+      MAVEN_GOAL: verify
     steps:
+      - setup_for_integration_tests
       - setup_remote_docker
-      - setup_for_unit_tests
       - setup_toil_wes_server
       - run_toil_wes_tests
-
+      - save_test_results
+      - send_coverage
 
   build:
     docker: # run the steps with Docker
@@ -366,9 +371,6 @@ commands:
           name: execute toil docker compose
           command: docker-compose up -d
           working_directory: toil/
-      - run:
-          name: do we get here?
-          command: echo "Send help?"
 
   run_toil_wes_tests:
     steps:
