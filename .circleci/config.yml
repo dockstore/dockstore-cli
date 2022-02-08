@@ -91,8 +91,7 @@ jobs:
       TESTING_PROFILE: unit-tests
       MAVEN_GOAL: test
     steps:
-      - setup_remote_docker:
-          version: 20.10.12
+      - setup_remote_docker
       - setup_for_unit_tests
       - setup_toil_wes_server
       - run_toil_wes_tests
