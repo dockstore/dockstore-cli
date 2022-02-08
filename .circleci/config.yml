@@ -92,10 +92,10 @@ jobs:
       MAVEN_GOAL: test
     steps:
       - get_workspace_and_dependencies
+      - setup_remote_docker
+      - setup_for_unit_tests
       - setup_toil_wes_server
       - run_toil_wes_tests
-      - save_test_results
-      - send_coverage
 
   build:
     docker: # run the steps with Docker
