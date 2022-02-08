@@ -92,9 +92,6 @@ jobs:
       MAVEN_GOAL: test
     steps:
       - get_workspace_and_dependencies
-      - setup_machine
-      - setup_for_tests
-      - setup_remote_docker
       - setup_toil_wes_server
       - run_toil_wes_tests
       - save_test_results
