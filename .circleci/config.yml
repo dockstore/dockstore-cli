@@ -95,9 +95,7 @@ jobs:
       - setup_remote_docker
       - setup_for_unit_tests
       - setup_toil_wes_server
-      - run_toil_wes_tests:
-          requires:
-            - setup_toil_wes_server
+      - run_toil_wes_tests
 
 
   build:
