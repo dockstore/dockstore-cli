@@ -49,10 +49,6 @@ workflows:
 #            - build
 
       - wes-toil-test:
-          matrix:
-            parameters:
-              parameters:
-              testing_profile: ["non-confidential-tests"]
           <<: *common_filters
           requires:
             - build
