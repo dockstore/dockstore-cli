@@ -40,7 +40,6 @@ import io.dockstore.client.cli.JCommanderUtility;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.SourceControl;
-import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
@@ -85,8 +84,7 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 
 /**
- * This stub will eventually implement all operations on the CLI that are
- * specific to workflows.
+ * This stub will eventually implement all operations on the CLI that are specific to workflows.
  *
  * @author dyuen
  */
@@ -94,6 +92,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     public static final String BIOWORKFLOW = "bioworkflow";
     public static final String LAUNCH_COMMAND_NAME = "launch";
+    public static final String GITHUB_APP_COMMAND_ERROR = "Command not supported for GitHub App entries";
     protected static final Logger LOG = LoggerFactory.getLogger(WorkflowClient.class);
     private static final String UPDATE_WORKFLOW = "update_workflow";
     protected final WorkflowsApi workflowsApi;
@@ -101,6 +100,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     protected final Client client;
     private final JCommander jCommander;
     private final CommandLaunch commandLaunch;
+
+    private boolean isAppTool;
 
     public WorkflowClient(WorkflowsApi workflowApi, UsersApi usersApi, Client client, boolean isAdmin) {
         this.workflowsApi = workflowApi;
@@ -134,6 +135,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         }
     }
 
+    public boolean isAppTool() {
+        return isAppTool;
+    }
+
     private void manualPublishHelp() {
         printHelpHeader();
         out("Usage: dockstore " + getEntryType().toLowerCase() + " manual_publish --help");
@@ -150,7 +155,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("Optional parameters:");
         out("  --workflow-path <workflow-path>                      Path for the descriptor file, defaults to /Dockstore.cwl");
         out("  --workflow-name <workflow-name>                      Workflow name, defaults to null");
-        out("  --descriptor-type <descriptor-type>                  Descriptor type, defaults to " + DescriptorLanguage.CWL.toString());
+        out("  --descriptor-type <descriptor-type>                  Descriptor type, defaults to " + DescriptorLanguage.CWL);
         out("  --test-parameter-path <test-parameter-path>          Path to default test parameter file, defaults to /test.json");
 
         printHelpFooter();
@@ -207,7 +212,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     public void handleLabels(String entryPath, Set<String> addsSet, Set<String> removesSet) {
         // Try and update the labels for the given workflow
         try {
-            Workflow workflow = workflowsApi.getWorkflowByPath(entryPath, BIOWORKFLOW, null);
+            Workflow workflow = findAndGetDockstoreWorkflowByPath(entryPath, null, false, true);
             long workflowId = workflow.getId();
             List<Label> existingLabels = workflow.getLabels();
 
@@ -252,7 +257,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     public void handleEntry2json(List<String> args) throws ApiException, IOException {
         String commandName = "entry2json";
         String[] argv = args.toArray(new String[0]);
-        String[] argv1 = { commandName };
+        String[] argv1 = {commandName};
         String[] both = ArrayUtils.addAll(argv1, argv);
         CommandEntry2json commandEntry2json = new CommandEntry2json();
         JCommander jc = new JCommander();
@@ -276,7 +281,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     public void handleEntry2tsv(List<String> args) throws ApiException, IOException {
         String commandName = "entry2tsv";
         String[] argv = args.toArray(new String[0]);
-        String[] argv1 = { commandName };
+        String[] argv1 = {commandName};
         String[] both = ArrayUtils.addAll(argv1, argv);
         CommandEntry2tsv commandEntry2tsv = new CommandEntry2tsv();
         JCommander jc = new JCommander();
@@ -300,27 +305,26 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         // User may enter the version, so we have to extract the path
         String[] parts = entry.split(":");
         String path = parts[0];
-        Workflow workflow = getDockstoreWorkflowByPath(path);
+        Workflow workflow = findAndGetDockstoreWorkflowByPath(path);
         String descriptor = workflow.getDescriptorType().getValue();
         LanguageClientInterface languageCLient = convertCLIStringToEnum(descriptor);
         return languageCLient.generateInputJson(entry, json);
     }
 
-    public Workflow getDockstoreWorkflowByPath(String path) {
-        // simply getting published descriptors does not require permissions
-        Workflow workflow = null;
-        try {
-            workflow = workflowsApi.getPublishedWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW.toString(), "versions",  null);
-        } catch (ApiException e) {
-            if (e.getResponseBody().contains("Entry not found")) {
-                LOG.info("Unable to locate entry without credentials, trying again as authenticated user");
-                workflow = workflowsApi.getWorkflowByPath(path, BIOWORKFLOW, "versions");
-            }
-        } finally {
-            if (workflow == null) {
-                errorMessage("No workflow found with path " + path, Client.ENTRY_NOT_FOUND);
-            }
-        }
+    /**
+     * Try and get the workflow with the path (unauthenticated/authenticated bioworkflow, unauthenticated/authenticated apptool)
+     *
+     * @param path Path of the apptool or bioworkflow
+     * @return
+     */
+    public Workflow findAndGetDockstoreWorkflowByPath(String path) {
+        return findAndGetDockstoreWorkflowByPath(path, null, true, true);
+    }
+
+    public Workflow findAndGetDockstoreWorkflowByPath(String entryPath, String include, boolean searchUnauthenticated, boolean searchAppTool) {
+        WebserviceWorkflowClient webserviceWorkflowClient = new WebserviceWorkflowClient(workflowsApi, include, searchUnauthenticated, searchAppTool);
+        Workflow workflow = webserviceWorkflowClient.findAndGetDockstoreWorkflowByPath(entryPath);
+        this.isAppTool = webserviceWorkflowClient.isFoundAppTool();
         return workflow;
     }
 
@@ -358,7 +362,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String[] parts = toolpath.split(":");
         String path = parts[0];
         // match behaviour from getDescriptorFromServer, use master if no version is provided
-        Workflow workflow = getDockstoreWorkflowByPath(path);
+        Workflow workflow = findAndGetDockstoreWorkflowByPath(path, "versions", true, true);
         String tag = getVersionID(toolpath);
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(tag))
             .findFirst();
@@ -397,11 +401,16 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
      */
     @Override
     public String getTrsId(String entryPath) {
-        return entryPath.startsWith("#workflow/") ? entryPath : "#workflow/" + entryPath;
+        if (isAppTool) {
+            return entryPath;
+        } else {
+            return entryPath.startsWith("#workflow/") ? entryPath : "#workflow/" + entryPath;
+        }
     }
 
     /**
      * Returns the version ID of the given workflow, falls back to the latest version
+     *
      * @param entryPath Workflow path
      */
     @Override
@@ -410,7 +419,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
         final String versionID = parts.length > 1 ? parts[1] : "master";
 
-        final Workflow workflow = getDockstoreWorkflowByPath(parts[0]);
+        final Workflow workflow = findAndGetDockstoreWorkflowByPath(parts[0], "versions", true, true);
 
         // ensure workflow has version
         Optional<WorkflowVersion> first = workflow.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(versionID))
@@ -439,7 +448,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     public void launch(final List<String> args) {
         preValidateLaunchArguments(args);
         String[] argv = args.toArray(new String[0]);
-        String[] argv1 = { LAUNCH_COMMAND_NAME };
+        String[] argv1 = {LAUNCH_COMMAND_NAME};
         String[] both = ArrayUtils.addAll(argv1, argv);
         this.jCommander.parse(both);
         String entry = commandLaunch.entry;
@@ -474,7 +483,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     String[] parts = entry.split(":");
                     String path = parts[0];
                     try {
-                        Workflow workflow = getDockstoreWorkflowByPath(path);
+                        Workflow workflow = findAndGetDockstoreWorkflowByPath(path);
                         final Workflow.DescriptorTypeEnum descriptorType = workflow.getDescriptorType();
                         final String descriptor = descriptorType.getValue().toLowerCase();
                         LanguageClientInterface languageClientInterface = convertCLIStringToEnum(descriptor);
@@ -482,7 +491,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
                         switch (language) {
                         case CWL:
-                            if (!(yamlRun != null ^ jsonRun != null)) {
+                            if ((yamlRun != null) == (jsonRun != null)) {
                                 errorMessage("One of  --json, --yaml, and --tsv is required", CLIENT_ERROR);
                             } else {
                                 try {
@@ -542,9 +551,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     /**
      * this function will check for the content and the extension of entry file
      *
-     * @param entry relative path to local descriptor for either WDL/CWL tools or workflows
-     *              this will either give back exceptionMessage and exit (if the content/extension/descriptor is invalid)
-     *              OR proceed with launching the entry file (if it's valid)
+     * @param entry relative path to local descriptor for either WDL/CWL tools or workflows this will either give back exceptionMessage and exit (if the content/extension/descriptor is invalid) OR
+     *              proceed with launching the entry file (if it's valid)
      * @param uuid
      */
     private void checkEntryFile(String entry, String jsonRun, String yamlRun, String wdlOutputTarget, String uuid) {
@@ -604,7 +612,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     @Override
     public void handleInfo(String entryPath) {
         try {
-            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entryPath, WorkflowSubClass.BIOWORKFLOW.toString(), "versions", null);
+            Workflow workflow = findAndGetDockstoreWorkflowByPath(entryPath, null, true, true);
             if (workflow == null || !workflow.isIsPublished()) {
                 errorMessage("This workflow is not published.", COMMAND_ERROR);
             } else {
@@ -622,7 +630,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
                 String date = lastUpdated.toString();
 
-                out(workflow.getPath());
+                out(workflow.getFullWorkflowPath());
                 out("");
                 out("DESCRIPTION:");
                 out(description);
@@ -666,22 +674,22 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             // add user to all workflows
             final List<Workflow> updatedWorkflows = usersApi.addUserToDockstoreWorkflows(user.getId(), "").stream()
-                    // Skip hosted workflows
-                    .filter(workflow -> StringUtils.isNotEmpty(workflow.getGitUrl()))
-                    .map(workflow -> {
-                        out(MessageFormat.format("Refreshing {0}", workflow.getFullWorkflowPath()));
-                        try {
-                            return workflowsApi.refresh(workflow.getId(), true);
-                        } catch (ApiException ex) {
-                            err(ex.getMessage());
-                            return null;
-                        } catch (Exception ex) {
-                            exceptionMessage(ex, "", 0);
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                // Skip hosted workflows
+                .filter(workflow -> StringUtils.isNotEmpty(workflow.getGitUrl()))
+                .map(workflow -> {
+                    out(MessageFormat.format("Refreshing {0}", workflow.getFullWorkflowPath()));
+                    try {
+                        return workflowsApi.refresh(workflow.getId(), true);
+                    } catch (ApiException ex) {
+                        err(ex.getMessage());
+                        return null;
+                    } catch (Exception ex) {
+                        exceptionMessage(ex, "", 0);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
             printLineBreak();
             printWorkflowList(updatedWorkflows);
         } catch (ApiException ex) {
@@ -692,7 +700,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     @Override
     protected void refreshTargetEntry(String path) {
         try {
-            Workflow workflow = workflowsApi.getWorkflowByPath(path, BIOWORKFLOW, null);
+            Workflow workflow = findAndGetDockstoreWorkflowByPath(path, null, false, true);
+            if (isAppTool) {
+                errorMessage("GitHub Apps entries cannot be refreshed", COMMAND_ERROR);
+            }
             final Long workflowId = workflow.getId();
             out("Refreshing workflow...");
             Workflow updatedWorkflow = workflowsApi.refresh(workflowId, true);
@@ -715,7 +726,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         assert (!(unpublishRequest && newName != null));
 
         try {
-            existingWorkflow = workflowsApi.getWorkflowByPath(entryPath, BIOWORKFLOW, null);
+            existingWorkflow = findAndGetDockstoreWorkflowByPath(entryPath, null, false, true);
             isPublished = existingWorkflow.isIsPublished();
         } catch (ApiException ex) {
             exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
@@ -827,7 +838,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         }
 
         try {
-            Workflow workflow = workflowsApi.getWorkflowByPath(entry, BIOWORKFLOW, null);
+            Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, false, true);
             PublishRequest pub = SwaggerUtility.createPublishRequest(publish);
             workflow = workflowsApi.publish(workflow.getId(), pub);
 
@@ -851,7 +862,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     protected void handleStarUnstar(String entry, boolean star) {
         String action = star ? "star" : "unstar";
         try {
-            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entry, WorkflowSubClass.BIOWORKFLOW.toString(), null, null);
+            Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, true, true);
             StarRequest request = new StarRequest();
             request.setStar(star);
             workflowsApi.starEntry(workflow.getId(), request);
@@ -997,7 +1008,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         } else {
             final String entry = reqVal(args, "--entry");
             try {
-                Workflow workflow = workflowsApi.getWorkflowByPath(entry, BIOWORKFLOW, "versions");
+                Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, "versions", false, true);
+                if (isAppTool) {
+                    errorMessage(GITHUB_APP_COMMAND_ERROR, COMMAND_ERROR);
+                }
                 long workflowId = workflow.getId();
 
                 String descriptorType = optVal(args, "--descriptor-type", workflow.getDescriptorType().getValue());
@@ -1065,7 +1079,11 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     protected void handleTestParameter(String entry, String versionName, List<String> adds, List<String> removes, String descriptorType,
         String parentEntry) {
         try {
-            Workflow workflow = workflowsApi.getWorkflowByPath(entry, BIOWORKFLOW, null);
+            Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, false, true);
+            if (isAppTool) {
+                errorMessage("Cannot update test parameter files of GitHub App entries",
+                    COMMAND_ERROR);
+            }
             long workflowId = workflow.getId();
 
             if (adds.size() > 0) {
@@ -1098,7 +1116,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             final String name = reqVal(args, "--name");
 
             try {
-                Workflow workflow = workflowsApi.getWorkflowByPath(entry, BIOWORKFLOW, "versions");
+                Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, "versions", false, true);
+                if (this.isAppTool) {
+                    errorMessage(GITHUB_APP_COMMAND_ERROR, COMMAND_ERROR);
+                }
                 List<WorkflowVersion> workflowVersions = workflow.getWorkflowVersions();
 
                 for (WorkflowVersion workflowVersion : workflowVersions) {
@@ -1137,7 +1158,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         } else {
             try {
                 final String entry = reqVal(args, "--entry");
-                Workflow workflow = workflowsApi.getWorkflowByPath(entry, BIOWORKFLOW, null);
+                Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, false, true);
+                if (this.isAppTool) {
+                    errorMessage(GITHUB_APP_COMMAND_ERROR, COMMAND_ERROR);
+                }
 
                 if (workflow.isIsPublished()) {
                     errorMessage("Cannot restub a published workflow. Please unpublish if you wish to restub.", Client.CLIENT_ERROR);
@@ -1178,7 +1202,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         String version = (parts.length > 1) ? parts[1] : "master";
         SourceFile file = new SourceFile();
         // simply getting published descriptors does not require permissions
-        Workflow workflow = getDockstoreWorkflowByPath(path);
+        Workflow workflow = findAndGetDockstoreWorkflowByPath(path);
 
         boolean valid = false;
         for (WorkflowVersion workflowVersion : workflow.getWorkflowVersions()) {
@@ -1193,6 +1217,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 file = workflowsApi.primaryDescriptor(workflow.getId(), version, descriptorType.toString());
             } catch (ApiException ex) {
                 if (ex.getCode() == HttpStatus.SC_BAD_REQUEST) {
+                    // TODO: "No descriptor found" should not trigger the below
                     exceptionMessage(ex, "Invalid version", Client.API_ERROR);
                 } else {
                     exceptionMessage(ex, "No " + descriptorType + " file found.", Client.API_ERROR);
@@ -1206,6 +1231,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     @Parameters(separators = "=", commandDescription = "Spit out a json run file for a given entry.")
     private static class CommandEntry2json {
+
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
         @Parameter(names = "--help", description = "Prints help for entry2json command", help = true)
@@ -1214,6 +1240,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     @Parameters(separators = "=", commandDescription = "Spit out a tsv run file for a given entry.")
     private static class CommandEntry2tsv {
+
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
         @Parameter(names = "--help", description = "Prints help for entry2json command", help = true)
@@ -1222,6 +1249,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     @Parameters(separators = "=", commandDescription = "Launch an entry locally or remotely.")
     private static class CommandLaunch {
+
         @Parameter(names = "--local-entry", description = "Allows you to specify a full path to a local descriptor instead of an entry path")
         private String localEntry;
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)")
