@@ -13,6 +13,9 @@ import io.swagger.client.model.Workflow;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 
+/**
+ * This is used to interact with the Dockstore webservice to get Dockstore workflows (which can include Bioworkflows, AppTools, etc)
+ */
 public class WebserviceWorkflowClient {
     private WorkflowsApi workflowsApi;
     private String include;
@@ -36,18 +39,18 @@ public class WebserviceWorkflowClient {
      * @return
      */
     public Workflow findAndGetDockstoreWorkflowByPath(String entryPath) {
-        List<Supplier<Workflow>> workflows = new ArrayList<>();
+        List<Supplier<Workflow>> workflowSuppliers = new ArrayList<>();
         if (searchUnauthenticated) {
-            workflows.add(getDockstoreBioworkflowByPath(entryPath));
+            workflowSuppliers.add(getDockstoreBioworkflowByPath(entryPath));
             if (searchAppTool) {
-                workflows.add(getDockstoreAppToolByPath(entryPath));
+                workflowSuppliers.add(getDockstoreAppToolByPath(entryPath));
             }
         }
-        workflows.add(getAuthenticatedDockstoreBioworkflowByPath(entryPath));
+        workflowSuppliers.add(getAuthenticatedDockstoreBioworkflowByPath(entryPath));
         if (searchAppTool) {
-            workflows.add(getAuthenticatedDockstoreAppToolByPath(entryPath));
+            workflowSuppliers.add(getAuthenticatedDockstoreAppToolByPath(entryPath));
         }
-        Workflow workflow = workflows.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+        Workflow workflow = workflowSuppliers.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
         if (workflow == null) {
             errorMessage("No workflow found with path " + entryPath, Client.ENTRY_NOT_FOUND);
             return null;
