@@ -684,6 +684,7 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest
+                    io.dockstore.client.cli.WesToilIT
                 </excludeGroups>
             </properties>
         </profile>
