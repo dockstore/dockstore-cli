@@ -585,14 +585,10 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                 for (Object entry : stringObjectEntryList) {
                     if (entry instanceof Map) {
                         Map lhm = (Map)entry;
-                        if ((lhm.containsKey("path") && lhm.get("path") instanceof String) || (lhm.containsKey("location") && lhm
-                                .get("location") instanceof String)) {
-                            String path = getPathOrLocation(lhm);
-                            // notice I'm putting key:path together so they are unique in the hash
-                            if (stringObjectEntry.getKey().equals(cwlInputFileID)) {
-                                inputSet.addAll(doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap,
-                                        secondaryFiles));
-                            }
+                        String path = getPathOrLocation(lhm);
+                        // notice I'm putting key:path together so they are unique in the hash
+                        if (path != null && stringObjectEntry.getKey().equals(cwlInputFileID)) {
+                            inputSet.addAll(doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap, secondaryFiles));
                         }
                     } else if (entry instanceof ArrayList) {
                         inputSet.addAll(processArrayofArrayOfFiles(entry, stringObjectEntry, cwlInputFileID, fileMap, secondaryFiles));
@@ -602,7 +598,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
             } else if (stringObjectEntry.getValue() instanceof HashMap) {
                 Map param = (HashMap)stringObjectEntry.getValue();
                 String path = getPathOrLocation(param);
-                if (stringObjectEntry.getKey().equals(cwlInputFileID)) {
+                if (path != null && stringObjectEntry.getKey().equals(cwlInputFileID)) {
                     inputSet.addAll(doProcessFile(stringObjectEntry.getKey(), path, cwlInputFileID, fileMap, secondaryFiles));
                 }
             }
@@ -613,27 +609,24 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     private List<Pair<String, Path>> processArrayofArrayOfFiles(Object entry, Map.Entry<String, Object> stringObjectEntry,
             String cwlInputFileID, Map<String, FileProvisioning.FileInfo> fileMap, List<String> secondaryFiles) {
         List<Pair<String, Path>> inputSet = new ArrayList<>();
-        try {
-            ArrayList<Map> filesArray = (ArrayList)entry;
-            for (Map file : filesArray) {
-                if ((file.containsKey("path") && file.get("path") instanceof String) || (file.containsKey("location") && file
-                        .get("location") instanceof String)) {
-                    String path = getPathOrLocation(file);
-                    // notice I'm putting key:path together so they are unique in the hash
-                    if (stringObjectEntry.getKey().equals(cwlInputFileID)) {
-                        inputSet.addAll(
-                                doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap, secondaryFiles));
-                    }
-                }
+        ArrayList<Map> filesArray = (ArrayList)entry;
+        for (Map file : filesArray) {
+            String path = getPathOrLocation(file);
+            // notice I'm putting key:path together so they are unique in the hash
+            if (path != null && stringObjectEntry.getKey().equals(cwlInputFileID)) {
+                inputSet.addAll(doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap, secondaryFiles));
             }
-        } catch (ClassCastException e) {
-            LOG.warn("This is not an array of array of files, it may be an array of array of strings");
         }
         return inputSet;
     }
 
+    private String getString(Map map, String key) {
+        Object value = map.get(key);
+        return value instanceof String ? (String)value : null;
+    }
+
     private String getPathOrLocation(Map param) {
-        return ObjectUtils.firstNonNull((String)param.get("path"), (String)param.get("location"));
+        return ObjectUtils.firstNonNull(getString(param, "path"), getString(param, "location"));
     }
 
     /**
