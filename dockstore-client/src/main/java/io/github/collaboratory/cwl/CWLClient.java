@@ -168,9 +168,21 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         return null;
     }
 
+    private Class getCWLClassTarget() {
+        if (abstractEntryClient instanceof WorkflowClient) {
+            if (((WorkflowClient)abstractEntryClient).isAppTool()) {
+                return CommandLineTool.class;
+            } else {
+                return Workflow.class;
+            }
+        } else {
+            return CommandLineTool.class;
+        }
+    }
+
     @Override
     public File provisionInputFiles() {
-        Class cwlClassTarget = abstractEntryClient instanceof WorkflowClient ? Workflow.class : CommandLineTool.class;
+        Class cwlClassTarget = getCWLClassTarget();
 
         // Load CWL from JSON to object
         CWL cwlUtil = new CWL(false, config);
