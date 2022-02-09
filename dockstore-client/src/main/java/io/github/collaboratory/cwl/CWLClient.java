@@ -609,13 +609,17 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     private List<Pair<String, Path>> processArrayofArrayOfFiles(Object entry, Map.Entry<String, Object> stringObjectEntry,
             String cwlInputFileID, Map<String, FileProvisioning.FileInfo> fileMap, List<String> secondaryFiles) {
         List<Pair<String, Path>> inputSet = new ArrayList<>();
-        ArrayList<Map> filesArray = (ArrayList)entry;
-        for (Map file : filesArray) {
-            String path = getPathOrLocation(file);
-            // notice I'm putting key:path together so they are unique in the hash
-            if (path != null && stringObjectEntry.getKey().equals(cwlInputFileID)) {
-                inputSet.addAll(doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap, secondaryFiles));
+        try {
+            ArrayList<Map> filesArray = (ArrayList)entry;
+            for (Map file : filesArray) {
+                String path = getPathOrLocation(file);
+                // notice I'm putting key:path together so they are unique in the hash
+                if (path != null && stringObjectEntry.getKey().equals(cwlInputFileID)) {
+                    inputSet.addAll(doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap, secondaryFiles));
+                }
             }
+        } catch (ClassCastException e) {
+            LOG.warn("This is not an array of array of files, it may be an array of array of strings");
         }
         return inputSet;
     }
