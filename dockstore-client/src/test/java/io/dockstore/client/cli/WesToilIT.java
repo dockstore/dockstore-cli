@@ -21,6 +21,7 @@ public class WesToilIT {
     public static final String RUN_ID_PATTERN_PREFIX = "Launched WES run with id:";
     public static final String COMPLETED_STATE = "state: COMPLETE";
     public static final String EXECUTOR_ERROR_STATE = "state: EXECUTOR_ERROR";
+    public static final String CANCELED_STATE = "state: CANCELED";
 
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
@@ -47,7 +48,7 @@ public class WesToilIT {
      * @return true if the workflow reaches the 'COMPLETE' state in time, false otherwise
      * @throws InterruptedException
      */
-    private boolean waitForWorkflowCompletion(String runId) throws InterruptedException {
+    private boolean waitForWorkflowState(String runId, String state) throws InterruptedException {
         for (int i = 0; i < WAIT_COUNT; i++) {
 
             // Check on a workflow's run status
@@ -57,12 +58,9 @@ public class WesToilIT {
             };
             Client.main(commandStatementStatus);
 
-            // If the returned state is completed, we succeeded the test so return true.
-            // If the returned state is executor_error, we know the workflow has failed, so we can bail out early.
-            if (systemOutRule.getLog().contains(COMPLETED_STATE)) {
+            // wait for the provided state to be printed
+            if (systemOutRule.getLog().contains(state)) {
                 return true;
-            } else if (systemOutRule.getLog().contains(EXECUTOR_ERROR_STATE)) {
-                return false;
             }
 
             Thread.sleep(WAIT_ITER_TIME_MILLI);
@@ -83,7 +81,7 @@ public class WesToilIT {
         assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
         final String runId = findWorkflowId(systemOutRule.getLog());
-        final boolean isSuccessful = waitForWorkflowCompletion(runId);
+        final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         if (!isSuccessful) {
             fail("The workflow did not succeed in time.");
@@ -102,10 +100,10 @@ public class WesToilIT {
         assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
         final String runId = findWorkflowId(systemOutRule.getLog());
-        final boolean isSuccessful = waitForWorkflowCompletion(runId);
+        final boolean isError = waitForWorkflowState(runId, EXECUTOR_ERROR_STATE);
 
         // Toil does not support imports at this time, so multi-descriptor workflows should fail.
-        if (isSuccessful) {
+        if (!isError) {
             fail("The workflow was not supposed to succeed");
         }
     }
@@ -122,10 +120,36 @@ public class WesToilIT {
         assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
         final String runId = findWorkflowId(systemOutRule.getLog());
-        final boolean isSuccessful = waitForWorkflowCompletion(runId);
+        final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         if (!isSuccessful) {
             fail("The workflow did not succeed in time.");
+        }
+    }
+
+    @Test
+    public void testCancel() throws InterruptedException {
+        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
+            "--config", TOIL_CONFIG,
+            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
+            "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
+            "--inline-workflow"
+        };
+        Client.main(commandStatementRun);
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+
+        final String runId = findWorkflowId(systemOutRule.getLog());
+
+        String[] commandStatementCancel = new String[]{ "workflow", "wes", "cancel",
+            "--config", TOIL_CONFIG,
+            "--id", runId
+        };
+        Client.main(commandStatementCancel);
+
+        final boolean isCanceled = waitForWorkflowState(runId, CANCELED_STATE);
+
+        if (!isCanceled) {
+            fail("The workflow did not cancel in time.");
         }
     }
 }
