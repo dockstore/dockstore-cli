@@ -20,7 +20,7 @@ executors:
   toil_wes_test_executor:
     machine: # run the steps with Ubuntu VM
       image: ubuntu-2004:202104-01
-    resource_class: medium
+    resource_class: small
 
 common_filters: &common_filters
   filters:
