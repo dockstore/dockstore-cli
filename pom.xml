@@ -783,7 +783,6 @@
                             <excludes>
                                 <exclude>io/dockstore/webservice/resources/Description.*</exclude>
                                 <exclude>io/dockstore/common/WdlBridge.*</exclude>
-                                <exclude>io/dockstore/client/cli/WesToilIt</exclude>
                                 <!-- exclude client classes, but not the server classes to help guide tests -->
                                 <exclude>io/swagger/client/**/*</exclude>
                                 <exclude>io/swagger/client/*</exclude>
@@ -808,6 +807,11 @@
                     </plugin>
                 </plugins>
             </build>
+            <properties>
+                <excludeGroups>
+                    io.dockstore.client.cli.WesToilIT
+                </excludeGroups>
+            </properties>
         </profile>
         <profile>
             <id>singularity-tests</id>
