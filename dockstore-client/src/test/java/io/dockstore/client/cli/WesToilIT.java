@@ -9,7 +9,6 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @Category(WesToilIT.class)
 public class WesToilIT {
@@ -83,9 +82,7 @@ public class WesToilIT {
         final String runId = findWorkflowId(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
-        if (!isSuccessful) {
-            fail("The workflow did not succeed in time.");
-        }
+        assertTrue("The workflow did not succeed in time.", isSuccessful);
     }
 
     @Test
@@ -103,9 +100,8 @@ public class WesToilIT {
         final boolean isError = waitForWorkflowState(runId, EXECUTOR_ERROR_STATE);
 
         // Toil does not support imports at this time, so multi-descriptor workflows should fail.
-        if (!isError) {
-            fail("The workflow was not supposed to succeed");
-        }
+        assertTrue("The workflow was not supposed to succeed.", isError);
+
     }
 
     @Test
@@ -122,9 +118,7 @@ public class WesToilIT {
         final String runId = findWorkflowId(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
-        if (!isSuccessful) {
-            fail("The workflow did not succeed in time.");
-        }
+        assertTrue("The workflow did not succeed in time.", isSuccessful);
     }
 
     @Test
@@ -148,8 +142,7 @@ public class WesToilIT {
 
         final boolean isCanceled = waitForWorkflowState(runId, CANCELED_STATE);
 
-        if (!isCanceled) {
-            fail("The workflow did not cancel in time.");
-        }
+        assertTrue("The workflow did not cancel in time.", isCanceled);
+
     }
 }
