@@ -787,6 +787,7 @@
                                 <exclude>io/swagger/client/**/*</exclude>
                                 <exclude>io/swagger/client/*</exclude>
                                 <exclude>**/*$*</exclude>
+                                <exclude>**/WesToilIT*</exclude>
                             </excludes>
                         </configuration>
                         <executions>
@@ -807,11 +808,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <properties>
-                <excludeGroups>
-                    io.dockstore.client.cli.WesToilIT
-                </excludeGroups>
-            </properties>
         </profile>
         <profile>
             <id>singularity-tests</id>
