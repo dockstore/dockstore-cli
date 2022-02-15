@@ -1,5 +1,6 @@
 package io.dockstore.client.cli;
 
+import io.dockstore.client.cli.nested.notificationsclients.WesTests;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -10,7 +11,7 @@ import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertTrue;
 
-@Category(WesToilIT.class)
+@Category(WesTests.class)
 public class WesToilIT {
 
     public static final String TOIL_CONFIG = ResourceHelpers.resourceFilePath("wesIt/config_toil");
