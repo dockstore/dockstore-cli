@@ -774,8 +774,8 @@
         <profile>
             <id>coverage</id>
             <properties>
-                <skipTests>false</skipTests>
-                <skipITs>false</skipITs>
+                <skipTests>true</skipTests>
+                <skipITs>true</skipITs>
                 <excludeGroups>
                     io.dockstore.client.cli.WesToilIT
                 </excludeGroups>
