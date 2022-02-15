@@ -773,6 +773,13 @@
         </profile>
         <profile>
             <id>coverage</id>
+            <properties>
+                <skipTests>false</skipTests>
+                <skipITs>false</skipITs>
+                <excludeGroups>
+                    io.dockstore.client.cli.WesToilIT
+                </excludeGroups>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -787,7 +794,6 @@
                                 <exclude>io/swagger/client/**/*</exclude>
                                 <exclude>io/swagger/client/*</exclude>
                                 <exclude>**/*$*</exclude>
-                                <exclude>io.dockstore.client.cli.WesToilIT</exclude>
                             </excludes>
                         </configuration>
                         <executions>
