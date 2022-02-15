@@ -787,7 +787,7 @@
                                 <exclude>io/swagger/client/**/*</exclude>
                                 <exclude>io/swagger/client/*</exclude>
                                 <exclude>**/*$*</exclude>
-                                <exclude>**/WesToilIT*</exclude>
+                                <exclude>io.dockstore.client.cli.WesToilIT</exclude>
                             </excludes>
                         </configuration>
                         <executions>
