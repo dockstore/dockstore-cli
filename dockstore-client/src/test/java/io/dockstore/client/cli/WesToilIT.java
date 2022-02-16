@@ -1,6 +1,6 @@
 package io.dockstore.client.cli;
 
-import io.dockstore.client.cli.nested.notificationsclients.WesTests;
+import io.dockstore.client.cli.nested.WesTests;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.Rule;
 import org.junit.Test;

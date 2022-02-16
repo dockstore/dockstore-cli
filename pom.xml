@@ -682,7 +682,7 @@
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <groups>io.dockstore.client.cli.nested.WestTests</groups>
+                <groups>io.dockstore.client.cli.nested.WesTests</groups>
             </properties>
         </profile>
         <profile>
