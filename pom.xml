@@ -643,7 +643,7 @@
                     io.dockstore.common.ConfidentialTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.BenchmarkTest,
-                    io.dockstore.common.ToilOnlyTest
+                    io.dockstore.common.ToilOnlyTest,
                     io.dockstore.client.cli.nested.WestTests
                 </excludeGroups>
             </properties>
@@ -693,7 +693,7 @@
                 <excludeGroups>
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
-                    io.dockstore.common.ToilOnlyTest
+                    io.dockstore.common.ToilOnlyTest,
                     io.dockstore.client.cli.nested.WestTests
                 </excludeGroups>
             </properties>
@@ -709,7 +709,7 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.common.WorkflowTest
+                    io.dockstore.common.WorkflowTest,
                     io.dockstore.client.cli.nested.WestTests
                 </excludeGroups>
             </properties>
@@ -725,7 +725,7 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.common.ToolTest
+                    io.dockstore.common.ToolTest,
                     io.dockstore.client.cli.nested.WestTests
                 </excludeGroups>
             </properties>
@@ -740,7 +740,7 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.common.ConfidentialTest
+                    io.dockstore.common.ConfidentialTest,
                     io.dockstore.client.cli.nested.WestTests
                 </excludeGroups>
             </properties>
