@@ -15,6 +15,7 @@ import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
+import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
 import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.Workflow;
@@ -52,7 +53,7 @@ public final class WesLauncher {
      * @param workflowParamPath The path to a file to be used as an input JSON. (i.e. /path/to/file.json)
      * @param filePaths A list of paths to files to be attached to the request.
      */
-    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, boolean inlineWorkflow, String workflowParamPath, List<String> filePaths) {
+    public static void launchWesCommand(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, WorkflowClient workflowClient, String workflowEntry, boolean inlineWorkflow, String workflowParamPath, List<String> filePaths) {
 
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
@@ -101,9 +102,7 @@ public final class WesLauncher {
         String workflowTypeVersion = createWorkflowTypeVersion(workflowType);
 
         try {
-            RunId response = workflowClient
-                .getWorkflowExecutionServiceApi()
-                .runWorkflow(
+            RunId response = clientWorkflowExecutionServiceApi.runWorkflow(
                     workflowParams,
                     workflowType,
                     workflowTypeVersion,

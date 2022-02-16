@@ -1045,13 +1045,14 @@ public abstract class AbstractEntryClient<T> {
     /**
      * Creates a WES API object and sets the endpoint.
      */
-    public WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
+    public WorkflowExecutionServiceApi getWorkflowExecutionServiceApi(boolean debugMode) {
 
         if (this.getWesRequestData() == null) {
             errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);
         }
 
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = new WorkflowExecutionServiceApi();
+        clientWorkflowExecutionServiceApi.getApiClient().setDebugging(debugMode);
 
         // Uncomment this code when Swagger Codegen generates correct Java
         // for OpenApi 3.0 yaml with arrays of files
@@ -1078,12 +1079,14 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * Attempts to launch a workflow (tools not currently supported) on a WES server
+     * @param clientWorkflowExecutionServiceApi The WES API client
      * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
      * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
      * @param paramsPath Path to the parameter JSON file
      * @param filePaths Paths to any other required files for the WES execution
      */
-    abstract void wesLaunch(String entry, boolean inlineWorkflow, String paramsPath, List<String> filePaths);
+    abstract void wesLaunch(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, String entry, boolean inlineWorkflow,
+        String paramsPath, List<String> filePaths);
 
     public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
         // Does nothing for tools.
@@ -1095,7 +1098,7 @@ public abstract class AbstractEntryClient<T> {
      * @param verbose Whether or not we want verbose logs
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesStatus(final String workflowId, final boolean verbose, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+    private void wesStatus(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId, final boolean verbose) {
         out("Getting status of WES workflow");
         if (verbose) {
             try {
@@ -1119,7 +1122,7 @@ public abstract class AbstractEntryClient<T> {
      * @param runId The ID of the run we are cancelling
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesCancel(final String runId, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+    private void wesCancel(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String runId) {
         out("Canceling WES workflow");
         try {
             RunId response = clientWorkflowExecutionServiceApi.cancelRun(runId);
@@ -1148,7 +1151,7 @@ public abstract class AbstractEntryClient<T> {
      * @param pageToken The returned page token from a previous call of ListRuns
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesListRuns(int pageSize, String pageToken, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+    private void wesListRuns(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, int pageSize, String pageToken) {
         try {
             RunListResponse response = clientWorkflowExecutionServiceApi.listRuns((long)pageSize, pageToken);
             out("WES Run List: " + response.toString());
@@ -1204,32 +1207,37 @@ public abstract class AbstractEntryClient<T> {
 
         final boolean helpDisplayed = displayWesHelpWhenNecessary(wesCommandParser);
         if (!helpDisplayed) {
+
+            // Get any credentials that will be used in the following WES request
             final WesRequestData requestData = this.aggregateWesRequestData(wesCommandParser);
             setWesRequestData(requestData);
-            WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
+            WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(wesCommandParser.wesMain.debugMode());
 
+            // Depending on the desired WES request, parse input parameters from the command line
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
-                wesLaunch(wesCommandParser.commandLaunch.getEntry(),
+                wesLaunch(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandLaunch.getEntry(),
                     wesCommandParser.commandLaunch.getInlineWorkflow(),
                     wesCommandParser.commandLaunch.getJson(),
                     wesCommandParser.commandLaunch.getAttachments());
                 break;
             case "status":
-                wesStatus(wesCommandParser.commandStatus.getId(),
-                    wesCommandParser.commandStatus.isVerbose(),
-                    clientWorkflowExecutionServiceApi);
+                wesStatus(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandStatus.getId(),
+                    wesCommandParser.commandStatus.isVerbose());
                 break;
             case "cancel":
-                wesCancel(wesCommandParser.commandCancel.getId(), clientWorkflowExecutionServiceApi);
+                wesCancel(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandCancel.getId());
                 break;
             case "service-info":
                 wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
             case "list":
-                wesListRuns(wesCommandParser.commandRunList.getPageSize(),
-                    wesCommandParser.commandRunList.getPageToken(),
-                    clientWorkflowExecutionServiceApi);
+                wesListRuns(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandRunList.getPageSize(),
+                    wesCommandParser.commandRunList.getPageToken());
                 break;
             default:
                 errorMessage("Unknown WES command.", CLIENT_ERROR);
