@@ -49,7 +49,7 @@ workflows:
 #              "confidential-workflow-tests",
 #              "confidential-tool-tests",
 #              "singularity-tests"]
-          testing_profile: ["non-confidential-tests"]
+              testing_profile: ["non-confidential-tests"]
           <<: *common_filters
           requires:
             - build
