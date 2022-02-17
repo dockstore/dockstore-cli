@@ -128,7 +128,7 @@ public class WesLauncherIT {
         String workflowEntry = "my/entry/path";
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
-        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, null, null);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, null, null, false);
         assertTrue("The runId should be printed out", systemOutRule.getLog().contains(RUN_ID));
     }
 
@@ -140,7 +140,7 @@ public class WesLauncherIT {
         List<String> attachments = new ArrayList<>();
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
-        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The runId should be printed out", systemOutRule.getLog().contains(RUN_ID));
     }
 
@@ -154,7 +154,7 @@ public class WesLauncherIT {
 
         // Expect an error to be thrown when a file cant be found
         systemExit.expectSystemExit();
-        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The file doesn't exist, so an error should be thrown",
             systemErrRule.getLog().contains("Unable to locate file: this/file/doesnt/exist"));
     }
@@ -171,7 +171,7 @@ public class WesLauncherIT {
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
         // Expect an error to be thrown when a file cant be found
-        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The runId should be printed out", systemOutRule.getLog().contains(RUN_ID));
 
     }
@@ -187,7 +187,7 @@ public class WesLauncherIT {
 
         // Expect an error to be thrown when a file cant be found
         systemExit.expectSystemExit();
-        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The file doesn't exist, so an error should be thrown",
             systemErrRule.getLog().contains("Unable to locate file: this/file/doesnt/exist"));
     }
@@ -205,7 +205,7 @@ public class WesLauncherIT {
 
         // Expect an error to be thrown when a file cant be found
         systemExit.expectSystemExit();
-        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The file doesn't exist, so an error should be thrown",
             systemErrRule.getLog().contains("Unable to locate file: uh/oh/this/is/a/typo"));
     }
@@ -218,7 +218,7 @@ public class WesLauncherIT {
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
         // Directories should be ignored, no error should be thrown
-        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, null);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, null, false);
     }
 
     @Test

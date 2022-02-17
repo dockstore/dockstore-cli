@@ -53,7 +53,7 @@ public final class WesLauncher {
      * @param workflowParamPath The path to a file to be used as an input JSON. (i.e. /path/to/file.json)
      * @param filePaths A list of paths to files to be attached to the request.
      */
-    public static void launchWesCommand(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, WorkflowClient workflowClient, String workflowEntry, boolean inlineWorkflow, String workflowParamPath, List<String> filePaths) {
+    public static void launchWesCommand(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, WorkflowClient workflowClient, String workflowEntry, boolean inlineWorkflow, String workflowParamPath, List<String> filePaths, boolean verbose) {
 
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
@@ -101,6 +101,11 @@ public final class WesLauncher {
         // The workflow version
         String workflowTypeVersion = createWorkflowTypeVersion(workflowType);
 
+        if (verbose) {
+            out("Primary descriptor URI: " + workflowUrl);
+            out("Number of file attachments: " + workflowAttachment.size());
+        }
+
         try {
             RunId response = clientWorkflowExecutionServiceApi.runWorkflow(
                     workflowParams,
@@ -113,8 +118,8 @@ public final class WesLauncher {
 
             String runID = response.getRunId();
 
-            // If debugging, print verbose messages and helper commands, otherwise just print the runId
-            if (clientWorkflowExecutionServiceApi.getApiClient().isDebugging()) {
+            // If verbose launches, print verbose messages and helper commands, otherwise just print the runId
+            if (verbose) {
                 out("Launched WES run with id: " + runID);
                 wesCommandSuggestions(runID);
             } else {

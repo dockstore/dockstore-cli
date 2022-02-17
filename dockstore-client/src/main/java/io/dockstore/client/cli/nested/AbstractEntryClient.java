@@ -1225,10 +1225,15 @@ public abstract class AbstractEntryClient<T> {
             setWesRequestData(requestData);
             WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
 
-            JCommander wutIsHappennin = wesCommandParser.jCommander.getCommands().get(wesCommandParser.jCommander.getParsedCommand());
+            // All Wes commands are parsed as subclasses of WesMain. W
+            WesCommandParser.WesMain parsedCommand = (WesCommandParser.WesMain) wesCommandParser.jCommander.getCommands()
+                .get(wesCommandParser.jCommander.getParsedCommand())
+                .getObjects().get(0);
 
-            if (wesCommandParser.wesMain.isVerbose()) {
-                out("hello");
+            // Print the WES URL and parsed credentials type
+            if (parsedCommand.isVerbose()) {
+                out("WES URL: " + wesRequestData.getUrl());
+                out("Credentials type: " + wesRequestData.getCredentialType());
             }
 
             // Depending on the desired WES request, parse input parameters from the command line
