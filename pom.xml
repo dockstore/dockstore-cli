@@ -694,7 +694,7 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.client.cli.nested.WestTests
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
@@ -710,7 +710,7 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.WorkflowTest,
-                    io.dockstore.client.cli.nested.WestTests
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
@@ -726,7 +726,7 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.ToolTest,
-                    io.dockstore.client.cli.nested.WestTests
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
@@ -741,7 +741,7 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.ConfidentialTest,
-                    io.dockstore.client.cli.nested.WestTests
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>

@@ -12,8 +12,7 @@ import org.junit.experimental.categories.Category;
 import static org.junit.Assert.assertTrue;
 
 @Category(WesTests.class)
-public class WesToilIT implements WesTests {
-
+public class WesToilIT {
     public static final String TOIL_CONFIG = ResourceHelpers.resourceFilePath("wesIt/config_toil");
     public static final int WAIT_COUNT = 10; // The number of times we will check on a workflow's run status before automatically failing
     public static final int WAIT_ITER_TIME_MILLI = 10000; // The time between each check of a workflow run status
