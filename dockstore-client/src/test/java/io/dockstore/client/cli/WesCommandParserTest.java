@@ -301,4 +301,33 @@ public class WesCommandParserTest {
         assertEquals("Page token should be set to 'banana'", "banana", wesCommandParser.commandRunList.getPageToken());
 
     }
+
+    @Test
+    public void testCommandRunLogsHelp() {
+        final String[] args = {
+            "logs",
+            "--help"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+        assertTrue("Help should be set", wesCommandParser.commandRunLogs.isHelp());
+    }
+
+    @Test
+    public void testCommandRunlogs1() {
+        final String[] args = {
+            "logs",
+            "--id",
+            "123456"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+
+        assertEquals("Parsed command should be 'logs'", "logs", parser.getParsedCommand());
+        assertEquals("The parsed entry should be '123456'", "123456", wesCommandParser.commandRunLogs.getId());
+    }
 }
