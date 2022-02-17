@@ -1225,7 +1225,8 @@ public abstract class AbstractEntryClient<T> {
             setWesRequestData(requestData);
             WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
 
-            // All Wes commands are parsed as subclasses of WesMain. W
+            // All Wes commands are parsed as subclasses of WesMain. We need to extract which object was created to parse with jCommander
+            // so we can get a global attribute.
             WesCommandParser.WesMain parsedCommand = (WesCommandParser.WesMain) wesCommandParser.jCommander.getCommands()
                 .get(wesCommandParser.jCommander.getParsedCommand())
                 .getObjects().get(0);
