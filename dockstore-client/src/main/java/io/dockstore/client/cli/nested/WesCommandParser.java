@@ -49,8 +49,8 @@ public class WesCommandParser {
         private String wesUrl = null;
         @Parameter(names = "--help", description = "Prints help for launch command", help = true)
         private boolean help = false;
-        @Parameter(names = "--debug", description = "Sets the CLI to debug mode.", help = true)
-        private boolean debug = false;
+        @Parameter(names = "--verbose", description = "Sets the CLI to verbose mode.")
+        private boolean verbose = false;
 
         public String getWesUrl() {
             return wesUrl;
@@ -60,8 +60,8 @@ public class WesCommandParser {
             return help;
         }
 
-        public boolean debugMode() {
-            return debug;
+        public boolean isVerbose() {
+            return verbose;
         }
     }
 

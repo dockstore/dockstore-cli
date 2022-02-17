@@ -539,9 +539,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
      * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
      * @param paramsPath Path to the parameter JSON file
      * @param filePaths Paths to any other required files for the WES execution
+     * @param verbose
      */
     void wesLaunch(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, String entry, boolean inlineWorkflow, String paramsPath,
-        List<String> filePaths) {
+        List<String> filePaths, boolean verbose) {
         WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, this, entry, inlineWorkflow, paramsPath, filePaths);
     }
 
