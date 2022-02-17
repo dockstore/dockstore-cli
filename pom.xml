@@ -643,7 +643,8 @@
                     io.dockstore.common.ConfidentialTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.BenchmarkTest,
-                    io.dockstore.common.ToilOnlyTest
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.client.cli.nested.WestTests
                 </excludeGroups>
             </properties>
 
@@ -676,6 +677,15 @@
             </properties>
         </profile>
         <profile>
+            <id>wes-integration-tests</id>
+            <!-- run only tests that are relevant for WES Integration -->
+            <properties>
+                <skipTests>true</skipTests>
+                <skipITs>false</skipITs>
+                <groups>io.dockstore.client.cli.nested.WesTests</groups>
+            </properties>
+        </profile>
+        <profile>
             <id>integration-tests</id>
             <properties>
                 <skipTests>true</skipTests>
@@ -683,7 +693,8 @@
                 <excludeGroups>
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
-                    io.dockstore.common.ToilOnlyTest
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
@@ -698,7 +709,8 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.common.WorkflowTest
+                    io.dockstore.common.WorkflowTest,
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
@@ -713,7 +725,8 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.common.ToolTest
+                    io.dockstore.common.ToolTest,
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
@@ -727,7 +740,8 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.common.ConfidentialTest
+                    io.dockstore.common.ConfidentialTest,
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
