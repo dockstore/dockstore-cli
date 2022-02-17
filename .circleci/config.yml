@@ -377,5 +377,5 @@ commands:
           command: ./mvnw clean install -DskipTests
       - run:
           name: run toil tests
-          command: ./mvnw -pl dockstore-client -P wes-integration-tests integration-test
+          command: ./mvnw -P wes-integration-tests integration-test
 
