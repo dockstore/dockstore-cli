@@ -112,8 +112,15 @@ public final class WesLauncher {
                     workflowAttachment);
 
             String runID = response.getRunId();
-            out("Launched WES run with id: " + runID);
-            wesCommandSuggestions(runID);
+
+            // If debugging, print verbose messages and helper commands, otherwise just print the runId
+            if (clientWorkflowExecutionServiceApi.getApiClient().isDebugging()) {
+                out("Launched WES run with id: " + runID);
+                wesCommandSuggestions(runID);
+            } else {
+                out(runID);
+            }
+
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error launching WES run", e);
         }
@@ -305,6 +312,6 @@ public final class WesLauncher {
     public static void wesCommandSuggestions(String runId) {
         out("To view the workflow run status, execute: ");
         out(MessageFormat.format("\tdockstore workflow wes status --id {0}", runId));
-        out(MessageFormat.format("\tdockstore workflow wes status --id {0} --verbose", runId));
+        out(MessageFormat.format("\tdockstore workflow wes logs --id {0}", runId));
     }
 }

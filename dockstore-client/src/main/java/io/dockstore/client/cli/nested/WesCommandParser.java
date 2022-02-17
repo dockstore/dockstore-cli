@@ -12,6 +12,7 @@ public class WesCommandParser {
     public CommandLaunch commandLaunch;
     public CommandCancel commandCancel;
     public CommandStatus commandStatus;
+    public CommandRunLogs commandRunLogs;
     public CommandServiceInfo commandServiceInfo;
     public CommandRunList commandRunList;
     public JCommander jCommander;
@@ -21,6 +22,7 @@ public class WesCommandParser {
         this.commandLaunch = new CommandLaunch();
         this.commandCancel = new CommandCancel();
         this.commandStatus = new CommandStatus();
+        this.commandRunLogs = new CommandRunLogs();
         this.commandServiceInfo = new CommandServiceInfo();
         this.commandRunList = new CommandRunList();
 
@@ -35,6 +37,7 @@ public class WesCommandParser {
             .addCommand("launch", this.commandLaunch)
             .addCommand("cancel", this.commandCancel)
             .addCommand("status", this.commandStatus)
+            .addCommand("logs", this.commandRunLogs)
             .addCommand("service-info", this.commandServiceInfo)
             .addCommand("list", this.commandRunList)
             .build();
@@ -104,15 +107,20 @@ public class WesCommandParser {
     public static class CommandStatus extends WesMain {
         @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
         private String id;
-        @Parameter(names = "--verbose", description = "Flag indicating to print verbose logs", required = false)
-        private boolean verbose = false;
 
         public String getId() {
             return id;
         }
 
-        public boolean isVerbose() {
-            return verbose;
+    }
+
+    @Parameters(commandDescription = "Retrieve the status of a workflow")
+    public static class CommandRunLogs extends WesMain {
+        @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
+        private String id;
+
+        public String getId() {
+            return id;
         }
     }
 

@@ -1095,25 +1095,28 @@ public abstract class AbstractEntryClient<T> {
     /**
      *  This will attempt to retrieve the status of a workflow run
      * @param workflowId The ID of the workflow we are getting status info for
-     * @param verbose Whether or not we want verbose logs
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesStatus(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId, final boolean verbose) {
-        out("Getting status of WES workflow");
-        if (verbose) {
-            try {
-                RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
-                out("Verbose run status is: " + response.toString());
-            } catch (io.openapi.wes.client.ApiException e) {
-                LOG.error("Error getting verbose WES run status", e);
-            }
-        } else {
-            try {
-                RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
-                out("Brief run status is: " + response.toString());
-            } catch (io.openapi.wes.client.ApiException e) {
-                LOG.error("Error getting brief WES run status", e);
-            }
+    private void wesStatus(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId) {
+        try {
+            RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
+            out("Brief run status is: " + response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting brief WES run status", e);
+        }
+    }
+
+    /**
+     *  This will attempt to retrieve the status of a workflow run
+     * @param workflowId The ID of the workflow we are getting status info for
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesRunLogs(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId) {
+        try {
+            RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
+            out("Verbose run status is: " + response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting verbose WES run status", e);
         }
     }
 
@@ -1176,6 +1179,9 @@ public abstract class AbstractEntryClient<T> {
         } else if (wesCommandParser.commandStatus.isHelp()) {
             wesStatusHelp();
             return true;
+        } else if (wesCommandParser.commandRunLogs.isHelp()) {
+            wesRunLogsHelp();
+            return true;
         } else if (wesCommandParser.commandCancel.isHelp()) {
             wesCancelHelp();
             return true;
@@ -1224,8 +1230,11 @@ public abstract class AbstractEntryClient<T> {
                 break;
             case "status":
                 wesStatus(clientWorkflowExecutionServiceApi,
-                    wesCommandParser.commandStatus.getId(),
-                    wesCommandParser.commandStatus.isVerbose());
+                    wesCommandParser.commandStatus.getId());
+                break;
+            case "logs":
+                wesRunLogs(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandStatus.getId());
                 break;
             case "cancel":
                 wesCancel(clientWorkflowExecutionServiceApi,
@@ -1505,6 +1514,7 @@ public abstract class AbstractEntryClient<T> {
         out("Usage: dockstore " + getEntryType().toLowerCase() + " wes --help");
         out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes service-info [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes list [parameters]");
@@ -1549,8 +1559,20 @@ public abstract class AbstractEntryClient<T> {
         out("  Status, gets the status of a " + getEntryType() + ".");
         out("Required Parameters:");
         out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
-        out("Optional Parameters:");
-        out("  --verbose                           Provide extra status information");
+        out("");
+        printWesHelpFooter();
+        printHelpFooter();
+    }
+
+    private void wesRunLogsHelp() {
+        printHelpHeader();
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes logs --help");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
+        out("");
+        out("Description:");
+        out("  Logs, gets the verbose run logs of a " + getEntryType() + ".");
+        out("Required Parameters:");
+        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
         out("");
         printWesHelpFooter();
         printHelpFooter();

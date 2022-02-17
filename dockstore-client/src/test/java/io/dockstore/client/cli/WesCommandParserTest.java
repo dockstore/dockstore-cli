@@ -205,8 +205,7 @@ public class WesCommandParserTest {
         final String[] args = {
             "status",
             "--id",
-            "123456",
-            "--verbose"
+            "123456"
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -215,7 +214,6 @@ public class WesCommandParserTest {
 
         assertEquals("Parsed command should be 'status'", "status", parser.getParsedCommand());
         assertEquals("The parsed entry should be '123456'", "123456", wesCommandParser.commandStatus.getId());
-        assertTrue("verbose flag should be set", wesCommandParser.commandStatus.isVerbose());
     }
 
     @Test
