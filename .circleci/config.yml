@@ -45,11 +45,10 @@ workflows:
       - integration-tests:
           matrix:
             parameters:
-#              testing_profile: ["non-confidential-tests",
-#              "confidential-workflow-tests",
-#              "confidential-tool-tests",
-#              "singularity-tests"]
-              testing_profile: ["non-confidential-tests"]
+              testing_profile: ["non-confidential-tests",
+              "confidential-workflow-tests",
+              "confidential-tool-tests",
+              "singularity-tests"]
           <<: *common_filters
           requires:
             - build
