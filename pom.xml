@@ -736,13 +736,13 @@
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <excludes>
-                    <exclude>io.dockstore.client.cli.nested.SingularityTest</exclude>
-                    <exclude>io.dockstore.common.SlowTest</exclude>
-                    <exclude>io.dockstore.common.ToilOnlyTest</exclude>
-                    <exclude>io.dockstore.common.ConfidentialTest</exclude>
-                    <exclude>io.dockstore.client.cli.nested.WestTests</exclude>
-                </excludes>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.ConfidentialTest,
+                    io.dockstore.client.cli.nested.WestTests
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
