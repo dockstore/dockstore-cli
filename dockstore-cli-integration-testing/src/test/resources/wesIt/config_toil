@@ -1,0 +1,4 @@
+[WES]
+url: http://localhost:8080/ga4gh/wes/v1
+authorization: Basic dGVzdDp0ZXN0
+type: bearer
