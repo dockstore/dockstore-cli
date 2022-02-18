@@ -96,6 +96,10 @@ public final class WesLauncher {
             // Download all workflow files and place them into a temporary directory, then add them as attachments to the WES request
             final File unzippedWorkflowDir = provisionFilesLocally(workflowClient, workflowEntry, workflowType);
             workflowAttachment.addAll(fetchFilesFromLocalDirectory(unzippedWorkflowDir.getAbsolutePath()));
+
+            if (verbose) {
+                out("Workflow files provisioned to temporary directory: " + unzippedWorkflowDir.getAbsolutePath());
+            }
         }
 
         // The workflow version
@@ -191,7 +195,6 @@ public final class WesLauncher {
             throw new RuntimeException(ex);
         }
 
-        out("Successfully downloaded files for entry '" + workflowEntry + "'");
         return unzippedWorkflowDir;
     }
 

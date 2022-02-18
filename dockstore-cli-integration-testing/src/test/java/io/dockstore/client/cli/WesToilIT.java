@@ -30,15 +30,24 @@ public class WesToilIT {
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     /**
-     * Searches for a runId in the provided string using a pattern printed by the CLI during a launch
+     * Searches for a runId in the provided string using a pattern printed by the CLI during a launch. Only needed for verbose outputs.
      * @param runLog The String to search for the runId in
-     * @return
+     * @return String run ID
      */
-    private String findWorkflowId(String runLog) {
+    private String findWorkflowIdFromVerboseLaunch(String runLog) {
         // This is pretty ugly, but we don't present the workflow ID in an clean format.
         int runIdIndex = runLog.indexOf(RUN_ID_PATTERN_PREFIX);
         int newlineFromRunId = runLog.indexOf("\n", runIdIndex);
         return runLog.substring(runIdIndex + RUN_ID_PATTERN_PREFIX.length(), newlineFromRunId).trim();
+    }
+
+    /**
+     * When not using verbose logging, the runId should just be "{ID}\n"
+     * @param runLog The String to search for the runId in
+     * @return String run ID
+     */
+    private String findWorkflowIdFromNonVerboseLaunch(String runLog) {
+        return runLog.trim();
     }
 
     /**
@@ -77,9 +86,8 @@ public class WesToilIT {
             "--inline-workflow"
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
-        final String runId = findWorkflowId(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromNonVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         assertTrue("The workflow did not succeed in time.", isSuccessful);
@@ -91,12 +99,13 @@ public class WesToilIT {
             "--config", TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/multi-descriptor-no-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"), // Toil requires workflow_params to be provided
-            "--inline-workflow"
+            "--inline-workflow",
+            "--verbose"
         };
         Client.main(commandStatementRun);
         assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
-        final String runId = findWorkflowId(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isError = waitForWorkflowState(runId, EXECUTOR_ERROR_STATE);
 
         // Toil does not support imports at this time, so multi-descriptor workflows should fail.
@@ -113,9 +122,8 @@ public class WesToilIT {
             "--inline-workflow"
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
-        final String runId = findWorkflowId(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromNonVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         assertTrue("The workflow did not succeed in time.", isSuccessful);
@@ -130,9 +138,8 @@ public class WesToilIT {
             "--inline-workflow"
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
-        final String runId = findWorkflowId(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromNonVerboseLaunch(systemOutRule.getLog());
 
         String[] commandStatementCancel = new String[]{ "workflow", "wes", "cancel",
             "--config", TOIL_CONFIG,
