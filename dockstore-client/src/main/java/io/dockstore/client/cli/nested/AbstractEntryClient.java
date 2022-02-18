@@ -1117,7 +1117,7 @@ public abstract class AbstractEntryClient<T> {
             RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
             out(response.toString());
         } catch (io.openapi.wes.client.ApiException e) {
-            LOG.error("Error getting verbose WES run status", e);
+            LOG.error("Error getting WES run logs", e);
         }
     }
 
