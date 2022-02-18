@@ -1,7 +1,12 @@
 package io.dockstore.client.cli;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+
 import io.dockstore.client.cli.nested.WesTests;
 import io.dropwizard.testing.ResourceHelpers;
+import io.dropwizard.util.Resources;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -27,7 +32,7 @@ public class WesToilIT {
     @Rule
     public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     /**
      * Searches for a runId in the provided string using a pattern printed by the CLI during a launch
@@ -143,6 +148,61 @@ public class WesToilIT {
         final boolean isCanceled = waitForWorkflowState(runId, CANCELED_STATE);
 
         assertTrue("The workflow did not cancel in time.", isCanceled);
+    }
 
+    @Test
+    public void testDirectoryAttachment() throws InterruptedException {
+        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
+            "--config", TOIL_CONFIG,
+            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
+            "-a", ResourceHelpers.resourceFilePath("wesIt/nestedDirectoryTests"),
+            "--inline-workflow"
+        };
+        Client.main(commandStatementRun);
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+
+        final String runId = findWorkflowId(systemOutRule.getLog());
+        final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
+
+        assertTrue("The workflow did not succeed in time.", isSuccessful);
+    }
+
+    @Test
+    public void testAbsoluteDirectoryFileAttachment() throws InterruptedException {
+
+        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
+            "--config", TOIL_CONFIG,
+            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
+            "-a", "src/test/resources/wesIt/nestedDirectoryTests/w4_2_test.txt",
+            "--inline-workflow"
+        };
+        Client.main(commandStatementRun);
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+
+        final String runId = findWorkflowId(systemOutRule.getLog());
+        final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
+
+        assertTrue("The workflow did not succeed in time.", isSuccessful);
+    }
+
+    @Test
+    public void testComplexNestedDirectoryAttachments() throws InterruptedException {
+
+        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
+            "--config", TOIL_CONFIG,
+            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            "--json", ResourceHelpers.resourceFilePath("wesIt/w5_1_test.json"),
+            "-a", ResourceHelpers.resourceFilePath("wesIt/w5_nested"),
+            "--inline-workflow"
+        };
+        Client.main(commandStatementRun);
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+
+        final String runId = findWorkflowId(systemOutRule.getLog());
+        final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
+
+        assertTrue("The workflow did not succeed in time.", isSuccessful);
     }
 }
