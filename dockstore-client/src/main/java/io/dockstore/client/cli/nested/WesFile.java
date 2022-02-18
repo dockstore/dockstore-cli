@@ -1,6 +1,7 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
@@ -36,7 +37,7 @@ public class WesFile extends File {
         // by WES.
         if (this.desiredSuffix != null) {
 
-            if (this.desiredSuffix.startsWith("/")) {
+            if (Path.of(desiredSuffix).isAbsolute()) {
                 errorMessage(MessageFormat.format("Unable to attach {0} to the WES request. Absolute paths are not allowed.",
                     this.desiredSuffix), CLIENT_ERROR);
             } else if (!this.getAbsolutePath().endsWith(this.desiredSuffix)) {
@@ -51,6 +52,11 @@ public class WesFile extends File {
         // If the file was provisioned locally from an entry on Dockstore, we can remove the path to the temporary directory
         // from the file's absolute path to obtain a relative path.
         if (this.removablePrefix != null) {
+
+            if (!(Path.of(removablePrefix)).isAbsolute()) {
+                errorMessage("The provided removable prefix must be absolute", CLIENT_ERROR);
+            }
+
             // Get the path to the file, minus the temporary directory that was created
             final String relativeFileName = this.getAbsolutePath().substring(this.removablePrefix.length());
 

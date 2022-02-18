@@ -53,7 +53,6 @@ public class WesFileTest {
         systemExit.expectSystemExit();
         wesFile.getName();
         fail("Should have failed when given an absolute path");
-
     }
 
     @Test
@@ -86,5 +85,13 @@ public class WesFileTest {
         WesFile wesFile = new WesFile(descriptorPath, null, null);
         assertEquals("The default File getName() functionality should be used if no additional constructor parameters are given",
             "hello.wdl", wesFile.getName());
+    }
+
+    @Test
+    public void testRelativeDirectory() {
+        WesFile wesFile = new WesFile("/fake/path/to/file", "not/absolute", null);
+        systemExit.expectSystemExit();
+        wesFile.getName();
+        fail("Should have failed when given an relative directory path path");
     }
 }
