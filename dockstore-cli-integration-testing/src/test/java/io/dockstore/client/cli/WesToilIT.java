@@ -46,7 +46,7 @@ public class WesToilIT {
      * @param runLog The String to search for the runId in
      * @return String run ID
      */
-    private String findWorkflowIdFromNonVerboseLaunch(String runLog) {
+    private String findWorkflowIdFromDefaultLaunch(String runLog) {
         return runLog.trim();
     }
 
@@ -87,7 +87,7 @@ public class WesToilIT {
         };
         Client.main(commandStatementRun);
 
-        final String runId = findWorkflowIdFromNonVerboseLaunch(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromDefaultLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         assertTrue("The workflow did not succeed in time.", isSuccessful);
@@ -123,7 +123,7 @@ public class WesToilIT {
         };
         Client.main(commandStatementRun);
 
-        final String runId = findWorkflowIdFromNonVerboseLaunch(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromDefaultLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         assertTrue("The workflow did not succeed in time.", isSuccessful);
@@ -139,7 +139,7 @@ public class WesToilIT {
         };
         Client.main(commandStatementRun);
 
-        final String runId = findWorkflowIdFromNonVerboseLaunch(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromDefaultLaunch(systemOutRule.getLog());
 
         String[] commandStatementCancel = new String[]{ "workflow", "wes", "cancel",
             "--config", TOIL_CONFIG,
