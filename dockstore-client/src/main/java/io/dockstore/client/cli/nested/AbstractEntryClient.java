@@ -24,6 +24,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -1078,12 +1079,15 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * Attempts to launch a workflow (tools not currently supported) on a WES server
+     * @param clientWorkflowExecutionServiceApi The WES API client
      * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
      * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
      * @param paramsPath Path to the parameter JSON file
      * @param filePaths Paths to any other required files for the WES execution
+     * @param verbose Whether or not to print verbose info messages
      */
-    abstract void wesLaunch(String entry, boolean inlineWorkflow, String paramsPath, List<String> filePaths);
+    abstract void wesLaunch(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, String entry, boolean inlineWorkflow,
+        String paramsPath, List<String> filePaths, boolean verbose);
 
     public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
         // Does nothing for tools.
@@ -1092,25 +1096,28 @@ public abstract class AbstractEntryClient<T> {
     /**
      *  This will attempt to retrieve the status of a workflow run
      * @param workflowId The ID of the workflow we are getting status info for
-     * @param verbose Whether or not we want verbose logs
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesStatus(final String workflowId, final boolean verbose, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
-        out("Getting status of WES workflow");
-        if (verbose) {
-            try {
-                RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
-                out("Verbose run status is: " + response.toString());
-            } catch (io.openapi.wes.client.ApiException e) {
-                LOG.error("Error getting verbose WES run status", e);
-            }
-        } else {
-            try {
-                RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
-                out("Brief run status is: " + response.toString());
-            } catch (io.openapi.wes.client.ApiException e) {
-                LOG.error("Error getting brief WES run status", e);
-            }
+    private void wesStatus(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId) {
+        try {
+            RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
+            out(response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting brief WES run status", e);
+        }
+    }
+
+    /**
+     *  This will attempt to retrieve the status of a workflow run
+     * @param workflowId The ID of the workflow we are getting status info for
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesRunLogs(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId) {
+        try {
+            RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
+            out(response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting WES run logs", e);
         }
     }
 
@@ -1119,8 +1126,7 @@ public abstract class AbstractEntryClient<T> {
      * @param runId The ID of the run we are cancelling
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesCancel(final String runId, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
-        out("Canceling WES workflow");
+    private void wesCancel(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String runId, boolean verbose) {
         try {
             RunId response = clientWorkflowExecutionServiceApi.cancelRun(runId);
             out("Cancelled run with id: " + response.toString());
@@ -1136,7 +1142,7 @@ public abstract class AbstractEntryClient<T> {
     private void wesServiceInfo(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
         try {
             ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
-            out("WES server info: " + response.toString());
+            out(response.toString());
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES server info", e);
         }
@@ -1148,10 +1154,13 @@ public abstract class AbstractEntryClient<T> {
      * @param pageToken The returned page token from a previous call of ListRuns
      * @param clientWorkflowExecutionServiceApi The API client
      */
-    private void wesListRuns(int pageSize, String pageToken, WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+    private void wesListRuns(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, int pageSize, String pageToken, boolean verbose) {
         try {
+            if (verbose) {
+                out(MessageFormat.format("Requesting latest {0} runs", pageSize));
+            }
             RunListResponse response = clientWorkflowExecutionServiceApi.listRuns((long)pageSize, pageToken);
-            out("WES Run List: " + response.toString());
+            out(response.toString());
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES Run List", e);
         }
@@ -1172,6 +1181,9 @@ public abstract class AbstractEntryClient<T> {
             return true;
         } else if (wesCommandParser.commandStatus.isHelp()) {
             wesStatusHelp();
+            return true;
+        } else if (wesCommandParser.commandRunLogs.isHelp()) {
+            wesRunLogsHelp();
             return true;
         } else if (wesCommandParser.commandCancel.isHelp()) {
             wesCancelHelp();
@@ -1204,32 +1216,55 @@ public abstract class AbstractEntryClient<T> {
 
         final boolean helpDisplayed = displayWesHelpWhenNecessary(wesCommandParser);
         if (!helpDisplayed) {
+
+            // Get any credentials that will be used in the following WES request
             final WesRequestData requestData = this.aggregateWesRequestData(wesCommandParser);
             setWesRequestData(requestData);
             WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
 
+            // All Wes commands are parsed as subclasses of WesMain. We need to extract which object was created to parse with jCommander
+            // so we can get a global attribute.
+            WesCommandParser.WesMain parsedCommand = (WesCommandParser.WesMain) wesCommandParser.jCommander.getCommands()
+                .get(wesCommandParser.jCommander.getParsedCommand())
+                .getObjects().get(0);
+
+            // Print the WES URL and parsed credentials type
+            if (parsedCommand.isVerbose()) {
+                out("WES URL: " + wesRequestData.getUrl());
+                out("Credentials type: " + wesRequestData.getCredentialType());
+            }
+
+            // Depending on the desired WES request, parse input parameters from the command line
             switch (wesCommandParser.jCommander.getParsedCommand()) {
             case "launch":
-                wesLaunch(wesCommandParser.commandLaunch.getEntry(),
+                wesLaunch(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandLaunch.getEntry(),
                     wesCommandParser.commandLaunch.getInlineWorkflow(),
                     wesCommandParser.commandLaunch.getJson(),
-                    wesCommandParser.commandLaunch.getAttachments());
+                    wesCommandParser.commandLaunch.getAttachments(),
+                    wesCommandParser.commandLaunch.isVerbose());
                 break;
             case "status":
-                wesStatus(wesCommandParser.commandStatus.getId(),
-                    wesCommandParser.commandStatus.isVerbose(),
-                    clientWorkflowExecutionServiceApi);
+                wesStatus(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandStatus.getId());
+                break;
+            case "logs":
+                wesRunLogs(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandRunLogs.getId());
                 break;
             case "cancel":
-                wesCancel(wesCommandParser.commandCancel.getId(), clientWorkflowExecutionServiceApi);
+                wesCancel(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandCancel.getId(),
+                    wesCommandParser.commandCancel.isVerbose());
                 break;
             case "service-info":
                 wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
             case "list":
-                wesListRuns(wesCommandParser.commandRunList.getPageSize(),
+                wesListRuns(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandRunList.getPageSize(),
                     wesCommandParser.commandRunList.getPageToken(),
-                    clientWorkflowExecutionServiceApi);
+                    wesCommandParser.commandRunList.isVerbose());
                 break;
             default:
                 errorMessage("Unknown WES command.", CLIENT_ERROR);
@@ -1497,6 +1532,7 @@ public abstract class AbstractEntryClient<T> {
         out("Usage: dockstore " + getEntryType().toLowerCase() + " wes --help");
         out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes service-info [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes list [parameters]");
@@ -1519,7 +1555,6 @@ public abstract class AbstractEntryClient<T> {
         out("  --json <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
         out("  --attach <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
         out("  --inline-workflow                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
-
         out("");
     }
 
@@ -1541,8 +1576,20 @@ public abstract class AbstractEntryClient<T> {
         out("  Status, gets the status of a " + getEntryType() + ".");
         out("Required Parameters:");
         out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
-        out("Optional Parameters:");
-        out("  --verbose                           Provide extra status information");
+        out("");
+        printWesHelpFooter();
+        printHelpFooter();
+    }
+
+    private void wesRunLogsHelp() {
+        printHelpHeader();
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes logs --help");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
+        out("");
+        out("Description:");
+        out("  Logs, gets the verbose run logs of a " + getEntryType() + ".");
+        out("Required Parameters:");
+        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
         out("");
         printWesHelpFooter();
         printHelpFooter();

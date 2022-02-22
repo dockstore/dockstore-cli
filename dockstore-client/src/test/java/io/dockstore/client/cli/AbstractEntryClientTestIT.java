@@ -27,9 +27,9 @@ public class AbstractEntryClientTestIT {
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
     @Rule
     public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
@@ -39,7 +39,7 @@ public class AbstractEntryClientTestIT {
     @Test
     public void testWESHelpMessages() {
         final String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
-        final String[] commandNames = {"", "launch", "status", "cancel", "service-info"};
+        final String[] commandNames = {"", "launch", "status", "cancel", "service-info", "logs", "list"};
 
         // has config file
         for (String command : commandNames) {

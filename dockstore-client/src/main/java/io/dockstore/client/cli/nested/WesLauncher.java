@@ -15,6 +15,7 @@ import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
+import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
 import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.Workflow;
@@ -52,7 +53,7 @@ public final class WesLauncher {
      * @param workflowParamPath The path to a file to be used as an input JSON. (i.e. /path/to/file.json)
      * @param filePaths A list of paths to files to be attached to the request.
      */
-    public static void launchWesCommand(WorkflowClient workflowClient, String workflowEntry, boolean inlineWorkflow, String workflowParamPath, List<String> filePaths) {
+    public static void launchWesCommand(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, WorkflowClient workflowClient, String workflowEntry, boolean inlineWorkflow, String workflowParamPath, List<String> filePaths, boolean verbose) {
 
         // Get the workflow object associated with the provided entry path
         final Workflow workflow = getWorkflowForEntry(workflowClient, workflowEntry);
@@ -95,15 +96,22 @@ public final class WesLauncher {
             // Download all workflow files and place them into a temporary directory, then add them as attachments to the WES request
             final File unzippedWorkflowDir = provisionFilesLocally(workflowClient, workflowEntry, workflowType);
             workflowAttachment.addAll(fetchFilesFromLocalDirectory(unzippedWorkflowDir.getAbsolutePath()));
+
+            if (verbose) {
+                out("Workflow files provisioned to temporary directory: " + unzippedWorkflowDir.getAbsolutePath());
+            }
         }
 
         // The workflow version
         String workflowTypeVersion = createWorkflowTypeVersion(workflowType);
 
+        if (verbose) {
+            out("Primary descriptor URI: " + workflowUrl);
+            out("Number of file attachments: " + workflowAttachment.size());
+        }
+
         try {
-            RunId response = workflowClient
-                .getWorkflowExecutionServiceApi()
-                .runWorkflow(
+            RunId response = clientWorkflowExecutionServiceApi.runWorkflow(
                     workflowParams,
                     workflowType,
                     workflowTypeVersion,
@@ -113,8 +121,15 @@ public final class WesLauncher {
                     workflowAttachment);
 
             String runID = response.getRunId();
-            out("Launched WES run with id: " + runID);
-            wesCommandSuggestions(runID);
+
+            // If verbose launches, print verbose messages and helper commands, otherwise just print the runId
+            if (verbose) {
+                out("Launched WES run with id: " + runID);
+                wesCommandSuggestions(runID);
+            } else {
+                out(runID);
+            }
+
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error launching WES run", e);
         }
@@ -180,7 +195,6 @@ public final class WesLauncher {
             throw new RuntimeException(ex);
         }
 
-        out("Successfully downloaded files for entry '" + workflowEntry + "'");
         return unzippedWorkflowDir;
     }
 
@@ -306,6 +320,6 @@ public final class WesLauncher {
     public static void wesCommandSuggestions(String runId) {
         out("To view the workflow run status, execute: ");
         out(MessageFormat.format("\tdockstore workflow wes status --id {0}", runId));
-        out(MessageFormat.format("\tdockstore workflow wes status --id {0} --verbose", runId));
+        out(MessageFormat.format("\tdockstore workflow wes logs --id {0}", runId));
     }
 }
