@@ -165,7 +165,7 @@ public class WesToilIT {
     }
 
     @Test
-    public void testAbsoluteDirectoryFileAttachment() throws InterruptedException {
+    public void testRelativeDirectoryFileAttachment() throws InterruptedException {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
         String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
             "--config", TOIL_CONFIG,
