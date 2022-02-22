@@ -269,7 +269,7 @@ public final class WesLauncher {
                 final Optional<WesFile> attachmentFile = fetchFile(resourcePath.toString(), null, resourcePath.toString());
                 attachmentFile.ifPresent(workflowAttachments::add);
             } else if (Files.isDirectory(resourcePath)) {
-                // Walk directory tree and add all files and directories
+                // Walk directory tree and add all files
                 workflowAttachments.addAll(fetchFilesFromLocalDirectory(resourcePath.toAbsolutePath().toString()));
             } else {
                 errorMessage(MessageFormat.format("Unable to locate: {0}", resourcePath), CLIENT_ERROR);
