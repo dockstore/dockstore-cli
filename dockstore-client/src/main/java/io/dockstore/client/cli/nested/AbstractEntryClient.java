@@ -1127,12 +1127,9 @@ public abstract class AbstractEntryClient<T> {
      * @param clientWorkflowExecutionServiceApi The API client
      */
     private void wesCancel(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String runId, boolean verbose) {
-        out("Canceling WES workflow");
         try {
             RunId response = clientWorkflowExecutionServiceApi.cancelRun(runId);
-            if (verbose) {
-                out("Cancelled run with id: " + response.toString());
-            }
+            out("Cancelled run with id: " + response.toString());
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error canceling WES run", e);
         }
