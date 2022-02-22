@@ -27,7 +27,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class WesLauncherIT {
+public class WesLauncherTest {
 
     public static final String RUN_ID = "123456-098765-123123-04983782";
     public static final String WORKFLOW_PATH = "github.com/org/repo";
@@ -36,9 +36,9 @@ public class WesLauncherIT {
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     public Workflow buildFakeWorkflow() {
         Workflow workflow = new Workflow();
