@@ -160,12 +160,13 @@ public class WesToilIT {
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
             "-a", ResourceHelpers.resourceFilePath("wesIt/w4_nested"),
-            "--inline-workflow"
+            "--inline-workflow",
+            "--verbose"
         };
         Client.main(commandStatementRun);
         assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
-        final String runId = findWorkflowId(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         assertTrue("The workflow did not succeed in time.", isSuccessful);
@@ -179,12 +180,13 @@ public class WesToilIT {
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
             "-a", "src/test/resources/wesIt/w4_nested/w4_2_test.txt",
-            "--inline-workflow"
+            "--inline-workflow",
+            "--verbose"
         };
         Client.main(commandStatementRun);
         assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
-        final String runId = findWorkflowId(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         assertTrue("The workflow did not succeed in time.", isSuccessful);
@@ -199,12 +201,13 @@ public class WesToilIT {
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
             "-a", "src/test/resources/wesIt/w4_nested",
-            "--inline-workflow"
+            "--inline-workflow",
+            "--verbose"
         };
         Client.main(commandStatementRun);
         assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
-        final String runId = findWorkflowId(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, EXECUTOR_ERROR_STATE);
 
         assertTrue("The workflow did not succeed in time.", isSuccessful);
@@ -219,12 +222,13 @@ public class WesToilIT {
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
             "-a", "src/test/resources/wesIt/w4_nested",
-            "--inline-workflow"
+            "--inline-workflow",
+            "--verbose"
         };
         Client.main(commandStatementRun);
         assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
-        final String runId = findWorkflowId(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         assertTrue("The workflow did not succeed in time.", isSuccessful);
@@ -238,12 +242,13 @@ public class WesToilIT {
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-complex-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w5_1_test.json"),
             "-a", ResourceHelpers.resourceFilePath("wesIt/w5_nested"),
-            "--inline-workflow"
+            "--inline-workflow",
+            "--verbose"
         };
         Client.main(commandStatementRun);
         assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
 
-        final String runId = findWorkflowId(systemOutRule.getLog());
+        final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
 
         assertTrue("The workflow did not succeed in time.", isSuccessful);
