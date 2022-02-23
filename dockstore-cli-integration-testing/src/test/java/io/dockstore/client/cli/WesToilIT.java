@@ -200,7 +200,7 @@ public class WesToilIT {
             "--config", TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
-            "-a", "src/test/resources/wesIt/w4_nested",
+            "--attach", "src/test/resources/wesIt/w4_nested",
             "--inline-workflow",
             "--verbose"
         };
@@ -241,7 +241,7 @@ public class WesToilIT {
             "--config", TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-complex-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w5_1_test.json"),
-            "-a", ResourceHelpers.resourceFilePath("wesIt/w5_nested"),
+            "--attach", ResourceHelpers.resourceFilePath("wesIt/w5_nested"),
             "--inline-workflow",
             "--verbose"
         };
