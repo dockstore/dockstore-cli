@@ -27,7 +27,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class WesLauncherIT {
+public class WesLauncherTest {
 
     public static final String RUN_ID = "123456-098765-123123-04983782";
     public static final String WORKFLOW_PATH = "github.com/org/repo";
@@ -36,9 +36,9 @@ public class WesLauncherIT {
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     public Workflow buildFakeWorkflow() {
         Workflow workflow = new Workflow();
@@ -57,7 +57,7 @@ public class WesLauncherIT {
         return workflow;
     }
 
-    public WorkflowClient mockWorkflowClient(String configPath) throws ApiException {
+    public WorkflowClient mockWorkflowClient(String configPath) {
 
         // Create the CLI client
         Client client = new Client();
@@ -71,11 +71,30 @@ public class WesLauncherIT {
         // Mock the workflows API, and return a prebuilt workflow
         WorkflowsApi workflowApi = mock(WorkflowsApi.class);
         WorkflowClient workflowClient = mock(WorkflowClient.class);
-        WorkflowExecutionServiceApi fakeApi = mock(WorkflowExecutionServiceApi.class);
 
         // Set request credentials object
         WesRequestData wrd = new WesRequestData("myUrl", "myBearerToken");
         workflowClient.setWesRequestData(wrd);
+
+        // WorkflowsApi Function mocks
+        when(workflowApi.getPublishedWorkflowByPath(
+            any(String.class),
+            any(String.class),
+            ArgumentMatchers.isNull(),
+            any(String.class)
+        )).thenReturn(fakeWorkflow);
+
+        // WorkflowClient function mocks
+        when(workflowClient.getClient()).thenReturn(client);
+        when(workflowClient.getVersionID(any(String.class))).thenReturn(fakeWorkflow.getDefaultVersion());
+        when(workflowClient.getTrsId(any(String.class))).thenReturn("#workflow/" + WORKFLOW_PATH);
+        when(workflowClient.getWorkflowsApi()).thenReturn(workflowApi);
+
+        return workflowClient;
+    }
+
+    public WorkflowExecutionServiceApi mockWesApi() throws ApiException {
+        WorkflowExecutionServiceApi fakeApi = mock(WorkflowExecutionServiceApi.class);
 
         // Mock requests to the GA4GH WES API, returning a fake run ID
         RunId runId = new RunId();
@@ -100,30 +119,16 @@ public class WesLauncherIT {
             any(List.class)
         )).thenReturn(runId);
 
-        // WorkflowsApi Function mocks
-        when(workflowApi.getPublishedWorkflowByPath(
-            any(String.class),
-            any(String.class),
-            ArgumentMatchers.isNull(),
-            any(String.class)
-        )).thenReturn(fakeWorkflow);
-
-        // WorkflowClient function mocks
-        when(workflowClient.getClient()).thenReturn(client);
-        when(workflowClient.getVersionID(any(String.class))).thenReturn(fakeWorkflow.getDefaultVersion());
-        when(workflowClient.getTrsId(any(String.class))).thenReturn("#workflow/" + WORKFLOW_PATH);
-        when(workflowClient.getWorkflowsApi()).thenReturn(workflowApi);
-        when(workflowClient.getWorkflowExecutionServiceApi()).thenReturn(fakeApi);
-
-        return workflowClient;
+        return fakeApi;
     }
 
     @Test
     public void testLaunchWithNoFiles() throws ApiException {
         WorkflowClient workflowClient = mockWorkflowClient("configNoContent");
         String workflowEntry = "my/entry/path";
+        WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
-        WesLauncher.launchWesCommand(workflowClient, workflowEntry, false, null, null);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, null, null, false);
         assertTrue("The runId should be printed out", systemOutRule.getLog().contains(RUN_ID));
     }
 
@@ -133,8 +138,9 @@ public class WesLauncherIT {
         String workflowEntry = "my/entry/path";
         String workflowParamPath = ResourceHelpers.resourceFilePath("helloSpaces.json");
         List<String> attachments = new ArrayList<>();
+        WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
-        WesLauncher.launchWesCommand(workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The runId should be printed out", systemOutRule.getLog().contains(RUN_ID));
     }
 
@@ -144,10 +150,11 @@ public class WesLauncherIT {
         String workflowEntry = "my/entry/path";
         String workflowParamPath = "this/file/doesnt/exist";
         List<String> attachments = new ArrayList<>();
+        WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
         // Expect an error to be thrown when a file cant be found
         systemExit.expectSystemExit();
-        WesLauncher.launchWesCommand(workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The file doesn't exist, so an error should be thrown",
             systemErrRule.getLog().contains("Unable to locate file: this/file/doesnt/exist"));
     }
@@ -161,9 +168,10 @@ public class WesLauncherIT {
         attachments.add(ResourceHelpers.resourceFilePath("helloSpaces.json"));
         attachments.add(ResourceHelpers.resourceFilePath("helloSpaces.wdl"));
         attachments.add(ResourceHelpers.resourceFilePath("idNonWord.cwl"));
+        WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
         // Expect an error to be thrown when a file cant be found
-        WesLauncher.launchWesCommand(workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The runId should be printed out", systemOutRule.getLog().contains(RUN_ID));
 
     }
@@ -175,10 +183,11 @@ public class WesLauncherIT {
         String workflowParamPath = ResourceHelpers.resourceFilePath("helloSpaces.json");
         List<String> attachments = new ArrayList<>();
         attachments.add("this/file/doesnt/exist");
+        WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
         // Expect an error to be thrown when a file cant be found
         systemExit.expectSystemExit();
-        WesLauncher.launchWesCommand(workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The file doesn't exist, so an error should be thrown",
             systemErrRule.getLog().contains("Unable to locate file: this/file/doesnt/exist"));
     }
@@ -192,10 +201,11 @@ public class WesLauncherIT {
         attachments.add(ResourceHelpers.resourceFilePath("helloSpaces.json"));
         attachments.add("uh/oh/this/is/a/typo");
         attachments.add(ResourceHelpers.resourceFilePath("helloSpaces.wdl"));
+        WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
         // Expect an error to be thrown when a file cant be found
         systemExit.expectSystemExit();
-        WesLauncher.launchWesCommand(workflowClient, workflowEntry, false, workflowParamPath, attachments);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, attachments, false);
         assertTrue("The file doesn't exist, so an error should be thrown",
             systemErrRule.getLog().contains("Unable to locate file: uh/oh/this/is/a/typo"));
     }
@@ -205,9 +215,10 @@ public class WesLauncherIT {
         WorkflowClient workflowClient = mockWorkflowClient("configNoContent");
         String workflowEntry = "my/entry/path";
         String workflowParamPath = ResourceHelpers.resourceFilePath("");
+        WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = mockWesApi();
 
         // Directories should be ignored, no error should be thrown
-        WesLauncher.launchWesCommand(workflowClient, workflowEntry, false, workflowParamPath, null);
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, workflowClient, workflowEntry, false, workflowParamPath, null, false);
     }
 
     @Test

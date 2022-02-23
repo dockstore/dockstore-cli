@@ -40,6 +40,7 @@ import io.dockstore.client.cli.JCommanderUtility;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.SourceControl;
+import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
@@ -533,14 +534,16 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     /**
      * Attempts to launch a workflow on a WES server
-     *
+     * @param clientWorkflowExecutionServiceApi The WES API client
      * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
      * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
      * @param paramsPath Path to the parameter JSON file
      * @param filePaths Paths to any other required files for the WES execution
+     * @param verbose Launching with verbose logs
      */
-    void wesLaunch(String entry, boolean inlineWorkflow, String paramsPath, List<String> filePaths) {
-        WesLauncher.launchWesCommand(this, entry, inlineWorkflow, paramsPath, filePaths);
+    void wesLaunch(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, String entry, boolean inlineWorkflow, String paramsPath,
+        List<String> filePaths, boolean verbose) {
+        WesLauncher.launchWesCommand(clientWorkflowExecutionServiceApi, this, entry, inlineWorkflow, paramsPath, filePaths, verbose);
     }
 
     @Override

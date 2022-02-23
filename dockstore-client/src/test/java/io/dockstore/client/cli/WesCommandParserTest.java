@@ -205,8 +205,7 @@ public class WesCommandParserTest {
         final String[] args = {
             "status",
             "--id",
-            "123456",
-            "--verbose"
+            "123456"
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -215,7 +214,6 @@ public class WesCommandParserTest {
 
         assertEquals("Parsed command should be 'status'", "status", parser.getParsedCommand());
         assertEquals("The parsed entry should be '123456'", "123456", wesCommandParser.commandStatus.getId());
-        assertTrue("verbose flag should be set", wesCommandParser.commandStatus.isVerbose());
     }
 
     @Test
@@ -302,5 +300,34 @@ public class WesCommandParserTest {
         assertEquals("Count should be set to 3", count, wesCommandParser.commandRunList.getPageSize());
         assertEquals("Page token should be set to 'banana'", "banana", wesCommandParser.commandRunList.getPageToken());
 
+    }
+
+    @Test
+    public void testCommandRunLogsHelp() {
+        final String[] args = {
+            "logs",
+            "--help"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+        assertTrue("Help should be set", wesCommandParser.commandRunLogs.isHelp());
+    }
+
+    @Test
+    public void testCommandRunlogs1() {
+        final String[] args = {
+            "logs",
+            "--id",
+            "123456"
+        };
+
+        WesCommandParser wesCommandParser = new WesCommandParser();
+        JCommander parser = wesCommandParser.jCommander;
+        parser.parse(args);
+
+        assertEquals("Parsed command should be 'logs'", "logs", parser.getParsedCommand());
+        assertEquals("The parsed entry should be '123456'", "123456", wesCommandParser.commandRunLogs.getId());
     }
 }
