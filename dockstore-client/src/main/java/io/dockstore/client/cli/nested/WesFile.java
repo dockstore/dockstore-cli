@@ -54,7 +54,7 @@ public class WesFile extends File {
         if (this.removablePrefix != null) {
 
             if (!(Path.of(removablePrefix)).isAbsolute()) {
-                errorMessage("The provided removable prefix must be absolute", CLIENT_ERROR);
+                errorMessage(MessageFormat.format("Unable to calculate relative name for HTTP file attachment: {0}", super.getName()), CLIENT_ERROR);
             }
 
             // Get the path to the file, minus the temporary directory that was created
