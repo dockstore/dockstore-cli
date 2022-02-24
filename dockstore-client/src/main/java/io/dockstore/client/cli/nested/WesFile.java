@@ -54,7 +54,9 @@ public class WesFile extends File {
         if (this.removablePrefix != null) {
 
             if (!(Path.of(removablePrefix)).isAbsolute()) {
-                errorMessage(MessageFormat.format("Unable to calculate relative name for HTTP file attachment: {0}", super.getName()), CLIENT_ERROR);
+                // This should never occur, but just in case...
+                errorMessage(MessageFormat.format("Unable to calculate relative name for HTTP file attachment: {0}. Please try uploading via a different path.",
+                    super.getName()), CLIENT_ERROR);
             }
 
             // Get the path to the file, minus the temporary directory that was created
