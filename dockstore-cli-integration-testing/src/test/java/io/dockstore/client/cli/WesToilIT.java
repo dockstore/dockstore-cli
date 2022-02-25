@@ -18,9 +18,9 @@ public class WesToilIT {
     public static final int WAIT_ITER_TIME_MILLI = 10000; // The time between each check of a workflow run status
 
     public static final String RUN_ID_PATTERN_PREFIX = "Launched WES run with id:";
-    public static final String COMPLETED_STATE = "state: COMPLETE";
-    public static final String EXECUTOR_ERROR_STATE = "state: EXECUTOR_ERROR";
-    public static final String CANCELED_STATE = "state: CANCELED";
+    public static final String COMPLETED_STATE = "\"state\" : \"COMPLETE\"";
+    public static final String EXECUTOR_ERROR_STATE = "\"state\" : \"EXECUTOR_ERROR\"";
+    public static final String CANCELED_STATE = "\"state\" : \"CANCELED\"";
 
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();

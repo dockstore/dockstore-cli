@@ -43,6 +43,8 @@ import com.amazonaws.auth.profile.ProfilesConfigFile;
 import com.amazonaws.regions.AwsProfileRegionProvider;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -1101,9 +1103,12 @@ public abstract class AbstractEntryClient<T> {
     private void wesStatus(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId) {
         try {
             RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
-            out(response.toString());
+            ObjectMapper mapper = new ObjectMapper();
+            out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting brief WES run status", e);
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert WES response object to JSON", e);
         }
     }
 
@@ -1115,9 +1120,12 @@ public abstract class AbstractEntryClient<T> {
     private void wesRunLogs(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId) {
         try {
             RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
-            out(response.toString());
+            ObjectMapper mapper = new ObjectMapper();
+            out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES run logs", e);
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert WES response object to JSON", e);
         }
     }
 
@@ -1142,9 +1150,12 @@ public abstract class AbstractEntryClient<T> {
     private void wesServiceInfo(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
         try {
             ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
-            out(response.toString());
+            ObjectMapper mapper = new ObjectMapper();
+            out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES server info", e);
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert WES response object to JSON", e);
         }
     }
 
@@ -1160,9 +1171,12 @@ public abstract class AbstractEntryClient<T> {
                 out(MessageFormat.format("Requesting latest {0} runs", pageSize));
             }
             RunListResponse response = clientWorkflowExecutionServiceApi.listRuns((long)pageSize, pageToken);
-            out(response.toString());
+            ObjectMapper mapper = new ObjectMapper();
+            out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES Run List", e);
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert WES response object to JSON", e);
         }
     }
 
