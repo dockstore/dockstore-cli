@@ -91,7 +91,7 @@ public final class WesLauncher {
         // 4. Any other files referenced by the workflow
         // TODO: Allow users to specify a directory to upload?
         // 6. Automatically attach all files referenced in remote Dockstore entry?
-        List<File> workflowAttachment = new ArrayList<>(fetchFiles(filePaths));
+        List<File> workflowAttachment = new ArrayList<>(fetchFilesAndDirectories(filePaths));
         if (inlineWorkflow) {
             // Download all workflow files and place them into a temporary directory, then add them as attachments to the WES request
             final File unzippedWorkflowDir = provisionFilesLocally(workflowClient, workflowEntry, workflowType);
@@ -247,13 +247,13 @@ public final class WesLauncher {
             return Optional.empty();
         }
 
-        // Verify the file path exists
-        // 1. If the path is to a directory, return an empty optional
+        // If the path isn't a file or a directory, we've done something wrong on our end.
+        // We don't want to attach a directory directly, so return an empty optional instead
         Path path = Paths.get(filePath);
         if (Files.isDirectory(path)) {
             return Optional.empty();
         } else if (!Files.isRegularFile(path)) {
-            errorMessage(MessageFormat.format("Unable to locate file: {0}", filePath), CLIENT_ERROR);
+            errorMessage(MessageFormat.format("Unable to locate resource: {0}", filePath), CLIENT_ERROR);
         }
 
         // TODO: Handle path expansions? i.e. '~/my/file.txt'
@@ -266,7 +266,7 @@ public final class WesLauncher {
      * @param filePaths A list of paths that correspond to files that need to be attached to the WES request, this may be null
      * @return A list of File objects, which may be empty
      */
-    public static List<WesFile> fetchFiles(List<String> filePaths) {
+    public static List<WesFile> fetchFilesAndDirectories(List<String> filePaths) {
 
         // Return an empty list if no attachments were passed
         if (filePaths == null) {
@@ -275,8 +275,19 @@ public final class WesLauncher {
 
         List<WesFile> workflowAttachments = new ArrayList<>();
         filePaths.forEach(path -> {
-            final Optional<WesFile> attachmentFile = fetchFile(path, null, path);
-            attachmentFile.ifPresent(workflowAttachments::add);
+
+            // Verify the path leads to a file or directory, otherwise raise an error and exit
+            Path resourcePath = Paths.get(path);
+            if (Files.isRegularFile(resourcePath)) {
+                // Add individual file
+                final Optional<WesFile> attachmentFile = fetchFile(resourcePath.toString(), null, resourcePath.toString());
+                attachmentFile.ifPresent(workflowAttachments::add);
+            } else if (Files.isDirectory(resourcePath)) {
+                // Walk directory tree and add all files
+                workflowAttachments.addAll(fetchFilesFromLocalDirectory(resourcePath.toAbsolutePath().toString()));
+            } else {
+                errorMessage(MessageFormat.format("Unable to locate: {0}", resourcePath), CLIENT_ERROR);
+            }
         });
 
         return workflowAttachments;
