@@ -497,20 +497,20 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                             } else {
                                 try {
                                     languageClientInterface.launch(entry, false, yamlRun, jsonRun, null, uuid);
-                                } catch (IOException e) {
-                                    errorMessage("Could not launch entry", IO_ERROR);
+                                } catch (Exception e) {
+                                    exceptionMessage(e, "Could not launch entry", IO_ERROR);
                                 }
                             }
                             break;
                         case WDL:
                         case NEXTFLOW:
                             if (jsonRun == null) {
-                                errorMessage("dockstore: missing required flag " + "--json", Client.CLIENT_ERROR);
+                                errorMessage("dockstore: missing required flag --json", Client.CLIENT_ERROR);
                             } else {
                                 try {
                                     languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
                                 } catch (Exception e) {
-                                    errorMessage("Could not launch entry", IO_ERROR);
+                                    exceptionMessage(e, "Could not launch entry", IO_ERROR);
                                 }
                             }
                             break;
@@ -519,7 +519,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                             break;
                         }
                     } catch (ApiException e) {
-                        errorMessage("Could not get workflow: " + path, ENTRY_NOT_FOUND);
+                        exceptionMessage(e, "Could not get workflow: " + path, ENTRY_NOT_FOUND);
                     }
                 } else {
                     this.isLocalEntry = true;
