@@ -499,14 +499,14 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                                 break;
                             case WDL:
                             case NEXTFLOW:
-                                conditionalErrorMessage(jsonRun == null, "dockstore: missing required flag --json", Client.CLIENT_ERROR);
+                                conditionalErrorMessage(jsonRun == null, "dockstore: missing required flag --json", CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
                                 break;
                             default:
                                 errorMessage("Workflow type not supported for launch: " + path, ENTRY_NOT_FOUND);
                                 break;
                             }
-                        } catch (Exception e) {
+                        } catch (IOException | ApiException | UnsupportedOperationException e) {
                             exceptionMessage(e, "Could not launch entry", IO_ERROR);
                         }
                         
