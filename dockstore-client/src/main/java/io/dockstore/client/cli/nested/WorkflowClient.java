@@ -506,7 +506,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                                 errorMessage("Workflow type not supported for launch: " + path, ENTRY_NOT_FOUND);
                                 break;
                             }
-                        } catch (IOException | ApiException | UnsupportedOperationException e) {
+                        } catch (Exception e) {
+                            // in addition to its checked exceptions, languageClientInterface.launch() can throw a variety of RuntimeExceptions, handle them all here
                             exceptionMessage(e, "Could not launch entry", IO_ERROR);
                         }
                         
