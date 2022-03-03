@@ -66,6 +66,7 @@ import static io.dockstore.client.cli.ArgumentUtility.GIT_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.NAME_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.boolWord;
 import static io.dockstore.client.cli.ArgumentUtility.columnWidthsWorkflow;
+import static io.dockstore.client.cli.ArgumentUtility.conditionalErrorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
@@ -493,16 +494,12 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         try {
                             switch (language) {
                             case CWL:
-                                if ((yamlRun != null) == (jsonRun != null)) {
-                                    errorMessage("One of  --json, --yaml, and --tsv is required", CLIENT_ERROR);
-                                }
+                                conditionalErrorMessage((yamlRun != null) == (jsonRun != null), "One of  --json, --yaml, and --tsv is required", CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, yamlRun, jsonRun, null, uuid);
                                 break;
                             case WDL:
                             case NEXTFLOW:
-                                if (jsonRun == null) {
-                                    errorMessage("dockstore: missing required flag --json", Client.CLIENT_ERROR);
-                                }
+                                conditionalErrorMessage(jsonRun == null, "dockstore: missing required flag --json", Client.CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
                                 break;
                             default:

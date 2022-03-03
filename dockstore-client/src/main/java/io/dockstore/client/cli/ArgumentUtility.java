@@ -91,6 +91,12 @@ public final class ArgumentUtility {
         System.exit(exitCode);
     }
 
+    public static void conditionalErrorMessage(boolean isError, String message, int exitCode) {
+        if (isError) {
+            errorMessage(message, exitCode);
+        }
+    }
+
     /**
      * @param bool primitive
      * @return the String "Yes" or "No"
