@@ -490,34 +490,29 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         LanguageClientInterface languageClientInterface = convertCLIStringToEnum(descriptor);
                         DescriptorLanguage language = DescriptorLanguage.convertShortStringToEnum(descriptor);
 
-                        switch (language) {
-                        case CWL:
-                            if ((yamlRun != null) == (jsonRun != null)) {
-                                errorMessage("One of  --json, --yaml, and --tsv is required", CLIENT_ERROR);
-                            } else {
-                                try {
-                                    languageClientInterface.launch(entry, false, yamlRun, jsonRun, null, uuid);
-                                } catch (Exception e) {
-                                    exceptionMessage(e, "Could not launch entry", IO_ERROR);
+                        try {
+                            switch (language) {
+                            case CWL:
+                                if ((yamlRun != null) == (jsonRun != null)) {
+                                    errorMessage("One of  --json, --yaml, and --tsv is required", CLIENT_ERROR);
                                 }
-                            }
-                            break;
-                        case WDL:
-                        case NEXTFLOW:
-                            if (jsonRun == null) {
-                                errorMessage("dockstore: missing required flag --json", Client.CLIENT_ERROR);
-                            } else {
-                                try {
-                                    languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
-                                } catch (Exception e) {
-                                    exceptionMessage(e, "Could not launch entry", IO_ERROR);
+                                languageClientInterface.launch(entry, false, yamlRun, jsonRun, null, uuid);
+                                break;
+                            case WDL:
+                            case NEXTFLOW:
+                                if (jsonRun == null) {
+                                    errorMessage("dockstore: missing required flag --json", Client.CLIENT_ERROR);
                                 }
+                                languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
+                                break;
+                            default:
+                                errorMessage("Workflow type not supported for launch: " + path, ENTRY_NOT_FOUND);
+                                break;
                             }
-                            break;
-                        default:
-                            errorMessage("Workflow type not supported for launch: " + path, ENTRY_NOT_FOUND);
-                            break;
+                        } catch (Exception e) {
+                            exceptionMessage(e, "Could not launch entry", IO_ERROR);
                         }
+                        
                     } catch (ApiException e) {
                         exceptionMessage(e, "Could not get workflow: " + path, ENTRY_NOT_FOUND);
                     }
