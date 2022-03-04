@@ -11,7 +11,7 @@ set -o xtrace
 : "$CIRCLE_CI_KEY_2"
 : "$CIRCLE_CI_IV_2"
 
-openssl aes-256-cbc -d -in circle_ci_test_data.zip.enc -k "$CIRCLE_CI_KEY_2" -iv "$CIRCLE_CI_IV_2" -out secrets.tar
+openssl aes-256-cbc -md sha256 -d -in circle_ci_test_data.zip.enc -k "$CIRCLE_CI_KEY_2" -iv "$CIRCLE_CI_IV_2" -out secrets.tar
 tar xvf secrets.tar
 # Create the directory where the .pem file will be placed for continuous integration
 # If you would like to change this path (might be a good idea since we no longer use
