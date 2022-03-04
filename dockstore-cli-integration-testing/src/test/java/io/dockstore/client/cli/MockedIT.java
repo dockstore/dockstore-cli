@@ -23,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.TestUtility;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
@@ -69,10 +71,10 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 public class MockedIT {
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
 
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();

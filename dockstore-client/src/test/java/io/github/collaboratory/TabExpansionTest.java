@@ -15,6 +15,8 @@
  */
 package io.github.collaboratory;
 
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.TabExpansionUtil;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,9 +29,9 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 public class TabExpansionTest {
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog();
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog();
 
     @Test
     public void testForNonCrashing() {

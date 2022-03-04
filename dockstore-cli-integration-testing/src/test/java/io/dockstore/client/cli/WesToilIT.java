@@ -1,6 +1,8 @@
 package io.dockstore.client.cli;
 
 import io.dockstore.client.cli.nested.WesTests;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,9 +27,9 @@ public class WesToilIT {
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
 
     /**
      * Searches for a runId in the provided string using a pattern printed by the CLI during a launch. Only needed for verbose outputs.

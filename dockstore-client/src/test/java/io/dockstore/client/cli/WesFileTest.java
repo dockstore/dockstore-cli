@@ -1,6 +1,7 @@
 package io.dockstore.client.cli;
 
 import io.dockstore.client.cli.nested.WesFile;
+import io.dockstore.common.FlushingSystemErrRule;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class WesFileTest {
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
 
     @Test
     public void testFileSuffixNaming() {
