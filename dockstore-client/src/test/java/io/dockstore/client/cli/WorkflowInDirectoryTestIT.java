@@ -18,6 +18,8 @@ package io.dockstore.client.cli;
 import java.io.File;
 import java.util.ArrayList;
 
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -36,9 +38,9 @@ public class WorkflowInDirectoryTestIT {
 
     private static File configFile;
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
     /**
      * Guard against failing tests killing VM
      */

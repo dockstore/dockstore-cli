@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dropwizard.testing.ResourceHelpers;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.util.Lists;
@@ -34,10 +36,10 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 
 public class NextflowIT {
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
 
     @Test
     public void demoNextflowLaunch() throws IOException {

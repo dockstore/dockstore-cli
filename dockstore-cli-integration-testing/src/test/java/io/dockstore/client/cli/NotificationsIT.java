@@ -18,6 +18,8 @@ package io.dockstore.client.cli;
 import java.io.IOException;
 
 import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.TestUtility;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
@@ -44,9 +46,9 @@ public class NotificationsIT extends BaseIT {
     private static final String SENDING_NOTIFICATION = "Sending notifications message.";
     private static final String GENERATING_UUID = "The UUID generated for this specific execution is ";
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 

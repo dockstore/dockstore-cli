@@ -7,6 +7,8 @@ import java.util.List;
 import io.dockstore.client.cli.nested.WesLauncher;
 import io.dockstore.client.cli.nested.WesRequestData;
 import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dropwizard.testing.ResourceHelpers;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
@@ -36,9 +38,9 @@ public class WesLauncherTest {
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
 
     public Workflow buildFakeWorkflow() {
         Workflow workflow = new Workflow();
