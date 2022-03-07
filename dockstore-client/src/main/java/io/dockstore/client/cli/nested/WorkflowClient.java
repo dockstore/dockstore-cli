@@ -66,6 +66,7 @@ import static io.dockstore.client.cli.ArgumentUtility.GIT_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.NAME_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.boolWord;
 import static io.dockstore.client.cli.ArgumentUtility.columnWidthsWorkflow;
+import static io.dockstore.client.cli.ArgumentUtility.conditionalErrorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
@@ -490,36 +491,28 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         LanguageClientInterface languageClientInterface = convertCLIStringToEnum(descriptor);
                         DescriptorLanguage language = DescriptorLanguage.convertShortStringToEnum(descriptor);
 
-                        switch (language) {
-                        case CWL:
-                            if ((yamlRun != null) == (jsonRun != null)) {
-                                errorMessage("One of  --json, --yaml, and --tsv is required", CLIENT_ERROR);
-                            } else {
-                                try {
-                                    languageClientInterface.launch(entry, false, yamlRun, jsonRun, null, uuid);
-                                } catch (IOException e) {
-                                    errorMessage("Could not launch entry", IO_ERROR);
-                                }
+                        try {
+                            switch (language) {
+                            case CWL:
+                                conditionalErrorMessage((yamlRun != null) == (jsonRun != null), "One of  --json, --yaml, and --tsv is required", CLIENT_ERROR);
+                                languageClientInterface.launch(entry, false, yamlRun, jsonRun, null, uuid);
+                                break;
+                            case WDL:
+                            case NEXTFLOW:
+                                conditionalErrorMessage(jsonRun == null, "dockstore: missing required flag --json", CLIENT_ERROR);
+                                languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
+                                break;
+                            default:
+                                errorMessage("Workflow type not supported for launch: " + path, ENTRY_NOT_FOUND);
+                                break;
                             }
-                            break;
-                        case WDL:
-                        case NEXTFLOW:
-                            if (jsonRun == null) {
-                                errorMessage("dockstore: missing required flag " + "--json", Client.CLIENT_ERROR);
-                            } else {
-                                try {
-                                    languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
-                                } catch (Exception e) {
-                                    errorMessage("Could not launch entry", IO_ERROR);
-                                }
-                            }
-                            break;
-                        default:
-                            errorMessage("Workflow type not supported for launch: " + path, ENTRY_NOT_FOUND);
-                            break;
+                        } catch (Exception e) {
+                            // in addition to its checked exceptions, languageClientInterface.launch() can throw a variety of RuntimeExceptions, handle them all here
+                            exceptionMessage(e, "Could not launch entry", IO_ERROR);
                         }
+                        
                     } catch (ApiException e) {
-                        errorMessage("Could not get workflow: " + path, ENTRY_NOT_FOUND);
+                        exceptionMessage(e, "Could not get workflow: " + path, ENTRY_NOT_FOUND);
                     }
                 } else {
                     this.isLocalEntry = true;
