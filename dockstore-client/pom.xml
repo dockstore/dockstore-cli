@@ -85,6 +85,18 @@
             <groupId>io.dockstore</groupId>
             <artifactId>swagger-java-client</artifactId>
             <version>${dockstore-core.version}</version>
+            <exclusions>
+                <!-- swagger pulls in com.fasterxml.jackson.core:jackson-core 2.13.1 which causes
+                error Failed while enforcing RequireUpperBoundDeps.:Require upper bound dependencies error
+                So exclude the jackson-core version that is pulled in
+                in favor of the older version of jackson-core specified in bom-internal (2.12.3)
+                Remove this when jackson-core can be safely upgraded to a newer version
+                -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
