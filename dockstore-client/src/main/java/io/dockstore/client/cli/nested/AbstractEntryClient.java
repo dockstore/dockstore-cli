@@ -1653,7 +1653,7 @@ public abstract class AbstractEntryClient<T> {
         out("Global Optional Parameters:");
         out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
         out("");
-        out("NOTE: WES SUPPORT IS IN BETA AT THIS TIME. RESULTS MAY BE UNPREDICTABLE.");
+        out("NOTE: Currently only WDL workflows are supported for WES requests. Further language support is under development.");
     }
 
     protected abstract void publishHelp();
