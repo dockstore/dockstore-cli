@@ -32,12 +32,6 @@
       <artifactId>dockstore-client</artifactId>
       <version>1.12.0-alpha.0-SNAPSHOT</version>
       <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-core</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
@@ -54,10 +48,6 @@
         <exclusion>
           <groupId>org.liquibase</groupId>
           <artifactId>liquibase-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-core</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
