@@ -35,7 +35,7 @@
     <properties>
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.12.0-beta.0</dockstore-core.version>
+        <dockstore-core.version>1.13.0-alpha.0-SNAPSHOT</dockstore-core.version>
         <maven-failsafe.version>2.21.0</maven-failsafe.version>
         <maven-surefire.version>2.21.0</maven-surefire.version>
         <aws-java-sdk.version>1.11.86</aws-java-sdk.version>
@@ -126,6 +126,18 @@
                 <version>${dockstore-core.version}</version>
                 <scope>import</scope>
             </dependency>
+
+            <!--
+                  override the BOM for jackson-core version
+                  until the BOM version is upgraded
+                  several dependencies in the CLI need the newer version
+             -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.13.1</version>
+            </dependency>
+
             <dependency>
                 <groupId>ro.fortsoft.pf4j</groupId>
                 <artifactId>pf4j</artifactId>
