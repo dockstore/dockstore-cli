@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.FileProvisioning;
@@ -32,6 +34,9 @@ public abstract class BaseLauncher {
     // For local entries this is the parent dir of the primary file
     // For remote entries this is the tmp dir where workflow files are downloaded to
     protected String workingDirectory;
+
+    // The entry's name (i.e. github.com/my-org/my-repo:master)
+    protected String entryVal;
 
     // CWL, WDL, NEXTFLOW
     protected DescriptorLanguage languageType;
@@ -64,12 +69,13 @@ public abstract class BaseLauncher {
      * @param originalParameters
      * @param workDir
      */
-    public void setFiles(File descriptor, File entryZip, File provisionedParameters, String originalParameters, String workDir) {
+    public void setFiles(File descriptor, File entryZip, File provisionedParameters, String originalParameters, String workDir, String entry) {
         this.primaryDescriptor = descriptor;
         this.zippedEntry = entryZip;
         this.provisionedParameterFile = provisionedParameters;
         this.originalParameterFile = originalParameters;
         this.workingDirectory = workDir;
+        this.entryVal = entry;
     }
 
     /**
@@ -108,11 +114,11 @@ public abstract class BaseLauncher {
      * @throws RuntimeException
      */
     public ImmutablePair<String, String> executeEntry(String runCommand, File workingDir) throws RuntimeException {
-        if (workingDir == null) {
-            return Utilities.executeCommand(runCommand, System.out, System.err);
-        } else {
-            return Utilities.executeCommand(runCommand, System.out, System.err, workingDir);
-        }
+        // As of Nextflow version 21.08.0-edge, NXF_HOME appears to be required, setting it for other languages too
+        Map<String, String> additionalEnvVars = new HashMap<>();
+        String nextflowHome = System.getProperty("user.home") + "/.nextflow";
+        additionalEnvVars.put("NXF_HOME", nextflowHome);
+        return Utilities.executeCommand(runCommand, System.out, System.err, workingDir, additionalEnvVars);
     }
 
     /**

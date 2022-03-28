@@ -1,0 +1,11 @@
+# Each line is a regular expression against the output of git-secrets
+# swagger-java-bitbucket-client/swagger.yaml:.*
+# Can match on the content of the string
+
+# dockstore-client/src/test/java/io/dockstore/client/cli/ApiClientExtendedIT.java
+dockstore-client/src/test/java/io/dockstore/client/cli/ApiClientExtendedIT.java:.*AKIAZHZQVUMXJASEFDT4
+dockstore-client/src/test/java/io/dockstore/client/cli/ApiClientExtendedIT.java:.*orCjq7tE9ejrJRYX2fHFhMW5BZSVWzrfeVIIQO/J
+dockstore-client/src/test/java/io/dockstore/client/cli/ApiClientExtendedIT.java:.*bf918205a9d2ce0cf8a0d1c7cc0eb2ecf42fdefc4ab387eaa1a7958edf26face
+dockstore-client/src/test/java/io/dockstore/client/cli/ApiClientExtendedIT.java:.*dab4ce2c5ff35cc2a99d57b03fb3ed0ece24630d97bfaf1676967b60b5171831
+dockstore-client/src/test/java/io/dockstore/client/cli/ApiClientExtendedIT.java:.*abc30f57ec627a809f6c3b4f738b2863ee8c242f8d4cdd653a37bf47e7bffc0f
+

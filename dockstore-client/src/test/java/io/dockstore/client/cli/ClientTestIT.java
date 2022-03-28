@@ -15,6 +15,8 @@
  */
 package io.dockstore.client.cli;
 
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Utilities;
 import io.dropwizard.testing.ResourceHelpers;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
@@ -32,9 +34,9 @@ import static io.dockstore.client.cli.Client.DEPRECATED_PORT_MESSAGE;
 public class ClientTestIT {
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog();
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog();
 
     @Test
     public void testDependencies() {

@@ -42,7 +42,6 @@ import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import io.cwl.avro.CWL;
@@ -354,8 +353,8 @@ public class Client {
             // was run to upgrade the Dockstore version.
             Map<String, String> additionalEnvVarMap =
                     Collections.singletonMap("DOCKSTORE_VERSION", dockstoreVersion);
-            Utilities.executeCommand(file.toPath().toString() + " self-install", ByteStreams.nullOutputStream(),
-                     ByteStreams.nullOutputStream(), null, additionalEnvVarMap);
+            Utilities.executeCommand(file.toPath().toString() + " self-install",
+                    System.out, System.err, null, additionalEnvVarMap);
         } catch (IOException e) {
             exceptionMessage(e, "Could not connect to Github. You may have reached your rate limit.", IO_ERROR);
         }

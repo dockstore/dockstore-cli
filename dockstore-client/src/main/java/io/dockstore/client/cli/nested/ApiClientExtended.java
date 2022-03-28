@@ -1,21 +1,62 @@
 package io.dockstore.client.cli.nested;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TimeZone;
+import java.util.TreeMap;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
+import io.dockstore.client.cli.Client;
 import io.openapi.wes.client.ApiClient;
 import io.openapi.wes.client.ApiException;
+import io.openapi.wes.client.Pair;
+import org.apache.http.HttpStatus;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.MultiPart;
+import uk.co.lucasweb.aws.v4.signer.HttpRequest;
+import uk.co.lucasweb.aws.v4.signer.Signer;
+import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
+
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.ArgumentUtility.out;
 
 public class ApiClientExtended extends ApiClient {
+
+    static final String TIME_ZONE = "UTC";
+    static final String DATA_FORMAT = "yyyyMMdd'T'HHmmss'Z'";
+    static final String AWS_DATE_HEADER = "x-amz-date";
+    static final String AWS_SESSION_TOKEN_HEADER = "X-Amz-Security-Token";
+    static final String AWS_WES_SERVICE_NAME = "execute-api";
+
+    static final String WORKFLOW_PARAMS = "workflow_params";
+
+    final WesRequestData wesRequestData;
+    private Signer.Builder awsAuthSignature = null;
+    private HttpRequest awsHttpRequest = null;
+
+    public ApiClientExtended(WesRequestData wesRequestData) {
+        this.wesRequestData = wesRequestData;
+    }
+
+    public WesRequestData getWesRequestData() {
+        return wesRequestData;
+    }
 
     /**
      *
@@ -54,7 +95,12 @@ public class ApiClientExtended extends ApiClient {
      */
     public void createBodyPart(MultiPart multiPart, String key, Object formObject) {
         Optional<MediaType> optMediaType = getMediaType(Optional.ofNullable(key));
-        if (formObject instanceof File) {
+
+        // Although the GA4GH WES client library expects workflow_params to be passed in as a file, the actual
+        // spec defines a JSON object, which is better represented as an octet-stream (not a file).
+        // This seems to match up with other WES implementations (Toil + AGC). So, in this case,
+        // even if the form object is a File, treat workflow_params as an string JSON object.
+        if (!WORKFLOW_PARAMS.equals(key) && formObject instanceof File) {
             File file = (File)formObject;
             FormDataContentDisposition contentDisp = FormDataContentDisposition.name(key)
                     .fileName(file.getName()).size(file.length()).build();
@@ -108,5 +154,265 @@ public class ApiClientExtended extends ApiClient {
         }
         return entity;
     }
+
+    /**
+     * Invoke API by sending HTTP request with the given options.
+     *
+     * @param <T> Type
+     * @param path The sub-path of the HTTP URL
+     * @param method The request method, one of "GET", "POST", "PUT", "HEAD" and "DELETE"
+     * @param queryParams The query parameters
+     * @param body The request body object
+     * @param headerParams The header parameters
+     * @param formParams The form parameters
+     * @param accept The request's Accept header
+     * @param contentType The request's Content-Type header
+     * @param authNames The authentications to apply
+     * @param returnType The return type into which to deserialize the response
+     * @return The response body in type of string
+     * @throws ApiException API exception
+     */
+    @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public <T> T invokeAPI(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String accept, String contentType, String[] authNames, GenericType<T> returnType) throws ApiException {
+        updateParamsForAuth(authNames, queryParams, headerParams);
+
+        // Not using `.target(this.basePath).path(path)` below,
+        // to support (constant) query string in `path`, e.g. "/posts?draft=1"
+        WebTarget target = httpClient.target(this.basePath + path);
+
+        if (queryParams != null) {
+            for (Pair queryParam : queryParams) {
+                if (queryParam.getValue() != null) {
+                    target = target.queryParam(queryParam.getName(), queryParam.getValue());
+                }
+            }
+        }
+
+        Invocation.Builder invocationBuilder = createInvocation(target, method, headerParams);
+
+        Entity<?> entity = serialize(body, formParams, contentType);
+
+        Response response = null;
+
+        try {
+            if ("GET".equals(method)) {
+                response = invocationBuilder.get();
+            } else if ("POST".equals(method)) {
+                response = invocationBuilder.post(entity);
+            } else if ("PUT".equals(method)) {
+                response = invocationBuilder.put(entity);
+            } else if ("DELETE".equals(method)) {
+                response = invocationBuilder.delete();
+            } else if ("PATCH".equals(method)) {
+                response = invocationBuilder.method("PATCH", entity);
+            } else if ("HEAD".equals(method)) {
+                response = invocationBuilder.head();
+            } else {
+                throw new ApiException(HttpStatus.SC_INTERNAL_SERVER_ERROR, "unknown method type " + method);
+            }
+
+            statusCode = response.getStatusInfo().getStatusCode();
+            responseHeaders = buildResponseHeaders(response);
+
+            if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+                return null;
+            } else if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+                if (returnType == null) {
+                    return null;
+                } else {
+                    return deserialize(response, returnType);
+                }
+            } else {
+                String message = "error";
+                String respBody = null;
+                if (response.hasEntity()) {
+                    try {
+                        respBody = String.valueOf(response.readEntity(String.class));
+                        message = respBody;
+                    } catch (RuntimeException e) {
+                        out(e.getMessage()); // Not in original generated code, placing this here for checkstyle
+                    }
+                }
+                throw new ApiException(
+                    response.getStatus(),
+                    message,
+                    buildResponseHeaders(response),
+                    respBody);
+            }
+        } catch (ProcessingException ex) {
+            // This could be caused by a failed Jersey Interceptor/filter, missing message body writers, or other IO exceptions.
+            // Mainly, this error is thrown when the provided WES URL is invalid. For more details, see:
+            // https://docs.oracle.com/javaee/7/api/index.html?javax/ws/rs/ProcessingException.html
+            errorMessage(MessageFormat.format("There was an error processing the HTTP request: {0}",
+                ex.getMessage()), Client.CONNECTION_ERROR);
+            return null;
+        } catch (ApiException ex) {
+            // Different WES servers provide error messages with different levels of verbosity/usefulness, so include both a default
+            // message and the message provided from the WES server in the printed error.
+            switch (ex.getCode()) {
+            case HttpStatus.SC_BAD_REQUEST:
+                errorMessage(MessageFormat.format("[{0}] The WES request was malformed: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_UNAUTHORIZED:
+                errorMessage(MessageFormat.format("[{0}] The WES request is unauthorized to be performed on the target WES server: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_FORBIDDEN:
+                errorMessage(MessageFormat.format("[{0}] The provided credentials are not authorized to make this WES request: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_NOT_FOUND:
+                errorMessage(MessageFormat.format("[{0}] The WES server was unable to locate an entity: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            case HttpStatus.SC_INTERNAL_SERVER_ERROR:
+                errorMessage(MessageFormat.format("[{0}] There was an internal server error processing this WES request: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+                break;
+            default:
+                errorMessage(MessageFormat.format("[{0}] There was an unknown error processing this WES request: {1}",
+                    ex.getCode(), ex.getMessage()), Client.API_ERROR);
+            }
+
+            return null;
+        } finally {
+            try {
+                response.close();
+            } catch (Exception e) {
+                out(e.getMessage()); // Not in original generated code, placing this here for checkstyle
+            }
+        }
+    }
+
+    /**
+     * We have 3 different sets of header values we need to consider
+     *  1. The headerParams passed into the invokeApi function
+     *  2. The defaultHeaderMap that is set when the Client is created
+     *  3. The required AWS headers for AWS SigV4 signing
+     *
+     * @param requiresAwsHeaders boolean indicating if the HTTP request needs to be authorized using AWS SigV4
+     * @param requiresAwsSessionHeader boolean indicating if the HTTP request is using temporary AWS credentials (a Session token)
+     * @param headerParams The header parameters passed to the original invokeAPI function
+     * @return A merged map of multiple headers.
+     */
+    private Map<String, String> mergeHeaders(boolean requiresAwsHeaders, boolean requiresAwsSessionHeader, Map<String, String> headerParams) {
+        // We need the map to be sorted, as AWS requires header orders to be alphabetical
+        Map<String, String> mergedHeaderMap = new TreeMap<>();
+
+        // Note: If 2 maps have duplicate keys, the key/value pair of the last map merged into the
+        // mergedMap is the one that will be kept, the rest will be clobbered.
+        mergedHeaderMap.putAll(defaultHeaderMap);
+        mergedHeaderMap.putAll(headerParams);
+
+        if (requiresAwsHeaders) {
+            // Calculate the date header
+            DateFormat dateFormat = new SimpleDateFormat(DATA_FORMAT);
+            dateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
+            mergedHeaderMap.put(AWS_DATE_HEADER, dateFormat.format(new Date()));
+
+            // Add the session token to the header list if we are validating using temporary AWS session credentials
+            if (requiresAwsSessionHeader) {
+                mergedHeaderMap.put(AWS_SESSION_TOKEN_HEADER, this.wesRequestData.getAwsSessionToken());
+            }
+
+            // Don't want to calculate our Authorization header off of another Authorization that will subsequently get overridden
+            mergedHeaderMap.remove(HttpHeaders.AUTHORIZATION);
+
+            // TODO decide how to handle this header. The 'Expect' header should only be sent for requests with a body, and might(?) impact signing based on how the 'Expect' header modifies how requests are sent
+            // It is currently part of the 'defaultHeaderMap', and is set in AbstractEntryClient, and seems to work fine for non-AWS WES requests
+            mergedHeaderMap.remove("Expect");
+        }
+
+        return mergedHeaderMap;
+    }
+
+    /**
+     * This will set the appropriate variables so the final Authorization header may be calculated in a Jersey hook
+     *
+     * @param target The target endpoint
+     * @param method The HTTP method (GET, POST, etc ...)
+     * @param allHeaders A list of header parameters custom to this request
+     */
+    public void setAwsHeaderCalculationData(WebTarget target, String method, Map<String, String> allHeaders) {
+        HttpRequest request = new HttpRequest(method, target.getUri());
+
+        // Our signature object. We will add all necessary headers to this request that comprise the 'canonical' HTTP request.
+        // This will then be signed alongside a hash of the body content (if there is a body).
+        Signer.Builder authSignature = Signer.builder()
+            .awsCredentials(new AwsCredentials(this.wesRequestData.getAwsAccessKey(), this.wesRequestData.getAwsSecretKey()))
+            .region(this.wesRequestData.getAwsRegion())
+            .header(HttpHeaders.HOST, target.getUri().getHost()); // Have to manually set the Host header as it's required when signing
+
+        // add all the headers to the signature object
+        for (Map.Entry<String, String> mapEntry : allHeaders.entrySet()) {
+            authSignature.header(mapEntry.getKey(), mapEntry.getValue());
+        }
+
+        // Not ideal, but we need to save some of the signature creation objects so we have the necessary information
+        // to calculate the Authorization header for requests with a payload. This isn't calculable until we're already
+        // making the request with jersey.
+        setAwsAuthMetadata(authSignature, request);
+    }
+
+    /**
+     * Sets metadata for calculating an AWS Authorization header later in the request process.
+     *
+     * @param authSignature The builder which creates the final request
+     * @param request An HttpRequest object that holds the AWS service type and URI
+     */
+    private void setAwsAuthMetadata(Signer.Builder authSignature, HttpRequest request) {
+        this.awsAuthSignature = authSignature;
+        this.awsHttpRequest = request;
+    }
+
+    /**
+     * Returns an AWS SigV4 String based on some request metadata and a sha256 of the payload content.
+     *
+     * @param contentSha256 A sha256 checksum of the request payload.
+     * @return A SigV4 string that should be set as the Authorization header of an AWS HTTP request
+     */
+    public String generateAwsContentSignature(String contentSha256) {
+        return awsAuthSignature.build(awsHttpRequest, AWS_WES_SERVICE_NAME, contentSha256).getSignature();
+    }
+
+    /**
+     * Creates an Invocation.Builder that will be used to make a WES request. If the request is to be sent to an AWS endpoint
+     * a SigV4 Authorization header needs to be calculated based on the canonical request (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
+     * The first step to calculating the AWS Authorization header is made here, but the Authorization header isn't set until later (In a Jersey hook)
+     * 
+     * @param target The target endpoint
+     * @param method The HTTP method (GET, POST, etc ...)
+     * @param headerParams A list of header parameters custom to this request
+     * @return An Invocation.Builder that can be used to make an HTTP request
+     */
+    private Invocation.Builder createInvocation(WebTarget target, String method, Map<String, String> headerParams) {
+
+        Invocation.Builder invocationBuilder = target.request();
+
+        // boolean values indicating if this request requires AWS-specific headers, and if the request is using temporary AWS credentials
+        final boolean requiresAwsHeaders = this.wesRequestData.usesAwsCredentials();
+        final boolean requiresAwsSessionHeader = this.wesRequestData.requiresAwsSessionHeader();
+
+        // Merge all our different headers into a single object for easier handling then add them to the invocation
+        final Map<String, String> mergedHeaderMap = mergeHeaders(requiresAwsHeaders, requiresAwsSessionHeader, headerParams);
+        for (Map.Entry<String, String> mapEntry : mergedHeaderMap.entrySet()) {
+            invocationBuilder.header(mapEntry.getKey(), mapEntry.getValue());
+        }
+
+        // If this request has credentials and is to an AWS endpoint, we need to set some signature calculation data.
+        // This will allow the jersey hook (WesChecksumFilter.java) to correctly calculate the Authorization header.
+        if (this.wesRequestData.hasCredentials() && requiresAwsHeaders) {
+            setAwsHeaderCalculationData(target, method, mergedHeaderMap);
+        }
+
+        // Point the jersey filter to this object so we can calculate the Authorization header if needed
+        WesChecksumFilter.setClientExtended(this);
+
+        // This invocation has no Authorization header set, that is handle in a Jersey hook
+        return invocationBuilder;
+    }
+
 
 }

@@ -38,6 +38,7 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Registry;
+import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.ContainertagsApi;
@@ -1132,6 +1133,21 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             }
         }
         return container;
+    }
+
+    /**
+     * Does nothing currently, as tools are not supported in WES
+     * @param clientWorkflowExecutionServiceApi The WES API client
+     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
+     * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
+     * @param paramsPath Path to the parameter JSON file
+     * @param filePaths Paths to any other required files for the WES execution
+     * @param verbose
+     */
+    void wesLaunch(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, String entry, boolean inlineWorkflow, String paramsPath,
+        List<String> filePaths, boolean verbose) {
+        // Only supports workflows for the moment
+        throw new UnsupportedOperationException("WES launch does not currently support tools. Please launch a workflow instead.");
     }
 
     @Override

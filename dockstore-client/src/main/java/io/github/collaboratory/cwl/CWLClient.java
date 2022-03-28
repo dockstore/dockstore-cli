@@ -54,7 +54,6 @@ import io.dockstore.client.cli.nested.CromwellLauncher;
 import io.dockstore.client.cli.nested.CwltoolLauncher;
 import io.dockstore.client.cli.nested.LanguageClientInterface;
 import io.dockstore.client.cli.nested.LauncherFiles;
-import io.dockstore.client.cli.nested.WESLauncher;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.client.cli.nested.notificationsclients.NotificationsClient;
 import io.dockstore.common.DescriptorLanguage;
@@ -123,9 +122,6 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
 
         BaseLauncher launcher;
         switch (cwlLauncherType) {
-        case WES:
-            launcher = new WESLauncher(abstractEntryClient, DescriptorLanguage.CWL, SCRIPT.get());
-            break;
         case CROMWELL:
             launcher = new CromwellLauncher(abstractEntryClient, DescriptorLanguage.CWL, SCRIPT.get());
             LOG.info("Cromwell is currently in beta for CWL tools and workflows.");
@@ -172,9 +168,21 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         return null;
     }
 
+    private Class getCWLClassTarget() {
+        if (abstractEntryClient instanceof WorkflowClient) {
+            if (((WorkflowClient)abstractEntryClient).isAppTool()) {
+                return CommandLineTool.class;
+            } else {
+                return Workflow.class;
+            }
+        } else {
+            return CommandLineTool.class;
+        }
+    }
+
     @Override
     public File provisionInputFiles() {
-        Class cwlClassTarget = abstractEntryClient instanceof WorkflowClient ? Workflow.class : CommandLineTool.class;
+        Class cwlClassTarget = getCWLClassTarget();
 
         // Load CWL from JSON to object
         CWL cwlUtil = new CWL(false, config);
@@ -589,14 +597,10 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                 for (Object entry : stringObjectEntryList) {
                     if (entry instanceof Map) {
                         Map lhm = (Map)entry;
-                        if ((lhm.containsKey("path") && lhm.get("path") instanceof String) || (lhm.containsKey("location") && lhm
-                                .get("location") instanceof String)) {
-                            String path = getPathOrLocation(lhm);
-                            // notice I'm putting key:path together so they are unique in the hash
-                            if (stringObjectEntry.getKey().equals(cwlInputFileID)) {
-                                inputSet.addAll(doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap,
-                                        secondaryFiles));
-                            }
+                        String path = getPathOrLocation(lhm);
+                        // notice I'm putting key:path together so they are unique in the hash
+                        if (path != null && stringObjectEntry.getKey().equals(cwlInputFileID)) {
+                            inputSet.addAll(doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap, secondaryFiles));
                         }
                     } else if (entry instanceof ArrayList) {
                         inputSet.addAll(processArrayofArrayOfFiles(entry, stringObjectEntry, cwlInputFileID, fileMap, secondaryFiles));
@@ -606,7 +610,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
             } else if (stringObjectEntry.getValue() instanceof HashMap) {
                 Map param = (HashMap)stringObjectEntry.getValue();
                 String path = getPathOrLocation(param);
-                if (stringObjectEntry.getKey().equals(cwlInputFileID)) {
+                if (path != null && stringObjectEntry.getKey().equals(cwlInputFileID)) {
                     inputSet.addAll(doProcessFile(stringObjectEntry.getKey(), path, cwlInputFileID, fileMap, secondaryFiles));
                 }
             }
@@ -620,14 +624,10 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         try {
             ArrayList<Map> filesArray = (ArrayList)entry;
             for (Map file : filesArray) {
-                if ((file.containsKey("path") && file.get("path") instanceof String) || (file.containsKey("location") && file
-                        .get("location") instanceof String)) {
-                    String path = getPathOrLocation(file);
-                    // notice I'm putting key:path together so they are unique in the hash
-                    if (stringObjectEntry.getKey().equals(cwlInputFileID)) {
-                        inputSet.addAll(
-                                doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap, secondaryFiles));
-                    }
+                String path = getPathOrLocation(file);
+                // notice I'm putting key:path together so they are unique in the hash
+                if (path != null && stringObjectEntry.getKey().equals(cwlInputFileID)) {
+                    inputSet.addAll(doProcessFile(stringObjectEntry.getKey() + ":" + path, path, cwlInputFileID, fileMap, secondaryFiles));
                 }
             }
         } catch (ClassCastException e) {
@@ -636,8 +636,13 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         return inputSet;
     }
 
+    private String getString(Map map, String key) {
+        Object value = map.get(key);
+        return value instanceof String ? (String)value : null;
+    }
+
     private String getPathOrLocation(Map param) {
-        return ObjectUtils.firstNonNull((String)param.get("path"), (String)param.get("location"));
+        return ObjectUtils.firstNonNull(getString(param, "path"), getString(param, "location"));
     }
 
     /**

@@ -20,7 +20,7 @@
     <parent>
         <groupId>io.dockstore</groupId>
         <artifactId>dockstore-cli</artifactId>
-        <version>1.11.3-SNAPSHOT</version>
+        <version>1.12.1-SNAPSHOT</version>
     </parent>
     <artifactId>dockstore-client</artifactId>
     <packaging>jar</packaging>
@@ -28,7 +28,7 @@
     <name>dockstore-client</name>
 
     <properties>
-        <docker-client.version>3.2.7</docker-client.version>
+        <docker-client.version>3.2.8</docker-client.version>
     </properties>
 
     <dependencies>
@@ -37,7 +37,6 @@
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
         </dependency>
-
         <!-- https://mvnrepository.com/artifact/com.github.docker-java/docker-java-transport-httpclient5 -->
         <dependency>
             <groupId>com.github.docker-java</groupId>
@@ -95,12 +94,12 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>openapi-java-wes-client</artifactId>
-            <version>1.11.3-SNAPSHOT</version>
+            <version>1.12.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-file-plugin-parent</artifactId>
-            <version>1.11.3-SNAPSHOT</version>
+            <version>1.12.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
@@ -158,6 +157,10 @@
             <artifactId>jackson-jaxrs-base</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.cwl</groupId>
             <artifactId>cwlavro-tools</artifactId>
         </dependency>
@@ -212,15 +215,9 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>ro.fortsoft.pf4j</groupId>
@@ -277,6 +274,26 @@
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
+        </dependency>
+        <!--
+        This is a zero-dependency package for calculating AWS SigV4 headers.
+        GitHub: https://github.com/lucasweb78/aws-v4-signer-java
+        This repo seems to be slightly abandoned, it was last modified in 2017 and has open PRs from 2018.
+        -->
+        <dependency>
+            <groupId>uk.co.lucasweb</groupId>
+            <artifactId>aws-v4-signer-java</artifactId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-core</artifactId>
+            <version>${aws-java-sdk.version}</version>
         </dependency>
     </dependencies>
 
@@ -361,7 +378,6 @@
                                 <ignoredUnusedDeclaredDependency>org.glassfish.jersey.inject:jersey-hk2</ignoredUnusedDeclaredDependency>
                             </ignoredUnusedDeclaredDependencies>
                             <usedDependencies>
-                                <usedDependency>javax.annotation:javax.annotation-api</usedDependency>
                                 <usedDependency>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</usedDependency>
                                 <usedDependency>io.spray:spray-json_2.12</usedDependency>
                             </usedDependencies>
@@ -416,6 +432,24 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <executions>
+                    <execution>
+                        <id>Install git-secrets</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>bash</executable>
+                            <commandlineArgs>${project.parent.basedir}/scripts/install-git-hooks.sh</commandlineArgs>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 

@@ -19,7 +19,7 @@
 
     <groupId>io.dockstore</groupId>
     <artifactId>dockstore-cli</artifactId>
-    <version>1.11.3-SNAPSHOT</version>
+    <version>1.12.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>dockstore</name>
@@ -35,11 +35,13 @@
     <properties>
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.11.10</dockstore-core.version>
+        <dockstore-core.version>1.12.0-rc.1</dockstore-core.version>
         <maven-failsafe.version>2.21.0</maven-failsafe.version>
         <maven-surefire.version>2.21.0</maven-surefire.version>
+        <aws-java-sdk.version>1.11.86</aws-java-sdk.version>
         <skipTests>false</skipTests>
         <skipITs>true</skipITs>
+
     </properties>
 
     <organization>
@@ -51,14 +53,24 @@
         <connection>${github.url}</connection>
         <developerConnection>${github.url}</developerConnection>
         <url>${github.url}</url>
-        <tag>1.9.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <repositories>
         <repository>
+            <id>artifacts.oicr.on.ca.ca-snapshots</id>
+            <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
             <id>artifacts.oicr.on.ca</id>
             <name>artifacts.oicr.on.ca</name>
             <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>apache-releases</id>
@@ -106,6 +118,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- remove likely when bumping bom-internal -->
             <dependency>
                 <groupId>io.dockstore</groupId>
                 <artifactId>bom-internal</artifactId>
@@ -127,6 +140,12 @@
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>2.3.1</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-simpleworkflow</artifactId>
+                <version>${aws-java-sdk.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -306,7 +325,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>3.1.12.2</version>
+                    <version>4.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -344,7 +363,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>1.4.1</version>
+                    <version>3.0.0-M3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -456,10 +475,10 @@
                                 </requireReleaseDeps>
                                 <requireUpperBoundDeps />
                                 <requireMavenVersion>
-                                    <version>3.5.4</version>
+                                    <version>3.8.1</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>11</version>
+                                    <version>[11.0.11,18.0)</version>
                                 </requireJavaVersion>
                                 <banDuplicatePomDependencyVersions />
                                 <bannedDependencies>
@@ -624,7 +643,8 @@
                     io.dockstore.common.ConfidentialTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.BenchmarkTest,
-                    io.dockstore.common.ToilOnlyTest
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.client.cli.nested.WestTests
                 </excludeGroups>
             </properties>
 
@@ -657,6 +677,15 @@
             </properties>
         </profile>
         <profile>
+            <id>wes-integration-tests</id>
+            <!-- run only tests that are relevant for WES Integration -->
+            <properties>
+                <skipTests>true</skipTests>
+                <skipITs>false</skipITs>
+                <groups>io.dockstore.client.cli.nested.WesTests</groups>
+            </properties>
+        </profile>
+        <profile>
             <id>integration-tests</id>
             <properties>
                 <skipTests>true</skipTests>
@@ -664,7 +693,8 @@
                 <excludeGroups>
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
-                    io.dockstore.common.ToilOnlyTest
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
@@ -679,7 +709,8 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.common.WorkflowTest
+                    io.dockstore.common.WorkflowTest,
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
@@ -694,7 +725,8 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.common.ToolTest
+                    io.dockstore.common.ToolTest,
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>
@@ -708,7 +740,8 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.common.ConfidentialTest
+                    io.dockstore.common.ConfidentialTest,
+                    io.dockstore.client.cli.nested.WesTests
                 </excludeGroups>
             </properties>
         </profile>

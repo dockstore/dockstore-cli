@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.dockstore</groupId>
   <artifactId>dockstore-cli-integration-testing</artifactId>
-  <version>1.11.3-SNAPSHOT</version>
+  <version>1.12.1-SNAPSHOT</version>
   <licenses>
     <license>
       <name>Apache Software License, Version 2.0</name>
@@ -30,37 +30,37 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-client</artifactId>
-      <version>1.11.3-SNAPSHOT</version>
+      <version>1.12.1-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.11.10</version>
+      <version>1.12.0-rc.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-webservice</artifactId>
-      <version>1.11.10</version>
+      <version>1.12.0-rc.1</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <artifactId>liquibase-core</artifactId>
           <groupId>org.liquibase</groupId>
+          <artifactId>liquibase-core</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.11.10</version>
+      <version>1.12.0-rc.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-jdbi3</artifactId>
-      <version>2.0.21</version>
+      <version>2.0.25</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -78,20 +78,30 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.5</version>
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.5</version>
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
   </dependencies>
   <repositories>
     <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>artifacts.oicr.on.ca.ca-snapshots</id>
+      <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
       <id>artifacts.oicr.on.ca</id>
       <name>artifacts.oicr.on.ca</name>
       <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>

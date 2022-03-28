@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 
 import io.dockstore.client.cli.nested.SingularityTest;
 import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.SourceControl;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;
@@ -30,7 +31,7 @@ public class SingularityIT extends BaseIT {
     private static final String SINGULARITY_CONFIG_TEMPLATE = ResourceHelpers.resourceFilePath("config_for_singularity");
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog();
 
     @Before
     @Override
