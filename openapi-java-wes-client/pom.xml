@@ -36,7 +36,7 @@
             <plugin>
                 <groupId>io.swagger.codegen.v3 </groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.5</version>
+                <version>3.0.33</version>
                 <executions>
                     <execution>
                         <goals>
@@ -51,7 +51,9 @@
                             <configOptions>
                                 <sourceFolder>src/gen/java/main</sourceFolder>
                                 <library>jersey2</library>
-                                <dateLibrary>java8</dateLibrary>
+                                <dateLibrary>java11</dateLibrary>
+                                <java8>true</java8>
+                                <java11>true</java11>
                                 <invokerPackage>io.openapi.wes.client</invokerPackage>
                                 <modelPackage>io.openapi.wes.client.model</modelPackage>
                                 <apiPackage>io.openapi.wes.client.api</apiPackage>
