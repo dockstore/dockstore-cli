@@ -1321,7 +1321,7 @@ public abstract class AbstractEntryClient<T> {
                 // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
                 // the default home/.aws/credentials file.
                 final String profileToRead = authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE;
-                final ProfileFile profilesConfigFile = ProfileFile.builder().build();
+                final ProfileFile profilesConfigFile = ProfileFile.defaultProfileFile();
                 final ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileFile(profilesConfigFile).profileName(profileToRead).build();
                 final AwsProfileRegionProvider regionProvider = new AwsProfileRegionProvider();
 
