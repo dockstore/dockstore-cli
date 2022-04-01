@@ -72,7 +72,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.13.0-alpha.0-SNAPSHOT</version>
+      <version>1.13.0-alpha.5</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -84,13 +84,13 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>swagger-java-client</artifactId>
-      <version>1.13.0-alpha.0-SNAPSHOT</version>
+      <version>1.13.0-alpha.5</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.13.0-alpha.0-SNAPSHOT</version>
+      <version>1.13.0-alpha.5</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -224,7 +224,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.32</version>
+      <version>1.7.35</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -301,10 +301,10 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>annotations</artifactId>
-      <version>3.0.1u2</version>
-      <scope>provided</scope>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>4.6.0</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>

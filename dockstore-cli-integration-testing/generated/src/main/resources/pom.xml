@@ -36,13 +36,13 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.13.0-alpha.0-SNAPSHOT</version>
+      <version>1.13.0-alpha.5</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-webservice</artifactId>
-      <version>1.13.0-alpha.0-SNAPSHOT</version>
+      <version>1.13.0-alpha.5</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -54,7 +54,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.13.0-alpha.0-SNAPSHOT</version>
+      <version>1.13.0-alpha.5</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
