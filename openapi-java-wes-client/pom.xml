@@ -27,7 +27,7 @@
     <parent>
         <artifactId>dockstore-cli</artifactId>
         <groupId>io.dockstore</groupId>
-        <version>1.12.1-SNAPSHOT</version>
+        <version>${revision}${changelist}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

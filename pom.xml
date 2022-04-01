@@ -19,7 +19,7 @@
 
     <groupId>io.dockstore</groupId>
     <artifactId>dockstore-cli</artifactId>
-    <version>1.12.1-SNAPSHOT</version>
+    <version>${revision}${changelist}</version>
     <packaging>pom</packaging>
 
     <name>dockstore</name>
@@ -33,6 +33,10 @@
     in dependencies elements
     -->
     <properties>
+        <!-- the following properties set sane defaults when no revision properties are set from the command-line -->
+        <revision>1.13</revision>
+        <changelist>.0-SNAPSHOT</changelist>
+
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dockstore-core.version>1.13.0-alpha.0-SNAPSHOT</dockstore-core.version>
