@@ -1,5 +1,5 @@
 
-Lists of 371 third-party dependencies.
+Lists of 367 third-party dependencies.
      (Apache License, Version 2.0) akka-actor (com.typesafe.akka:akka-actor_2.12:2.5.32 - https://akka.io/)
      (Apache License, Version 2.0) akka-protobuf (com.typesafe.akka:akka-protobuf_2.12:2.5.32 - https://akka.io/)
      (Apache License, Version 2.0) akka-slf4j (com.typesafe.akka:akka-slf4j_2.12:2.5.32 - https://akka.io/)
@@ -70,7 +70,6 @@ Lists of 371 third-party dependencies.
      (Apache License, Version 2.0) AWS Java SDK :: Services :: AWS Lambda (software.amazon.awssdk:lambda:2.17.79 - https://aws.amazon.com/sdkforjava)
      (Apache License, Version 2.0) AWS Java SDK :: Third Party :: Jackson-core (software.amazon.awssdk:third-party-jackson-core:2.17.79 - https://aws.amazon.com/sdkforjava)
      (Apache License, Version 2.0) AWS Java SDK :: Utilities (software.amazon.awssdk:utils:2.17.79 - https://aws.amazon.com/sdkforjava/utils)
-     (Apache License, Version 2.0) AWS SDK for Java - Core (com.amazonaws:aws-java-sdk-core:1.11.86 - https://aws.amazon.com/sdkforjava)
      (The Apache Software License, Version 2.0) AWS V4 Signer for Java (uk.co.lucasweb:aws-v4-signer-java:1.3 - https://github.com/lucasweb78/aws-v4-signer-java)
      (The Apache Software License, Version 2.0) Bean Validation API (javax.validation:validation-api:1.1.0.Final - http://beanvalidation.org)
      (MIT) better-files (com.github.pathikrit:better-files_2.12:3.9.1 - https://github.com/pathikrit/better-files)
@@ -187,7 +186,6 @@ Lists of 371 third-party dependencies.
      (The Apache Software License, Version 2.0) J2ObjC Annotations (com.google.j2objc:j2objc-annotations:1.3 - https://github.com/google/j2objc/)
      (The Apache Software License, Version 2.0) Jackson (org.codehaus.jackson:jackson-core-asl:1.9.13 - http://jackson.codehaus.org)
      (The Apache Software License, Version 2.0) Jackson 2 extensions to the Google APIs Client Library for Java (com.google.api-client:google-api-client-jackson2:1.33.2 - https://github.com/googleapis/google-api-java-client/google-api-client-jackson2)
-     (The Apache Software License, Version 2.0) Jackson dataformat: CBOR (com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3 - http://github.com/FasterXML/jackson-dataformats-binary)
      (The Apache Software License, Version 2.0) Jackson datatype: Guava (com.fasterxml.jackson.datatype:jackson-datatype-guava:2.12.3 - https://github.com/FasterXML/jackson-datatypes-collections)
      (The Apache Software License, Version 2.0) Jackson datatype: jdk8 (com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.12.3 - https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jdk8)
      (The Apache Software License, Version 2.0) Jackson datatype: Joda (com.fasterxml.jackson.datatype:jackson-datatype-joda:2.12.3 - https://github.com/FasterXML/jackson-datatype-joda)
@@ -230,7 +228,6 @@ Lists of 371 third-party dependencies.
      (Eclipse Distribution License v. 1.0) (Eclipse Public License v1.0) javax.persistence-api (javax.persistence:javax.persistence-api:2.2 - https://github.com/javaee/jpa-spec)
      (CDDL + GPLv2 with classpath exception) javax.transaction API (javax.transaction:javax.transaction-api:1.3 - http://jta-spec.java.net)
      (Eclipse Distribution License - v 1.0) JAXB Runtime (org.glassfish.jaxb:jaxb-runtime:2.3.6 - https://eclipse-ee4j.github.io/jaxb-ri/)
-     (CDDL 1.1) (GPL2 w/ CPE) jaxb-api (javax.xml.bind:jaxb-api:2.3.1 - https://github.com/javaee/jaxb-spec/jaxb-api)
      (Apache License, version 2.0) JBoss Logging 3 (org.jboss.logging:jboss-logging:3.3.2.Final - http://www.jboss.org)
      (Apache License, Version 2.0) JCL 1.2 implemented over SLF4J (org.slf4j:jcl-over-slf4j:1.7.35 - http://www.slf4j.org)
      (Apache License, Version 2.0) jcommander (com.beust:jcommander:1.78 - https://jcommander.org)
@@ -342,7 +339,6 @@ Lists of 371 third-party dependencies.
      (EPL 2.0) (GPL2 w/ CPE) ServiceLocator Default Implementation (org.glassfish.hk2:hk2-locator:2.6.1 - https://github.com/eclipse-ee4j/glassfish-hk2/hk2-locator)
      (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.7.35 - http://www.slf4j.org)
      (Apache License, Version 2.0) SnakeYAML (org.yaml:snakeyaml:1.28 - http://www.snakeyaml.org)
-     (The Apache License, Version 2.0) software.amazon.ion:ion-java (software.amazon.ion:ion-java:1.0.1 - https://github.com/amznlabs/ion-java/)
      (MIT) sourcecode_2.12 (com.lihaoyi:sourcecode_2.12:0.2.7 - https://github.com/lihaoyi/sourcecode)
      (GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1) SpotBugs Annotations (com.github.spotbugs:spotbugs-annotations:4.6.0 - https://spotbugs.github.io/)
      (Apache 2) spray-json (io.spray:spray-json_2.12:1.3.6 - https://github.com/spray/spray-json)

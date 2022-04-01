@@ -42,7 +42,6 @@
         <dockstore-core.version>1.13.0-alpha.5</dockstore-core.version>
         <maven-failsafe.version>2.22.2</maven-failsafe.version>
         <maven-surefire.version>2.22.2</maven-surefire.version>
-        <aws-java-sdk.version>1.11.86</aws-java-sdk.version>
         <skipTests>false</skipTests>
         <skipITs>true</skipITs>
 
@@ -486,6 +485,22 @@
                                         <exclude>commons-configuration:commons-configuration</exclude>
                                         <!-- superceded by org.apache.httpcomponents:httpclient -->
                                         <exclude>commons-httpclient:commons-httpclient</exclude>
+                                        <!-- see https://github.com/dropwizard/dropwizard/pull/3069 -->
+                                        <exclude>javax.annotation:javax.annotation-api</exclude>
+                                        <exclude>javax.activation:activation</exclude>
+                                        <exclude>javax.ws.rs:javax.ws.rs-api</exclude>
+                                        <!-- Replaced with jakarta.activation:jakarta.activation-api -->
+                                        <exclude>javax.activation:javax.activation-api</exclude>
+                                        <!-- Replaced with jakarta.servlet:jakarta.servlet-api -->
+                                        <exclude>javax.servlet:javax.servlet-api</exclude>
+                                        <!-- Replaced with jakarta.validation:jakarta.validation-api -->
+                                        <exclude>javax.validation:validation-api</exclude>
+                                        <!-- Replaced with jakarta.xml.bind:jakarta.xml.bind-api -->
+                                        <exclude>javax.xml.bind:jaxb-api</exclude>
+                                        <!-- should be using v2 api -->
+                                        <exclude>com.amazonaws:*</exclude>
+                                        <!-- we should be using jpa 2.2 -->
+                                        <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.1-api</exclude>
                                     </excludes>
                                 </bannedDependencies>
                             </rules>
