@@ -156,12 +156,6 @@
                 <artifactId>jaxb-api</artifactId>
                 <version>2.3.1</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-simpleworkflow</artifactId>
-                <version>${aws-java-sdk.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -221,6 +215,13 @@
                         <includeTestResources>true</includeTestResources>
                         <includeResources>true</includeResources>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>10.1</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

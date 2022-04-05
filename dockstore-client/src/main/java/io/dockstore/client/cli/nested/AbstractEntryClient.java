@@ -92,8 +92,8 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.parser.ParserException;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.profiles.ProfileFile;
-import software.amazon.awssdk.regions.providers.AwsProfileRegionProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import wdl.draft3.parser.WdlParser;
 
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
@@ -1321,14 +1321,13 @@ public abstract class AbstractEntryClient<T> {
                 // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
                 // the default home/.aws/credentials file.
                 final String profileToRead = authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE;
-                final ProfileFile profilesConfigFile = ProfileFile.defaultProfileFile();
-                final ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileFile(profilesConfigFile).profileName(profileToRead).build();
-                final AwsProfileRegionProvider regionProvider = new AwsProfileRegionProvider();
+                final ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileName(profileToRead).build();
+                final Region region = DefaultAwsRegionProviderChain.builder().profileName(profileToRead).build().getRegion();
 
                 // Build and return the request data
                 return new WesRequestData(wesEndpointUrl,
                     credentialsProvider.resolveCredentials(),
-                    regionProvider.getRegion().toString());
+                        region.toString());
 
             } catch (IllegalArgumentException | SdkClientException e) {
                 // Some potential reasons for this exception are:
