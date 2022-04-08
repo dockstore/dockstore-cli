@@ -27,7 +27,7 @@
     <parent>
         <artifactId>dockstore-cli</artifactId>
         <groupId>io.dockstore</groupId>
-        <version>1.12.1-SNAPSHOT</version>
+        <version>${revision}${changelist}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -36,7 +36,7 @@
             <plugin>
                 <groupId>io.swagger.codegen.v3 </groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.5</version>
+                <version>3.0.33</version>
                 <executions>
                     <execution>
                         <goals>
@@ -51,7 +51,9 @@
                             <configOptions>
                                 <sourceFolder>src/gen/java/main</sourceFolder>
                                 <library>jersey2</library>
-                                <dateLibrary>java8</dateLibrary>
+                                <dateLibrary>java11</dateLibrary>
+                                <java8>true</java8>
+                                <java11>true</java11>
                                 <invokerPackage>io.openapi.wes.client</invokerPackage>
                                 <modelPackage>io.openapi.wes.client.model</modelPackage>
                                 <apiPackage>io.openapi.wes.client.api</apiPackage>
@@ -241,6 +243,11 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.1.13</version>
+        </dependency>
         <!-- dependencies are needed for the client being generated -->
         <!-- HTTP client: jersey-client -->
         <dependency>
@@ -249,29 +256,18 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.jaxrs</groupId>
                     <artifactId>jackson-jaxrs-base</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.glassfish.jersey.core</groupId>
-                    <artifactId>jersey-common</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                    <artifactId>jackson-jaxrs-json-provider</artifactId>
-                </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-multipart</artifactId>
         </dependency>
 
         <!-- JSON processing: jackson -->
@@ -300,23 +296,17 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations -->
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations</artifactId>
         </dependency>
     </dependencies>
 </project>

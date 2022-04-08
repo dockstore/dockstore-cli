@@ -19,7 +19,7 @@
 
     <groupId>io.dockstore</groupId>
     <artifactId>dockstore-cli</artifactId>
-    <version>1.12.1-SNAPSHOT</version>
+    <version>${revision}${changelist}</version>
     <packaging>pom</packaging>
 
     <name>dockstore</name>
@@ -33,12 +33,15 @@
     in dependencies elements
     -->
     <properties>
+        <!-- the following properties set sane defaults when no revision properties are set from the command-line -->
+        <revision>1.13</revision>
+        <changelist>.0-SNAPSHOT</changelist>
+
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.13.0-alpha.0-SNAPSHOT</dockstore-core.version>
-        <maven-failsafe.version>2.21.0</maven-failsafe.version>
-        <maven-surefire.version>2.21.0</maven-surefire.version>
-        <aws-java-sdk.version>1.11.86</aws-java-sdk.version>
+        <dockstore-core.version>1.13.0-alpha.5</dockstore-core.version>
+        <maven-failsafe.version>2.22.2</maven-failsafe.version>
+        <maven-surefire.version>2.22.2</maven-surefire.version>
         <skipTests>false</skipTests>
         <skipITs>true</skipITs>
 
@@ -153,12 +156,6 @@
                 <artifactId>jaxb-api</artifactId>
                 <version>2.3.1</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-simpleworkflow</artifactId>
-                <version>${aws-java-sdk.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -169,12 +166,12 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.4</version>
+                    <version>0.8.7</version>
                 </plugin>
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
                     <artifactId>download-maven-plugin</artifactId>
-                    <version>1.4.0</version>
+                    <version>1.6.8</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -184,7 +181,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>3.10.1</version>
                     <configuration>
                         <release>11</release>
                         <showDeprecation>true</showDeprecation>
@@ -193,7 +190,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.2</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -207,18 +204,10 @@
                         </excludes>
                     </configuration>
                 </plugin>
-                <!-- version fixed at 2.17 due to https://sourceforge.net/p/eclipse-cs/discussion/274376/thread/ba316e08/?limit=25 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.1.0</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>8.29</version>
-                        </dependency>
-                    </dependencies>
+                    <version>3.1.2</version>
                     <configuration>
                         <configLocation>checkstyle.xml</configLocation>
                         <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
@@ -226,23 +215,23 @@
                         <includeTestResources>true</includeTestResources>
                         <includeResources>true</includeResources>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
                     <dependencies>
                         <dependency>
-                            <groupId>org.apache.maven.shared</groupId>
-                            <artifactId>maven-dependency-analyzer</artifactId>
-                            <version>1.11.1</version>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>10.1</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.2.1</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -295,11 +284,10 @@
                     <artifactId>maven-site-plugin</artifactId>
                     <version>3.7.1</version>
                 </plugin>
-                <!-- fix at 2.7 until a solution to symbolic links not being copied is ready -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -337,12 +325,12 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.3.0</version>
+                    <version>4.6.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <phase>package</phase>
@@ -375,12 +363,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.3.2</version>
                 </plugin>
                 <!-- https://mvnrepository.com/artifact/org.scala-tools/maven-scala-plugin -->
                 <plugin>
@@ -391,23 +379,18 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>io.swagger</groupId>
-                    <artifactId>swagger-codegen-maven-plugin</artifactId>
-                    <version>2.4.8</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>2.10.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -417,7 +400,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
-                    <version>1.2.2</version>
+                    <version>1.2.7</version>
                     <configuration>
                         <outputDirectory>${project.basedir}/generated/src/main/resources/</outputDirectory>
                         <updatePomFile>false</updatePomFile>
@@ -503,6 +486,22 @@
                                         <exclude>commons-configuration:commons-configuration</exclude>
                                         <!-- superceded by org.apache.httpcomponents:httpclient -->
                                         <exclude>commons-httpclient:commons-httpclient</exclude>
+                                        <!-- see https://github.com/dropwizard/dropwizard/pull/3069 -->
+                                        <exclude>javax.annotation:javax.annotation-api</exclude>
+                                        <exclude>javax.activation:activation</exclude>
+                                        <exclude>javax.ws.rs:javax.ws.rs-api</exclude>
+                                        <!-- Replaced with jakarta.activation:jakarta.activation-api -->
+                                        <exclude>javax.activation:javax.activation-api</exclude>
+                                        <!-- Replaced with jakarta.servlet:jakarta.servlet-api -->
+                                        <exclude>javax.servlet:javax.servlet-api</exclude>
+                                        <!-- Replaced with jakarta.validation:jakarta.validation-api -->
+                                        <exclude>javax.validation:validation-api</exclude>
+                                        <!-- Replaced with jakarta.xml.bind:jakarta.xml.bind-api -->
+                                        <exclude>javax.xml.bind:jaxb-api</exclude>
+                                        <!-- should be using v2 api -->
+                                        <exclude>com.amazonaws:*</exclude>
+                                        <!-- we should be using jpa 2.2 -->
+                                        <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.1-api</exclude>
                                     </excludes>
                                 </bannedDependencies>
                             </rules>
@@ -625,7 +624,7 @@
             <plugin>
                 <groupId>net.revelc.code</groupId>
                 <artifactId>impsort-maven-plugin</artifactId>
-                <version>1.2.0</version>
+                <version>1.6.2</version>
                 <configuration>
                     <groups>java.,javax.,*</groups>
                     <staticAfter>true</staticAfter>

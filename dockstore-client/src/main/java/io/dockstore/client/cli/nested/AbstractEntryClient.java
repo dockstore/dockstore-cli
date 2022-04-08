@@ -37,10 +37,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.auth.profile.ProfilesConfigFile;
-import com.amazonaws.regions.AwsProfileRegionProvider;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -94,6 +90,10 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.parser.ParserException;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import wdl.draft3.parser.WdlParser;
 
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
@@ -1321,14 +1321,13 @@ public abstract class AbstractEntryClient<T> {
                 // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
                 // the default home/.aws/credentials file.
                 final String profileToRead = authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE;
-                final ProfilesConfigFile profilesConfigFile = new ProfilesConfigFile();
-                final ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider(profilesConfigFile, profileToRead);
-                final AwsProfileRegionProvider regionProvider = new AwsProfileRegionProvider(profileToRead);
+                final ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileName(profileToRead).build();
+                final Region region = DefaultAwsRegionProviderChain.builder().profileName(profileToRead).build().getRegion();
 
                 // Build and return the request data
                 return new WesRequestData(wesEndpointUrl,
-                    credentialsProvider.getCredentials(),
-                    regionProvider.getRegion());
+                    credentialsProvider.resolveCredentials(),
+                        region.toString());
 
             } catch (IllegalArgumentException | SdkClientException e) {
                 // Some potential reasons for this exception are:

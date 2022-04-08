@@ -1,8 +1,8 @@
 package io.dockstore.client.cli.nested;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSSessionCredentials;
 import io.dockstore.client.cli.Client;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
@@ -59,12 +59,12 @@ public class WesRequestData {
         }
     }
 
-    public WesRequestData(String url, AWSCredentials credentials, String region) {
-        this(url, credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey(), region);
+    public WesRequestData(String url, AwsCredentials credentials, String region) {
+        this(url, credentials.accessKeyId(), credentials.secretAccessKey(), region);
 
         // Check if the credentials object uses a temporary session token
-        if (credentials instanceof AWSSessionCredentials) {
-            this.awsSessionToken = ((AWSSessionCredentials) credentials).getSessionToken();
+        if (credentials instanceof AwsSessionCredentials) {
+            this.awsSessionToken = ((AwsSessionCredentials) credentials).sessionToken();
             this.credentialType = CredentialType.AWS_TEMPORARY_CREDENTIALS;
         }
     }

@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static software.amazon.awssdk.profiles.ProfileFileSystemSetting.AWS_CONFIG_FILE;
+import static software.amazon.awssdk.profiles.ProfileFileSystemSetting.AWS_SHARED_CREDENTIALS_FILE;
 
 public class AbstractEntryClientTestIT {
 
@@ -127,8 +129,8 @@ public class AbstractEntryClientTestIT {
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
         String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
-        environmentVariables.set("AWS_CONFIG_FILE", config);
-        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
+        environmentVariables.set(AWS_CONFIG_FILE.name(), config);
+        environmentVariables.set(AWS_SHARED_CREDENTIALS_FILE.name(), credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -150,8 +152,8 @@ public class AbstractEntryClientTestIT {
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
         String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
-        environmentVariables.set("AWS_CONFIG_FILE", config);
-        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
+        environmentVariables.set(AWS_CONFIG_FILE.name(), config);
+        environmentVariables.set(AWS_SHARED_CREDENTIALS_FILE.name(), credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -177,8 +179,8 @@ public class AbstractEntryClientTestIT {
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeMalformedAwsCredentials");
         String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
-        environmentVariables.set("AWS_CONFIG_FILE", config);
-        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
+        environmentVariables.set(AWS_CONFIG_FILE.name(), config);
+        environmentVariables.set(AWS_SHARED_CREDENTIALS_FILE.name(), credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -200,8 +202,8 @@ public class AbstractEntryClientTestIT {
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
         String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
-        environmentVariables.set("AWS_CONFIG_FILE", config);
-        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
+        environmentVariables.set(AWS_CONFIG_FILE.name(), config);
+        environmentVariables.set(AWS_SHARED_CREDENTIALS_FILE.name(), credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -225,8 +227,8 @@ public class AbstractEntryClientTestIT {
             "myUrl"
         };
 
-        environmentVariables.set("AWS_CONFIG_FILE", config);
-        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
+        environmentVariables.set(AWS_CONFIG_FILE.name(), config);
+        environmentVariables.set(AWS_SHARED_CREDENTIALS_FILE.name(), credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -269,8 +271,8 @@ public class AbstractEntryClientTestIT {
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
         String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
-        environmentVariables.set("AWS_CONFIG_FILE", config);
-        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
+        environmentVariables.set(AWS_CONFIG_FILE.name(), config);
+        environmentVariables.set(AWS_SHARED_CREDENTIALS_FILE.name(), credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -296,8 +298,8 @@ public class AbstractEntryClientTestIT {
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
         String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
-        environmentVariables.set("AWS_CONFIG_FILE", config);
-        environmentVariables.set("AWS_CREDENTIAL_PROFILES_FILE", credentials);
+        environmentVariables.set(AWS_CONFIG_FILE.name(), config);
+        environmentVariables.set(AWS_SHARED_CREDENTIALS_FILE.name(), credentials);
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);

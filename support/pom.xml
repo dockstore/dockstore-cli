@@ -22,7 +22,7 @@
     <name>support</name>
 
     <parent>
-        <version>1.12.1-SNAPSHOT</version>
+        <version>${revision}${changelist}</version>
         <groupId>io.dockstore</groupId>
         <artifactId>dockstore-cli</artifactId>
         <relativePath>../pom.xml</relativePath>
