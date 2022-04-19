@@ -11,5 +11,7 @@ extraction:
       - export PATH="$PWD:$PATH"
     index:
     # Specify the Java version required to build the project.
+      maven:
+        version: 3.8.3
       java_version: 12
 
