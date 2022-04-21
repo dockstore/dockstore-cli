@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
 
     <name>dockstore</name>
-    <description>dockstore cli parent POM</description>
+    <description>dockstore-cli parent POM</description>
     <url>https://github.com/dockstore/dockstore-cli</url>
     <!--
     The following properties are mostly used in the plugins section
