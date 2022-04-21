@@ -41,6 +41,7 @@ public class CheckerClient extends WorkflowClient {
     @Override
     public void printGeneralHelp() {
         printHelpHeader();
+        printHelpHeader();
         printUsageHelp(getEntryType().toLowerCase());
 
         // Checker client help
