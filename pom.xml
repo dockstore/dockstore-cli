@@ -25,7 +25,6 @@
     <name>dockstore</name>
     <description>dockstore cli parent POM</description>
     <url>https://github.com/dockstore/dockstore-cli</url>
-
     <!--
     The following properties are mostly used in the plugins section
     as the versions for the dependencies elements are provided
@@ -39,12 +38,21 @@
 
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.13.0-alpha.5</dockstore-core.version>
+        <dockstore-core.version>1.13.0-alpha.6</dockstore-core.version>
         <maven-failsafe.version>2.22.2</maven-failsafe.version>
         <maven-surefire.version>2.22.2</maven-surefire.version>
         <skipTests>false</skipTests>
         <skipITs>true</skipITs>
-
+        <!-- for sonarcloud -->
+        <sonar.projectKey>dockstore_dockstore-cli</sonar.projectKey>
+        <sonar.organization>dockstore</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+        <!-- this is not an aggregated path -->
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../reports/target/site/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+        <!-- end sonarcloud properties -->
     </properties>
 
     <organization>
@@ -679,6 +687,11 @@
                         <configuration>
                             <skip>false</skip>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>3.9.1.2184</version>
                     </plugin>
                 </plugins>
             </build>

@@ -41,7 +41,8 @@ workflows:
           <<: *common_filters
           requires:
             - build
-
+          context:
+            - sonarcloud
       - integration-tests:
           matrix:
             parameters:
@@ -70,6 +71,9 @@ jobs:
       - run_tests
       - save_test_results
       - send_coverage
+      - run:
+          name: SonarCloud scan - coverage
+          command: ./mvnw sonar:sonar
 
   integration-tests:
     parameters:
