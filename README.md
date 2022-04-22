@@ -1,5 +1,4 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/c583635906d84de5a1b5f62068fc26be)](https://www.codacy.com/gh/dockstore/dockstore-cli/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dockstore/dockstore-cli&amp;utm_campaign=Badge_Grade)
-[![Build Status](https://travis-ci.org/dockstore/dockstore-cli.svg?branch=develop)](https://travis-ci.org/dockstore/dockstore-cli)
 [![codecov](https://codecov.io/gh/dockstore/dockstore-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/dockstore/dockstore-cli)
 [![Website](https://img.shields.io/website/https/dockstore.org.svg)](https://dockstore.org)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ga4gh/dockstore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  
