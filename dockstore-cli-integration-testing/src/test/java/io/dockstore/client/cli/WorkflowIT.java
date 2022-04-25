@@ -406,7 +406,7 @@ public class WorkflowIT extends BaseIT {
         // Register and refresh workflow
         Workflow workflow = workflowApi
                 .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
-                        "test", "cwl", null);
+                        null, "cwl", null);
         Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         WorkflowVersion workflowVersion = refresh.getWorkflowVersions().get(0);
 
