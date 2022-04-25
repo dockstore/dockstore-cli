@@ -414,11 +414,7 @@ public class WorkflowIT extends BaseIT {
         final String entryWithVersion = workflow.getPath() + ":" + workflowVersion.getName();
 
         // Both the versioned and un-versioned entry paths should succeed
-        Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
-                        entryWithoutVersion });
-        Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
-                        entryWithVersion });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry", entryWithoutVersion });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry", entryWithVersion });
     }
 }
