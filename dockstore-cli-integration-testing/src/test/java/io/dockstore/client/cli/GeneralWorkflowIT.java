@@ -159,9 +159,13 @@ public class GeneralWorkflowIT extends BaseIT {
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
                 "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
 
-        // info
+        // info (no version)
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--script" });
+
+        // info (with version)
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
+                SourceControl.GITHUB.toString() + "/DockstoreTestUser2/hello-dockstore-workflow/testname:master", "--script" });
 
         // unpublish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
