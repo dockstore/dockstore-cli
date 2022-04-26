@@ -405,13 +405,12 @@ public class WorkflowIT extends BaseIT {
 
         // Register and refresh workflow
         Workflow workflow = workflowApi
-                .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
-                        "", "cwl", null);
+                .manualRegister("github.com", "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
+                        "test", "cwl", null);
         Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         WorkflowVersion workflowVersion = refresh.getWorkflowVersions().get(0);
-
-        final String entryWithoutVersion = workflow.getPath();
-        final String entryWithVersion = workflow.getPath() + ":" + workflowVersion.getName();
+        final String entryWithoutVersion = "github.com/DockstoreTestUser2/md5sum-checker/test";
+        final String entryWithVersion = entryWithoutVersion + ":" + workflowVersion.getName();
 
         // Both the versioned and un-versioned entry paths should succeed
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry", entryWithoutVersion });
