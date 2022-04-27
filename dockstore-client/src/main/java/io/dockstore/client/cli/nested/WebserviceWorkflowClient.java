@@ -76,7 +76,12 @@ public class WebserviceWorkflowClient {
 
     private Workflow getDockstoreWorkflowByPath(WorkflowSubClass workflowSubClass, String entryPath) {
         try {
-            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(entryPath, workflowSubClass.toString(), include, null);
+            // Split out the base path and version from the entry path
+            final String[] paths = entryPath.split(":");
+            final String basePath = paths[0];
+            final String versionName = paths.length > 1 ? paths[1] : null;
+
+            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(basePath, workflowSubClass.toString(), include, versionName);
             if (workflowSubClass.equals(WorkflowSubClass.APPTOOL)) {
                 this.setFoundAppTool(true);
             }
