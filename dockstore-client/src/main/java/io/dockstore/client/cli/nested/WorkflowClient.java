@@ -494,7 +494,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         try {
                             switch (language) {
                             case CWL:
-                                conditionalErrorMessage((yamlRun != null) == (jsonRun != null), "One of  --json, --yaml, and --tsv is required", CLIENT_ERROR);
+                                conditionalErrorMessage((yamlRun != null) == (jsonRun != null), "Either --json or --yaml is required", CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, yamlRun, jsonRun, null, uuid);
                                 break;
                             case WDL:
