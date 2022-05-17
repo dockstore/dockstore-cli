@@ -1210,14 +1210,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         private boolean help = false;
     }
 
-    @Parameters(separators = "=", commandDescription = "Spit out a tsv run file for a given entry.")
-    private static class CommandEntry2tsv {
-        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
-        private String entry;
-        @Parameter(names = "--help", description = "Prints help for entry2json command", help = true)
-        private boolean help = false;
-    }
-
     @Parameters(separators = "=", commandDescription = "Launch an entry locally or remotely.")
     private static class CommandLaunch {
 
