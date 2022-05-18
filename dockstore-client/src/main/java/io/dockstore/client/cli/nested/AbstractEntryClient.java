@@ -619,7 +619,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void convert(final List<String> args) throws ApiException, IOException {
         if (args.isEmpty() || (containsHelpRequest(args) && !args.contains("cwl2json") && !args.contains("wdl2json") && !args
-                .contains("entry2json") && !args.contains("entry2tsv"))) {
+                .contains("entry2json"))) {
             convertHelp(); // Display general help
         } else {
             final String cmd = args.remove(0);
@@ -636,9 +636,6 @@ public abstract class AbstractEntryClient<T> {
                     break;
                 case "entry2json":
                     handleEntry2json(args);
-                    break;
-                case "entry2tsv":
-                    handleEntry2tsv(args);
                     break;
                 default:
                     invalid(cmd);
@@ -706,15 +703,6 @@ public abstract class AbstractEntryClient<T> {
             entry2jsonHelp();
         } else {
             final String runString = convertEntry2Json(args, true);
-            out(runString);
-        }
-    }
-
-    public void handleEntry2tsv(List<String> args) throws ApiException, IOException {
-        if (args.isEmpty() || containsHelpRequest(args)) {
-            entry2tsvHelp();
-        } else {
-            final String runString = convertEntry2Json(args, false);
             out(runString);
         }
     }
@@ -1823,24 +1811,9 @@ public abstract class AbstractEntryClient<T> {
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2yaml [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " wdl2json [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2tsv [parameters]");
         out("");
         out("Description:");
         out("  They allow you to convert between file representations.");
-        printHelpFooter();
-    }
-
-    private void entry2tsvHelp() {
-        printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2tsv --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2tsv [parameters]");
-        out("");
-        out("Description:");
-        out("  Spit out a tsv run file for a given cwl document.");
-        out("");
-        out("Required parameters:");
-        out("  --entry <entry>                Complete " + getEntryType().toLowerCase()
-                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         printHelpFooter();
     }
 
