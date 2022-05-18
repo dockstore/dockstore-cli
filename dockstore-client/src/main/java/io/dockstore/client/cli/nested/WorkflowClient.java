@@ -466,16 +466,19 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         final String descriptor = descriptorType.getValue().toLowerCase();
                         LanguageClientInterface languageClientInterface = convertCLIStringToEnum(descriptor);
                         DescriptorLanguage language = DescriptorLanguage.convertShortStringToEnum(descriptor);
-
+                        if (workflow.getDefaultTestParameterFilePath() == null) {
+                            conditionalErrorMessage((yamlRun != null) == (jsonRun != null),
+                                                    "The workflow does not specify a default test parameter file, use --json or --yaml to specify one",
+                                                    CLIENT_ERROR);
+                        }
                         try {
                             switch (language) {
                             case CWL:
-                                conditionalErrorMessage((yamlRun != null) == (jsonRun != null), "Either --json or --yaml is required", CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, yamlRun, jsonRun, null, uuid);
                                 break;
                             case WDL:
                             case NEXTFLOW:
-                                conditionalErrorMessage(jsonRun == null, "dockstore: missing required flag --json", CLIENT_ERROR);
+                                conditionalErrorMessage((yamlRun != null), "Nextflow only supports --json, --yaml cannot be used", CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
                                 break;
                             default:
@@ -486,7 +489,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                             // in addition to its checked exceptions, languageClientInterface.launch() can throw a variety of RuntimeExceptions, handle them all here
                             exceptionMessage(e, "Could not launch entry", IO_ERROR);
                         }
-                        
+
                     } catch (ApiException e) {
                         exceptionMessage(e, "Could not get workflow: " + path, ENTRY_NOT_FOUND);
                     }
