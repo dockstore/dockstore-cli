@@ -1416,10 +1416,6 @@ public abstract class AbstractEntryClient<T> {
         final String yamlRun = optVal(args, "--yaml", null);
         String jsonRun = optVal(args, "--json", null);
         final String uuid = optVal(args, "--uuid", null);
-
-        if (!(yamlRun != null ^ jsonRun != null)) {
-            errorMessage("One of  --json or --yaml is required", CLIENT_ERROR);
-        }
         CWLClient client = new CWLClient(this);
         client.launch(entry, isALocalEntry, yamlRun, jsonRun, null, uuid);
     }
@@ -1459,9 +1455,6 @@ public abstract class AbstractEntryClient<T> {
     private void launchWdl(String entry, final List<String> args, boolean isALocalEntry) throws ApiException {
         final String yamlRun = optVal(args, "--yaml", null);
         String jsonRun = optVal(args, "--json", null);
-        if (!(yamlRun != null ^ jsonRun != null)) {
-            errorMessage("dockstore: Missing required flag: one of --json or --yaml", CLIENT_ERROR);
-        }
         final String wdlOutputTarget = optVal(args, "--wdl-output-target", null);
         final String uuid = optVal(args, "--uuid", null);
         WDLClient client = new WDLClient(this);

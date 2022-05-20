@@ -454,6 +454,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             JCommanderUtility.printJCommanderHelpLaunch(jCommander, "dockstore workflow", LAUNCH_COMMAND_NAME);
         } else {
             checkIfDockerRunning(); // print a warning message if Docker is not running
+            conditionalErrorMessage((yamlRun != null) && (jsonRun != null),
+                    "Specify a test parameter file with either --json or --yaml not both",
+                    CLIENT_ERROR);
             if ((entry == null) != (localEntry == null)) {
                 if (entry != null) {
                     this.isLocalEntry = false;
@@ -466,11 +469,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         final String descriptor = descriptorType.getValue().toLowerCase();
                         LanguageClientInterface languageClientInterface = convertCLIStringToEnum(descriptor);
                         DescriptorLanguage language = DescriptorLanguage.convertShortStringToEnum(descriptor);
-                        if (workflow.getDefaultTestParameterFilePath() == null) {
-                            conditionalErrorMessage((yamlRun != null) == (jsonRun != null),
-                                                    "The workflow does not specify a default test parameter file, use --json or --yaml to specify one",
-                                                    CLIENT_ERROR);
-                        }
                         try {
                             switch (language) {
                             case CWL:
@@ -478,7 +476,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                                 break;
                             case WDL:
                             case NEXTFLOW:
-                                conditionalErrorMessage((yamlRun != null), "Nextflow only supports --json, --yaml cannot be used", CLIENT_ERROR);
+                                conditionalErrorMessage((yamlRun != null), "--yaml is not supported please use --json instead", CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
                                 break;
                             default:

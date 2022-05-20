@@ -1393,4 +1393,67 @@ public class LaunchTestIT {
         // run simple echo null tool
         runTool(nullCWL, nullJSON, false);
     }
+
+    @Test
+    public void missingTestParameterFile() {
+        // Run workflows without specifying test parameter file
+        File helloWDL = new File(ResourceHelpers.resourceFilePath("helloSpaces.wdl"));
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(helloWDL.getAbsolutePath());
+
+        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+        runClientCommandConfig(args, config);
+        exit.expectSystemExit();
+        exit.checkAssertionAfterwards(() -> assertTrue("output should include a successful cromwell run",
+                systemOutRule.getLog().contains("Cromwell exit code: 0"))
+        );
+    }
+
+    @Test
+    public void duplicateTestParameterFile() {
+        // Return client failure if both --json and --yaml are passed
+        File file = new File(ResourceHelpers.resourceFilePath("wrongExtcwl.wdl"));
+        File helloJSON = new File(ResourceHelpers.resourceFilePath("helloSpaces.json"));
+        File helloYAML = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--json");
+        args.add(helloJSON.getPath());
+        args.add("--yaml");
+        args.add(helloYAML.getPath());
+
+        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+        runClientCommandConfig(args, config);
+        exit.expectSystemExitWithStatus(4);
+        exit.checkAssertionAfterwards(() -> assertTrue("Client error should be returned",
+                   systemOutRule.getLog().contains("Specify a test parameter file with either --json or --yaml not both")));
+    }
+
+    @Test
+    public void yamlForWDL() {
+        // Nextflow/WDL does not support --yaml, a client error should be raised
+        File file = new File(ResourceHelpers.resourceFilePath("random.wdl"));
+        File helloYAML = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--yaml");
+        args.add(helloYAML.getPath());
+
+        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+        runClientCommandConfig(args, config);
+        exit.expectSystemExitWithStatus(4);
+        exit.checkAssertionAfterwards(() -> assertTrue("Client error should be returned",
+                systemOutRule.getLog().contains("--yaml is not supported please use --json instead")));
+    }
 }
