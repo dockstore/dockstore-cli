@@ -101,7 +101,10 @@ public class CromwellLauncher extends BaseLauncher {
         }
 
         // Cromwell help specifies the 'run' command line format as: run [options] workflow-source
-        Collections.addAll(arguments, "-jar", executionFile.getAbsolutePath(), "run", "--inputs", provisionedParameterFile.getAbsolutePath());
+        Collections.addAll(arguments, "-jar", executionFile.getAbsolutePath(), "run");
+        if (provisionedParameterFile != null) {
+            Collections.addAll(arguments, "--inputs", provisionedParameterFile.getAbsolutePath());
+        }
 
         // NOTE: Support for ZIP imports exists, but we decided to comment it out for now as it was causing some issues.
         //Collections.addAll(arguments, "--imports", zippedEntry.getAbsolutePath());
