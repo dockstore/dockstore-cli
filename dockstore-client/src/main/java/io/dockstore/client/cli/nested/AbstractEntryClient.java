@@ -100,6 +100,7 @@ import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.MAX_DESCRIPTION;
+import static io.dockstore.client.cli.ArgumentUtility.conditionalErrorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
@@ -1010,6 +1011,9 @@ public abstract class AbstractEntryClient<T> {
         List<String> argsCopy = new ArrayList<>(args);
         String jsonFile = optVal(argsCopy, "--json", null);
         String yamlFile = optVal(argsCopy, "--yaml", null);
+        conditionalErrorMessage((jsonFile != null) && (yamlFile != null),
+                "Specify a test parameter file with either --json or --yaml not both",
+                CLIENT_ERROR);
         if (jsonFile != null) {
             try {
                 fileToJSON(jsonFile);
