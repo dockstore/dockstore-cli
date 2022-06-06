@@ -149,10 +149,12 @@ public class CromwellLauncher extends BaseLauncher {
         String alteredStderr = stderr.replaceAll("(?m)^", "\t");
         Gson gson = new Gson();
         String jsonString = null;
-        try {
-            jsonString = abstractEntryClient.fileToJSON(originalParameterFile);
-        } catch (IOException ex) {
-            errorMessage(ex.getMessage(), IO_ERROR);
+        if (originalParameterFile != null) {
+            try {
+                jsonString = abstractEntryClient.fileToJSON(originalParameterFile);
+            } catch (IOException ex) {
+                errorMessage(ex.getMessage(), IO_ERROR);
+            }
         }
         Map<String, Object> inputJson = gson.fromJson(jsonString, HashMap.class);
 

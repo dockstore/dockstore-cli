@@ -186,7 +186,7 @@ public abstract class BaseLanguageClient {
                     exceptionMessage(ex, ex.getMessage(), GENERIC_ERROR);
                 }
             } else {
-                LOG.debug("Input files were not passed, attempting to continue.");
+                LOG.debug("No test parameter file provided, skipping provisioning");
             }
         }
 

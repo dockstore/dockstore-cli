@@ -142,6 +142,7 @@ public abstract class AbstractEntryClient<T> {
     public static final String CHECKSUM_NULL_MESSAGE = "Unable to validate local descriptor checksum. Please refresh the entry. Missing checksum for descriptor ";
     public static final String CHECKSUM_MISMATCH_MESSAGE = "Launch halted. Local checksum does not match remote checksum for ";
     public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
+    public static final String MULTIPLE_TEST_FILE_ERROR_MESSAGE = "If specifying a test parameter file, use either --json or --yaml, but not both.";
 
     private static final String WORKFLOW = "workflow";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
@@ -1012,8 +1013,8 @@ public abstract class AbstractEntryClient<T> {
         String jsonFile = optVal(argsCopy, "--json", null);
         String yamlFile = optVal(argsCopy, "--yaml", null);
         conditionalErrorMessage((jsonFile != null) && (yamlFile != null),
-                "Specify a test parameter file with either --json or --yaml not both",
-                CLIENT_ERROR);
+                                MULTIPLE_TEST_FILE_ERROR_MESSAGE,
+                                CLIENT_ERROR);
         if (jsonFile != null) {
             try {
                 fileToJSON(jsonFile);

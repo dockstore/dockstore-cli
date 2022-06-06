@@ -28,6 +28,7 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.FlushingSystemErrRule;
@@ -241,7 +242,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(jsonTestParameterFile.getAbsolutePath());
         exit.expectSystemExitWithStatus(CLIENT_ERROR);
-        exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains("Specify a test parameter file with either --json or --yaml not both")));
+        exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
         Client.main(args.toArray(new String[0]));
     }
 
@@ -1396,8 +1397,8 @@ public class LaunchTestIT {
     }
 
     @Test
-    public void missingTestParameterFileWDL() {
-        // Run a workflow without specifying test parameter files, deffer errors to the
+    public void missingTestParameterFileWDLFailure() {
+        // Run a workflow without specifying test parameter files, defer errors to the
         // Cromwell workflow engine.
         File file = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         ArrayList<String> args = new ArrayList<>();
@@ -1411,6 +1412,23 @@ public class LaunchTestIT {
         runClientCommandConfig(args, config);
         assertTrue("This workflow cannot run without test files, it should raise an exception from the workflow engine",
                 systemOutRule.getLog().contains("problems running command:"));
+    }
+
+    @Test
+    public void missingTestParameterFileWDLSuccess() {
+        // Run a workflow without specifying test parameter files, defer errors to the
+        // Cromwell workflow engine.
+        File file = new File(ResourceHelpers.resourceFilePath("no-input-echo.wdl"));
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+
+        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+        runClientCommandConfig(args, config);
+        assertTrue("output should include a successful cromwell run", systemOutRule.getLog().contains("Cromwell exit code: 0"));
+
     }
 
     @Test
@@ -1456,7 +1474,7 @@ public class LaunchTestIT {
         File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
         exit.expectSystemExitWithStatus(CLIENT_ERROR);
         exit.checkAssertionAfterwards(() -> assertTrue("Client error should be returned",
-                systemErrRule.getLog().contains("Specify a test parameter file with either --json or --yaml not both")));
+                systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
         runClientCommandConfig(args, config);
     }
 }
