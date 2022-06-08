@@ -279,9 +279,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-multipart</artifactId>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
+            <version>1.41.4</version>
         </dependency>
+
         <!--
         This is a zero-dependency package for calculating AWS SigV4 headers.
         GitHub: https://github.com/lucasweb78/aws-v4-signer-java
@@ -296,8 +298,38 @@
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.1.7.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.common</groupId>
+            <artifactId>hibernate-commons-annotations</artifactId>
+            <version>5.1.2.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>javax.persistence</groupId>-->
+<!--            <artifactId>javax.persistence-api</artifactId>-->
+<!--            <version>2.2</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>2.33</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>3.0.4</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -381,6 +413,11 @@
                             <usedDependencies>
                                 <usedDependency>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</usedDependency>
                                 <usedDependency>io.spray:spray-json_2.12</usedDependency>
+                                <usedDependency>org.hibernate:hibernate-validator</usedDependency>
+                                <usedDependency>org.hibernate.common:hibernate-commons-annotations</usedDependency>
+                                <usedDependency>jakarta.validation:jakarta.validation-api</usedDependency>
+<!--                                <usedDependency>javax.persistence:javax.persistence-api</usedDependency>-->
+                                <usedDependency>org.glassfish:jakarta.el</usedDependency>
                             </usedDependencies>
 
                         </configuration>

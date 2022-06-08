@@ -61,6 +61,7 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
+import io.dockstore.common.yaml.DockstoreYamlHelper.DockstoreYamlException;
 import io.dockstore.openapi.client.api.Ga4Ghv20Api;
 import io.dockstore.openapi.client.model.ToolFile;
 import io.github.collaboratory.cwl.CWLClient;
@@ -259,7 +260,7 @@ public abstract class AbstractEntryClient<T> {
      * @param activeCommand the current command that we're interested in
      * @return whether this interface handled the active command
      */
-    public boolean processEntryCommands(List<String> args, String activeCommand) throws IOException, ApiException {
+    public boolean processEntryCommands(List<String> args, String activeCommand) throws IOException, ApiException, DockstoreYamlException {
         if (null != activeCommand) {
             // see if it is a command specific to this kind of Entry
             boolean processed = processEntrySpecificCommands(args, activeCommand);

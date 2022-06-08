@@ -122,6 +122,8 @@ public class Client {
     private WorkflowClient workflowClient;
     private CheckerClient checkerClient;
 
+    private YamlVerify yamlVerify;
+
     /*
      * Dockstore Client Functions for CLI
      * ----------------------------------------------------------------------------------------------------
@@ -719,6 +721,8 @@ public class Client {
                         String[] argsArray = new String[args.size()];
                         argsArray = args.toArray(argsArray);
                         handled = DepCommand.handleDepCommand(argsArray);
+                    } else if ("yaml".equals(mode)) {
+                        targetClient = getYamlVerify();
                     }
 
                     if (targetClient != null) {
@@ -832,6 +836,7 @@ public class Client {
         this.toolClient = new ToolClient(containersApi, new ContainertagsApi(defaultApiClient), usersApi, this, isAdmin);
         this.workflowClient = new WorkflowClient(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
         this.checkerClient = new CheckerClient(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
+        this.yamlVerify = new YamlVerify(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
 
         defaultApiClient.setDebugging(DEBUG.get());
         CWLRunnerFactory.setConfig(config);
@@ -876,6 +881,9 @@ public class Client {
         return checkerClient;
     }
 
+    public YamlVerify getYamlVerify() {
+        return yamlVerify;
+    }
     public Ga4Ghv20Api getGa4Ghv20Api() {
         return ga4ghv20Api;
     }
