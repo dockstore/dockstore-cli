@@ -101,7 +101,10 @@ public class CromwellLauncher extends BaseLauncher {
         }
 
         // Cromwell help specifies the 'run' command line format as: run [options] workflow-source
-        Collections.addAll(arguments, "-jar", executionFile.getAbsolutePath(), "run", "--inputs", provisionedParameterFile.getAbsolutePath());
+        Collections.addAll(arguments, "-jar", executionFile.getAbsolutePath(), "run");
+        if (provisionedParameterFile != null) {
+            Collections.addAll(arguments, "--inputs", provisionedParameterFile.getAbsolutePath());
+        }
 
         // NOTE: Support for ZIP imports exists, but we decided to comment it out for now as it was causing some issues.
         //Collections.addAll(arguments, "--imports", zippedEntry.getAbsolutePath());
@@ -146,10 +149,12 @@ public class CromwellLauncher extends BaseLauncher {
         String alteredStderr = stderr.replaceAll("(?m)^", "\t");
         Gson gson = new Gson();
         String jsonString = null;
-        try {
-            jsonString = abstractEntryClient.fileToJSON(originalParameterFile);
-        } catch (IOException ex) {
-            errorMessage(ex.getMessage(), IO_ERROR);
+        if (originalParameterFile != null) {
+            try {
+                jsonString = abstractEntryClient.fileToJSON(originalParameterFile);
+            } catch (IOException ex) {
+                errorMessage(ex.getMessage(), IO_ERROR);
+            }
         }
         Map<String, Object> inputJson = gson.fromJson(jsonString, HashMap.class);
 

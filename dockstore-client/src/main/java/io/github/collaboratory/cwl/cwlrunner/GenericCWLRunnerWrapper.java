@@ -18,6 +18,7 @@ package io.github.collaboratory.cwl.cwlrunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.base.Joiner;
 import io.dockstore.client.cli.ArgumentUtility;
@@ -40,9 +41,10 @@ public class GenericCWLRunnerWrapper implements CWLRunnerInterface {
     }
 
     @Override
-    public List<String> getExecutionCommand(String outputDir, String tmpDir, String workingDir, String cwlFile, String jsonSettings) {
-        return new ArrayList<>(Arrays
-            .asList("cwl-runner", "--outdir", outputDir, "--tmpdir-prefix", tmpDir, "--tmp-outdir-prefix",
-                workingDir, cwlFile, jsonSettings));
+    public List<String> getExecutionCommand(String outputDir, String tmpDir, String workingDir, String cwlFile, Optional<String> jsonSettings) {
+        ArrayList<String> command = new ArrayList<>(
+                Arrays.asList("cwl-runner", "--outdir", outputDir, "--tmpdir-prefix", tmpDir, "--tmp-outdir-prefix", workingDir, cwlFile));
+        jsonSettings.ifPresent(command::add);
+        return command;
     }
 }

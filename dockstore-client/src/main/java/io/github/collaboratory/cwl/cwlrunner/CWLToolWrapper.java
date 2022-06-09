@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.ProcessingException;
 
@@ -69,9 +70,12 @@ public class CWLToolWrapper implements CWLRunnerInterface {
     }
 
     @Override
-    public List<String> getExecutionCommand(String outputDir, String tmpDir, String workingDir, String cwlFile, String jsonSettings) {
-        return new ArrayList<>(Arrays
-            .asList("cwltool", "--enable-dev", "--non-strict", "--outdir", outputDir, "--tmpdir-prefix", tmpDir, "--tmp-outdir-prefix",
-                workingDir, cwlFile, jsonSettings));
+    public List<String> getExecutionCommand(String outputDir, String tmpDir, String workingDir, String cwlFile, Optional<String> jsonSettings) {
+
+        ArrayList<String> command = new ArrayList<>(
+                Arrays.asList("cwltool", "--enable-dev", "--non-strict", "--outdir", outputDir, "--tmpdir-prefix", tmpDir,
+                        "--tmp-outdir-prefix", workingDir, cwlFile));
+        jsonSettings.ifPresent(command::add);
+        return command;
     }
 }
