@@ -60,32 +60,16 @@ public class YamlValidatorTest {
     // This tests whether a Yaml is valid (ie. it compiles) but does not verify that it is valid for use in DockStore
     @Test
     public void invalidYaml() {
-        String testDirectory1 = "src/test/resources/InvalidYamlSyntax/test1";
-        String testDirectory2 = "src/test/resources/InvalidYamlSyntax/test2";
-        String testDirectory3 = "src/test/resources/InvalidYamlSyntax/test3";
-        try {
-            YamlVerify.dockstoreValidate(testDirectory1);
-            fail("Invalid YAML not caught");
-        } catch (YamlVerify.ValidateYamlException ex) {
-            final String dockstorePath = YamlVerify.ERROR_MESSAGE + testDirectory1 + "/" + YamlVerify.DOCKSTOREYML;
-            System.out.println(ex.getMessage());
-            assertTrue(ex.getMessage().startsWith(dockstorePath + " is not a valid yaml file:"));
-        }
-        try {
-            YamlVerify.dockstoreValidate(testDirectory2);
-            fail("Invalid YAML not caught");
-        } catch (YamlVerify.ValidateYamlException ex) {
-            final String dockstorePath = YamlVerify.ERROR_MESSAGE + testDirectory2 + "/" + YamlVerify.DOCKSTOREYML;
-            System.out.println(ex.getMessage());
-            assertTrue(ex.getMessage().startsWith(dockstorePath + " is not a valid yaml file:"));
-        }
-        try {
-            YamlVerify.dockstoreValidate(testDirectory3);
-            fail("Invalid YAML not caught");
-        } catch (YamlVerify.ValidateYamlException ex) {
-            final String dockstorePath = YamlVerify.ERROR_MESSAGE + testDirectory3+ "/" + YamlVerify.DOCKSTOREYML;
-            System.out.println(ex.getMessage());
-            assertTrue(ex.getMessage().startsWith(dockstorePath + " is not a valid yaml file:"));
+        final String baseTestDirectory = "src/test/resources/InvalidYamlSyntax/test";
+        for (int i = 1; i <= 3; i++) {
+            final String testDirectory = baseTestDirectory + i;
+            try {
+                YamlVerify.dockstoreValidate(testDirectory);
+                fail("Invalid YAML not caught");
+            } catch (YamlVerify.ValidateYamlException ex) {
+                final String dockstorePath = YamlVerify.ERROR_MESSAGE + testDirectory + "/" + YamlVerify.DOCKSTOREYML;
+                assertTrue(ex.getMessage().startsWith(dockstorePath + " is not a valid yaml file:"));
+            }
         }
     }
 
