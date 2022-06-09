@@ -88,32 +88,30 @@ public class YamlVerify extends WorkflowClient {
         return false;
     }
 
-    /*
-    private List<String> getFileNames(Map<String, Object> map) {
-        List<Object>
-    }
-    */
 
-    // Determines if all of the files reference in a list of strings exist
-    private static void filesExist(List<String> paths, String base) throws ValidateYamlException {
+    // Determines if all the files referenced in a list of strings exist
+    private static String filesExist(List<String> paths, String base) throws ValidateYamlException {
+        String MissingFiles = "";
         for (String path : paths) {
             Path pathToFile = Paths.get(base, path);
             if (!Files.exists(pathToFile)) {
-                throw new ValidateYamlException(ERROR_MESSAGE + pathToFile.toString() + " does not exist");
+                MissingFiles += pathToFile.toString() + " does not exist\n";
             }
         }
-
+        return MissingFiles;
     }
 
     // Determines if all the files in dockstoreYaml12 exist
     private static void allFilesExist(DockstoreYaml12 dockstoreYaml12, String basePath) throws ValidateYamlException {
+        String MissingFiles = "";
+
         // Check Workflows
         List<YamlWorkflow> workflows = dockstoreYaml12.getWorkflows();
         if (workflows != null) {
             for (YamlWorkflow workflow : workflows) {
                 List <String> filePaths = workflow.getTestParameterFiles();
                 filePaths.add(workflow.getPrimaryDescriptorPath());
-                filesExist(filePaths, basePath);
+                MissingFiles += filesExist(filePaths, basePath);
             }
         }
         // Check Tools
@@ -122,14 +120,17 @@ public class YamlVerify extends WorkflowClient {
             for (YamlWorkflow tool : tools) {
                 List <String> filePaths = tool.getTestParameterFiles();
                 filePaths.add(tool.getPrimaryDescriptorPath());
-                filesExist(filePaths, basePath);
+                MissingFiles += filesExist(filePaths, basePath);
             }
         }
 
         // Check service
         Service12 service = dockstoreYaml12.getService();
         if (service != null) {
-            filesExist(service.getFiles(), basePath);
+            MissingFiles += filesExist(service.getFiles(), basePath);
+        }
+        if (!MissingFiles.isBlank()) {
+            throw new ValidateYamlException("Your file structure has the following errors:\n" + MissingFiles);
         }
     }
 
@@ -163,13 +164,16 @@ public class YamlVerify extends WorkflowClient {
             throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " is not a valid yaml file:\n" + ex.getMessage());
         }
 
-
+        // Running validate first, as if readAsDockstoreYaml12 is run first and a parameter is incorrect it is difficult to understand
+        // Determine if any of the parameters names are incorrect (does not verify if all the parameters are there)
         try {
-            // Running validate first, as if readAsDockstoreYaml12 is run first and a parameter is incorrect it is difficult to understand
+
             DockstoreYamlHelper.validateDockstoreYamlProperties(Files.readString(dockstoreYmlPath));
         } catch (Exception ex) {
             throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " has the following errors:\n" + ex.getMessage());
         }
+
+        // Validates file dockstoreYaml in general
         DockstoreYaml12 dockstoreYaml12 = null;
         try {
             dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(Files.readString(dockstoreYmlPath));
@@ -177,7 +181,8 @@ public class YamlVerify extends WorkflowClient {
             throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " has the following errors:\n" + ex.getMessage());
         }
 
-        allFilesExist(dockstoreYaml12, dockstoreYmlPath.toString());
+        // Determines if all referenced files exist
+        allFilesExist(dockstoreYaml12, workflowPath.toString());
 
     }
 

@@ -73,8 +73,8 @@ public class YamlValidatorTest {
         }
     }
 
-    // Invalid Yaml tests
-    @Test
+    // Invalid Yaml test
+    @Test // This test case is failing due to errors in DockstoreYamlHelper.readAsDockstoreYaml12(contents)
     public void yamlNotAcceptableForDockstore() {
         final String testDirectory1 = "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName";
         try {
@@ -85,9 +85,38 @@ public class YamlValidatorTest {
             System.out.println(ex.getMessage());
         }
 
-
     }
 
+    @Test
+    public void allFilesNotPresent() {
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName";
+        try {
+            YamlVerify.dockstoreValidate(testDirectory);
+            fail("non-present test files not caught");
+        } catch (YamlVerify.ValidateYamlException ex) {
+            String ErrorMsg = "Your file structure has the following errors:\n" +
+                "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/dockstore.wdl.json does not exist\n" +
+                "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/Dockstore2.wdl does not exist\n" +
+                "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/dockstore.cwl.json does not exist\n" +
+                "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/Dockstore.cwl does not exist\n";
+
+            assertEquals(ErrorMsg, ex.getMessage());
+        }
+    }
+
+    @Test
+    public void someFilesNotPresent() {
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
+        try {
+            YamlVerify.dockstoreValidate(testDirectory);
+            fail("non-present test files not caught");
+        } catch (YamlVerify.ValidateYamlException ex) {
+            String ErrorMsg = "Your file structure has the following errors:\n" +
+                "src/test/resources/YamlVerifyTestDirectory/some-files-present/dockstore.wdl.json does not exist\n" +
+                "src/test/resources/YamlVerifyTestDirectory/some-files-present/Dockstore.cwl does not exist\n";
+            assertEquals(ErrorMsg, ex.getMessage());
+        }
+    }
 
 }
 
