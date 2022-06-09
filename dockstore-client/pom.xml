@@ -313,11 +313,6 @@
             <artifactId>jakarta.validation-api</artifactId>
             <version>2.0.2</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>javax.persistence</groupId>-->
-<!--            <artifactId>javax.persistence-api</artifactId>-->
-<!--            <version>2.2</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
@@ -416,7 +411,6 @@
                                 <usedDependency>org.hibernate:hibernate-validator</usedDependency>
                                 <usedDependency>org.hibernate.common:hibernate-commons-annotations</usedDependency>
                                 <usedDependency>jakarta.validation:jakarta.validation-api</usedDependency>
-<!--                                <usedDependency>javax.persistence:javax.persistence-api</usedDependency>-->
                                 <usedDependency>org.glassfish:jakarta.el</usedDependency>
                             </usedDependencies>
 
