@@ -58,6 +58,7 @@ import com.google.gson.JsonParseException;
 import io.cwl.avro.CWL;
 import io.dockstore.client.cli.CheckerClient;
 import io.dockstore.client.cli.Client;
+import io.dockstore.client.cli.YamlVerify.ValidateYamlException;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
@@ -260,7 +261,7 @@ public abstract class AbstractEntryClient<T> {
      * @param activeCommand the current command that we're interested in
      * @return whether this interface handled the active command
      */
-    public boolean processEntryCommands(List<String> args, String activeCommand) throws IOException, ApiException, DockstoreYamlException {
+    public boolean processEntryCommands(List<String> args, String activeCommand) throws IOException, ApiException, DockstoreYamlException, ValidateYamlException {
         if (null != activeCommand) {
             // see if it is a command specific to this kind of Entry
             boolean processed = processEntrySpecificCommands(args, activeCommand);

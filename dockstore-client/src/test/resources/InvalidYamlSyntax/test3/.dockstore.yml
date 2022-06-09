@@ -1,0 +1,20 @@
+version: 1.2
+tools:
+  - name: globalAligner
+    subclass: CWL
+    primaryDescriptorPath: /runGlobalAligner.cwl
+    testParameterFiles:
+      - /test/globalAligner.cwl.json
+    authors:
+      - name: Bob Generic Example
+        email: makesuretofilloutanactualemailaddress@ucsc.edu
+  - name: localAligner
+    subclass: CWL
+    primaryDescriptorPath /runLocalAligner.cwl
+    testParameterFiles:
+      - /test/localAligner.cwl.json
+    authors:
+      - orcid: 0000-0000-0000-0000
+      - orcid: 1111-1111-1111-1111
+      - name: Bob Generic Example Jr
+        email: anotherpersonsemailaddress@ucsc.edu

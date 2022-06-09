@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.yaml.DockstoreYaml12;
 import io.dockstore.common.yaml.DockstoreYamlHelper;
-import io.dockstore.common.yaml.DockstoreYamlHelper.DockstoreYamlException;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
@@ -18,7 +18,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import static com.google.api.client.util.Objects.equal;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
-import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.printFlagHelp;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
@@ -37,8 +36,9 @@ import static io.dockstore.client.cli.ArgumentUtility.reqVal;
 
 public class YamlVerify extends WorkflowClient {
 
-    private final String dockstoreYml = ".dockstore.yml";
+    public static final String ERROR_MESSAGE = "Your .dockstore.yml is invalid:\n";
 
+    public static final String DOCKSTOREYML = ".dockstore.yml";
     public YamlVerify(WorkflowsApi workflowApi, UsersApi usersApi, Client client, boolean isAdmin) {
         super(workflowApi, usersApi, client, isAdmin);
     }
@@ -79,7 +79,7 @@ public class YamlVerify extends WorkflowClient {
     }
 
     @Override
-    public boolean processEntryCommands(List<String> args, String activeCommand) throws ApiException, IOException, DockstoreYamlException {
+    public boolean processEntryCommands(List<String> args, String activeCommand) throws ApiException, IOException, ValidateYamlException {
         if (equal(activeCommand, "validate")) {
             validateChecker(args);
             return true;
@@ -92,58 +92,49 @@ public class YamlVerify extends WorkflowClient {
         List<Object>
     }
     */
-    private boolean validateChecker(List<String> args) {
-        if (containsHelpRequest(args) || args.isEmpty()) {
-            validateHelp();
-            return false;
-        } else {
-            // Retrieve arguments
-            String path = reqVal(args, "--path");
 
-            // Check that path type is valid
+    public static void dockstoreValidate(String path) throws ValidateYamlException {
+        Path workflowPath = Paths.get(path);
 
-            // Check that descriptor path is valid
-            if (!path.startsWith("/")) {
-                errorMessage("path must be an absolute path.",
-                    Client.CLIENT_ERROR);
-            }
+        // Verify that the path is a valid directory
+        if (!Files.isDirectory(workflowPath)) {
+            throw new ValidateYamlException(ERROR_MESSAGE + workflowPath.toString() + " does not exist");
+        }
 
-            Path workflowPath = Paths.get(path);
-            if (!Files.isDirectory(workflowPath)) {
-                errorMessage(path + " is not a valid directory",
-                    Client.CLIENT_ERROR);
-                return false;
-            }
-            Path dockstoreYmlPath = Paths.get(path, dockstoreYml);
-            if (!Files.exists(dockstoreYmlPath)) {
-                out(dockstoreYmlPath.toString() + " does not exist");
-                return false;
-            }
-            Yaml yaml = new Yaml();
-            Map<String, Object> data = null;
-            try {
-                data = yaml.load(Files.readString(dockstoreYmlPath));
-                out(dockstoreYmlPath + " is a valid yaml file");
-            } catch (Exception ex) {
-                out(dockstoreYmlPath + " is not a valid yaml file\n" + ex.getMessage());
-                return false;
-            }
-            try {
-                // Running validate first, as if readAsDockstoreYaml12 is run first and a parameter is incorrect it is difficult to understand
-                DockstoreYamlHelper.validateDockstoreYamlProperties(Files.readString(dockstoreYmlPath));
-            } catch (Exception ex) {
-                out(dockstoreYmlPath + " has the following errors\n" + ex.getMessage());
-                return false;
-            }
-            DockstoreYaml12 dockstoreYaml12 = null;
-            try {
-                dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(Files.readString(dockstoreYmlPath));
-            } catch (Exception ex) {
-                out(dockstoreYmlPath + " has the following errors\n" + ex.getMessage());
-                return false;
-            }
-            return true;
-            /*
+        // Verify that .dockstore.yml exists
+        Path dockstoreYmlPath = Paths.get(path, DOCKSTOREYML);
+        if (!Files.exists(dockstoreYmlPath)) {
+            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " does not exist");
+        }
+
+        // Verify that .dockstore.yml is non-empty
+        File dockstoreYml = new File(dockstoreYmlPath.toString());
+        if (dockstoreYml.length() == 0) {
+            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " is empty");
+        }
+
+        // Verify that the Yaml is valid, however does not verify it is valid for dockstore
+        Yaml yaml = new Yaml();
+        Map<String, Object> data = null;
+        try {
+            data = yaml.load(Files.readString(dockstoreYmlPath));
+            out(dockstoreYmlPath + " is a valid yaml file");
+        } catch (Exception ex) {
+            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " is not a valid yaml file:\n" + ex.getMessage());
+        }
+        try {
+            // Running validate first, as if readAsDockstoreYaml12 is run first and a parameter is incorrect it is difficult to understand
+            DockstoreYamlHelper.validateDockstoreYamlProperties(Files.readString(dockstoreYmlPath));
+        } catch (Exception ex) {
+            out(dockstoreYmlPath + " has the following errors\n" + ex.getMessage());
+        }
+        DockstoreYaml12 dockstoreYaml12 = null;
+        try {
+            dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(Files.readString(dockstoreYmlPath));
+        } catch (Exception ex) {
+            out(dockstoreYmlPath + " has the following errors\n" + ex.getMessage());
+        }
+        /*
             try {
                 DockstoreYamlHelper.validateDockstoreYamlProperties(Files.readString(dockstoreYmlPath));
                 DockstoreYaml12 dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(Files.readString(dockstoreYmlPath));
@@ -169,7 +160,26 @@ public class YamlVerify extends WorkflowClient {
                     LOG.info("Could not find file " + filePath + " in repo " + repository);
                 }
             }
-            */
+        */
+    }
+
+
+    private void validateChecker(List<String> args) throws ValidateYamlException {
+        if (containsHelpRequest(args) || args.isEmpty()) {
+            validateHelp();
+        } else {
+            // Retrieve arguments
+            String path = reqVal(args, "--path");
+            dockstoreValidate(path);
+            // Check that path type is valid
+
+            // Check that descriptor path is valid
+
+        }
+    }
+    public static class ValidateYamlException extends Exception {
+        public ValidateYamlException(final String msg) {
+            super(msg);
         }
     }
 }
