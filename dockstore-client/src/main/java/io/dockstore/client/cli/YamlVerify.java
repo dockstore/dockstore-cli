@@ -1,21 +1,5 @@
 package io.dockstore.client.cli;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
-import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.yaml.DockstoreYaml12;
-import io.dockstore.common.yaml.DockstoreYamlHelper;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.UsersApi;
-import io.swagger.client.api.WorkflowsApi;
-import org.yaml.snakeyaml.Yaml;
-
 import static com.google.api.client.util.Objects.equal;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.out;
@@ -25,6 +9,23 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+
+import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.yaml.DockstoreYaml12;
+import io.dockstore.common.yaml.DockstoreYamlHelper;
+import io.dockstore.common.yaml.Service12;
+import io.dockstore.common.yaml.YamlWorkflow;
+import io.swagger.client.ApiException;
+import io.swagger.client.api.UsersApi;
+import io.swagger.client.api.WorkflowsApi;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import org.yaml.snakeyaml.Yaml;
 
 /*
     GENERAL STEPS:
@@ -93,6 +94,45 @@ public class YamlVerify extends WorkflowClient {
     }
     */
 
+    // Determines if all of the files reference in a list of strings exist
+    private static void filesExist(List<String> paths, String base) throws ValidateYamlException {
+        for (String path : paths) {
+            Path pathToFile = Paths.get(base, path);
+            if (!Files.exists(pathToFile)) {
+                throw new ValidateYamlException(ERROR_MESSAGE + pathToFile.toString() + " does not exist");
+            }
+        }
+
+    }
+
+    // Determines if all the files in dockstoreYaml12 exist
+    private static void allFilesExist(DockstoreYaml12 dockstoreYaml12, String basePath) throws ValidateYamlException {
+        // Check Workflows
+        List<YamlWorkflow> workflows = dockstoreYaml12.getWorkflows();
+        if (workflows != null) {
+            for (YamlWorkflow workflow : workflows) {
+                List <String> filePaths = workflow.getTestParameterFiles();
+                filePaths.add(workflow.getPrimaryDescriptorPath());
+                filesExist(filePaths, basePath);
+            }
+        }
+        // Check Tools
+        List<YamlWorkflow> tools = dockstoreYaml12.getTools();
+        if (tools != null) {
+            for (YamlWorkflow tool : tools) {
+                List <String> filePaths = tool.getTestParameterFiles();
+                filePaths.add(tool.getPrimaryDescriptorPath());
+                filesExist(filePaths, basePath);
+            }
+        }
+
+        // Check service
+        Service12 service = dockstoreYaml12.getService();
+        if (service != null) {
+            filesExist(service.getFiles(), basePath);
+        }
+    }
+
     public static void dockstoreValidate(String path) throws ValidateYamlException {
         Path workflowPath = Paths.get(path);
 
@@ -122,45 +162,23 @@ public class YamlVerify extends WorkflowClient {
         } catch (Exception ex) {
             throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " is not a valid yaml file:\n" + ex.getMessage());
         }
+
+
         try {
             // Running validate first, as if readAsDockstoreYaml12 is run first and a parameter is incorrect it is difficult to understand
             DockstoreYamlHelper.validateDockstoreYamlProperties(Files.readString(dockstoreYmlPath));
         } catch (Exception ex) {
-            out(dockstoreYmlPath + " has the following errors\n" + ex.getMessage());
+            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " has the following errors:\n" + ex.getMessage());
         }
         DockstoreYaml12 dockstoreYaml12 = null;
         try {
             dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(Files.readString(dockstoreYmlPath));
         } catch (Exception ex) {
-            out(dockstoreYmlPath + " has the following errors\n" + ex.getMessage());
+            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " has the following errors:\n" + ex.getMessage());
         }
-        /*
-            try {
-                DockstoreYamlHelper.validateDockstoreYamlProperties(Files.readString(dockstoreYmlPath));
-                DockstoreYaml12 dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(Files.readString(dockstoreYmlPath));
-                String missingFiles = "";
-                System.out.println(data);
-                System.out.println(dockstoreYaml12.getTools());
-                System.out.println(dockstoreYaml12.getWorkflows());
-            } catch (Exception ex) {
-                errorMessage("Your .dockstore.yml has the following errors\n" + ex.getMessage(),
-                    Client.CLIENT_ERROR);
-            }
-            for (String filePath: files) {
-                String fileContent = this.readFileFromRepo(filePath, ref.getLeft(), repository);
-                if (fileContent != null) {
-                    SourceFile file = new SourceFile();
-                    file.setAbsolutePath(filePath);
-                    file.setPath(filePath);
-                    file.setContent(fileContent);
-                    file.setType(DescriptorLanguage.FileType.DOCKSTORE_SERVICE_OTHER);
-                    version.getSourceFiles().add(file);
-                } else {
-                    // File not found or null
-                    LOG.info("Could not find file " + filePath + " in repo " + repository);
-                }
-            }
-        */
+
+        allFilesExist(dockstoreYaml12, dockstoreYmlPath.toString());
+
     }
 
 

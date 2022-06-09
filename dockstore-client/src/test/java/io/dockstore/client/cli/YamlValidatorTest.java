@@ -73,6 +73,21 @@ public class YamlValidatorTest {
         }
     }
 
+    // Invalid Yaml tests
+    @Test
+    public void yamlNotAcceptableForDockstore() {
+        final String testDirectory1 = "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName";
+        try {
+            YamlVerify.dockstoreValidate(testDirectory1);
+            //fail("Invalid YAML not caught");
+            System.out.println("PASS");
+        } catch (YamlVerify.ValidateYamlException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+
+    }
+
 
 }
 
