@@ -1,14 +1,12 @@
 package io.dockstore.client.cli;
 
-import static com.google.api.client.util.Objects.equal;
-import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
-import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.ArgumentUtility.printFlagHelp;
-import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
-import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
-import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
-import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
-import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.yaml.DockstoreYaml12;
@@ -18,14 +16,17 @@ import io.dockstore.common.yaml.YamlWorkflow;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
+
+import static com.google.api.client.util.Objects.equal;
+import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.ArgumentUtility.printFlagHelp;
+import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
+import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
+import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
+import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
+import static io.dockstore.client.cli.ArgumentUtility.reqVal;
 
 /*
     GENERAL STEPS:
@@ -91,46 +92,46 @@ public class YamlVerify extends WorkflowClient {
 
     // Determines if all the files referenced in a list of strings exist
     private static String filesExist(List<String> paths, String base) throws ValidateYamlException {
-        String MissingFiles = "";
+        String missingFiles = "";
         for (String path : paths) {
             Path pathToFile = Paths.get(base, path);
             if (!Files.exists(pathToFile)) {
-                MissingFiles += pathToFile.toString() + " does not exist\n";
+                missingFiles += pathToFile.toString() + " does not exist\n";
             }
         }
-        return MissingFiles;
+        return missingFiles;
     }
 
     // Determines if all the files in dockstoreYaml12 exist
     private static void allFilesExist(DockstoreYaml12 dockstoreYaml12, String basePath) throws ValidateYamlException {
-        String MissingFiles = "";
+        String missingFiles = "";
 
         // Check Workflows
         List<YamlWorkflow> workflows = dockstoreYaml12.getWorkflows();
         if (workflows != null) {
             for (YamlWorkflow workflow : workflows) {
-                List <String> filePaths = workflow.getTestParameterFiles();
+                List<String> filePaths = workflow.getTestParameterFiles();
                 filePaths.add(workflow.getPrimaryDescriptorPath());
-                MissingFiles += filesExist(filePaths, basePath);
+                missingFiles += filesExist(filePaths, basePath);
             }
         }
         // Check Tools
         List<YamlWorkflow> tools = dockstoreYaml12.getTools();
         if (tools != null) {
             for (YamlWorkflow tool : tools) {
-                List <String> filePaths = tool.getTestParameterFiles();
+                List<String> filePaths = tool.getTestParameterFiles();
                 filePaths.add(tool.getPrimaryDescriptorPath());
-                MissingFiles += filesExist(filePaths, basePath);
+                missingFiles += filesExist(filePaths, basePath);
             }
         }
 
         // Check service
         Service12 service = dockstoreYaml12.getService();
         if (service != null) {
-            MissingFiles += filesExist(service.getFiles(), basePath);
+            missingFiles += filesExist(service.getFiles(), basePath);
         }
-        if (!MissingFiles.isBlank()) {
-            throw new ValidateYamlException("Your file structure has the following errors:\n" + MissingFiles);
+        if (!missingFiles.isBlank()) {
+            throw new ValidateYamlException("Your file structure has the following errors:\n" + missingFiles);
         }
     }
 

@@ -1,15 +1,10 @@
 package io.dockstore.client.cli;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import org.assertj.core.util.Arrays;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import scala.collection.immutable.List;
 
 public class YamlValidatorTest {
     /*
@@ -94,13 +89,13 @@ public class YamlValidatorTest {
             YamlVerify.dockstoreValidate(testDirectory);
             fail("non-present test files not caught");
         } catch (YamlVerify.ValidateYamlException ex) {
-            String ErrorMsg = "Your file structure has the following errors:\n" +
-                "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/dockstore.wdl.json does not exist\n" +
-                "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/Dockstore2.wdl does not exist\n" +
-                "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/dockstore.cwl.json does not exist\n" +
-                "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/Dockstore.cwl does not exist\n";
+            String errorMsg = "Your file structure has the following errors:\n"
+                + "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/dockstore.wdl.json does not exist\n"
+                + "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/Dockstore2.wdl does not exist\n"
+                + "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/dockstore.cwl.json does not exist\n"
+                + "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/Dockstore.cwl does not exist\n";
 
-            assertEquals(ErrorMsg, ex.getMessage());
+            assertEquals(errorMsg, ex.getMessage());
         }
     }
 
@@ -111,10 +106,10 @@ public class YamlValidatorTest {
             YamlVerify.dockstoreValidate(testDirectory);
             fail("non-present test files not caught");
         } catch (YamlVerify.ValidateYamlException ex) {
-            String ErrorMsg = "Your file structure has the following errors:\n" +
-                "src/test/resources/YamlVerifyTestDirectory/some-files-present/dockstore.wdl.json does not exist\n" +
-                "src/test/resources/YamlVerifyTestDirectory/some-files-present/Dockstore.cwl does not exist\n";
-            assertEquals(ErrorMsg, ex.getMessage());
+            String errorMsg = "Your file structure has the following errors:\n"
+                + "src/test/resources/YamlVerifyTestDirectory/some-files-present/dockstore.wdl.json does not exist\n"
+                + "src/test/resources/YamlVerifyTestDirectory/some-files-present/Dockstore.cwl does not exist\n";
+            assertEquals(errorMsg, ex.getMessage());
         }
     }
 
