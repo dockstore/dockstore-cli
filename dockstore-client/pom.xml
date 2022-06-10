@@ -303,10 +303,6 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.common</groupId>
-            <artifactId>hibernate-commons-annotations</artifactId>
-        </dependency>
-        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
@@ -405,7 +401,6 @@
                                 <usedDependency>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</usedDependency>
                                 <usedDependency>io.spray:spray-json_2.12</usedDependency>
                                 <usedDependency>org.hibernate:hibernate-validator</usedDependency>
-                                <usedDependency>org.hibernate.common:hibernate-commons-annotations</usedDependency>
                                 <usedDependency>jakarta.validation:jakarta.validation-api</usedDependency>
                                 <usedDependency>org.glassfish:jakarta.el</usedDependency>
                             </usedDependencies>
