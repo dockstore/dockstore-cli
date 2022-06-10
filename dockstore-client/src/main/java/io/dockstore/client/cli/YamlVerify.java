@@ -151,6 +151,7 @@ public class YamlVerify extends WorkflowClient {
 
         // Verify that .dockstore.yml is non-empty
         File dockstoreYml = new File(dockstoreYmlPath.toString());
+        String dockstoreYmlString = dockstoreYml.toString();
         if (dockstoreYml.length() == 0) {
             throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " is empty");
         }
@@ -159,7 +160,7 @@ public class YamlVerify extends WorkflowClient {
         Yaml yaml = new Yaml();
         Map<String, Object> data = null;
         try {
-            data = yaml.load(Files.readString(dockstoreYmlPath));
+            data = yaml.load(dockstoreYmlString);
             out(dockstoreYmlPath + " is a valid yaml file");
         } catch (Exception ex) {
             throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " is not a valid yaml file:\n" + ex.getMessage());
@@ -168,8 +169,7 @@ public class YamlVerify extends WorkflowClient {
         // Running validate first, as if readAsDockstoreYaml12 is run first and a parameter is incorrect it is difficult to understand
         // Determine if any of the parameters names are incorrect (does not verify if all the parameters are there)
         try {
-
-            DockstoreYamlHelper.validateDockstoreYamlProperties(Files.readString(dockstoreYmlPath));
+            DockstoreYamlHelper.validateDockstoreYamlProperties(dockstoreYmlString);
         } catch (Exception ex) {
             throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " has the following errors:\n" + ex.getMessage());
         }
@@ -177,7 +177,7 @@ public class YamlVerify extends WorkflowClient {
         // Validates file dockstoreYaml in general
         DockstoreYaml12 dockstoreYaml12 = null;
         try {
-            dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(Files.readString(dockstoreYmlPath));
+            dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(dockstoreYmlString);
         } catch (Exception ex) {
             throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " has the following errors:\n" + ex.getMessage());
         }
