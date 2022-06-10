@@ -75,7 +75,7 @@ public class YamlVerify extends WorkflowClient {
         out("  Verifies that a .dockstore.yml file is valid and that all required files are present");
         out("");
         out("Required Parameters:");
-        out("  --path <path>                                                          Complete entry path in computer (ex. /home/usr/test)");
+        out("  --path <path>                                                          Complete entry path on computer (ex. /home/usr/test)");
         out("");
         printHelpFooter();
     }
