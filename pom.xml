@@ -137,6 +137,19 @@
                 <version>${dockstore-core.version}</version>
                 <scope>import</scope>
             </dependency>
+
+            <!--
+            override the BOM for jackson-core version
+            until a new webservice release is on Artifactory
+            where the BOM version includes jackson-core version >= 2.13.2
+            several dependencies in the CLI need the newer version
+            -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.13.2</version>
+            </dependency>
+
             <dependency>
                 <groupId>ro.fortsoft.pf4j</groupId>
                 <artifactId>pf4j</artifactId>

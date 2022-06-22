@@ -194,7 +194,7 @@ Lists of 368 third-party dependencies.
      (The Apache Software License, Version 2.0) Jackson module: Afterburner (com.fasterxml.jackson.module:jackson-module-afterburner:2.12.3 - https://github.com/FasterXML/jackson-modules-base)
      (The Apache Software License, Version 2.0) Jackson module: JAXB Annotations (com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.12.3 - https://github.com/FasterXML/jackson-modules-base)
      (The Apache Software License, Version 2.0) Jackson-annotations (com.fasterxml.jackson.core:jackson-annotations:2.12.3 - http://github.com/FasterXML/jackson)
-     (The Apache Software License, Version 2.0) Jackson-core (com.fasterxml.jackson.core:jackson-core:2.12.3 - https://github.com/FasterXML/jackson-core)
+     (The Apache Software License, Version 2.0) Jackson-core (com.fasterxml.jackson.core:jackson-core:2.13.2 - https://github.com/FasterXML/jackson-core)
      (The Apache Software License, Version 2.0) jackson-databind (com.fasterxml.jackson.core:jackson-databind:2.12.3 - http://github.com/FasterXML/jackson)
      (The Apache Software License, Version 2.0) Jackson-dataformat-XML (com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.12.3 - https://github.com/FasterXML/jackson-dataformat-xml)
      (The Apache Software License, Version 2.0) Jackson-dataformat-YAML (com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3 - https://github.com/FasterXML/jackson-dataformats-text)
