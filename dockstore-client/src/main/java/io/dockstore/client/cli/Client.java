@@ -594,6 +594,7 @@ public class Client {
         out("   checker             Puts dockstore into checker mode.");
         out("   plugin              Configure and debug plugins.");
         out("   deps                Print tool/workflow runner dependencies.");
+        out("   yaml                Puts dockstore into yaml mode.");
         out("");
         printLineBreak();
         out("");
