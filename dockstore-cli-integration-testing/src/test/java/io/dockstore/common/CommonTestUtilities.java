@@ -178,13 +178,15 @@ public final class CommonTestUtilities {
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
         runMigration(migrationList, application, configPath);
 
-        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1.xml");
+        migrationList = Collections.singletonList(
+                new File("../dockstore-webservice/src/main/resources/migrations.test.confidential1.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
         runMigration(migrationList, application, configPath);
 
-        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml");
+        migrationList = Collections.singletonList(
+                new File("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0");
@@ -246,13 +248,16 @@ public final class CommonTestUtilities {
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
         runMigration(migrationList, application, configPath);
 
-        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2.xml");
+        migrationList = Collections.singletonList(
+                new File("../dockstore-webservice/src/main/resources/migrations.test.confidential2.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
+
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
         runMigration(migrationList, application, configPath);
 
-        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml");
+        migrationList = Collections.singletonList(
+                new File("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0");
