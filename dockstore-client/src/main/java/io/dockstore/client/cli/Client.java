@@ -723,7 +723,7 @@ public class Client {
                         argsArray = args.toArray(argsArray);
                         handled = DepCommand.handleDepCommand(argsArray);
                     } else if ("yaml".equals(mode)) {
-                        targetClient = getYamlVerify();
+                        handled = YamlClient.handleCommand(args);
                     }
 
                     if (targetClient != null) {
