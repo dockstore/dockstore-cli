@@ -25,25 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.yaml.DockstoreYaml12;
 import io.dockstore.common.yaml.DockstoreYamlHelper;
 import io.dockstore.common.yaml.Service12;
 import io.dockstore.common.yaml.YamlWorkflow;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.UsersApi;
-import io.swagger.client.api.WorkflowsApi;
 import org.yaml.snakeyaml.Yaml;
 
-import static com.google.api.client.util.Objects.equal;
-import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.ArgumentUtility.printFlagHelp;
-import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
-import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
-import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
-import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
-import static io.dockstore.client.cli.ArgumentUtility.reqVal;
 
 /*
     GENERAL STEPS:
@@ -53,62 +41,17 @@ import static io.dockstore.client.cli.ArgumentUtility.reqVal;
     4. Verify that all files exist
  */
 
-public class YamlVerify extends WorkflowClient {
+public final class YamlVerify {
 
     public static final String ERROR_MESSAGE = "Your .dockstore.yml is invalid:\n";
 
     public static final String DOCKSTOREYML = ".dockstore.yml";
-    public YamlVerify(WorkflowsApi workflowApi, UsersApi usersApi, Client client, boolean isAdmin) {
-        super(workflowApi, usersApi, client, isAdmin);
+
+
+    private YamlVerify() {
     }
-
-    @Override
-    public void printGeneralHelp() {
-        printHelpHeader();
-        printUsageHelp(getEntryType().toLowerCase());
-
-        // Checker client help
-        out("Commands:");
-        out("");
-        out("  validate             :  Verifies that .dockstore.yml has the correct fields, and that all the required files are present");
-        out("");
-
-        printLineBreak();
-        printFlagHelp();
-        printHelpFooter();
-    }
-
-    @Override
-    public String getEntryType() {
-        return "yaml";
-    }
-
-    private void validateHelp() {
-        printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " validate --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " validate [parameters]");
-        out("");
-        out("Description:");
-        out("  Verifies that a .dockstore.yml file is valid and that all required files are present");
-        out("");
-        out("Required Parameters:");
-        out("  --path <path>                                                          Complete entry path on computer (ex. /home/usr/test)");
-        out("");
-        printHelpFooter();
-    }
-
-    @Override
-    public boolean processEntryCommands(List<String> args, String activeCommand) throws ApiException, IOException, ValidateYamlException {
-        if (equal(activeCommand, "validate")) {
-            validateChecker(args);
-            return true;
-        }
-        return false;
-    }
-
-
     // Determines if all the files referenced in a list of strings exist
-    private static List<String> filesExist(List<String> paths, String base) throws ValidateYamlException {
+    private static List<String> filesExist(List<String> paths, String base) {
         List<String> missingFiles = new ArrayList<String>();
         for (String path : paths) {
             Path pathToFile = Paths.get(base, path);
@@ -217,19 +160,6 @@ public class YamlVerify extends WorkflowClient {
     }
 
 
-    private void validateChecker(List<String> args) throws ValidateYamlException {
-        if (containsHelpRequest(args) || args.isEmpty()) {
-            validateHelp();
-        } else {
-            // Retrieve arguments
-            String path = reqVal(args, "--path");
-            dockstoreValidate(path);
-            // Check that path type is valid
-
-            // Check that descriptor path is valid
-
-        }
-    }
     public static class ValidateYamlException extends Exception {
         public ValidateYamlException(final String msg) {
             super(msg);

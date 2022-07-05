@@ -16,20 +16,23 @@
 
 package io.dockstore.client.cli;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class YamlValidatorTest {
-    /*
+
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
     public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
-    */
+
 
     @Test
     public void invalidDirectory() {
@@ -91,7 +94,6 @@ public class YamlValidatorTest {
         try {
             YamlVerify.dockstoreValidate(testDirectory1);
             //fail("Invalid YAML not caught");
-            System.out.println("PASS");
         } catch (YamlVerify.ValidateYamlException ex) {
             System.out.println(ex.getMessage());
         }
@@ -100,16 +102,16 @@ public class YamlValidatorTest {
 
     @Test
     public void allFilesNotPresent() {
-        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName";
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present";
         try {
             YamlVerify.dockstoreValidate(testDirectory);
             fail("non-present test files not caught");
         } catch (YamlVerify.ValidateYamlException ex) {
             String errorMsg = "Your file structure has the following errors:\n"
-                + "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/dockstore.wdl.json does not exist\n"
-                + "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/Dockstore2.wdl does not exist\n"
-                + "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/dockstore.cwl.json does not exist\n"
-                + "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName/Dockstore.cwl does not exist\n";
+                + "src/test/resources/YamlVerifyTestDirectory/no-files-present/dockstore.wdl.json does not exist\n"
+                + "src/test/resources/YamlVerifyTestDirectory/no-files-present/dockstore.cwl.json does not exist\n"
+                + "src/test/resources/YamlVerifyTestDirectory/no-files-present/Dockstore.cwl does not exist\n"
+                + "src/test/resources/YamlVerifyTestDirectory/no-files-present/Dockstore2.wdl does not exist\n";
 
             assertEquals(errorMsg, ex.getMessage());
         }

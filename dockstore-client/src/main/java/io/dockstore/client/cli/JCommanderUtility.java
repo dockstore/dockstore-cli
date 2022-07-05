@@ -63,6 +63,19 @@ public final class JCommanderUtility {
         printJCommanderHelpFooter();
     }
 
+    public static void printJCommanderHelpYaml(JCommander jc, String programName, String commandName) {
+        JCommander commander = jc.getCommands().get(commandName);
+        DefaultUsageFormatter formatter = new DefaultUsageFormatter(jc);
+        String description = formatter.getCommandDescription(commandName);
+        printHelpHeader();
+        printJCommanderHelpUsage(programName, commandName, jc);
+        printJCommanderHelpDescription(description);
+        printJCommanderHelpCommand(commander);
+        out("Required parameters:\n"
+            + "  --path <path>        Complete entry path on computer (ex. /home/usr/test)\n");
+        printJCommanderHelpFooter();
+    }
+
     public static void printJCommanderHelp(JCommander jc, String programName, String commandName) {
         JCommander commander = jc.getCommands().get(commandName);
         DefaultUsageFormatter formatter = new DefaultUsageFormatter(jc);
@@ -87,6 +100,7 @@ public final class JCommanderUtility {
         }
         out("");
     }
+
 
     private static void printJCommanderHelpCommand(JCommander jc) {
         DefaultUsageFormatter formatter = new DefaultUsageFormatter(jc);

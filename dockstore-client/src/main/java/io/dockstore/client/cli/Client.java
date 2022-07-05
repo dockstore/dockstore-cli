@@ -837,7 +837,6 @@ public class Client {
         this.toolClient = new ToolClient(containersApi, new ContainertagsApi(defaultApiClient), usersApi, this, isAdmin);
         this.workflowClient = new WorkflowClient(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
         this.checkerClient = new CheckerClient(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
-        this.yamlVerify = new YamlVerify(new WorkflowsApi(defaultApiClient), usersApi, this, isAdmin);
 
         defaultApiClient.setDebugging(DEBUG.get());
         CWLRunnerFactory.setConfig(config);
