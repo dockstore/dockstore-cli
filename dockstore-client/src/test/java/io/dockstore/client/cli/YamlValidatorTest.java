@@ -16,6 +16,7 @@
 
 package io.dockstore.client.cli;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
@@ -88,12 +89,13 @@ public class YamlValidatorTest {
     }
 
     // Invalid Yaml test
+    @Ignore
     @Test // This test case is failing due to errors in DockstoreYamlHelper.readAsDockstoreYaml12(contents)
     public void yamlNotAcceptableForDockstore() {
         final String testDirectory1 = "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName";
         try {
             YamlVerify.dockstoreValidate(testDirectory1);
-            //fail("Invalid YAML not caught");
+            fail("Invalid YAML not caught");
         } catch (YamlVerify.ValidateYamlException ex) {
             System.out.println(ex.getMessage());
         }
