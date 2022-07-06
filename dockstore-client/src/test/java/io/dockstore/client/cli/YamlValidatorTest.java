@@ -16,7 +16,6 @@
 
 package io.dockstore.client.cli;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;

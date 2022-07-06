@@ -1,7 +1,5 @@
 package io.dockstore.client.cli;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,6 +13,8 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
+
+import static org.junit.Assert.assertTrue;
 
 public class YamlClientIT {
 
@@ -62,9 +62,9 @@ public class YamlClientIT {
     @Test
     public void verifyErrorMessagesArePrinted() {
         Client.main(new String[] { "yaml", "validate", "--path", "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory" });
-        String ErrorMsg = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/.dockstore.yml is a valid yaml file\n" +
-            "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/.dockstore.yml is a valid dockstore yaml file\n";
-        Assert.assertEquals(ErrorMsg, systemOutRule.getLog());
+        String errorMsg = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/.dockstore.yml is a valid yaml file\n"
+            + "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/.dockstore.yml is a valid dockstore yaml file\n";
+        Assert.assertEquals(errorMsg, systemOutRule.getLog());
     }
 
 
