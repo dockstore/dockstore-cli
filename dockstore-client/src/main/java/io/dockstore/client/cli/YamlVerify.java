@@ -157,6 +157,8 @@ public final class YamlVerify {
         // Determines if all referenced files exist
         allFilesExist(dockstoreYaml12, workflowPath.toString());
 
+        out(dockstoreYmlPath + " is a valid dockstore yaml file");
+
     }
 
 

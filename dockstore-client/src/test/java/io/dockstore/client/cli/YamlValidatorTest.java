@@ -16,6 +16,7 @@
 
 package io.dockstore.client.cli;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -116,6 +117,18 @@ public class YamlValidatorTest {
                 + "src/test/resources/YamlVerifyTestDirectory/no-files-present/Dockstore2.wdl does not exist\n";
 
             assertEquals(errorMsg, ex.getMessage());
+        }
+    }
+
+    @Test
+    public void correctYamlAndFiles() {
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/correct-directory";
+        try {
+            YamlVerify.dockstoreValidate(testDirectory);
+            assertTrue(systemOutRule.getLog().contains("src/test/resources/YamlVerifyTestDirectory/correct-directory/.dockstore.yml is a valid yaml file"));
+            assertTrue(systemOutRule.getLog().contains("src/test/resources/YamlVerifyTestDirectory/correct-directory/.dockstore.yml is a valid dockstore yaml file"));
+        } catch (YamlVerify.ValidateYamlException ex) {
+            fail("Threw exception when it should've passed");
         }
     }
 
