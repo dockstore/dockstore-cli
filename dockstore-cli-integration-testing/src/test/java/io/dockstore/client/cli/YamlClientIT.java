@@ -16,7 +16,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 
 import static org.junit.Assert.assertTrue;
 
-public class YamlClientIT {
+public class YamlClientIT extends BaseIT {
 
     @Rule
     public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
@@ -46,7 +46,7 @@ public class YamlClientIT {
     }
 
     @Test
-    public void missingPathParamter() {
+    public void missingPathParameter() {
         Client.main(new String[] { "yaml", "validate" });
         Assert.assertTrue(systemOutRule.getLog().contains("ERROR: Missing --path <path>"));
         systemOutRule.clearLog();
