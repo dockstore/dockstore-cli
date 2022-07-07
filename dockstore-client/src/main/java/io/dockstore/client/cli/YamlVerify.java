@@ -43,9 +43,21 @@ import static io.dockstore.client.cli.ArgumentUtility.out;
 
 public final class YamlVerify {
 
-    public static final String ERROR_MESSAGE = "Your .dockstore.yml is invalid:\n";
-
     public static final String DOCKSTOREYML = ".dockstore.yml";
+
+    public static final String VALID_DOCKSTORE_YML = " is a valid dockstore yaml file";
+    public static final String INVALID_DOCKSTORE_YML = "Your .dockstore.yml is invalid:\n";
+
+    public static final String CONTAINS_ERRORS = " has the following errors:\n";
+    public static final String EMPTY_FILE = " is empty";
+    public static final String FILE_DOES_NOT_EXIST = " does not exist";
+    public static final String INVALID_FILE_STRUCTURE = "Your file structure has the following errors:\n";
+
+    public static final String INVALID_YAML = " is not a valid yaml file:\n";
+    // This message is displayed when it is determined that DOCKSTOREYML is a valid yaml file,
+    // but displaying this message does NOT mean DOCKSTOREYML is a valid dockstore yaml file
+    public static final String VALID_YAML_ONLY = " is a valid yaml file";
+
 
 
     private YamlVerify() {
@@ -56,7 +68,7 @@ public final class YamlVerify {
         for (String path : paths) {
             Path pathToFile = Paths.get(base, path);
             if (!Files.exists(pathToFile)) {
-                missingFiles.add(pathToFile.toString() + " does not exist");
+                missingFiles.add(pathToFile.toString() + FILE_DOES_NOT_EXIST);
             }
         }
         return missingFiles;
@@ -95,7 +107,7 @@ public final class YamlVerify {
             for (String missingFile: missingFiles) {
                 errorMsg += missingFile + '\n';
             }
-            throw new ValidateYamlException("Your file structure has the following errors:\n" + errorMsg);
+            throw new ValidateYamlException(INVALID_FILE_STRUCTURE + errorMsg);
         }
     }
 
@@ -104,19 +116,19 @@ public final class YamlVerify {
 
         // Verify that the path is a valid directory
         if (!Files.isDirectory(workflowPath)) {
-            throw new ValidateYamlException(ERROR_MESSAGE + workflowPath.toString() + " does not exist");
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + workflowPath.toString() + FILE_DOES_NOT_EXIST);
         }
 
         // Verify that .dockstore.yml exists
         Path dockstoreYmlPath = Paths.get(path, DOCKSTOREYML);
         if (!Files.exists(dockstoreYmlPath)) {
-            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " does not exist");
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + FILE_DOES_NOT_EXIST);
         }
 
         // Verify that .dockstore.yml is non-empty
         File dockstoreYml = new File(dockstoreYmlPath.toString());
         if (dockstoreYml.length() == 0) {
-            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " is empty");
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + EMPTY_FILE);
         }
 
         // Load dockstoreYml into string
@@ -133,9 +145,9 @@ public final class YamlVerify {
         Map<String, Object> data = null;
         try {
             data = yaml.load(Files.readString(dockstoreYmlPath));
-            out(dockstoreYmlPath + " is a valid yaml file");
+            out(dockstoreYmlPath + VALID_YAML_ONLY);
         } catch (Exception ex) {
-            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " is not a valid yaml file:\n" + ex.getMessage());
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + INVALID_YAML + ex.getMessage());
         }
 
         // Running validate first, as if readAsDockstoreYaml12 is run first and a parameter is incorrect it is difficult to understand
@@ -143,7 +155,7 @@ public final class YamlVerify {
         try {
             DockstoreYamlHelper.validateDockstoreYamlProperties(dockstoreYmlString);
         } catch (Exception ex) {
-            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " has the following errors:\n" + ex.getMessage());
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + CONTAINS_ERRORS + ex.getMessage());
         }
 
         // Validates file dockstoreYaml in general
@@ -151,13 +163,13 @@ public final class YamlVerify {
         try {
             dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(dockstoreYmlString);
         } catch (Exception ex) {
-            throw new ValidateYamlException(ERROR_MESSAGE + dockstoreYmlPath.toString() + " has the following errors:\n" + ex.getMessage());
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + CONTAINS_ERRORS + ex.getMessage());
         }
 
         // Determines if all referenced files exist
         allFilesExist(dockstoreYaml12, workflowPath.toString());
 
-        out(dockstoreYmlPath + " is a valid dockstore yaml file");
+        out(dockstoreYmlPath + VALID_DOCKSTORE_YML);
 
     }
 
