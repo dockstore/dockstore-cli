@@ -45,7 +45,7 @@ public final class YamlVerify {
 
     public static final String DOCKSTOREYML = ".dockstore.yml";
 
-    public static final String VALID_DOCKSTORE_YML = " is a valid dockstore yaml file";
+    public static final String VALID_DOCKSTORE_YML = " is a valid dockstore yaml file and all required files exist";
     public static final String INVALID_DOCKSTORE_YML = "Your .dockstore.yml is invalid:\n";
 
     public static final String CONTAINS_ERRORS = " has the following errors:\n";
