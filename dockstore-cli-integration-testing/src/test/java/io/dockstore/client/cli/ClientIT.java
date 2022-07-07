@@ -41,6 +41,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 
 import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.YamlVerify.YAML;
 import static io.dockstore.common.CommonTestUtilities.checkToolList;
 
 /**
@@ -389,9 +390,9 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "checker", "update_version", "--help" });
         checkCommandForHelp(new String[] { "checker", "test_parameter", "--help" });
 
-        checkCommandForHelp(new String[] { "yaml"});
-        checkCommandForHelp(new String[] { "yaml", "--help" });
-        checkCommandForHelp(new String[] { "yaml", "validate", "--help" });
+        checkCommandForHelp(new String[] { YAML});
+        checkCommandForHelp(new String[] { YAML, "--help" });
+        checkCommandForHelp(new String[] { YAML, "validate", "--help" });
     }
 
     private void checkCommandForHelp(String[] argv) throws IOException {

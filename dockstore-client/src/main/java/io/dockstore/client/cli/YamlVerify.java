@@ -44,6 +44,7 @@ import static io.dockstore.client.cli.ArgumentUtility.out;
 public final class YamlVerify {
 
     public static final String DOCKSTOREYML = ".dockstore.yml";
+    public static final String YAML = "yaml";
 
     public static final String VALID_DOCKSTORE_YML = " is a valid dockstore yaml file and all required files exist";
     public static final String INVALID_DOCKSTORE_YML = "Your .dockstore.yml is invalid:\n";
@@ -53,10 +54,10 @@ public final class YamlVerify {
     public static final String FILE_DOES_NOT_EXIST = " does not exist";
     public static final String INVALID_FILE_STRUCTURE = "Your file structure has the following errors:\n";
 
-    public static final String INVALID_YAML = " is not a valid yaml file:\n";
+    public static final String INVALID_YAML = " is not a valid " + YAML + "file:\n";
     // This message is displayed when it is determined that DOCKSTOREYML is a valid yaml file,
     // but displaying this message does NOT mean DOCKSTOREYML is a valid dockstore yaml file
-    public static final String VALID_YAML_ONLY = " is a valid yaml file";
+    public static final String VALID_YAML_ONLY = " is a valid" + YAML + "file";
 
 
 

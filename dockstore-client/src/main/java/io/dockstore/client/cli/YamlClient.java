@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelpYaml;
+import static io.dockstore.client.cli.YamlVerify.YAML;
 
 /**
  *
@@ -51,7 +52,7 @@ public final class YamlClient {
         JCommander jc = new JCommander();
 
         CommandYaml commandYaml = new CommandYaml();
-        JCommander jcPlugin = JCommanderUtility.addCommand(jc, "yaml", commandYaml);
+        JCommander jcPlugin = JCommanderUtility.addCommand(jc, YAML, commandYaml);
         CommandYamlValidate commandYamlValidate = new CommandYamlValidate();
         commandYamlValidate = new CommandYamlValidate();
         JCommanderUtility.addCommand(jcPlugin, "validate", commandYamlValidate);
@@ -60,14 +61,14 @@ public final class YamlClient {
         jcPlugin.parse(argv);
         try {
             if (args.isEmpty() || commandYaml.help) {
-                printJCommanderHelpYaml(jc, "dockstore", "yaml");
+                printJCommanderHelpYaml(jc, "dockstore", YAML);
             } else {
                 switch (jcPlugin.getParsedCommand()) {
                 case "validate":
                     if (commandYamlValidate.help) {
-                        printJCommanderHelpYaml(jc, "dockstore", "yaml");
+                        printJCommanderHelpYaml(jc, "dockstore", YAML);
                     } else if (commandYamlValidate.path == null) {
-                        printJCommanderHelpYaml(jc, "dockstore", "yaml");
+                        printJCommanderHelpYaml(jc, "dockstore", YAML);
                         out(NO_PATH_FLAG);
                     } else {
                         try {
@@ -83,16 +84,16 @@ public final class YamlClient {
                 }
             }
         } catch (ParameterException e) {
-            printJCommanderHelp(jc, "dockstore", "yaml");
+            printJCommanderHelp(jc, "dockstore", YAML);
         }
         return true;
 
     }
 
 
-    @Parameters(separators = "=", commandDescription = "Tools used for yaml files")
+    @Parameters(separators = "=", commandDescription = "Tools used for " + YAML + " files")
     private static class CommandYaml {
-        @Parameter(names = "--help", description = "Prints help for yaml command", help = true)
+        @Parameter(names = "--help", description = "Prints help for " + YAML + " command", help = true)
         private boolean help = false;
 
     }

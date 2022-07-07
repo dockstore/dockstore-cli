@@ -84,6 +84,7 @@ import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
+import static io.dockstore.client.cli.YamlVerify.YAML;
 import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 
 /**
@@ -122,7 +123,6 @@ public class Client {
     private WorkflowClient workflowClient;
     private CheckerClient checkerClient;
 
-    private YamlVerify yamlVerify;
 
     /*
      * Dockstore Client Functions for CLI
@@ -594,7 +594,7 @@ public class Client {
         out("   checker             Puts dockstore into checker mode.");
         out("   plugin              Configure and debug plugins.");
         out("   deps                Print tool/workflow runner dependencies.");
-        out("   yaml                Puts dockstore into yaml mode.");
+        out("   " + YAML + "                Puts dockstore into " + YAML + " mode.");
         out("");
         printLineBreak();
         out("");
@@ -722,7 +722,7 @@ public class Client {
                         String[] argsArray = new String[args.size()];
                         argsArray = args.toArray(argsArray);
                         handled = DepCommand.handleDepCommand(argsArray);
-                    } else if ("yaml".equals(mode)) {
+                    } else if (YAML.equals(mode)) {
                         handled = YamlClient.handleCommand(args);
                     }
 
@@ -881,9 +881,6 @@ public class Client {
         return checkerClient;
     }
 
-    public YamlVerify getYamlVerify() {
-        return yamlVerify;
-    }
     public Ga4Ghv20Api getGa4Ghv20Api() {
         return ga4ghv20Api;
     }
