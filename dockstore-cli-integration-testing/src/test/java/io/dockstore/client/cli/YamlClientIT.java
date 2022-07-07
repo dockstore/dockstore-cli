@@ -39,26 +39,30 @@ public class YamlClientIT extends BaseIT {
     @Test
     public void missingPathParameter() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "validate" });
-        Assert.assertTrue(systemOutRule.getLog().contains("ERROR: Missing --path <path>"));
-        systemOutRule.clearLog();
-    }
-
-    @Test
-    public void completeRun() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "validate", "--path", "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory" });
-        assertTrue(systemOutRule.getLog().contains("src/test/resources/YamlVerifyTestDirectory/correct-directory/.dockstore.yml is a valid yaml file"));
-        assertTrue(systemOutRule.getLog().contains("src/test/resources/YamlVerifyTestDirectory/correct-directory/.dockstore.yml is a valid dockstore yaml file"));
+        Assert.assertTrue(systemOutRule.getLog().contains(YamlClient.NO_PATH_FLAG));
+        Assert.assertTrue(systemOutRule.getLog().contains("Usage: dockstore"));
         systemOutRule.clearLog();
     }
 
     @Test
     public void verifyErrorMessagesArePrinted() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "validate", "--path", "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/some-files-present" });
-        assertTrue(systemOutRule.getLog().contains("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/some-files-present/.dockstore.yml is a valid yaml file"));
-        String errorMsg = "Your file structure has the following errors:\n"
-            + "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/some-files-present/dockstore.wdl.json does not exist\n"
-            + "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/some-files-present/Dockstore.cwl does not exist";
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "validate", "--path", testDirectory });
+        String errorMsg = YamlVerify.INVALID_FILE_STRUCTURE
+            + testDirectory + "/dockstore.wdl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+            + testDirectory + "/Dockstore.cwl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n";
+        System.out.println(errorMsg);
         assertTrue(systemOutRule.getLog().contains(errorMsg));
+        systemOutRule.clearLog();
+    }
+
+    @Test
+    public void completeRun() throws IOException {
+        final String testDirectory = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory";
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "validate", "--path", testDirectory });
+        String successMsg = testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.VALID_YAML_ONLY + "\n"
+            + testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.VALID_DOCKSTORE_YML + "\n";
+        assertTrue(systemOutRule.getLog().contains(successMsg));
         systemOutRule.clearLog();
     }
 
