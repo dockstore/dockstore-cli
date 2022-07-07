@@ -99,7 +99,7 @@ public final class YamlClient {
 
     }
 
-    @Parameters(separators = "=", commandDescription = "List currently activated file provision plugins")
+    @Parameters(separators = "=", commandDescription = "Verifies .dockstore.yml is correct and ensures all required files are present")
     private static class CommandYamlValidate {
         @Parameter(names = "--path", description = PATH_ON_COMPUTER, required = false)
         private static String path = null;
