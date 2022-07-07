@@ -145,6 +145,37 @@ public class YamlValidatorTest {
         }
     }
 
+    @Test
+    public void missingFields() {
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/invalid-dockstore-yml";
+        try {
+            YamlVerify.dockstoreValidate(testDirectory);
+            fail("non-present test files not caught");
+        } catch (YamlVerify.ValidateYamlException ex) {
+            String errorMsg = YamlVerify.INVALID_DOCKSTORE_YML
+                + testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.CONTAINS_ERRORS
+                + "Missing property \"primaryDescriptorPath\"";
+            assertEquals(errorMsg, ex.getMessage());
+            assertEquals(testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.VALID_YAML_ONLY + "\n", systemOutRule.getLog());
+            systemOutRule.clearLog();
+        }
+    }
+
+    @Test
+    public void incorrectlyNamedField() {
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/incorrectly-named-paramter-in-yml";
+        try {
+            YamlVerify.dockstoreValidate(testDirectory);
+            fail("non-present test files not caught");
+        } catch (YamlVerify.ValidateYamlException ex) {
+            String errorMsg = YamlVerify.INVALID_DOCKSTORE_YML
+                + testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.CONTAINS_ERRORS
+                + "Unknown property: 'publih'. Did you mean: 'publish'?";
+            assertEquals(errorMsg, ex.getMessage());
+            assertEquals(testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.VALID_YAML_ONLY + "\n", systemOutRule.getLog());
+            systemOutRule.clearLog();
+        }
+    }
 }
 
 
