@@ -34,6 +34,7 @@ import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelpYaml;
  */
 public final class YamlClient {
 
+    public static final String NO_PATH_FLAG = "ERROR: Missing --path <path>";
     private static final Logger LOG = LoggerFactory.getLogger(YamlClient.class);
 
 
@@ -67,7 +68,7 @@ public final class YamlClient {
                         printJCommanderHelpYaml(jc, "dockstore", "yaml");
                     } else if (commandYamlValidate.path == null) {
                         printJCommanderHelpYaml(jc, "dockstore", "yaml");
-                        out("ERROR: Missing --path <path>");
+                        out(NO_PATH_FLAG);
                     } else {
                         try {
                             YamlVerify.dockstoreValidate(CommandYamlValidate.path);
