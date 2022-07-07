@@ -36,6 +36,7 @@ import static io.dockstore.client.cli.YamlVerify.YAML;
 public final class YamlClient {
 
     public static final String NO_PATH_FLAG = "ERROR: Missing --path <path>";
+    public static final String PATH_ON_COMPUTER = "Path on computer (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)";
     private static final Logger LOG = LoggerFactory.getLogger(YamlClient.class);
 
 
@@ -100,7 +101,7 @@ public final class YamlClient {
 
     @Parameters(separators = "=", commandDescription = "List currently activated file provision plugins")
     private static class CommandYamlValidate {
-        @Parameter(names = "--path", description = "Complete entry path on computer (ex. /home/usr/test)", required = false)
+        @Parameter(names = "--path", description = PATH_ON_COMPUTER, required = false)
         private static String path = null;
         @Parameter(names = "--help", description = "Verifies that .dockstore.yml has the correct fields, and that all the required files are present", help = true)
         private boolean help = false;

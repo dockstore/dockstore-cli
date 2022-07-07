@@ -72,7 +72,7 @@ public final class JCommanderUtility {
         printJCommanderHelpDescription(description);
         printJCommanderHelpCommand(commander);
         out("Required parameters:\n"
-            + "  --path <path>        Complete entry path on computer (ex. /home/usr/test)\n");
+            + "  --path <path>        " + YamlClient.PATH_ON_COMPUTER);
         printJCommanderHelpFooter();
     }
 
