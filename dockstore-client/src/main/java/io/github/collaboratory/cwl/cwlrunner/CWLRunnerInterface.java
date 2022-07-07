@@ -16,6 +16,7 @@
 package io.github.collaboratory.cwl.cwlrunner;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.swagger.client.api.MetadataApi;
 
@@ -33,6 +34,6 @@ public interface CWLRunnerInterface {
      *
      * @return an array representing the command to invoke a particular cwl-runner
      */
-    List<String> getExecutionCommand(String outputDir, String tmpDir, String workingDir, String cwlFile, String jsonSettings);
+    List<String> getExecutionCommand(String outputDir, String tmpDir, String workingDir, String cwlFile, Optional<String> jsonSettings);
 
 }

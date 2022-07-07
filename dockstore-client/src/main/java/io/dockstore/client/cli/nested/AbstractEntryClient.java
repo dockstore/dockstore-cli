@@ -100,6 +100,7 @@ import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.MAX_DESCRIPTION;
+import static io.dockstore.client.cli.ArgumentUtility.conditionalErrorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
@@ -141,6 +142,7 @@ public abstract class AbstractEntryClient<T> {
     public static final String CHECKSUM_NULL_MESSAGE = "Unable to validate local descriptor checksum. Please refresh the entry. Missing checksum for descriptor ";
     public static final String CHECKSUM_MISMATCH_MESSAGE = "Launch halted. Local checksum does not match remote checksum for ";
     public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
+    public static final String MULTIPLE_TEST_FILE_ERROR_MESSAGE = "If specifying a test parameter file, use either --json or --yaml, but not both.";
 
     private static final String WORKFLOW = "workflow";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
@@ -1010,6 +1012,9 @@ public abstract class AbstractEntryClient<T> {
         List<String> argsCopy = new ArrayList<>(args);
         String jsonFile = optVal(argsCopy, "--json", null);
         String yamlFile = optVal(argsCopy, "--yaml", null);
+        conditionalErrorMessage((jsonFile != null) && (yamlFile != null),
+                                MULTIPLE_TEST_FILE_ERROR_MESSAGE,
+                                CLIENT_ERROR);
         if (jsonFile != null) {
             try {
                 fileToJSON(jsonFile);
@@ -1416,10 +1421,6 @@ public abstract class AbstractEntryClient<T> {
         final String yamlRun = optVal(args, "--yaml", null);
         String jsonRun = optVal(args, "--json", null);
         final String uuid = optVal(args, "--uuid", null);
-
-        if (!(yamlRun != null ^ jsonRun != null)) {
-            errorMessage("One of  --json or --yaml is required", CLIENT_ERROR);
-        }
         CWLClient client = new CWLClient(this);
         client.launch(entry, isALocalEntry, yamlRun, jsonRun, null, uuid);
     }
@@ -1459,9 +1460,6 @@ public abstract class AbstractEntryClient<T> {
     private void launchWdl(String entry, final List<String> args, boolean isALocalEntry) throws ApiException {
         final String yamlRun = optVal(args, "--yaml", null);
         String jsonRun = optVal(args, "--json", null);
-        if (!(yamlRun != null ^ jsonRun != null)) {
-            errorMessage("dockstore: Missing required flag: one of --json or --yaml", CLIENT_ERROR);
-        }
         final String wdlOutputTarget = optVal(args, "--wdl-output-target", null);
         final String uuid = optVal(args, "--uuid", null);
         WDLClient client = new WDLClient(this);

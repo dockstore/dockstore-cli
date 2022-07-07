@@ -28,6 +28,7 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.FlushingSystemErrRule;
@@ -56,6 +57,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.Assert.assertEquals;
@@ -240,7 +242,7 @@ public class LaunchTestIT {
         args.add("--json");
         args.add(jsonTestParameterFile.getAbsolutePath());
         exit.expectSystemExitWithStatus(CLIENT_ERROR);
-        exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains("Missing required flag")));
+        exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
         Client.main(args.toArray(new String[0]));
     }
 
@@ -1392,5 +1394,87 @@ public class LaunchTestIT {
 
         // run simple echo null tool
         runTool(nullCWL, nullJSON, false);
+    }
+
+    @Test
+    public void missingTestParameterFileWDLFailure() {
+        // Run a workflow without specifying test parameter files, defer errors to the
+        // Cromwell workflow engine.
+        File file = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+
+        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+        exit.expectSystemExitWithStatus(IO_ERROR);
+        runClientCommandConfig(args, config);
+        assertTrue("This workflow cannot run without test files, it should raise an exception from the workflow engine",
+                systemOutRule.getLog().contains("problems running command:"));
+    }
+
+    @Test
+    public void missingTestParameterFileWDLSuccess() {
+        // Run a workflow without specifying test parameter files, defer errors to the
+        // Cromwell workflow engine.
+        File file = new File(ResourceHelpers.resourceFilePath("no-input-echo.wdl"));
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+
+        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+        runClientCommandConfig(args, config);
+        assertTrue("output should include a successful cromwell run", systemOutRule.getLog().contains("Cromwell exit code: 0"));
+
+    }
+
+    @Test
+    public void missingTestParameterFileCWL() {
+        // Tests that the CWLrunner is able to handle workflows that do not specify
+        // test parameter files.
+        File file = new File(ResourceHelpers.resourceFilePath("no-input-echo.cwl"));
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--local-entry");
+        args.add(file.getAbsolutePath());
+
+        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+        exit.expectSystemExitWithStatus(1);
+        runClientCommandConfig(args, config);
+        // FIXME: The CWLTool should be able to execute this workflow, there is an
+        //        issue with how outputs are handled.
+        //        https://github.com/dockstore/dockstore/issues/4922
+        if (false) {
+            assertTrue("CWLTool should be able to run this workflow without any problems",
+                    systemOutRule.getLog().contains("[job no-input-echo.cwl] completed success"));
+        }
+    }
+
+    @Test
+    public void duplicateTestParameterFile() {
+        // Return client failure if both --json and --yaml are passed
+        File file = new File(ResourceHelpers.resourceFilePath("wrongExtcwl.wdl"));
+        File helloJSON = new File(ResourceHelpers.resourceFilePath("helloSpaces.json"));
+        File helloYAML = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add("workflow");
+        args.add("launch");
+        args.add("--entry");
+        args.add(file.getAbsolutePath());
+        args.add("--json");
+        args.add(helloJSON.getPath());
+        args.add("--yaml");
+        args.add(helloYAML.getPath());
+
+        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+        exit.expectSystemExitWithStatus(CLIENT_ERROR);
+        exit.checkAssertionAfterwards(() -> assertTrue("Client error should be returned",
+                systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
+        runClientCommandConfig(args, config);
     }
 }
