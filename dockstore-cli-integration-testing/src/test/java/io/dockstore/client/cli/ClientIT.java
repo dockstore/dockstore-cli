@@ -388,6 +388,10 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "checker", "update", "--help" });
         checkCommandForHelp(new String[] { "checker", "update_version", "--help" });
         checkCommandForHelp(new String[] { "checker", "test_parameter", "--help" });
+
+        checkCommandForHelp(new String[] { "yaml"});
+        checkCommandForHelp(new String[] { "yaml", "--help" });
+        checkCommandForHelp(new String[] { "yaml", "validate", "--help" });
     }
 
     private void checkCommandForHelp(String[] argv) throws IOException {
