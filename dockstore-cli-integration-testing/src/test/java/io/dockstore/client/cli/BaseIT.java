@@ -56,6 +56,7 @@ import org.junit.runner.Description;
 @Category(ConfidentialTest.class)
 public class BaseIT {
 
+    public static final String INSTALLATION_ID = "1179416";
     public static final String ADMIN_USERNAME = "admin@admin.com";
     public static final String USER_1_USERNAME = "DockstoreTestUser";
     public static final String USER_2_USERNAME = "DockstoreTestUser2";

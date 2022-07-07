@@ -1,0 +1,8 @@
+[profile myProfile]
+region = REGION
+
+[default]
+region = REGION2
+
+[profile temporaryCreds]
+region = REGION3

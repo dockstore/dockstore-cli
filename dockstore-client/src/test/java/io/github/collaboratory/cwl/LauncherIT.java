@@ -29,6 +29,8 @@ import com.google.gson.Gson;
 import io.dockstore.client.cli.Client;
 import io.dockstore.common.FileProvisionUtil;
 import io.dockstore.common.FileProvisioning;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Utilities;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerInterface;
@@ -56,10 +58,10 @@ public abstract class LauncherIT {
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();

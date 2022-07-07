@@ -26,6 +26,8 @@ import java.util.zip.ZipFile;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Registry;
 import io.dockstore.common.ToilCompatibleTest;
 import io.dockstore.common.ToolTest;
@@ -59,10 +61,10 @@ import static org.junit.Assert.assertTrue;
 public class GeneralIT extends BaseIT {
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
 
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();

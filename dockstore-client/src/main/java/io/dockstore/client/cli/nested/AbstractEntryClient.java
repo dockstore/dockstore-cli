@@ -24,6 +24,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -35,8 +37,17 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.HttpHeaders;
-
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.InfoCmd;
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.transport.DockerHttpClient;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
@@ -44,10 +55,6 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.spotify.docker.client.DefaultDockerClient;
-import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.exceptions.DockerCertificateException;
-import com.spotify.docker.client.exceptions.DockerException;
 import io.cwl.avro.CWL;
 import io.dockstore.client.cli.CheckerClient;
 import io.dockstore.client.cli.Client;
@@ -61,8 +68,10 @@ import io.github.collaboratory.nextflow.NextflowClient;
 import io.github.collaboratory.wdl.WDLClient;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
+import io.openapi.wes.client.model.RunListResponse;
 import io.openapi.wes.client.model.RunLog;
 import io.openapi.wes.client.model.RunStatus;
+import io.openapi.wes.client.model.ServiceInfo;
 import io.swagger.client.ApiException;
 import io.swagger.client.model.Label;
 import io.swagger.client.model.SourceFile;
@@ -79,13 +88,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.parser.ParserException;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import wdl.draft3.parser.WdlParser;
 
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.MAX_DESCRIPTION;
+import static io.dockstore.client.cli.ArgumentUtility.conditionalErrorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
@@ -104,6 +119,7 @@ import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
+import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
@@ -126,6 +142,7 @@ public abstract class AbstractEntryClient<T> {
     public static final String CHECKSUM_NULL_MESSAGE = "Unable to validate local descriptor checksum. Please refresh the entry. Missing checksum for descriptor ";
     public static final String CHECKSUM_MISMATCH_MESSAGE = "Launch halted. Local checksum does not match remote checksum for ";
     public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
+    public static final String MULTIPLE_TEST_FILE_ERROR_MESSAGE = "If specifying a test parameter file, use either --json or --yaml, but not both.";
 
     private static final String WORKFLOW = "workflow";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
@@ -136,8 +153,7 @@ public abstract class AbstractEntryClient<T> {
     boolean ignoreChecksums = false;
 
     private boolean isWesCommand = false;
-    private String wesUri = null;
-    private String wesAuth = null;
+    private WesRequestData wesRequestData = null;
 
     static String getCleanedDescription(String description) {
         description = MoreObjects.firstNonNull(description, "");
@@ -149,12 +165,12 @@ public abstract class AbstractEntryClient<T> {
         return description;
     }
 
-    String getWesUri() {
-        return wesUri;
+    public WesRequestData getWesRequestData() {
+        return wesRequestData;
     }
 
-    String getWesAuth() {
-        return wesAuth;
+    public void setWesRequestData(WesRequestData wrd) {
+        this.wesRequestData = wrd;
     }
 
     public boolean isWesCommand() {
@@ -605,7 +621,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void convert(final List<String> args) throws ApiException, IOException {
         if (args.isEmpty() || (containsHelpRequest(args) && !args.contains("cwl2json") && !args.contains("wdl2json") && !args
-                .contains("entry2json") && !args.contains("entry2tsv"))) {
+                .contains("entry2json"))) {
             convertHelp(); // Display general help
         } else {
             final String cmd = args.remove(0);
@@ -622,9 +638,6 @@ public abstract class AbstractEntryClient<T> {
                     break;
                 case "entry2json":
                     handleEntry2json(args);
-                    break;
-                case "entry2tsv":
-                    handleEntry2tsv(args);
                     break;
                 default:
                     invalid(cmd);
@@ -692,15 +705,6 @@ public abstract class AbstractEntryClient<T> {
             entry2jsonHelp();
         } else {
             final String runString = convertEntry2Json(args, true);
-            out(runString);
-        }
-    }
-
-    public void handleEntry2tsv(List<String> args) throws ApiException, IOException {
-        if (args.isEmpty() || containsHelpRequest(args)) {
-            entry2tsvHelp();
-        } else {
-            final String runString = convertEntry2Json(args, false);
             out(runString);
         }
     }
@@ -1005,9 +1009,12 @@ public abstract class AbstractEntryClient<T> {
      */
     void preValidateLaunchArguments(List<String> args) {
         // Create a copy of args for prevalidation since optVals removes args from list
-        List<String> argsCopy = new java.util.ArrayList(args);
+        List<String> argsCopy = new ArrayList<>(args);
         String jsonFile = optVal(argsCopy, "--json", null);
         String yamlFile = optVal(argsCopy, "--yaml", null);
+        conditionalErrorMessage((jsonFile != null) && (yamlFile != null),
+                                MULTIPLE_TEST_FILE_ERROR_MESSAGE,
+                                CLIENT_ERROR);
         if (jsonFile != null) {
             try {
                 fileToJSON(jsonFile);
@@ -1033,10 +1040,13 @@ public abstract class AbstractEntryClient<T> {
 
     /**
      * Creates a WES API object and sets the endpoint.
-     *
-     * @param wesUrl URL to WES endpoint
      */
-    WorkflowExecutionServiceApi getWorkflowExecutionServiceApi(String wesUrl, String wesCred) {
+    public WorkflowExecutionServiceApi getWorkflowExecutionServiceApi() {
+
+        if (this.getWesRequestData() == null) {
+            errorMessage("The WES request data object was not created. This must be populated to generate the client APIs", GENERIC_ERROR);
+        }
+
         WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = new WorkflowExecutionServiceApi();
 
         // Uncomment this code when Swagger Codegen generates correct Java
@@ -1047,44 +1057,153 @@ public abstract class AbstractEntryClient<T> {
         // Since Swagger Codegen does not create correct code for the
         // workflow attachment
         // Delete these next two lines when Swagger Codegen is fixed
-        ApiClientExtended wesApiClient = new ApiClientExtended();
+        ApiClientExtended wesApiClient = new ApiClientExtended(wesRequestData);
         clientWorkflowExecutionServiceApi.setApiClient(wesApiClient);
+        wesApiClient.getHttpClient().register(WesChecksumFilter.class);
 
-        INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
-        SubnodeConfiguration configSubNode = null;
-        try {
-            configSubNode = config.getSection("WES");
-        } catch (Exception e) {
-            out("Could not get WES section from config file");
-        }
-
-        String wesEndpointUrl = ObjectUtils.firstNonNull(wesUrl, Objects.requireNonNull(configSubNode).getString("url"));
-        if (wesEndpointUrl == null || wesEndpointUrl.isEmpty()) {
-            errorMessage("No WES URL found in config file and no WES URL entered on command line. Please add url: <url> to "
-                    + "config file in a WES section or use --wes-url <url> option on the command line", CLIENT_ERROR);
-        } else {
-            out("WES endpoint url is: " + wesEndpointUrl);
-            wesApiClient.setBasePath(wesEndpointUrl);
-        }
-
-        /*
-         * Setup authentication credentials for the WES URL
-         */
-        String wesAuthorizationCredentials = ObjectUtils.firstNonNull(wesCred, configSubNode.getString("authorization"));
-        if (wesAuthorizationCredentials == null) {
-            out("Could not set Authorization header. Authorization key not found in config file and not provided on the command line. "
-                    + "Please add 'authorization: <type> <credentials> to config file in WES section or "
-                    + "use --wes-auth '<type> <credentials>' option on the command line if authorization credentials are needed");
-        } else {
-            wesApiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, wesAuthorizationCredentials);
-        }
+        wesApiClient.setBasePath(wesRequestData.getUrl());
 
         // Add these headers to the http request. Are these needed?
         wesApiClient.addDefaultHeader("Accept", "*/*");
         wesApiClient.addDefaultHeader("Expect", "100-continue");
+        // TODO Might want to override the default User Agent header with a custom one to make tracking WES requests easier.
 
         clientWorkflowExecutionServiceApi.setApiClient(wesApiClient);
         return clientWorkflowExecutionServiceApi;
+    }
+
+    /**
+     * Attempts to launch a workflow (tools not currently supported) on a WES server
+     * @param clientWorkflowExecutionServiceApi The WES API client
+     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
+     * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
+     * @param paramsPath Path to the parameter JSON file
+     * @param filePaths Paths to any other required files for the WES execution
+     * @param verbose Whether or not to print verbose info messages
+     */
+    abstract void wesLaunch(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, String entry, boolean inlineWorkflow,
+        String paramsPath, List<String> filePaths, boolean verbose);
+
+    public void launchWithArgs(final String entry, final String localEntry, final String jsonRun, final String yamlRun, final String wdlOutput, final boolean ignoreChecksumFlag, final String uuid) {
+        // Does nothing for tools.
+    }
+
+    /**
+     *  This will attempt to retrieve the status of a workflow run
+     * @param workflowId The ID of the workflow we are getting status info for
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesStatus(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId) {
+        try {
+            RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
+            ObjectMapper mapper = new ObjectMapper();
+            out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting brief WES run status", e);
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert WES response object to JSON", e);
+        }
+    }
+
+    /**
+     *  This will attempt to retrieve the status of a workflow run
+     * @param workflowId The ID of the workflow we are getting status info for
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesRunLogs(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String workflowId) {
+        try {
+            RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
+            ObjectMapper mapper = new ObjectMapper();
+            out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting WES run logs", e);
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert WES response object to JSON", e);
+        }
+    }
+
+    /**
+     * This will attempt to cancel a WES run
+     * @param runId The ID of the run we are cancelling
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesCancel(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, final String runId, boolean verbose) {
+        try {
+            RunId response = clientWorkflowExecutionServiceApi.cancelRun(runId);
+            out("Cancelled run with id: " + response.toString());
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error canceling WES run", e);
+        }
+    }
+
+    /**
+     * This will attempt to retrieve information regarding the WES server
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesServiceInfo(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi) {
+        try {
+            ServiceInfo response = clientWorkflowExecutionServiceApi.getServiceInfo();
+            ObjectMapper mapper = new ObjectMapper();
+            out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting WES server info", e);
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert WES response object to JSON", e);
+        }
+    }
+
+    /**
+     * This will attempt to retrieve information regarding the WES server
+     * @param pageSize The number of entries to return
+     * @param pageToken The returned page token from a previous call of ListRuns
+     * @param clientWorkflowExecutionServiceApi The API client
+     */
+    private void wesListRuns(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, int pageSize, String pageToken, boolean verbose) {
+        try {
+            if (verbose) {
+                out(MessageFormat.format("Requesting latest {0} runs", pageSize));
+            }
+            RunListResponse response = clientWorkflowExecutionServiceApi.listRuns((long)pageSize, pageToken);
+            ObjectMapper mapper = new ObjectMapper();
+            out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        } catch (io.openapi.wes.client.ApiException e) {
+            LOG.error("Error getting WES Run List", e);
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert WES response object to JSON", e);
+        }
+    }
+
+    /**
+     * Given the parsed command object, determine if we are to print help commands
+     * @param wesCommandParser Parse commands
+     * @return true if help was displayed, false otherwise
+     */
+    private boolean displayWesHelpWhenNecessary(WesCommandParser wesCommandParser) {
+        // Print the main help section if 'dockstore workflow wes' was the command
+        if (wesCommandParser.wesMain.isHelp() || wesCommandParser.jCommander.getParsedCommand() == null) {
+            wesHelp();
+            return true;
+        } else if (wesCommandParser.commandLaunch.isHelp()) {
+            wesLaunchHelp();
+            return true;
+        } else if (wesCommandParser.commandStatus.isHelp()) {
+            wesStatusHelp();
+            return true;
+        } else if (wesCommandParser.commandRunLogs.isHelp()) {
+            wesRunLogsHelp();
+            return true;
+        } else if (wesCommandParser.commandCancel.isHelp()) {
+            wesCancelHelp();
+            return true;
+        } else if (wesCommandParser.commandServiceInfo.isHelp()) {
+            wesServiceInfoHelp();
+            return true;
+        } else if (wesCommandParser.commandRunList.isHelp()) {
+            wesRunListHelp();
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -1093,70 +1212,127 @@ public abstract class AbstractEntryClient<T> {
      * @param args Arguments entered into the CLI
      */
     private void processWesCommands(final List<String> args) {
-        this.wesUri = optVal(args, "--wes-url", null);
-        this.wesAuth = optVal(args, "--wes-auth", null);
+        WesCommandParser wesCommandParser = new WesCommandParser();
 
-        if (args.isEmpty() || (args.size() == 1 && containsHelpRequest(args))) {
-            wesHelp();
-        } else {
-            final String cmd = args.remove(0);
-            switch (cmd) {
-            case "launch":
-                if (args.isEmpty() || containsHelpRequest(args)) {
-                    wesLaunchHelp();
-                } else {
-                    if (args.contains("--local-entry")) {
-                        errorMessage("You can only use --entry to launch a WES workflow", CLIENT_ERROR);
-                    } else {
-                        launch(args);
-                    }
-                }
-                break;
-            case "status":
-                if (args.isEmpty() || containsHelpRequest(args)) {
-                    wesStatusHelp();
-                } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(getWesUri(), getWesAuth());
-                    String workflowId = reqVal(args, "--id");
-                    out("Getting status of WES workflow");
-                    if (args.contains("--verbose")) {
-                        try {
-                            RunLog response = clientWorkflowExecutionServiceApi.getRunLog(workflowId);
-                            out("Verbose run status is: " + response.toString());
-                        } catch (io.openapi.wes.client.ApiException e) {
-                            LOG.error("Error getting verbose WES run status", e);
-                        }
-                    } else {
-                        try {
-                            RunStatus response = clientWorkflowExecutionServiceApi.getRunStatus(workflowId);
-                            out("Brief run status is: " + response.toString());
-                        } catch (io.openapi.wes.client.ApiException e) {
-                            LOG.error("Error getting brief WES run status", e);
-                        }
-                    }
-                }
-                break;
-            case "cancel":
-                if (args.isEmpty() || containsHelpRequest(args)) {
-                    wesCancelHelp();
-                } else {
-                    WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi(getWesUri(), getWesAuth());
-                    out("Canceling WES workflow");
-                    String workflowId = reqVal(args, "--id");
-                    try {
-                        RunId response = clientWorkflowExecutionServiceApi.cancelRun(workflowId);
-                        out("Cancelled run with id: " + response.toString());
-                    } catch (io.openapi.wes.client.ApiException e) {
-                        LOG.error("Error canceling WES run", e);
-                    }
-                }
-                break;
-            default:
-                invalid(cmd);
-                break;
-            }
+        // JCommander throws a parameter exception for invalid parameters. Catch this an print the error cleanly.
+        try {
+            wesCommandParser.jCommander.parse(args.toArray(new String[0]));
+        } catch (ParameterException e) {
+            errorMessage(e.getMessage(), CLIENT_ERROR);
         }
 
+        final boolean helpDisplayed = displayWesHelpWhenNecessary(wesCommandParser);
+        if (!helpDisplayed) {
+
+            // Get any credentials that will be used in the following WES request
+            final WesRequestData requestData = this.aggregateWesRequestData(wesCommandParser);
+            setWesRequestData(requestData);
+            WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi = getWorkflowExecutionServiceApi();
+
+            // All Wes commands are parsed as subclasses of WesMain. We need to extract which object was created to parse with jCommander
+            // so we can get a global attribute.
+            WesCommandParser.WesMain parsedCommand = (WesCommandParser.WesMain) wesCommandParser.jCommander.getCommands()
+                .get(wesCommandParser.jCommander.getParsedCommand())
+                .getObjects().get(0);
+
+            // Print the WES URL and parsed credentials type
+            if (parsedCommand.isVerbose()) {
+                out("WES URL: " + wesRequestData.getUrl());
+                out("Credentials type: " + wesRequestData.getCredentialType());
+            }
+
+            // Depending on the desired WES request, parse input parameters from the command line
+            switch (wesCommandParser.jCommander.getParsedCommand()) {
+            case "launch":
+                wesLaunch(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandLaunch.getEntry(),
+                    wesCommandParser.commandLaunch.getInlineWorkflow(),
+                    wesCommandParser.commandLaunch.getJson(),
+                    wesCommandParser.commandLaunch.getAttachments(),
+                    wesCommandParser.commandLaunch.isVerbose());
+                break;
+            case "status":
+                wesStatus(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandStatus.getId());
+                break;
+            case "logs":
+                wesRunLogs(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandRunLogs.getId());
+                break;
+            case "cancel":
+                wesCancel(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandCancel.getId(),
+                    wesCommandParser.commandCancel.isVerbose());
+                break;
+            case "service-info":
+                wesServiceInfo(clientWorkflowExecutionServiceApi);
+                break;
+            case "list":
+                wesListRuns(clientWorkflowExecutionServiceApi,
+                    wesCommandParser.commandRunList.getPageSize(),
+                    wesCommandParser.commandRunList.getPageToken(),
+                    wesCommandParser.commandRunList.isVerbose());
+                break;
+            default:
+                errorMessage("Unknown WES command.", CLIENT_ERROR);
+                wesHelp();
+            }
+        }
+    }
+
+    /**
+     * This will aggregate the WES request URI and credentials into a single object for use down the line
+     * @param wesCommandParser The parsed command line arguments
+     */
+    public WesRequestData aggregateWesRequestData(final WesCommandParser wesCommandParser) {
+
+        // Get the config file to see if credentials are there
+        INIConfiguration config = Utilities.parseConfig(this.getConfigFile());
+        SubnodeConfiguration configSubNode = config.getSection("WES");
+
+        // Obtain the WES command object
+        JCommander parsedCommand = wesCommandParser.jCommander
+            .findCommandByAlias(wesCommandParser.jCommander.getParsedCommand());
+        WesCommandParser.WesMain command = parsedCommand == null ?  new WesCommandParser.WesMain() : (WesCommandParser.WesMain) parsedCommand.getObjects().get(0);
+
+        // Attempt to find the WES URL
+        final String wesEndpointUrl = ObjectUtils.firstNonNull(
+            command.getWesUrl(),
+            configSubNode.getString(WesConfigOptions.URL_KEY));
+
+        // Determine the authorization method used by the user
+        final String authType = configSubNode.getString(WesConfigOptions.AUTHORIZATION_TYPE_KEY);
+
+        // The auth value is either a bearer token or AWS profile
+        final String authValue = configSubNode.getString(WesConfigOptions.AUTHORIZATION_VALUE_KEY);
+
+        // Depending on the endpoint (AWS/non-AWS) we need to look for a different set of credentials
+        final boolean isAwsWes = "aws".equals(authType);
+        if (isAwsWes) {
+
+            try {
+                // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
+                // the default home/.aws/credentials file.
+                final String profileToRead = authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE;
+                final ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileName(profileToRead).build();
+                final Region region = DefaultAwsRegionProviderChain.builder().profileName(profileToRead).build().getRegion();
+
+                // Build and return the request data
+                return new WesRequestData(wesEndpointUrl,
+                    credentialsProvider.resolveCredentials(),
+                        region.toString());
+
+            } catch (IllegalArgumentException | SdkClientException e) {
+                // Some potential reasons for this exception are:
+                // 1) The path to the config file is invalid or 2) The profile doesn't exist or 3) The config file is malformed
+                errorMessage(e.getMessage(), CLIENT_ERROR);
+            }
+
+            // Let the WesRequestData class handle missing credentials
+            return new WesRequestData(wesEndpointUrl, null, null, null);
+        } else {
+            return new WesRequestData(wesEndpointUrl, authValue);
+        }
     }
 
     /**
@@ -1164,13 +1340,16 @@ public abstract class AbstractEntryClient<T> {
      * it is not running, it fails with a cryptic error. This should make the problem more obvious.
      */
     void checkIfDockerRunning() {
-        try (DockerClient docker = DefaultDockerClient.fromEnv().build()) {
-            docker.info();  // attempt to get information about docker
-        } catch (DockerException | DockerCertificateException e) {  // couldn't access docker
+        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+
+        try (DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder().dockerHost(config.getDockerHost())
+                .sslConfig(config.getSSLConfig()).build();
+                DockerClient instance = DockerClientImpl.getInstance(config, httpClient)) {
+            InfoCmd infoCmd = instance.infoCmd(); // attempt to get information about docker
+            infoCmd.exec();
+        } catch (Exception e) {  // couldn't access docker, this library is wonderfully non-specific about exceptions
             String type = this.getEntryType().toLowerCase(); // "tool" or "workflow"
             out("WARNING: Docker is not running. If this " + type + " uses Docker, it will fail.");
-        } catch (InterruptedException e) {  // something else went wrong
-            LOG.error("Check for Docker failed", e);
         }
     }
 
@@ -1242,10 +1421,6 @@ public abstract class AbstractEntryClient<T> {
         final String yamlRun = optVal(args, "--yaml", null);
         String jsonRun = optVal(args, "--json", null);
         final String uuid = optVal(args, "--uuid", null);
-
-        if (!(yamlRun != null ^ jsonRun != null)) {
-            errorMessage("One of  --json or --yaml is required", CLIENT_ERROR);
-        }
         CWLClient client = new CWLClient(this);
         client.launch(entry, isALocalEntry, yamlRun, jsonRun, null, uuid);
     }
@@ -1285,9 +1460,6 @@ public abstract class AbstractEntryClient<T> {
     private void launchWdl(String entry, final List<String> args, boolean isALocalEntry) throws ApiException {
         final String yamlRun = optVal(args, "--yaml", null);
         String jsonRun = optVal(args, "--json", null);
-        if (!(yamlRun != null ^ jsonRun != null)) {
-            errorMessage("dockstore: Missing required flag: one of --json or --yaml", CLIENT_ERROR);
-        }
         final String wdlOutputTarget = optVal(args, "--wdl-output-target", null);
         final String uuid = optVal(args, "--uuid", null);
         WDLClient client = new WDLClient(this);
@@ -1359,7 +1531,10 @@ public abstract class AbstractEntryClient<T> {
         out("Usage: dockstore " + getEntryType().toLowerCase() + " wes --help");
         out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes service-info [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes list [parameters]");
         out("");
         out("Description:");
         out(" Sends a request to a Workflow Execution Service (WES) endpoint.");
@@ -1376,10 +1551,9 @@ public abstract class AbstractEntryClient<T> {
         out("  --entry <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         out("");
         out("Optional parameters:");
-        out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.toString());
-        out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
+        out("  --json <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
+        out("  --attach <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
+        out("  --inline-workflow                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
         out("");
     }
 
@@ -1401,8 +1575,20 @@ public abstract class AbstractEntryClient<T> {
         out("  Status, gets the status of a " + getEntryType() + ".");
         out("Required Parameters:");
         out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
-        out("Optional Parameters:");
-        out("  --verbose                           Provide extra status information");
+        out("");
+        printWesHelpFooter();
+        printHelpFooter();
+    }
+
+    private void wesRunLogsHelp() {
+        printHelpHeader();
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes logs --help");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
+        out("");
+        out("Description:");
+        out("  Logs, gets the verbose run logs of a " + getEntryType() + ".");
+        out("Required Parameters:");
+        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1422,12 +1608,37 @@ public abstract class AbstractEntryClient<T> {
         printHelpFooter();
     }
 
+    private void wesServiceInfoHelp() {
+        printHelpHeader();
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes service-info --help");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes service-info");
+        out("");
+        out("Description:");
+        out("  Returns descriptive information of the provided WES server. ");
+        printWesHelpFooter();
+        printHelpFooter();
+    }
+
+    private void wesRunListHelp() {
+        printHelpHeader();
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes list --help");
+        out("       dockstore " + getEntryType().toLowerCase() + " wes list");
+        out("");
+        out("Description:");
+        out("  Returns information about past runs. ");
+        out("Optional Parameters:");
+        out("  --count                           The number of runs to list.");
+        out("  --page-token                      A page token provided from a previous list of runs.");
+        out("");
+        printWesHelpFooter();
+        printHelpFooter();
+    }
+
     private void printWesHelpFooter() {
         out("Global Optional Parameters:");
         out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
-        out("  --wes-auth <auth>                   Authorization credentials for the WES endpoint, e.g. 'Bearer 12345'");
         out("");
-        out("NOTE: WES SUPPORT IS IN BETA AT THIS TIME. RESULTS MAY BE UNPREDICTABLE.");
+        out("NOTE: Currently only WDL workflows are supported for WES requests. Further language support is under development.");
     }
 
     protected abstract void publishHelp();
@@ -1598,24 +1809,9 @@ public abstract class AbstractEntryClient<T> {
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2yaml [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " wdl2json [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2tsv [parameters]");
         out("");
         out("Description:");
         out("  They allow you to convert between file representations.");
-        printHelpFooter();
-    }
-
-    private void entry2tsvHelp() {
-        printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2tsv --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2tsv [parameters]");
-        out("");
-        out("Description:");
-        out("  Spit out a tsv run file for a given cwl document.");
-        out("");
-        out("Required parameters:");
-        out("  --entry <entry>                Complete " + getEntryType().toLowerCase()
-                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         printHelpFooter();
     }
 
@@ -1718,7 +1914,7 @@ public abstract class AbstractEntryClient<T> {
      * @return json string representation of the yaml content
      */
     public String fileToJSON(String yamlRun) throws IOException {
-        Yaml yaml = new Yaml();
+        Yaml yaml = new Yaml(new SafeConstructor());
         try (FileInputStream fileInputStream = FileUtils.openInputStream(new File(yamlRun))) {
             Map<String, Object> map = yaml.load(fileInputStream);
             JSONObject jsonObject = new JSONObject(map);

@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Utilities;
 import io.dropwizard.testing.ResourceHelpers;
 import org.apache.commons.io.FileUtils;
@@ -41,9 +43,9 @@ public class LaunchNoInternetTestIT {
     private static final String FAKE_IMAGE_NAME = "dockstore.org/bashwithbinbash:0118999881999119725...3";
     private static String dockerImageDirectory;
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
     @Rule

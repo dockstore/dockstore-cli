@@ -19,13 +19,12 @@
 
     <groupId>io.dockstore</groupId>
     <artifactId>dockstore-cli</artifactId>
-    <version>1.11.0-alpha.0-SNAPSHOT</version>
+    <version>${revision}${changelist}</version>
     <packaging>pom</packaging>
 
     <name>dockstore</name>
     <description>dockstore cli parent POM</description>
     <url>https://github.com/dockstore/dockstore-cli</url>
-
     <!--
     The following properties are mostly used in the plugins section
     as the versions for the dependencies elements are provided
@@ -33,13 +32,27 @@
     in dependencies elements
     -->
     <properties>
+        <!-- the following properties set sane defaults when no revision properties are set from the command-line -->
+        <revision>1.13</revision>
+        <changelist>.0-SNAPSHOT</changelist>
+
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.10.0</dockstore-core.version>
-        <maven-failsafe.version>2.21.0</maven-failsafe.version>
-        <maven-surefire.version>2.21.0</maven-surefire.version>
+        <dockstore-core.version>1.13.0-alpha.7</dockstore-core.version>
+        <maven-failsafe.version>2.22.2</maven-failsafe.version>
+        <maven-surefire.version>2.22.2</maven-surefire.version>
         <skipTests>false</skipTests>
         <skipITs>true</skipITs>
+        <!-- for sonarcloud -->
+        <sonar.projectKey>dockstore_dockstore-cli</sonar.projectKey>
+        <sonar.organization>dockstore</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+        <!-- this is not an aggregated path -->
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../reports/target/site/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+        <!-- end sonarcloud properties -->
     </properties>
 
     <organization>
@@ -51,43 +64,29 @@
         <connection>${github.url}</connection>
         <developerConnection>${github.url}</developerConnection>
         <url>${github.url}</url>
-        <tag>1.9.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <repositories>
         <repository>
-            <id>artifacts.oicr.on.ca</id>
-            <name>artifacts.oicr.on.ca</name>
-            <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
-        </repository>
-        <repository>
-            <id>seqware.sourceforge.net</id>
-            <name>SeqWare Maven Repository</name>
-            <url>https://seqwaremaven.oicr.on.ca/artifactory/collab-release</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
+            <id>artifacts.oicr.on.ca.ca-snapshots</id>
+            <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
             <snapshots>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </snapshots>
         </repository>
         <repository>
-            <id>seqwaremaven.oicr.on.ca</id>
-            <name>seqwaremaven.oicr.on.ca-releases</name>
-            <url>https://seqwaremaven.oicr.on.ca/artifactory/seqware-dependencies</url>
+            <id>artifacts.oicr.on.ca</id>
+            <name>artifacts.oicr.on.ca</name>
+            <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>apache-releases</id>
             <name>Apache Releases repository</name>
             <url>https://repository.apache.org/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>jcenter</id>
-            <name>bintray</name>
-            <url>https://jcenter.bintray.com</url>
         </repository>
         <!-- broad -->
         <repository>
@@ -100,16 +99,6 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
-        <repository>
-            <id>sagebionetworks</id>
-            <name>sagebionetworks-releases</name>
-            <url>https://sagebionetworks.artifactoryonline.com/sagebionetworks/libs-releases-local</url>
-        </repository>
-        <repository>
-            <id>mockito</id>
-            <name>mockito</name>
-            <url>https://dl.bintray.com/mockito/maven/</url>
         </repository>
     </repositories>
 
@@ -140,6 +129,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- remove likely when bumping bom-internal -->
             <dependency>
                 <groupId>io.dockstore</groupId>
                 <artifactId>bom-internal</artifactId>
@@ -162,6 +152,11 @@
                 <artifactId>jaxb-api</artifactId>
                 <version>2.3.1</version>
             </dependency>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-migrations</artifactId>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -172,12 +167,12 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.4</version>
+                    <version>0.8.7</version>
                 </plugin>
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
                     <artifactId>download-maven-plugin</artifactId>
-                    <version>1.4.0</version>
+                    <version>1.6.8</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -187,7 +182,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>3.10.1</version>
                     <configuration>
                         <release>11</release>
                         <showDeprecation>true</showDeprecation>
@@ -196,7 +191,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.2</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -210,18 +205,10 @@
                         </excludes>
                     </configuration>
                 </plugin>
-                <!-- version fixed at 2.17 due to https://sourceforge.net/p/eclipse-cs/discussion/274376/thread/ba316e08/?limit=25 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.1.0</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>8.29</version>
-                        </dependency>
-                    </dependencies>
+                    <version>3.1.2</version>
                     <configuration>
                         <configLocation>checkstyle.xml</configLocation>
                         <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
@@ -229,22 +216,23 @@
                         <includeTestResources>true</includeTestResources>
                         <includeResources>true</includeResources>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.1</version>
                     <dependencies>
                         <dependency>
-                            <groupId>org.apache.maven.shared</groupId>
-                            <artifactId>maven-dependency-analyzer</artifactId>
-                            <version>1.11.1</version>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>10.1</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.2.1</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -297,11 +285,10 @@
                     <artifactId>maven-site-plugin</artifactId>
                     <version>3.7.1</version>
                 </plugin>
-                <!-- fix at 2.7 until a solution to symbolic links not being copied is ready -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -339,12 +326,12 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>3.1.12.2</version>
+                    <version>4.6.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <phase>package</phase>
@@ -377,12 +364,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>1.4.1</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.3.2</version>
                 </plugin>
                 <!-- https://mvnrepository.com/artifact/org.scala-tools/maven-scala-plugin -->
                 <plugin>
@@ -393,28 +380,52 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>io.swagger</groupId>
-                    <artifactId>swagger-codegen-maven-plugin</artifactId>
-                    <version>2.4.8</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>2.10.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>2.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>1.2.7</version>
+                    <configuration>
+                        <outputDirectory>${project.basedir}/generated/src/main/resources/</outputDirectory>
+                        <updatePomFile>false</updatePomFile>
+                        <!-- snyk is picky about filenames -->
+                        <flattenedPomFilename>pom.xml</flattenedPomFilename>
+                    </configuration>
+                    <executions>
+                        <!-- enable flattening -->
+                        <execution>
+                            <id>flatten</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                        <!-- ensure proper cleanup -->
+                        <execution>
+                            <id>flatten.clean</id>
+                            <phase>clean</phase>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -460,10 +471,10 @@
                                 </requireReleaseDeps>
                                 <requireUpperBoundDeps />
                                 <requireMavenVersion>
-                                    <version>3.5.4</version>
+                                    <version>3.8.1</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>11</version>
+                                    <version>[11.0.11,18.0)</version>
                                 </requireJavaVersion>
                                 <banDuplicatePomDependencyVersions />
                                 <bannedDependencies>
@@ -476,6 +487,22 @@
                                         <exclude>commons-configuration:commons-configuration</exclude>
                                         <!-- superceded by org.apache.httpcomponents:httpclient -->
                                         <exclude>commons-httpclient:commons-httpclient</exclude>
+                                        <!-- see https://github.com/dropwizard/dropwizard/pull/3069 -->
+                                        <exclude>javax.annotation:javax.annotation-api</exclude>
+                                        <exclude>javax.activation:activation</exclude>
+                                        <exclude>javax.ws.rs:javax.ws.rs-api</exclude>
+                                        <!-- Replaced with jakarta.activation:jakarta.activation-api -->
+                                        <exclude>javax.activation:javax.activation-api</exclude>
+                                        <!-- Replaced with jakarta.servlet:jakarta.servlet-api -->
+                                        <exclude>javax.servlet:javax.servlet-api</exclude>
+                                        <!-- Replaced with jakarta.validation:jakarta.validation-api -->
+                                        <exclude>javax.validation:validation-api</exclude>
+                                        <!-- Replaced with jakarta.xml.bind:jakarta.xml.bind-api -->
+                                        <exclude>javax.xml.bind:jaxb-api</exclude>
+                                        <!-- should be using v2 api -->
+                                        <exclude>com.amazonaws:*</exclude>
+                                        <!-- we should be using jpa 2.2 -->
+                                        <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.1-api</exclude>
                                     </excludes>
                                 </bannedDependencies>
                             </rules>
@@ -487,6 +514,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -597,7 +625,7 @@
             <plugin>
                 <groupId>net.revelc.code</groupId>
                 <artifactId>impsort-maven-plugin</artifactId>
-                <version>1.2.0</version>
+                <version>1.6.2</version>
                 <configuration>
                     <groups>java.,javax.,*</groups>
                     <staticAfter>true</staticAfter>
@@ -622,8 +650,13 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <excludeGroups>io.dockstore.common.RegressionTest, io.dockstore.common.ConfidentialTest,io.dockstore.common.SlowTest,
-                    io.dockstore.common.BenchmarkTest,io.dockstore.common.ToilOnlyTest
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.ConfidentialTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.BenchmarkTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.client.cli.nested.WestTests
                 </excludeGroups>
             </properties>
 
@@ -643,6 +676,11 @@
                             <skip>false</skip>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>3.9.1.2184</version>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -656,12 +694,12 @@
             </properties>
         </profile>
         <profile>
-            <id>regression-integration-tests</id>
-            <!-- run only regression tests-->
+            <id>wes-integration-tests</id>
+            <!-- run only tests that are relevant for WES Integration -->
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <groups>io.dockstore.common.RegressionTest</groups>
+                <groups>io.dockstore.client.cli.nested.WesTests</groups>
             </properties>
         </profile>
         <profile>
@@ -669,7 +707,12 @@
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.client.cli.nested.WesTests
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -679,7 +722,13 @@
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
                 <groups>io.dockstore.common.ConfidentialTest</groups>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.WorkflowTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.WorkflowTest,
+                    io.dockstore.client.cli.nested.WesTests
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -689,7 +738,13 @@
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
                 <groups>io.dockstore.common.ConfidentialTest</groups>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.ToolTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.ToolTest,
+                    io.dockstore.client.cli.nested.WesTests
+                </excludeGroups>
             </properties>
         </profile>
         <profile>
@@ -698,7 +753,13 @@
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <excludeGroups>io.dockstore.common.SlowTest,io.dockstore.common.RegressionTest, io.dockstore.common.ToilOnlyTest, io.dockstore.common.ConfidentialTest</excludeGroups>
+                <excludeGroups>
+                    io.dockstore.client.cli.nested.SingularityTest,
+                    io.dockstore.common.SlowTest,
+                    io.dockstore.common.ToilOnlyTest,
+                    io.dockstore.common.ConfidentialTest,
+                    io.dockstore.client.cli.nested.WesTests
+                </excludeGroups>
             </properties>
         </profile>
         <profile>

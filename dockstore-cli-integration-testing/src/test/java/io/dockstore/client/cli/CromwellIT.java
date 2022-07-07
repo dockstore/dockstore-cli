@@ -31,6 +31,8 @@ import io.dockstore.client.cli.nested.LanguageClientInterface;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.ToolTest;
 import io.dockstore.common.WDLFileProvisioning;
 import io.dockstore.common.WdlBridge;
@@ -55,10 +57,10 @@ import wdl.draft3.parser.WdlParser;
 public class CromwellIT {
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
 
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
@@ -104,7 +106,7 @@ public class CromwellIT {
         WdlBridge wdlBridge = new WdlBridge();
         Map<String, String> wdlInputs = null;
         try {
-            wdlInputs = wdlBridge.getInputFiles(workflowFile.getAbsolutePath());
+            wdlInputs = wdlBridge.getInputFiles(workflowFile.getAbsolutePath(), "/wdlfileprov.wdl");
         } catch (WdlParser.SyntaxError ex) {
             Assert.fail("Should not have any issue parsing file");
         }

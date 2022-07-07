@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import com.google.common.collect.Lists;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Registry;
 import io.dockstore.common.TestUtility;
 import io.dockstore.common.ToilCompatibleTest;
@@ -49,10 +51,10 @@ public class ClientIT extends BaseIT {
 
     private static final String FIRST_TOOL = ResourceHelpers.resourceFilePath("dockstore-tool-helloworld.cwl");
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
 
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
@@ -230,6 +232,9 @@ public class ClientIT extends BaseIT {
      *
      * @throws IOException
      */
+    @Ignore
+    // Ignore until https://ucsc-cgl.atlassian.net/browse/DOCK-2193 fixed
+    // and a new webservice artifact after 1.13.0-alpha.7 is built and put on Artifactory
     @Test
     public void testDepsCommandWithVersionAndPython3() throws IOException {
         Client.main(
@@ -259,6 +264,9 @@ public class ClientIT extends BaseIT {
      *
      * @throws IOException
      */
+    @Ignore
+    // Ignore until https://ucsc-cgl.atlassian.net/browse/DOCK-2193 fixed
+    // and a new webservice artifact after 1.13.0-alpha.7 is built and put on Artifactory
     @Test
     public void testDepsCommand() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps" });
@@ -272,6 +280,9 @@ public class ClientIT extends BaseIT {
      *
      * @throws IOException
      */
+    @Ignore
+    // Ignore until https://ucsc-cgl.atlassian.net/browse/DOCK-2193 fixed
+    // and a new webservice artifact after 1.13.0-alpha.7 is built and put on Artifactory
     @Test
     public void testDepsCommandHelp() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--help" });
@@ -302,7 +313,6 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "tool", "update_tool" });
 
         checkCommandForHelp(new String[] { "tool", "convert", "entry2json" });
-        checkCommandForHelp(new String[] { "tool", "convert", "entry2tsv" });
         checkCommandForHelp(new String[] { "tool", "convert", "cwl2yaml" });
         checkCommandForHelp(new String[] { "tool", "convert", "cwl2json" });
         checkCommandForHelp(new String[] { "tool", "convert", "wdl2json" });
@@ -323,7 +333,6 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "tool", "convert", "cwl2yaml", "--help" });
         checkCommandForHelp(new String[] { "tool", "convert", "wdl2json", "--help" });
         checkCommandForHelp(new String[] { "tool", "convert", "entry2json", "--help" });
-        checkCommandForHelp(new String[] { "tool", "convert", "entry2tsv", "--help" });
         checkCommandForHelp(new String[] { "tool", "launch", "--help" });
         checkCommandForHelp(new String[] { "tool", "version_tag", "--help" });
         checkCommandForHelp(new String[] { "tool", "version_tag", "remove", "--help" });
@@ -337,7 +346,6 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "tool" });
 
         checkCommandForHelp(new String[] { "workflow", "convert", "entry2json" });
-        checkCommandForHelp(new String[] { "workflow", "convert", "entry2tsv" });
         checkCommandForHelp(new String[] { "workflow", "convert", "cwl2yaml" });
         checkCommandForHelp(new String[] { "workflow", "convert", "cwl2json" });
         checkCommandForHelp(new String[] { "workflow", "convert", "wdl2json" });
@@ -368,7 +376,6 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "workflow", "convert", "cwl2yaml", "--help" });
         checkCommandForHelp(new String[] { "workflow", "convert", "wd2json", "--help" });
         checkCommandForHelp(new String[] { "workflow", "convert", "entry2json", "--help" });
-        checkCommandForHelp(new String[] { "workflow", "convert", "entry2tsv", "--help" });
         checkCommandForHelp(new String[] { "workflow", "launch", "--help" });
         checkCommandForHelp(new String[] { "workflow", "version_tag", "--help" });
         checkCommandForHelp(new String[] { "workflow", "update_workflow", "--help" });

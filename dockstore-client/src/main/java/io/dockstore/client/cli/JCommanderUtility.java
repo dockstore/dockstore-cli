@@ -55,8 +55,6 @@ public final class JCommanderUtility {
         out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("   OR");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs (only for CWL)");
-        out("   OR");
-        out("  --tsv <tsv file>                    One row corresponds to parameters for one run in the dockstore (only for CWL)");
         out("");
         out("Optional parameters:\n"
                 + "  --wdl-output-target                 Allows you to specify a remote path to provision output files to ex: s3://oicr.temp/testing-launcher/\n"

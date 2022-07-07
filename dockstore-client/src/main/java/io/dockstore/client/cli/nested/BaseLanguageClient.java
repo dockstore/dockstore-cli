@@ -171,19 +171,22 @@ public abstract class BaseLanguageClient {
          endpoint.
         */
         if (!abstractEntryClient.isWesCommand()) {
-            try {
-                // Provision the input files
-                provisionedParameterFile = provisionInputFiles();
-            } catch (ApiException ex) {
-                if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool")) {
-                    exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
-                            ENTRY_NOT_FOUND);
-                } else {
-                    exceptionMessage(ex, "The workflow entry does not exist. Did you mean to launch a local workflow or a tool?",
-                            ENTRY_NOT_FOUND);
+            if (provisionedParameterFile != null || selectedParameterFile != null) {
+                try {
+                    provisionedParameterFile = provisionInputFiles();
+                } catch (ApiException ex) {
+                    if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool")) {
+                        exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
+                                ENTRY_NOT_FOUND);
+                    } else {
+                        exceptionMessage(ex, "The workflow entry does not exist. Did you mean to launch a local workflow or a tool?",
+                                ENTRY_NOT_FOUND);
+                    }
+                } catch (Exception ex) {
+                    exceptionMessage(ex, ex.getMessage(), GENERIC_ERROR);
                 }
-            } catch (Exception ex) {
-                exceptionMessage(ex, ex.getMessage(), GENERIC_ERROR);
+            } else {
+                LOG.debug("No test parameter file provided, skipping provisioning");
             }
         }
 
@@ -192,9 +195,9 @@ public abstract class BaseLanguageClient {
             validateDescriptorChecksum(type, entryVal);
         }
 
-        // Update the launcher with references to the files to be launched
-        launcher.setFiles(localPrimaryDescriptorFile, zippedEntryFile, provisionedParameterFile, selectedParameterFile, workingDirectory);
 
+        // Update the launcher with references to the files to be launched
+        launcher.setFiles(localPrimaryDescriptorFile, zippedEntryFile, provisionedParameterFile, selectedParameterFile, workingDirectory, entryVal);
         try {
             // Attempt to run launcher
             launcher.printLaunchMessage();
@@ -237,7 +240,7 @@ public abstract class BaseLanguageClient {
 
         // All secondary files are located relative to the location of the primary descriptor.
         final String localTemporaryDirectory = localPrimaryDescriptorFile.getParent();
-        final String checksumFunction = "sha1";
+        final String checksumFunction = "sha-256";
 
         // Validate each tool file associated with the entry (Primary and secondary descriptors)
         for (ToolFile toolFile : allDescriptors) {
@@ -264,7 +267,7 @@ public abstract class BaseLanguageClient {
                     // if the toolFile.getPath() is absolute, it is converted to a relative path by File the constructor
                     final File localDescriptor = new File(localTemporaryDirectory, toolFile.getPath());
                     final String fileContents = FileUtils.readFileToString(localDescriptor, StandardCharsets.UTF_8);
-                    final String fileChecksum = DigestUtils.sha1Hex(fileContents);
+                    final String fileChecksum = DigestUtils.sha256Hex(fileContents);
                     localDescriptorChecksum.setChecksum(fileChecksum);
                 } catch (IOException ex) {
                     exceptionMessage(ex, "Unable to locate local descriptor at " + localTemporaryDirectory + "/" + toolFile.getPath(), IO_ERROR);

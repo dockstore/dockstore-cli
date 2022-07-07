@@ -17,7 +17,6 @@
 package io.dockstore.common;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,11 +31,7 @@ import io.swagger.client.ApiException;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.Tag;
 import org.apache.commons.configuration2.INIConfiguration;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.Executor;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +41,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class CommonTestUtilities {
 
-    public static final String OLD_DOCKSTORE_VERSION = "1.7.4";
     // Travis is slow, need to wait up to 1 min for webservice to return
     public static final int WAIT_TIME = 60000;
     public static final String PUBLIC_CONFIG_PATH = ResourceHelpers.resourceFilePath("dockstore.yml");
@@ -89,7 +83,7 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", dropwizardConfigurationFile);
         application
             .run("db", "migrate", dropwizardConfigurationFile, "--include", "1.3.0.generated,1.3.1.consistency,1.4.0,1.5.0,"
-                    + "1.6.0,1.7.0,1.8.0,1.9.0,1.10.0");
+                    + "1.6.0,1.7.0,1.8.0,1.9.0,1.10.0,1.11.0,1.12.0,1.13.0");
     }
 
     /**
@@ -116,7 +110,7 @@ public final class CommonTestUtilities {
 
         List<String> migrationList = Arrays
             .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0",
-                    "1.8.0", "1.9.0", "1.10.0");
+                    "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0");
         runMigration(migrationList, application, dropwizardConfigurationFile);
     }
 
@@ -184,16 +178,18 @@ public final class CommonTestUtilities {
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
         runMigration(migrationList, application, configPath);
 
-        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1.xml");
+        migrationList = Collections.singletonList(
+                new File("../dockstore-webservice/src/main/resources/migrations.test.confidential1.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
         runMigration(migrationList, application, configPath);
 
-        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml");
+        migrationList = Collections.singletonList(
+                new File("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0");
         runMigration(migrationList, application, configPath);
     }
 
@@ -252,49 +248,20 @@ public final class CommonTestUtilities {
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
         runMigration(migrationList, application, configPath);
 
-        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2.xml");
+        migrationList = Collections.singletonList(
+                new File("../dockstore-webservice/src/main/resources/migrations.test.confidential2.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
+
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
         runMigration(migrationList, application, configPath);
 
-        migrationList = Collections.singletonList("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml");
+        migrationList = Collections.singletonList(
+                new File("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0");
         runMigration(migrationList, application, configPath);
-    }
-
-    public static ImmutablePair<String, String> runOldDockstoreClient(File dockstore, String[] commandArray) throws RuntimeException {
-        List<String> commandList = new ArrayList<>();
-        commandList.add(dockstore.getAbsolutePath());
-        commandList.addAll(Arrays.asList(commandArray));
-        String commandString = String.join(" ", commandList);
-        return Utilities.executeCommand(commandString);
-    }
-
-    /**
-     * For running the old dockstore client when spaces are involved
-     *
-     * @param dockstore
-     * @param commandArray
-     * @throws RuntimeException
-     */
-    public static void runOldDockstoreClientWithSpaces(File dockstore, String[] commandArray) throws RuntimeException {
-        List<String> commandList;
-        CommandLine commandLine = new CommandLine(dockstore.getAbsoluteFile());
-
-        commandList = Arrays.asList(commandArray);
-        commandList.forEach(command -> {
-            commandLine.addArgument(command, false);
-        });
-        Executor executor = new DefaultExecutor();
-        try {
-            executor.execute(commandLine);
-        } catch (IOException e) {
-            LOG.error("Could not execute command. " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     public static void checkToolList(String log) {
