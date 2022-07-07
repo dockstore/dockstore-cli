@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelpYaml;
+import static io.dockstore.client.cli.YamlVerify.DOCKSTOREYML;
 import static io.dockstore.client.cli.YamlVerify.YAML;
 
 /**
@@ -36,6 +37,7 @@ import static io.dockstore.client.cli.YamlVerify.YAML;
 public final class YamlClient {
 
     public static final String NO_PATH_FLAG = "ERROR: Missing --path <path>";
+    public static final String VALIDATE_HELP_MESSAGE = "Verifies " + DOCKSTOREYML + " is correct and ensures all required files are present";
     public static final String PATH_ON_COMPUTER = "Path on computer (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)";
     private static final Logger LOG = LoggerFactory.getLogger(YamlClient.class);
 
@@ -99,11 +101,11 @@ public final class YamlClient {
 
     }
 
-    @Parameters(separators = "=", commandDescription = "Verifies .dockstore.yml is correct and ensures all required files are present")
+    @Parameters(separators = "=", commandDescription = VALIDATE_HELP_MESSAGE)
     private static class CommandYamlValidate {
         @Parameter(names = "--path", description = PATH_ON_COMPUTER, required = false)
         private static String path = null;
-        @Parameter(names = "--help", description = "Verifies that .dockstore.yml has the correct fields, and that all the required files are present", help = true)
+        @Parameter(names = "--help", description = VALIDATE_HELP_MESSAGE, help = true)
         private boolean help = false;
     }
 
