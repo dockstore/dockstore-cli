@@ -50,12 +50,10 @@ public class YamlClientIT extends BaseIT {
         Client.DEBUG.set(false);
     }
 
-
-
     @Test
     public void missingPathParameter() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "validate" });
-        Assert.assertTrue(systemOutRule.getLog().contains(YamlClient.NO_PATH_FLAG));
+        Assert.assertTrue(systemOutRule.getLog().contains("The following option is required: [--path]"));
         Assert.assertTrue(systemOutRule.getLog().contains("Usage: dockstore"));
         systemOutRule.clearLog();
     }
@@ -63,7 +61,7 @@ public class YamlClientIT extends BaseIT {
     @Test
     public void verifyErrorMessagesArePrinted() throws IOException {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "validate", "--path", testDirectory });
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "--path", testDirectory, "validate" });
         String errorMsg = YamlVerify.INVALID_FILE_STRUCTURE
             + testDirectory + "/dockstore.wdl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
             + testDirectory + "/Dockstore.cwl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n";
@@ -75,13 +73,11 @@ public class YamlClientIT extends BaseIT {
     @Test
     public void completeRun() throws IOException {
         final String testDirectory = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory";
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "validate", "--path", testDirectory });
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "--path", testDirectory, "validate" });
         String successMsg = testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.VALID_YAML_ONLY + "\n"
             + testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.VALID_DOCKSTORE_YML + "\n";
         assertTrue(systemOutRule.getLog().contains(successMsg));
         systemOutRule.clearLog();
     }
-
-
 
 }

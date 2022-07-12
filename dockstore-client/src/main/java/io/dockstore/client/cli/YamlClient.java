@@ -27,18 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
-import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelpYaml;
 import static io.dockstore.client.cli.YamlVerify.DOCKSTOREYML;
 import static io.dockstore.client.cli.YamlVerify.YAML;
 
-/**
- *
- */
 public final class YamlClient {
 
-    public static final String NO_PATH_FLAG = "ERROR: Missing --path <path>";
     public static final String VALIDATE_HELP_MESSAGE = "Verifies " + DOCKSTOREYML + " is correct and ensures all required files are present";
-    public static final String PATH_ON_COMPUTER = "Path on computer (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)";
     private static final Logger LOG = LoggerFactory.getLogger(YamlClient.class);
 
 
@@ -57,38 +51,35 @@ public final class YamlClient {
         CommandYaml commandYaml = new CommandYaml();
         JCommander jcPlugin = JCommanderUtility.addCommand(jc, YAML, commandYaml);
         CommandYamlValidate commandYamlValidate = new CommandYamlValidate();
-        commandYamlValidate = new CommandYamlValidate();
         JCommanderUtility.addCommand(jcPlugin, "validate", commandYamlValidate);
-
-        // Not parsing with jc because we know the first command was plugin.  jc's purpose is to display help
-        jcPlugin.parse(argv);
         try {
-            if (args.isEmpty() || commandYaml.help) {
-                printJCommanderHelpYaml(jc, "dockstore", YAML);
-            } else {
-                switch (jcPlugin.getParsedCommand()) {
-                case "validate":
-                    if (commandYamlValidate.help) {
-                        printJCommanderHelpYaml(jc, "dockstore", YAML);
-                    } else if (commandYamlValidate.path == null) {
-                        printJCommanderHelpYaml(jc, "dockstore", YAML);
-                        out(NO_PATH_FLAG);
-                    } else {
-                        try {
-                            YamlVerify.dockstoreValidate(CommandYamlValidate.path);
-                        } catch (ValidateYamlException Ex) {
-                            out(Ex.getMessage());
-                        }
-                        return true;
-                    }
-                    break;
-                default:
-                    // fall through
-                }
-            }
-        } catch (ParameterException e) {
+            jcPlugin.parse(argv);
+        } catch (ParameterException Ex) {
             printJCommanderHelp(jc, "dockstore", YAML);
+            out(Ex.getMessage());
+            return true;
         }
+        if (args.isEmpty() || commandYaml.help) {
+            printJCommanderHelp(jc, "dockstore", YAML);
+        } else {
+            switch (jcPlugin.getParsedCommand()) {
+            case "validate":
+                if (commandYamlValidate.help) {
+                    printJCommanderHelp(jc, "dockstore", YAML);
+                } else {
+                    try {
+                        YamlVerify.dockstoreValidate(CommandYaml.path);
+                    } catch (ValidateYamlException Ex) {
+                        out(Ex.getMessage());
+                    }
+                    return true;
+                }
+                break;
+            default:
+                // fall through
+            }
+        }
+
         return true;
 
     }
@@ -96,15 +87,14 @@ public final class YamlClient {
 
     @Parameters(separators = "=", commandDescription = "Tools used for " + YAML + " files")
     private static class CommandYaml {
+        @Parameter(names = "--path", description = "Path to " + DOCKSTOREYML + " (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)", required = true)
+        private static String path = null;
         @Parameter(names = "--help", description = "Prints help for " + YAML + " command", help = true)
         private boolean help = false;
-
     }
 
     @Parameters(separators = "=", commandDescription = VALIDATE_HELP_MESSAGE)
     private static class CommandYamlValidate {
-        @Parameter(names = "--path", description = PATH_ON_COMPUTER, required = false)
-        private static String path = null;
         @Parameter(names = "--help", description = VALIDATE_HELP_MESSAGE, help = true)
         private boolean help = false;
     }
