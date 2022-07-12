@@ -16,6 +16,9 @@
 
 package io.dockstore.client.cli;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -103,7 +106,63 @@ public class YamlValidatorTest {
 
     @Test
     public void allFilesNotPresent() {
-        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present";
+        final String baseTestDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present/";
+        List<String> directoryEnds1 = Arrays.asList("tool", "service", "workflow");
+        for (String directoryEnd : directoryEnds1) {
+            String testDirectory = baseTestDirectory + directoryEnd;
+            String errorMsg = YamlVerify.INVALID_FILE_STRUCTURE
+                + testDirectory + "/dockstore.wdl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/dockstore.cwl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/Dockstore.cwl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/Dockstore2.wdl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n";
+            try {
+                YamlVerify.dockstoreValidate(testDirectory);
+                fail("non-present test files not caught");
+            } catch (YamlVerify.ValidateYamlException ex) {
+                assertEquals(errorMsg, ex.getMessage());
+            }
+        }
+        List<String> directoryEnds2 = Arrays.asList("multiple-workflows", "multiple-tools", "workflows-and-tools-1", "workflows-and-tools-2");
+        for (String directoryEnd : directoryEnds2) {
+            String testDirectory = baseTestDirectory + directoryEnd;
+            String errorMsg = YamlVerify.INVALID_FILE_STRUCTURE
+                + testDirectory + "/dockstore.wdl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/dockstore.cwl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/Dockstore2.wdl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/dockstore2.wdl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/dockstore2.cwl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/Dockstore2.cwl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/Dockstore3.wdl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/Dockstore.cwl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n";
+            try {
+                YamlVerify.dockstoreValidate(testDirectory);
+                fail("non-present test files not caught");
+            } catch (YamlVerify.ValidateYamlException ex) {
+                assertEquals(errorMsg, ex.getMessage());
+            }
+        }
+    }
+
+
+    @Test
+    public void allFilesNotPresentTool() {
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present/tool";
+        try {
+            YamlVerify.dockstoreValidate(testDirectory);
+            fail("non-present test files not caught");
+        } catch (YamlVerify.ValidateYamlException ex) {
+            String errorMsg = YamlVerify.INVALID_FILE_STRUCTURE
+                + testDirectory + "/dockstore.wdl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/dockstore.cwl.json" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/Dockstore.cwl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n"
+                + testDirectory + "/Dockstore2.wdl" + YamlVerify.FILE_DOES_NOT_EXIST + "\n";
+            assertEquals(errorMsg, ex.getMessage());
+        }
+    }
+
+    @Test
+    public void allFilesNotPresentService() {
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present/service";
         try {
             YamlVerify.dockstoreValidate(testDirectory);
             fail("non-present test files not caught");
@@ -152,10 +211,7 @@ public class YamlValidatorTest {
             YamlVerify.dockstoreValidate(testDirectory);
             fail("non-present test files not caught");
         } catch (YamlVerify.ValidateYamlException ex) {
-            String errorMsg = YamlVerify.INVALID_DOCKSTORE_YML
-                + testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.CONTAINS_ERRORS
-                + "Missing property \"primaryDescriptorPath\"";
-            assertEquals(errorMsg, ex.getMessage());
+            assertTrue(ex.getMessage().contains("primaryDescriptorPath"));
             assertEquals(testDirectory + "/" + YamlVerify.DOCKSTOREYML + YamlVerify.VALID_YAML_ONLY + "\n", systemOutRule.getLog());
             systemOutRule.clearLog();
         }
