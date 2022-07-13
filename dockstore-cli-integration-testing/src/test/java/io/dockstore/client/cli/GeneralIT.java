@@ -316,11 +316,13 @@ public class GeneralIT extends BaseIT {
     public void testTool2JSONWDL() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser2/quayandgithubwdl" });
+        // need to refresh to overrride bad data in ye-olde seed DB that trips up improved validation now
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "tool", "refresh", "--entry",
+            "quay.io/dockstoretestuser2/quayandgithubwdl", "--script" });
         // need to publish before converting
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "tool", "convert", "entry2json", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithubwdl", "--descriptor", "wdl", "--script" });
-        // TODO: Test that output is the expected WDL file
         Assert.assertTrue(systemOutRule.getLog().contains("\"test.hello.name\": \"String\""));
     }
 
