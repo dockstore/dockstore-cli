@@ -16,22 +16,22 @@
 
 package io.dockstore.client.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import static io.dockstore.client.cli.ArgumentUtility.out;
 
 import io.dockstore.common.yaml.DockstoreYaml12;
 import io.dockstore.common.yaml.DockstoreYamlHelper;
 import io.dockstore.common.yaml.Service12;
 import io.dockstore.common.yaml.YamlWorkflow;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import org.yaml.snakeyaml.Yaml;
-
-import static io.dockstore.client.cli.ArgumentUtility.out;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import software.amazon.awssdk.utils.Platform;
 
 /*
     GENERAL STEPS:
@@ -47,14 +47,14 @@ public final class YamlVerifyUtility {
     public static final String YAML = "yaml";
 
     public static final String VALID_DOCKSTORE_YML = " is a valid dockstore yaml file and all required files are present";
-    public static final String INVALID_DOCKSTORE_YML = "Your .dockstore.yml is invalid:\n";
+    public static final String INVALID_DOCKSTORE_YML = "Your .dockstore.yml is invalid:" + System.lineSeparator();
 
-    public static final String CONTAINS_ERRORS = " has the following errors:\n";
+    public static final String CONTAINS_ERRORS = " has the following errors:" + System.lineSeparator();
     public static final String EMPTY_FILE = " is empty";
     public static final String FILE_DOES_NOT_EXIST = " does not exist";
-    public static final String INVALID_FILE_STRUCTURE = "Your file structure has the following errors:\n";
+    public static final String INVALID_FILE_STRUCTURE = "Your file structure has the following errors:" + System.lineSeparator();
 
-    public static final String INVALID_YAML = " is not a valid " + YAML + "file:\n";
+    public static final String INVALID_YAML = " is not a valid " + YAML + "file:" + System.lineSeparator();
     // This message is displayed when it is determined that DOCKSTOREYML is a valid yaml file,
     // but displaying this message does NOT mean DOCKSTOREYML is a valid dockstore yaml file
     public static final String VALID_YAML_ONLY = " is a valid " + YAML + " file";
@@ -106,7 +106,7 @@ public final class YamlVerifyUtility {
         if (!missingFiles.isEmpty()) {
             StringBuilder errorMsgBuild = new StringBuilder();
             for (String missingFile: missingFiles) {
-                errorMsgBuild.append(missingFile + '\n');
+                errorMsgBuild.append(missingFile + System.lineSeparator());
             }
             String errorMsg = errorMsgBuild.toString();
             throw new ValidateYamlException(INVALID_FILE_STRUCTURE + errorMsg);
@@ -139,7 +139,7 @@ public final class YamlVerifyUtility {
             dockstoreYmlString = Files.readString(dockstoreYmlPath);
         } catch (IOException ex) {
             // Unlikely to ever catch
-            throw new ValidateYamlException("Error reading " + dockstoreYmlPath.toString() + " :\n" + ex.getMessage());
+            throw new ValidateYamlException("Error reading " + dockstoreYmlPath.toString() + " :" +  System.lineSeparator() + ex.getMessage());
         }
 
         // Verify that the Yaml is valid, however does not verify it is valid for dockstore
