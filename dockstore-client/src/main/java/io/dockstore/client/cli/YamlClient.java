@@ -22,8 +22,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import io.dockstore.client.cli.YamlVerify.ValidateYamlException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
@@ -62,14 +60,10 @@ public final class YamlClient {
         } else {
             switch (jcPlugin.getParsedCommand()) {
             case "validate":
-                if (commandYamlValidate.help) {
-                    printJCommanderHelp(jc, "dockstore", YAML);
-                } else {
-                    try {
-                        YamlVerify.dockstoreValidate(CommandYaml.path);
-                    } catch (ValidateYamlException ex) {
-                        out(ex.getMessage());
-                    }
+                try {
+                    YamlVerify.dockstoreValidate(CommandYaml.path);
+                } catch (ValidateYamlException ex) {
+                    out(ex.getMessage());
                 }
                 break;
             default:
