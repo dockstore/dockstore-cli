@@ -59,7 +59,7 @@ public final class YamlClient {
             out(Ex.getMessage());
             return true;
         }
-        if (args.isEmpty() || commandYaml.help) {
+        if (commandYaml.help) {
             printJCommanderHelp(jc, "dockstore", YAML);
         } else {
             switch (jcPlugin.getParsedCommand()) {
@@ -72,16 +72,13 @@ public final class YamlClient {
                     } catch (ValidateYamlException Ex) {
                         out(Ex.getMessage());
                     }
-                    return true;
                 }
                 break;
             default:
                 // fall through
             }
         }
-
         return true;
-
     }
 
 
