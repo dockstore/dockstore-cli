@@ -60,7 +60,7 @@ public class YamlClientIT extends BaseIT {
     @Test
     public void verifyErrorMessagesArePrinted() throws IOException {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "--path", testDirectory, "validate" });
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "--path", testDirectory, YamlVerifyUtility.COMMAND_NAME });
         String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
             + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
             + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
@@ -72,7 +72,7 @@ public class YamlClientIT extends BaseIT {
     @Test
     public void completeRun() throws IOException {
         final String testDirectory = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory";
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "--path", testDirectory, "validate" });
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "--path", testDirectory, YamlVerifyUtility.COMMAND_NAME });
         String successMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
             + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
         assertTrue(systemOutRule.getLog().contains(successMsg));

@@ -44,6 +44,7 @@ import software.amazon.awssdk.utils.Platform;
 public final class YamlVerifyUtility {
 
     public static final String DOCKSTOREYML = ".dockstore.yml";
+    public static final String COMMAND_NAME = "validate";
     public static final String YAML = "yaml";
 
     public static final String VALID_DOCKSTORE_YML = " is a valid dockstore yaml file and all required files are present";

@@ -401,7 +401,7 @@ public class ClientIT extends BaseIT {
 
         checkCommandForHelp(new String[] { YAML});
         checkCommandForHelp(new String[] { YAML, "--help" });
-        checkCommandForHelp(new String[] { YAML, "validate", "--help" });
+        checkCommandForHelp(new String[] { YAML, YamlVerifyUtility.COMMAND_NAME, "--help" });
     }
 
     private void checkCommandForHelp(String[] argv) throws IOException {

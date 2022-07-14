@@ -47,7 +47,7 @@ public final class YamlClient {
         CommandYaml commandYaml = new CommandYaml();
         JCommander jcPlugin = JCommanderUtility.addCommand(jc, YAML, commandYaml);
         CommandYamlValidate commandYamlValidate = new CommandYamlValidate();
-        JCommanderUtility.addCommand(jcPlugin, "validate", commandYamlValidate);
+        JCommanderUtility.addCommand(jcPlugin, YamlVerifyUtility.COMMAND_NAME, commandYamlValidate);
         try {
             jcPlugin.parse(argv);
         } catch (ParameterException ex) {
@@ -59,7 +59,7 @@ public final class YamlClient {
             printJCommanderHelp(jc, "dockstore", YAML);
         } else {
             switch (jcPlugin.getParsedCommand()) {
-            case "validate":
+            case YamlVerifyUtility.COMMAND_NAME:
                 try {
                     YamlVerifyUtility.dockstoreValidate(CommandYaml.path);
                 } catch (ValidateYamlException ex) {
