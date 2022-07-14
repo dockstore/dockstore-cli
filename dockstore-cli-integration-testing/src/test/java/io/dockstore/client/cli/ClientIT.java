@@ -41,7 +41,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 
 import static io.dockstore.client.cli.Client.API_ERROR;
-import static io.dockstore.client.cli.YamlVerify.YAML;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.common.CommonTestUtilities.checkToolList;
 
 /**

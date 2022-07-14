@@ -40,7 +40,7 @@ import static io.dockstore.client.cli.ArgumentUtility.out;
     4. Verify that all files exist
  */
 
-public final class YamlVerify {
+public final class YamlVerifyUtility {
 
     public static final String DOCKSTOREYML = ".dockstore.yml";
     public static final String YAML = "yaml";
@@ -60,7 +60,7 @@ public final class YamlVerify {
 
 
 
-    private YamlVerify() {
+    private YamlVerifyUtility() {
     }
     // Determines if all the files referenced in a list of strings exist
     private static List<String> filesExist(List<String> paths, String base) {
