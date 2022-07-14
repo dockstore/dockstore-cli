@@ -91,7 +91,7 @@ public class YamlValidatorTest {
     }
 
     // Invalid Yaml test
-    @Ignore // This test case is failing due to errors in DockstoreYamlHelper.readAsDockstoreYaml12(contents) see https://github.com/dockstore/dockstore/issues/4985
+    @Ignore("This test case is failing due to errors in DockstoreYamlHelper.readAsDockstoreYaml12(contents) see GitHub issue 4985")
     @Test
     public void yamlNotAcceptableForDockstore() {
         final String testDirectory1 = "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName";

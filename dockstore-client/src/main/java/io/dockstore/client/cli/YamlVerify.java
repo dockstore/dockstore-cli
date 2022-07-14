@@ -65,7 +65,7 @@ public final class YamlVerify {
     }
     // Determines if all the files referenced in a list of strings exist
     private static List<String> filesExist(List<String> paths, String base) {
-        List<String> missingFiles = new ArrayList<String>();
+        List<String> missingFiles = new ArrayList<>();
         for (String path : paths) {
             Path pathToFile = Paths.get(base, path);
             if (!Files.exists(pathToFile)) {
@@ -77,7 +77,7 @@ public final class YamlVerify {
 
     // Determines if all the files in dockstoreYaml12 exist
     private static void allFilesExist(DockstoreYaml12 dockstoreYaml12, String basePath) throws ValidateYamlException {
-        List<String> missingFiles = new ArrayList<String>();
+        List<String> missingFiles = new ArrayList<>();
 
         // Check Workflows
         List<YamlWorkflow> workflows = dockstoreYaml12.getWorkflows();
@@ -104,10 +104,11 @@ public final class YamlVerify {
             missingFiles.addAll(filesExist(service.getFiles(), basePath));
         }
         if (!missingFiles.isEmpty()) {
-            String errorMsg = "";
+            StringBuilder errorMsgBuild = new StringBuilder();
             for (String missingFile: missingFiles) {
-                errorMsg += missingFile + '\n';
+                errorMsgBuild.append(missingFile + '\n');
             }
+            String errorMsg = errorMsgBuild.toString();
             throw new ValidateYamlException(INVALID_FILE_STRUCTURE + errorMsg);
         }
     }
@@ -143,9 +144,8 @@ public final class YamlVerify {
 
         // Verify that the Yaml is valid, however does not verify it is valid for dockstore
         Yaml yaml = new Yaml();
-        Map<String, Object> data = null;
         try {
-            data = yaml.load(Files.readString(dockstoreYmlPath));
+            yaml.load(Files.readString(dockstoreYmlPath));
             out(dockstoreYmlPath + VALID_YAML_ONLY);
         } catch (Exception ex) {
             throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + INVALID_YAML + ex.getMessage());
