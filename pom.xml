@@ -753,11 +753,10 @@
         </profile>
         <profile>
             <id>bitbucket-tests</id>
-            <!-- run non-confidential tests -->
             <properties>
                 <skipTests>true</skipTests>
                 <skipITs>false</skipITs>
-                <Groups>io.dockstore.common.BitBucketTest</Groups>
+                <groups>io.dockstore.common.BitBucketTest</groups>
             </properties>
         </profile>
         <profile>
