@@ -76,7 +76,7 @@ public final class YamlClient {
 
     @Parameters(separators = "=", commandDescription = "Tools used for " + YAML + " files")
     private static class CommandYaml {
-        @Parameter(names = "--path", description = "Path to " + DOCKSTOREYML + " (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)", required = true)
+        @Parameter(names = "--path", description = "Directory that contains " + DOCKSTOREYML + " (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)", required = true)
         private static String path = null;
         @Parameter(names = "--help", description = "Prints help for " + YAML + " command", help = true)
         private boolean help = false;
