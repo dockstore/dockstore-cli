@@ -33,8 +33,6 @@ import static io.dockstore.client.cli.YamlVerify.YAML;
 public final class YamlClient {
 
     public static final String VALIDATE_HELP_MESSAGE = "Verifies " + DOCKSTOREYML + " is correct and ensures all required files are present";
-    private static final Logger LOG = LoggerFactory.getLogger(YamlClient.class);
-
 
     private YamlClient() {
         // disable constructor for utility class
@@ -54,9 +52,9 @@ public final class YamlClient {
         JCommanderUtility.addCommand(jcPlugin, "validate", commandYamlValidate);
         try {
             jcPlugin.parse(argv);
-        } catch (ParameterException Ex) {
+        } catch (ParameterException ex) {
             printJCommanderHelp(jc, "dockstore", YAML);
-            out(Ex.getMessage());
+            out(ex.getMessage());
             return true;
         }
         if (commandYaml.help) {
@@ -69,8 +67,8 @@ public final class YamlClient {
                 } else {
                     try {
                         YamlVerify.dockstoreValidate(CommandYaml.path);
-                    } catch (ValidateYamlException Ex) {
-                        out(Ex.getMessage());
+                    } catch (ValidateYamlException ex) {
+                        out(ex.getMessage());
                     }
                 }
                 break;
