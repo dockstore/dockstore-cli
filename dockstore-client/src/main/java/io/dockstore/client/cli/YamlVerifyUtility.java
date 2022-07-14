@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,9 +143,9 @@ public final class YamlVerifyUtility {
         }
 
         // Verify that the Yaml is valid, however does not verify it is valid for dockstore
-        Yaml yaml = new Yaml();
+        final Yaml safeYaml = new Yaml(new SafeConstructor());
         try {
-            yaml.load(Files.readString(dockstoreYmlPath));
+            safeYaml.load(Files.readString(dockstoreYmlPath));
             out(dockstoreYmlPath + VALID_YAML_ONLY);
         } catch (Exception ex) {
             throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + INVALID_YAML + ex.getMessage());
