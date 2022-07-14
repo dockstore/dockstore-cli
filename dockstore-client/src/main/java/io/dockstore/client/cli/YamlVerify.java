@@ -81,7 +81,7 @@ public final class YamlVerify {
 
         // Check Workflows
         List<YamlWorkflow> workflows = dockstoreYaml12.getWorkflows();
-        if (workflows != null) {
+        if (!workflows.isEmpty()) {
             for (YamlWorkflow workflow : workflows) {
                 List<String> filePaths = workflow.getTestParameterFiles();
                 filePaths.add(workflow.getPrimaryDescriptorPath());
@@ -90,7 +90,7 @@ public final class YamlVerify {
         }
         // Check Tools
         List<YamlWorkflow> tools = dockstoreYaml12.getTools();
-        if (tools != null) {
+        if (!tools.isEmpty()) {
             for (YamlWorkflow tool : tools) {
                 List<String> filePaths = tool.getTestParameterFiles();
                 filePaths.add(tool.getPrimaryDescriptorPath());
