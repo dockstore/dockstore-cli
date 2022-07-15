@@ -471,23 +471,6 @@ public class BasicIT extends BaseIT {
         Assert.assertEquals("the given entry should be published", 1, count);
     }
 
-    /*
-     * Test Quay and Bitbucket -
-     * These tests are focused on testing entries created from Quay and Bitbucket repositories
-     */
-
-    /**
-     * Checks that the two Quay/Bitbucket entrys were automatically found
-     */
-    @Test
-    public void testQuayBitbucketAutoRegistration() {
-
-        final long count = testingPostgres.runSelectStatement(
-            "select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath() + "' and giturl like 'git@bitbucket.org%'",
-            long.class);
-        Assert.assertEquals("there should be 2 registered from Quay and Bitbucket", 2, count);
-    }
-
 
     /*
      * Test Quay and Gitlab -
@@ -687,77 +670,7 @@ public class BasicIT extends BaseIT {
 
     }
 
-    /*
-     * Test dockerhub and bitbucket -
-     * These tests are focused on testing entrys created from Dockerhub and Bitbucket repositories
-     */
 
-    /**
-     * Tests manual registration and unpublishing of a Dockerhub/Bitbucket entry
-     */
-    @Test
-    public void testDockerhubBitbucketManualRegistration() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
-            "dockerhubandbitbucket", "--git-url", "git@bitbucket.org:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master",
-            "--toolname", "regular", "--script" });
-
-        final long count = testingPostgres
-            .runSelectStatement("select count(*) from tool where toolname = 'regular' and ispublished='t'", long.class);
-
-        Assert.assertEquals("there should be 1 entries, there are " + count, 1, count);
-
-        // Unpublish
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandbitbucket/regular", "--script" });
-        final long count2 = testingPostgres
-            .runSelectStatement("select count(*) from tool where toolname = 'regular' and ispublished='t'", long.class);
-
-        Assert.assertEquals("there should be 0 entries, there are " + count2, 0, count2);
-    }
-
-
-    /**
-     * Checks that you can manually publish and unpublish a Dockerhub/Bitbucket duplicate if different toolnames are set (but same Path)
-     */
-    @Test
-    public void testDockerhubBitbucketManualRegistrationDuplicates() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
-            "dockerhubandbitbucket", "--git-url", "git@bitbucket.org:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master",
-            "--toolname", "regular", "--script" });
-
-        final long count = testingPostgres
-            .runSelectStatement("select count(*) from tool where toolname = 'regular' and ispublished='t'", long.class);
-
-        Assert.assertEquals("there should be 1 entry", 1, count);
-
-        // Add duplicate entry with different toolname
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
-            "dockerhubandbitbucket", "--git-url", "git@bitbucket.org:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master",
-            "--toolname", "regular2", "--script" });
-
-        // Unpublish the duplicate entrys
-        final long count2 = testingPostgres
-            .runSelectStatement("select count(*) from tool where toolname like 'regular%' and ispublished='t'", long.class);
-        Assert.assertEquals("there should be 2 entries", 2, count2);
-
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandbitbucket/regular", "--script" });
-        final long count3 = testingPostgres
-            .runSelectStatement("select count(*) from tool where toolname = 'regular2' and ispublished='t'", long.class);
-
-        Assert.assertEquals("there should be 1 entry", 1, count3);
-
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandbitbucket/regular2", "--script" });
-        final long count4 = testingPostgres
-            .runSelectStatement("select count(*) from tool where toolname like 'regular%' and ispublished='t'", long.class);
-
-        Assert.assertEquals("there should be 0 entries", 0, count4);
-
-    }
 
     /*
      * Test dockerhub and gitlab -
