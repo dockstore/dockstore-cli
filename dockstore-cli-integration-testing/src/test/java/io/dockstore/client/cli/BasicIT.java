@@ -489,33 +489,6 @@ public class BasicIT extends BaseIT {
     }
 
 
-    /**
-     * Checks that you can manually publish and unpublish a Quay/Bitbucket entry with an alternate structure, if the CWL and Dockerfile paths are defined properly
-     */
-    @Test
-    public void testQuayBitbucketManualPublishAndUnpublishAlternateStructure() {
-        // Manual Publish
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandbitbucketalternate",
-            "--git-url", "git@bitbucket.org:DockstoreTestUser/quayandbitbucketalternate.git", "--git-reference", "master", "--toolname",
-            "alternate", "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", "--script" });
-
-        final long count = testingPostgres
-            .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
-
-        Assert.assertEquals("there should be 1 entries, there are " + count, 1, count);
-
-        // Unpublish
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "quay.io/dockstoretestuser/quayandbitbucketalternate/alternate", "--script" });
-        final long count2 = testingPostgres
-            .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
-
-        Assert.assertEquals("there should be 0 entries, there are " + count2, 0, count2);
-
-    }
-
-
     /*
      * Test Quay and Gitlab -
      * These tests are focused on testing entries created from Quay and Gitlab repositories
