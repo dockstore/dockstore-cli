@@ -961,6 +961,26 @@ public class GeneralWorkflowIT extends BaseIT {
         assertEquals("there should be one verified workflowversion, there are " + count5, 1, count5);
     }
 
+    /**
+     * This tests that you can refresh user data by refreshing a workflow
+     * ONLY WORKS if the current user in the database dump has no metadata, and on Github there is metadata (bio, location)
+     * If the user has metadata, test will pass as long as the user's metadata isn't the same as Github already
+     *
+     * Ignoring this one for 1.9, since we don't have the refresh endpoint any more
+     */
+    @Ignore
+    @Test
+    public void testRefreshingUserMetadata() {
+        // Refresh all workflows
+        refreshByOrganizationReplacement(USER_2_USERNAME);
+
+        // Check that user has been updated
+        // TODO: bizarrely, the new GitHub Java API library doesn't seem to handle bio
+        // final long count = testingPostgres.runSelectStatement("select count(*) from enduser where location='Toronto' and bio='I am a test user'", long.class);
+        final long count = testingPostgres.runSelectStatement("select count(*) from user_profile where location='Toronto'", long.class);
+        assertEquals("One user should have this info now, there are  " + count, 1, count);
+    }
+
     @Test
     public void testGenerateDOIFrozenVersion() throws ApiException {
         // Set up webservice
