@@ -16,18 +16,17 @@
 
 package io.dockstore.client.cli;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class YamlValidatorTest {
 
@@ -115,7 +114,7 @@ public class YamlValidatorTest {
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/dockstore.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore2.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
+                + testDirectory + "/Dockstore2.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
             try {
                 YamlVerifyUtility.dockstoreValidate(testDirectory);
                 fail("non-present test files not caught");
@@ -134,30 +133,13 @@ public class YamlValidatorTest {
                 + testDirectory + "/dockstore2.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore2.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore3.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
+                + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
             try {
                 YamlVerifyUtility.dockstoreValidate(testDirectory);
                 fail("non-present test files not caught");
             } catch (YamlVerifyUtility.ValidateYamlException ex) {
                 assertEquals(errorMsg, ex.getMessage());
             }
-        }
-    }
-
-
-    @Test
-    public void allFilesNotPresentTool() {
-        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present/tool";
-        try {
-            YamlVerifyUtility.dockstoreValidate(testDirectory);
-            fail("non-present test files not caught");
-        } catch (YamlVerifyUtility.ValidateYamlException ex) {
-            String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
-                + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/dockstore.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore2.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
-            assertEquals(errorMsg, ex.getMessage());
         }
     }
 
@@ -172,7 +154,7 @@ public class YamlValidatorTest {
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/dockstore.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore2.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
+                + testDirectory + "/Dockstore2.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
             assertEquals(errorMsg, ex.getMessage());
         }
     }
@@ -200,7 +182,7 @@ public class YamlValidatorTest {
         } catch (YamlVerifyUtility.ValidateYamlException ex) {
             String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
+                + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
             assertEquals(errorMsg, ex.getMessage());
         }
     }
@@ -220,7 +202,7 @@ public class YamlValidatorTest {
 
     @Test
     public void incorrectlyNamedField() {
-        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/incorrectly-named-paramter-in-yml";
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/incorrectly-named-parameter-in-yml";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
             fail("non-present test files not caught");
@@ -253,7 +235,7 @@ public class YamlValidatorTest {
         } catch (YamlVerifyUtility.ValidateYamlException ex) {
             String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
+                + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
             assertEquals(errorMsg, ex.getMessage());
         }
     }
