@@ -16,12 +16,6 @@
 
 package io.dockstore.client.cli;
 
-import static io.dockstore.client.cli.ArgumentUtility.out;
-
-import io.dockstore.common.yaml.DockstoreYaml12;
-import io.dockstore.common.yaml.DockstoreYamlHelper;
-import io.dockstore.common.yaml.Service12;
-import io.dockstore.common.yaml.YamlWorkflow;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,9 +23,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.dockstore.common.yaml.DockstoreYaml12;
+import io.dockstore.common.yaml.DockstoreYamlHelper;
+import io.dockstore.common.yaml.Service12;
+import io.dockstore.common.yaml.YamlWorkflow;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
-import software.amazon.awssdk.utils.Platform;
+
+import static io.dockstore.client.cli.ArgumentUtility.out;
 
 /*
     GENERAL STEPS:
@@ -46,6 +46,7 @@ public final class YamlVerifyUtility {
     public static final String DOCKSTOREYML = ".dockstore.yml";
     public static final String COMMAND_NAME = "validate";
     public static final String YAML = "yaml";
+    public static final String GITHUB_DIRECTORY_NAME = ".github";
 
     public static final String VALID_DOCKSTORE_YML = " is a valid dockstore yaml file and all required files are present";
     public static final String INVALID_DOCKSTORE_YML = "Your .dockstore.yml is invalid:" + System.lineSeparator();
@@ -166,6 +167,10 @@ public final class YamlVerifyUtility {
             dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(dockstoreYmlString);
         } catch (Exception ex) {
             throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + CONTAINS_ERRORS + ex.getMessage());
+        }
+
+        if (workflowPath.endsWith(GITHUB_DIRECTORY_NAME)) {
+            workflowPath = workflowPath.getParent();
         }
 
         // Determines if all referenced files exist

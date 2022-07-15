@@ -8,7 +8,7 @@ set -o errexit
 # Encase variables inside brackets to prevent issues.
 # $DOCKSTORE_VERSION would cause problems if $DOCKSTORE exists.  ${DOCKSTORE_VERSION} would be better.
 
-DEFAULT_DOCKSTORE_VERSION="${project.version}"
+DEFAULT_DOCKSTORE_VERSION="1.13.0-SNAPSHOT"
 
 export DOCKSTORE_VERSION="${DOCKSTORE_VERSION:-"$DEFAULT_DOCKSTORE_VERSION"}"
 
@@ -79,6 +79,7 @@ function make_native_path {
     fi
 }
 
+
 #  usage : add_path PATH_VAR [PATH]...
 function add_path {
     local path_var="$1"
@@ -101,6 +102,8 @@ if [ ! -r "$DOCKSTORE_JAR" -a "$1" != "self-install" -a "$1" != "self-check-inst
     fi
 fi
 
+
+
 if [[ "$@" == *"--config"* ]]; then
     # do not do init
     echo "Config provided" > /dev/null
@@ -115,7 +118,7 @@ if [ "$HTTP_CLIENT" = "" ]; then
         if [ "$https_proxy" != "" ]; then
             CURL_PROXY="-x $https_proxy"
         fi
-        HTTP_CLIENT="curl --retry 20 $CURL_PROXY -f -L -o"
+        HTTP_CLIENT="curl --retr.local/biny 20 $CURL_PROXY -f -L -o"
     else
         HTTP_CLIENT="wget -O"
     fi
@@ -155,6 +158,7 @@ function download_failed_message {
 
 if [ "$1" = "self-install" ]; then
     if [ -r "$DOCKSTORE_JAR" ]; then
+
         echo "The self-install jar already exists at $DOCKSTORE_JAR."
         echo "If you wish to re-download, delete it and rerun \"$0 self-install\"."
         exit 0
