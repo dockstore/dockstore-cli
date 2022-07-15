@@ -8,6 +8,7 @@ import io.dockstore.common.Registry;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -170,6 +171,21 @@ public class BitBucketBasicIT extends BaseIT {
 
     }
 
+
+    /**
+     * Will test attempting to manually publish a Dockerhub/Bitbucket entry using incorrect CWL and/or dockerfile locations
+     */
+    @Ignore
+    @Test
+    public void testDockerhubBitbucketWrongStructure() {
+        // Todo : Manual publish entry with wrong cwl and dockerfile locations, should not be able to manual publish
+        systemExit.expectSystemExitWithStatus(Client.GENERIC_ERROR);
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+            Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
+            "dockerhubandbitbucketalternate", "--git-url", "git@bitbucket.org:DockstoreTestUser/quayandbitbucketalterante.git",
+            "--git-reference", "master", "--toolname", "alternate", "--cwl-path", "/Dockstore.cwl", "--dockerfile-path", "/Dockerfile",
+            "--script" });
+    }
 
 
 }
