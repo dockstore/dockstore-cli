@@ -16,20 +16,19 @@
 
 package io.dockstore.client.cli;
 
-import java.io.IOException;
+import static org.junit.Assert.assertTrue;
 
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.TestUtility;
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-
-import static org.junit.Assert.assertTrue;
 
 public class YamlClientIT extends BaseIT {
 
@@ -77,6 +76,14 @@ public class YamlClientIT extends BaseIT {
             + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
         assertTrue(systemOutRule.getLog().contains(successMsg));
         systemOutRule.clearLog();
+    }
+
+    @Test
+    public void noCommandGiven() throws IOException {
+        final String testDirectory = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory";
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "yaml", "--path", testDirectory });
+        assertTrue(systemOutRule.getLog().contains("Usage: dockstore"));
+        assertTrue(systemOutRule.getLog().contains(YamlClient.ERROR_NO_COMMAND));
     }
 
 }

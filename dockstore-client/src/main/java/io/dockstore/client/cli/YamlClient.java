@@ -15,22 +15,22 @@
  */
 package io.dockstore.client.cli;
 
-import java.util.List;
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
+import static io.dockstore.client.cli.YamlVerifyUtility.DOCKSTOREYML;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import io.dockstore.client.cli.YamlVerifyUtility.ValidateYamlException;
-
-import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
-import static io.dockstore.client.cli.YamlVerifyUtility.DOCKSTOREYML;
-import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import java.util.List;
 
 public final class YamlClient {
 
     public static final String VALIDATE_HELP_MESSAGE = "Verifies " + DOCKSTOREYML + " is correct and ensures all required files are present";
+    public static final String ERROR_NO_COMMAND = "ERROR: No command given";
 
     private YamlClient() {
         // disable constructor for utility class
@@ -57,6 +57,9 @@ public final class YamlClient {
         }
         if (commandYaml.help) {
             printJCommanderHelp(jc, "dockstore", YAML);
+        } else if  (jcPlugin.getParsedCommand() == null) {
+            printJCommanderHelp(jc, "dockstore", YAML);
+            out(ERROR_NO_COMMAND);
         } else {
             switch (jcPlugin.getParsedCommand()) {
             case YamlVerifyUtility.COMMAND_NAME:
