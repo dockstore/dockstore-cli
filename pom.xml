@@ -656,7 +656,7 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.BenchmarkTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.client.cli.nested.WestTests,
+                    io.dockstore.client.cli.nested.WesTests,
                     io.dockstore.common.BitBucketTest
                 </excludeGroups>
             </properties>
