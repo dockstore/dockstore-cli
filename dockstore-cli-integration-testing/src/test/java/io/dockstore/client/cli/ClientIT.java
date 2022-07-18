@@ -16,8 +16,8 @@
 
 package io.dockstore.client.cli;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.common.CommonTestUtilities.checkToolList;
 
 import com.google.common.collect.Lists;
 import io.dockstore.common.CommonTestUtilities;
@@ -30,6 +30,8 @@ import io.dockstore.common.ToilCompatibleTest;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiException;
+import java.io.IOException;
+import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -39,10 +41,6 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
-
-import static io.dockstore.client.cli.Client.API_ERROR;
-import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
-import static io.dockstore.common.CommonTestUtilities.checkToolList;
 
 /**
  * @author dyuen
@@ -398,10 +396,6 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "checker", "update", "--help" });
         checkCommandForHelp(new String[] { "checker", "update_version", "--help" });
         checkCommandForHelp(new String[] { "checker", "test_parameter", "--help" });
-
-        checkCommandForHelp(new String[] { YAML});
-        checkCommandForHelp(new String[] { YAML, "--help" });
-        checkCommandForHelp(new String[] { YAML, YamlVerifyUtility.COMMAND_NAME, "--help" });
     }
 
     private void checkCommandForHelp(String[] argv) throws IOException {
