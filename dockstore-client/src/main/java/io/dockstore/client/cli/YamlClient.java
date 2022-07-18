@@ -51,8 +51,14 @@ public final class YamlClient {
         try {
             jcPlugin.parse(argv);
         } catch (ParameterException ex) {
-            printJCommanderHelp(jc, "dockstore", YAML);
-            out(ex.getMessage());
+            if (ex.getJCommander().getParsedCommand() == YamlVerifyUtility.COMMAND_NAME) {
+                printJCommanderHelp(jcPlugin, "dockstore " + YAML, YamlVerifyUtility.COMMAND_NAME);
+                out(ex.getMessage());
+            } else {
+                // Will not be used as validate is the only command with required parameters
+                printJCommanderHelp(jc, "dockstore", YAML);
+                out(ex.getMessage());
+            }
             return true;
         }
         if (commandYaml.help) {
@@ -63,15 +69,20 @@ public final class YamlClient {
         } else {
             switch (jcPlugin.getParsedCommand()) {
             case YamlVerifyUtility.COMMAND_NAME:
-                try {
-                    YamlVerifyUtility.dockstoreValidate(CommandYaml.path);
-                } catch (ValidateYamlException ex) {
-                    out(ex.getMessage());
+                if (CommandYamlValidate.help) {
+                    printJCommanderHelp(jcPlugin, "dockstore " + YAML, YamlVerifyUtility.COMMAND_NAME);
+                } else {
+                    try {
+                        YamlVerifyUtility.dockstoreValidate(CommandYamlValidate.path);
+                    } catch (ValidateYamlException ex) {
+                        out(ex.getMessage());
+                    }
                 }
                 break;
             default:
                 // fall through
             }
+
         }
         return true;
     }
@@ -79,16 +90,16 @@ public final class YamlClient {
 
     @Parameters(separators = "=", commandDescription = "Tools used for " + YAML + " files")
     private static class CommandYaml {
-        @Parameter(names = "--path", description = "Directory that contains " + DOCKSTOREYML + " (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)", required = true)
-        private static String path = null;
         @Parameter(names = "--help", description = "Prints help for " + YAML + " command", help = true)
-        private boolean help = false;
+        private static boolean help = false;
     }
 
     @Parameters(separators = "=", commandDescription = VALIDATE_HELP_MESSAGE)
     private static class CommandYamlValidate {
+        @Parameter(names = "--path", description = "Directory that contains " + DOCKSTOREYML + " (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)", required = true)
+        private static String path = null;
         @Parameter(names = "--help", description = VALIDATE_HELP_MESSAGE, help = true)
-        private boolean help = false;
+        private static boolean help = false;
     }
 
 
