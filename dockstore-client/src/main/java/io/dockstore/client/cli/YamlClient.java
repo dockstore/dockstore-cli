@@ -48,7 +48,6 @@ public final class YamlClient {
         try {
             jcPlugin.parse(argv);
         } catch (ParameterException ex) {
-            out(argv.toString());
             if (ex.getJCommander().getParsedCommand().contains(YamlVerifyUtility.COMMAND_NAME)) {
                 printJCommanderHelp(jcPlugin, "dockstore " + YAML, YamlVerifyUtility.COMMAND_NAME);
                 out(ex.getMessage());
