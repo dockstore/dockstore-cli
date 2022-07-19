@@ -396,6 +396,7 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "checker", "update", "--help" });
         checkCommandForHelp(new String[] { "checker", "update_version", "--help" });
         checkCommandForHelp(new String[] { "checker", "test_parameter", "--help" });
+        Assert.assertTrue(false);
     }
 
     private void checkCommandForHelp(String[] argv) throws IOException {

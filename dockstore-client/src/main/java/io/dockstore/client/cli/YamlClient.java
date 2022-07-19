@@ -32,15 +32,12 @@ public final class YamlClient {
     public static final String VALIDATE_HELP_MESSAGE = "Verifies " + DOCKSTOREYML + " is correct and ensures all required files are present";
     public static final String ERROR_NO_COMMAND = "ERROR: No command given";
 
-    private YamlClient() {
-        // disable constructor for utility class
-    }
 
 
     /**
      * @param args
      */
-    public static boolean handleCommand(List<String> args) {
+    public boolean handleCommand(List<String> args) {
         String[] argv = args.toArray(new String[args.size()]);
         JCommander jc = new JCommander();
 
@@ -51,11 +48,11 @@ public final class YamlClient {
         try {
             jcPlugin.parse(argv);
         } catch (ParameterException ex) {
+            out(argv.toString());
             if (ex.getJCommander().getParsedCommand() == YamlVerifyUtility.COMMAND_NAME) {
                 printJCommanderHelp(jcPlugin, "dockstore " + YAML, YamlVerifyUtility.COMMAND_NAME);
                 out(ex.getMessage());
             } else {
-                // Will not be used as validate is the only command with required parameters
                 printJCommanderHelp(jc, "dockstore", YAML);
                 out(ex.getMessage());
             }
@@ -69,11 +66,11 @@ public final class YamlClient {
         } else {
             switch (jcPlugin.getParsedCommand()) {
             case YamlVerifyUtility.COMMAND_NAME:
-                if (CommandYamlValidate.help) {
+                if (commandYamlValidate.help) {
                     printJCommanderHelp(jcPlugin, "dockstore " + YAML, YamlVerifyUtility.COMMAND_NAME);
                 } else {
                     try {
-                        YamlVerifyUtility.dockstoreValidate(CommandYamlValidate.path);
+                        YamlVerifyUtility.dockstoreValidate(commandYamlValidate.path);
                     } catch (ValidateYamlException ex) {
                         out(ex.getMessage());
                     }
@@ -89,17 +86,17 @@ public final class YamlClient {
 
 
     @Parameters(separators = "=", commandDescription = "Tools used for " + YAML + " files")
-    private static class CommandYaml {
+    private class CommandYaml {
         @Parameter(names = "--help", description = "Prints help for " + YAML + " command", help = true)
-        private static boolean help = false;
+        private boolean help = false;
     }
 
     @Parameters(separators = "=", commandDescription = VALIDATE_HELP_MESSAGE)
-    private static class CommandYamlValidate {
+    private class CommandYamlValidate {
         @Parameter(names = "--path", description = "Directory that contains " + DOCKSTOREYML + " (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)", required = true)
-        private static String path = null;
+        private String path = null;
         @Parameter(names = "--help", description = VALIDATE_HELP_MESSAGE, help = true)
-        private static boolean help = false;
+        private boolean help = false;
     }
 
 

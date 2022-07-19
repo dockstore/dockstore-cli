@@ -45,6 +45,9 @@ public class YamlClientIT extends BaseIT {
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
 
+    public final String yamlHelpMsg = "dockstore yaml --help";
+    public final String validateHelpMsg = "dockstore yaml validate --help";
+
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
@@ -63,6 +66,7 @@ public class YamlClientIT extends BaseIT {
     @Test
     public void verifyErrorMessagesArePrinted() throws IOException {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
+        System.out.println(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
             + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
@@ -75,6 +79,7 @@ public class YamlClientIT extends BaseIT {
     @Test
     public void completeRun() throws IOException {
         final String testDirectory = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory";
+        System.out.println(Lists.newArrayList(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory}));
         Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         String successMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
             + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
@@ -83,20 +88,25 @@ public class YamlClientIT extends BaseIT {
     }
 
 
+    // Tests for when Help message should be generated
+
     @Test
     public void testHelpCommands() throws Exception {
-        final String yamlHelpMsg = "dockstore yaml --help";
-        String validateHelpMsg = "dockstore yaml validate --help";
-
-        checkCommandForHelp(new String[]{YAML}, yamlHelpMsg, YamlClient.ERROR_NO_COMMAND);
         checkCommandForHelp(new String[]{YAML, "--help"}, yamlHelpMsg);
-
-        checkCommandForHelp(new String[]{YAML, "--help", YamlVerifyUtility.COMMAND_NAME}, validateHelpMsg);
-        checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME}, validateHelpMsg, "The following option is required: [--path]");
-        checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME, "--path"}, validateHelpMsg, "Expected a value after parameter --path");
-        checkCommandForHelp(new String[]{YAML, "validate", "--help"}, validateHelpMsg);
+        checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME, "--help"}, validateHelpMsg);
     }
 
+
+
+    // This tests for when a help message should be generated even though no help flag was given
+    // it also tests for the appropriate error message
+    @Test
+    public void testHelpCommandsNoHelpFlag() throws Exception {
+        checkCommandForHelp(new String[]{YAML}, yamlHelpMsg, YamlClient.ERROR_NO_COMMAND);
+        checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME}, validateHelpMsg, "The following option is required: [--path]");
+        checkCommandForHelp(new String[]{YAML, "--path", YamlVerifyUtility.COMMAND_NAME}, "Usage: dockstore yaml");
+        checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME, "--path"}, validateHelpMsg, "Expected a value after parameter --path");
+    }
 
     private void checkCommandForHelp(String[] argv, String helpMsg) throws Exception {
         checkCommandForHelp(argv, helpMsg, " ");
@@ -106,12 +116,9 @@ public class YamlClientIT extends BaseIT {
         final ArrayList<String> strings = Lists.newArrayList(argv);
         strings.add("--config");
         strings.add(TestUtility.getConfigFileLocation(true));
-
         Client.main(strings.toArray(new String[0]));
-        System.out.println(strings);
         Assert.assertTrue(systemOutRule.getLog().contains(helpMsg));
         Assert.assertTrue(systemOutRule.getLog().contains(errorMsg));
         systemOutRule.clearLog();
-        resetDBBetweenTests();
     }
 }
