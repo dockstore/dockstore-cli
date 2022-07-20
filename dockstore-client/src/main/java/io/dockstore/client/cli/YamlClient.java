@@ -92,7 +92,7 @@ public final class YamlClient {
 
     @Parameters(separators = "=", commandDescription = VALIDATE_HELP_MESSAGE)
     private class CommandYamlValidate {
-        @Parameter(names = "--path", description = "Directory that contains " + DOCKSTOREYML + " (ex. /home/usr/Dockstore/test, ~/Dockstore/test, or ../test)", required = true)
+        @Parameter(names = "--path", description = "Directory that contains " + DOCKSTOREYML + " (ex. /home/usr/workflow-repo, ~/Dockstore/.github, or ../biotool)", required = true)
         private String path = null;
         @Parameter(names = "--help", description = VALIDATE_HELP_MESSAGE, help = true)
         private boolean help = false;
