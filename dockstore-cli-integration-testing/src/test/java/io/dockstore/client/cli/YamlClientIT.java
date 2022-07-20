@@ -26,7 +26,6 @@ import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.TestUtility;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -117,8 +116,8 @@ public class YamlClientIT extends BaseIT {
         strings.add("--config");
         strings.add(TestUtility.getConfigFileLocation(true));
         Client.main(strings.toArray(new String[0]));
-        Assert.assertTrue(systemOutRule.getLog().contains(helpMsg));
-        Assert.assertTrue(systemOutRule.getLog().contains(errorMsg));
+        assertTrue(systemOutRule.getLog().contains(helpMsg));
+        assertTrue(systemOutRule.getLog().contains(errorMsg));
         systemOutRule.clearLog();
     }
 }
