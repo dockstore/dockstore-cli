@@ -771,7 +771,7 @@ public class Client {
                         }
                     }
                 } catch (Kill k) {
-                    k.printStackTrace();
+                    LOG.debug("client ran into unclassified error", k.getCause());
                     System.exit(GENERIC_ERROR);
                 }
             }
