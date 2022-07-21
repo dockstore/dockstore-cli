@@ -16,27 +16,20 @@
 
 package io.dockstore.client.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.ws.rs.ProcessingException;
+import static io.dockstore.client.cli.ArgumentUtility.Kill;
+import static io.dockstore.client.cli.ArgumentUtility.err;
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.flag;
+import static io.dockstore.client.cli.ArgumentUtility.invalid;
+import static io.dockstore.client.cli.ArgumentUtility.isHelpRequest;
+import static io.dockstore.client.cli.ArgumentUtility.optVal;
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
+import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
+import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 
 import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,24 +60,30 @@ import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.auth.ApiKeyAuth;
 import io.swagger.client.model.Metadata;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.ws.rs.ProcessingException;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static io.dockstore.client.cli.ArgumentUtility.Kill;
-import static io.dockstore.client.cli.ArgumentUtility.err;
-import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
-import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
-import static io.dockstore.client.cli.ArgumentUtility.flag;
-import static io.dockstore.client.cli.ArgumentUtility.invalid;
-import static io.dockstore.client.cli.ArgumentUtility.isHelpRequest;
-import static io.dockstore.client.cli.ArgumentUtility.optVal;
-import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
-import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
-import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
-import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 
 /**
  * Main entrypoint for the dockstore CLI.
@@ -121,6 +120,9 @@ public class Client {
     private ToolClient toolClient;
     private WorkflowClient workflowClient;
     private CheckerClient checkerClient;
+
+    private YamlClient yamlClient;
+
 
     /*
      * Dockstore Client Functions for CLI
@@ -592,6 +594,7 @@ public class Client {
         out("   checker             Puts dockstore into checker mode.");
         out("   plugin              Configure and debug plugins.");
         out("   deps                Print tool/workflow runner dependencies.");
+        out("   " + YAML + "                Puts dockstore into " + YAML + " mode.");
         out("");
         printLineBreak();
         out("");
@@ -719,6 +722,9 @@ public class Client {
                         String[] argsArray = new String[args.size()];
                         argsArray = args.toArray(argsArray);
                         handled = DepCommand.handleDepCommand(argsArray);
+                    } else if (YAML.equals(mode)) {
+                        yamlClient = new YamlClient();
+                        handled = yamlClient.handleCommand(args);
                     }
 
                     if (targetClient != null) {

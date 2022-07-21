@@ -278,10 +278,7 @@
             <artifactId>profiles</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-multipart</artifactId>
-        </dependency>
+
         <!--
         This is a zero-dependency package for calculating AWS SigV4 headers.
         GitHub: https://github.com/lucasweb78/aws-v4-signer-java
@@ -296,8 +293,19 @@
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+        </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -381,6 +389,8 @@
                             <usedDependencies>
                                 <usedDependency>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</usedDependency>
                                 <usedDependency>io.spray:spray-json_2.12</usedDependency>
+                                <usedDependency>org.hibernate:hibernate-validator</usedDependency>
+                                <usedDependency>org.glassfish:jakarta.el</usedDependency>
                             </usedDependencies>
 
                         </configuration>
