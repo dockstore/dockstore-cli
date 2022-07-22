@@ -339,8 +339,8 @@ commands:
     steps:
       - run:
           name: run tests
-          command: mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp
-
+          command: mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+          # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:
     steps:
       - run:
