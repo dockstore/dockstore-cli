@@ -16,22 +16,23 @@
 
 package io.dockstore.client.cli;
 
-import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
-import static org.junit.Assert.assertTrue;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import com.google.common.collect.Lists;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.TestUtility;
-import java.io.IOException;
-import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
+
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static org.junit.Assert.assertTrue;
 
 public class YamlClientIT extends BaseIT {
 

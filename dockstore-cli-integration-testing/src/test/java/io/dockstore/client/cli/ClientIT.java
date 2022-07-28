@@ -16,8 +16,8 @@
 
 package io.dockstore.client.cli;
 
-import static io.dockstore.client.cli.Client.API_ERROR;
-import static io.dockstore.common.CommonTestUtilities.checkToolList;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import com.google.common.collect.Lists;
 import io.dockstore.common.CommonTestUtilities;
@@ -30,8 +30,6 @@ import io.dockstore.common.ToilCompatibleTest;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiException;
-import java.io.IOException;
-import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -41,6 +39,9 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
+
+import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.common.CommonTestUtilities.checkToolList;
 
 /**
  * @author dyuen
