@@ -232,9 +232,6 @@ public class ClientIT extends BaseIT {
      *
      * @throws IOException
      */
-    @Ignore
-    // Ignore until https://ucsc-cgl.atlassian.net/browse/DOCK-2193 fixed
-    // and a new webservice artifact after 1.13.0-alpha.7 is built and put on Artifactory
     @Test
     public void testDepsCommandWithVersionAndPython3() throws IOException {
         Client.main(
@@ -264,9 +261,6 @@ public class ClientIT extends BaseIT {
      *
      * @throws IOException
      */
-    @Ignore
-    // Ignore until https://ucsc-cgl.atlassian.net/browse/DOCK-2193 fixed
-    // and a new webservice artifact after 1.13.0-alpha.7 is built and put on Artifactory
     @Test
     public void testDepsCommand() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps" });
@@ -280,9 +274,6 @@ public class ClientIT extends BaseIT {
      *
      * @throws IOException
      */
-    @Ignore
-    // Ignore until https://ucsc-cgl.atlassian.net/browse/DOCK-2193 fixed
-    // and a new webservice artifact after 1.13.0-alpha.7 is built and put on Artifactory
     @Test
     public void testDepsCommandHelp() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--help" });
