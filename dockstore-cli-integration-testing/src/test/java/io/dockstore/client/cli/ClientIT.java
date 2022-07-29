@@ -16,8 +16,8 @@
 
 package io.dockstore.client.cli;
 
-import static io.dockstore.client.cli.Client.API_ERROR;
-import static io.dockstore.common.CommonTestUtilities.checkToolList;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import com.google.common.collect.Lists;
 import io.dockstore.common.CommonTestUtilities;
@@ -30,8 +30,6 @@ import io.dockstore.common.ToilCompatibleTest;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiException;
-import java.io.IOException;
-import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -41,6 +39,9 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
+
+import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.common.CommonTestUtilities.checkToolList;
 
 /**
  * @author dyuen
@@ -231,9 +232,6 @@ public class ClientIT extends BaseIT {
      *
      * @throws IOException
      */
-    @Ignore
-    // Ignore until https://ucsc-cgl.atlassian.net/browse/DOCK-2193 fixed
-    // and a new webservice artifact after 1.13.0-alpha.7 is built and put on Artifactory
     @Test
     public void testDepsCommandWithVersionAndPython3() throws IOException {
         Client.main(
@@ -263,9 +261,6 @@ public class ClientIT extends BaseIT {
      *
      * @throws IOException
      */
-    @Ignore
-    // Ignore until https://ucsc-cgl.atlassian.net/browse/DOCK-2193 fixed
-    // and a new webservice artifact after 1.13.0-alpha.7 is built and put on Artifactory
     @Test
     public void testDepsCommand() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps" });
@@ -279,9 +274,6 @@ public class ClientIT extends BaseIT {
      *
      * @throws IOException
      */
-    @Ignore
-    // Ignore until https://ucsc-cgl.atlassian.net/browse/DOCK-2193 fixed
-    // and a new webservice artifact after 1.13.0-alpha.7 is built and put on Artifactory
     @Test
     public void testDepsCommandHelp() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--help" });
