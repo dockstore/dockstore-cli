@@ -162,5 +162,6 @@ public class BaseIT {
     @Before
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.dropAndCreateWithTestData(SUPPORT, false);
+        CommonTestUtilities.deleteBitBucketToken(testingPostgres);
     }
 }
