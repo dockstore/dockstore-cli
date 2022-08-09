@@ -80,6 +80,7 @@ public class WDLWorkflowIT extends BaseIT {
     @Override
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.cleanStatePrivate1(SUPPORT);
+        CommonTestUtilities.deleteBitBucketToken(testingPostgres);
     }
 
     /**

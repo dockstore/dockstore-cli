@@ -151,6 +151,18 @@ public final class CommonTestUtilities {
     }
 
     /**
+     * Deletes BitBucket Tokens from Database
+     *
+     * @param testingPostgres reference to the testing instance of Postgres
+     * @throws Exception
+     */
+    public static void deleteBitBucketToken(TestingPostgres testingPostgres) throws Exception {
+        LOG.info("Deleting BitBucket Token from Database");
+        testingPostgres.runUpdateStatement("delete from token where tokensource = 'bitbucket.org'");
+    }
+
+
+    /**
      * Wrapper for dropping and recreating database from migrations for test confidential 1
      *
      * @param support reference to testing instance of the dockstore web service

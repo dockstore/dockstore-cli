@@ -48,6 +48,7 @@ public class GitHubAppToolIT extends BaseIT {
     @Override
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.cleanStatePrivate2(SUPPORT, false);
+        CommonTestUtilities.deleteBitBucketToken(testingPostgres);
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         final WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         workflowApi.handleGitHubRelease(WORKFLOW_REPO, USER_2_USERNAME, "refs/heads/main", INSTALLATION_ID);
