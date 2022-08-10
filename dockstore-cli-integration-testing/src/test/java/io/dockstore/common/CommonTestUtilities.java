@@ -67,14 +67,6 @@ public final class CommonTestUtilities {
     }
 
     /**
-     * Drops the database and recreates from migrations, not including any test data, using new application and optionally deletes BitBucket token
-     *
-     * @param support reference to testing instance of the dockstore web service
-     * @throws Exception
-     */
-
-
-    /**
      * Drops the database and recreates from migrations, not including any test data, using new application
      *
      * @param support reference to testing instance of the dockstore web service
@@ -181,7 +173,6 @@ public final class CommonTestUtilities {
         LOG.info("Dropping and Recreating the database with confidential 1 test data");
         cleanStatePrivate1(support, CONFIDENTIAL_CONFIG_PATH);
         if (!needBucketToken) {
-            LOG.info("Deleting BitBucket token from database");
             deleteBitBucketToken(testingPostgres);
         }
     }
@@ -258,7 +249,6 @@ public final class CommonTestUtilities {
         LOG.info("Dropping and Recreating the database with confidential 2 test data");
         cleanStatePrivate2(support, CONFIDENTIAL_CONFIG_PATH, isNewApplication);
         if (!needBucketToken) {
-            LOG.info("Deleting BitBucket Token from Database");
             deleteBitBucketToken(testingPostgres);
         }
     }
