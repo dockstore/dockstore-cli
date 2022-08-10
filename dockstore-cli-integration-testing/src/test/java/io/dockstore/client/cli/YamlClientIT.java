@@ -51,7 +51,7 @@ public class YamlClientIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate1(SUPPORT);
+        CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
         Client.DEBUG.set(false);
     }
 
