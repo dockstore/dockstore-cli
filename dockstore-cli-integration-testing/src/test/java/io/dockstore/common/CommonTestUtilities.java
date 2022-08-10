@@ -169,7 +169,8 @@ public final class CommonTestUtilities {
      * @param needBucketToken if false the bitbucket token will be deleted
      * @throws Exception
      */
-    public static void cleanStatePrivate1(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, TestingPostgres testingPostgres, Boolean needBucketToken) throws Exception {
+    public static void cleanStatePrivate1(DropwizardTestSupport<DockstoreWebserviceConfiguration> support,
+        TestingPostgres testingPostgres, Boolean needBucketToken) throws Exception {
         LOG.info("Dropping and Recreating the database with confidential 1 test data");
         cleanStatePrivate1(support, CONFIDENTIAL_CONFIG_PATH);
         if (!needBucketToken) {
