@@ -30,7 +30,7 @@ public class BitBucketBasicIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate1(SUPPORT);
+        CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres, true);
     }
 
     /**

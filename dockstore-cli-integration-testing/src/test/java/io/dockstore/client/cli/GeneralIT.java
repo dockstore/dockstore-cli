@@ -72,8 +72,7 @@ public class GeneralIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate2(SUPPORT, false);
-        CommonTestUtilities.deleteBitBucketToken(testingPostgres);
+        CommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
     }
 
     /**

@@ -67,6 +67,14 @@ public final class CommonTestUtilities {
     }
 
     /**
+     * Drops the database and recreates from migrations, not including any test data, using new application and optionally deletes BitBucket token
+     *
+     * @param support reference to testing instance of the dockstore web service
+     * @throws Exception
+     */
+
+
+    /**
      * Drops the database and recreates from migrations, not including any test data, using new application
      *
      * @param support reference to testing instance of the dockstore web service
@@ -161,18 +169,31 @@ public final class CommonTestUtilities {
         testingPostgres.runUpdateStatement("delete from token where tokensource = 'bitbucket.org'");
     }
 
-
+    /**
+     * Wrapper for dropping and recreating database from migrations and optionally deleting bitbucket tokens
+     *
+     * @param support reference to testing instance of the dockstore web service
+     * @param testingPostgres reference to the testing instance of Postgres
+     * @param needBucketToken if false the bitbucket token will be deleted
+     * @throws Exception
+     */
+    public static void cleanStatePrivate1(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, TestingPostgres testingPostgres, Boolean needBucketToken) throws Exception {
+        LOG.info("Dropping and Recreating the database with confidential 1 test data");
+        cleanStatePrivate1(support, CONFIDENTIAL_CONFIG_PATH);
+        if (!needBucketToken) {
+            LOG.info("Deleting BitBucket token from database");
+            deleteBitBucketToken(testingPostgres);
+        }
+    }
     /**
      * Wrapper for dropping and recreating database from migrations for test confidential 1
      *
      * @param support reference to testing instance of the dockstore web service
+     * @param testingPostgres reference to the testing instance of Postgres
      * @throws Exception
      */
-    public static void cleanStatePrivate1(DropwizardTestSupport<DockstoreWebserviceConfiguration> support) throws Exception {
-        LOG.info("Dropping and Recreating the database with confidential 1 test data");
-        cleanStatePrivate1(support, CONFIDENTIAL_CONFIG_PATH);
-        // TODO: it looks like gitlab's API has gone totally unresponsive, delete after recovery
-        // getTestingPostgres(SUPPORT).runUpdateStatement("delete from token where tokensource = 'gitlab.com'");
+    public static void cleanStatePrivate1(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, TestingPostgres testingPostgres) throws Exception {
+        cleanStatePrivate1(support, testingPostgres, false);
     }
 
     /**
@@ -227,15 +248,30 @@ public final class CommonTestUtilities {
     }
 
     /**
+     * Wrapper for dropping and recreating database from migrations for test confidential 2 and optionally deleting BitBucket tokens
+     *
+     * @param support reference to testing instance of the dockstore web service
+     * @throws Exception
+     */
+    public static void cleanStatePrivate2(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, boolean isNewApplication,
+        TestingPostgres testingPostgres, boolean needBucketToken) throws Exception {
+        LOG.info("Dropping and Recreating the database with confidential 2 test data");
+        cleanStatePrivate2(support, CONFIDENTIAL_CONFIG_PATH, isNewApplication);
+        if (!needBucketToken) {
+            LOG.info("Deleting BitBucket Token from Database");
+            deleteBitBucketToken(testingPostgres);
+        }
+    }
+
+    /**
      * Wrapper for dropping and recreating database from migrations for test confidential 2
      *
      * @param support reference to testing instance of the dockstore web service
      * @throws Exception
      */
-    public static void cleanStatePrivate2(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, boolean isNewApplication)
+    public static void cleanStatePrivate2(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, boolean isNewApplication, TestingPostgres testingPostgres)
         throws Exception {
-        LOG.info("Dropping and Recreating the database with confidential 2 test data");
-        cleanStatePrivate2(support, CONFIDENTIAL_CONFIG_PATH, isNewApplication);
+        cleanStatePrivate2(support, isNewApplication, testingPostgres, false);
         // TODO: You can uncomment the following line to disable GitLab tool and workflow discovery
         // getTestingPostgres(SUPPORT).runUpdateStatement("delete from token where tokensource = 'gitlab.com'");
     }
