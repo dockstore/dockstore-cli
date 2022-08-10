@@ -3,7 +3,6 @@ parameters:
   java-tag:
     type: string
     default: "11.0.12"
-
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
