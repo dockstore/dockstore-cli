@@ -84,6 +84,7 @@ import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 
 /**
@@ -121,6 +122,9 @@ public class Client {
     private ToolClient toolClient;
     private WorkflowClient workflowClient;
     private CheckerClient checkerClient;
+
+    private YamlClient yamlClient;
+
 
     /*
      * Dockstore Client Functions for CLI
@@ -592,6 +596,7 @@ public class Client {
         out("   checker             Puts dockstore into checker mode.");
         out("   plugin              Configure and debug plugins.");
         out("   deps                Print tool/workflow runner dependencies.");
+        out("   " + YAML + "                Puts dockstore into " + YAML + " mode.");
         out("");
         printLineBreak();
         out("");
@@ -719,6 +724,9 @@ public class Client {
                         String[] argsArray = new String[args.size()];
                         argsArray = args.toArray(argsArray);
                         handled = DepCommand.handleDepCommand(argsArray);
+                    } else if (YAML.equals(mode)) {
+                        yamlClient = new YamlClient();
+                        handled = yamlClient.handleCommand(args);
                     }
 
                     if (targetClient != null) {
@@ -771,7 +779,7 @@ public class Client {
                         }
                     }
                 } catch (Kill k) {
-                    k.printStackTrace();
+                    LOG.debug("client ran into unclassified error", k.getCause());
                     System.exit(GENERIC_ERROR);
                 }
             }

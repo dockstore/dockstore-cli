@@ -87,18 +87,17 @@ For users of Intellij or comparable IDEs, we also suggest loading the checkstyle
 
 ### Dockstore Command Line
 
-The dockstore command line should be installed in a location in your path.
+Be sure to have a configuration file in place. Follow the instructions in [Configuration File](#configuration-file) for help.
 
-  /dockstore-client/bin/dockstore
+Add the directory `dockstore-client/bin` to your PATH: 
 
-You then need to setup a `~/.dockstore/config` file with the following contents:
-
+```bash
+  cd dockstore-cli 
+  echo "export PATH=$(pwd)/dockstore-client/bin:"'$PATH' >> ~/.bash_profile
+  source ~/.bash_profile
 ```
-token: <dockstore_token_from_web_app>
-server-url: http://www.dockstore.org:8080
-```
 
-If you are working with a custom-built or updated dockstore client you will need to update the jar in: `~/.dockstore/config/self-installs`.
+If you are working with a custom-built or updated dockstore client you will need to update the jar in: `~/.dockstore/self-installs`.
 
 ### Encrypted Documents for Travis-CI
 
