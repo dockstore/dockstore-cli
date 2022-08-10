@@ -156,7 +156,7 @@ public final class CommonTestUtilities {
      * @param testingPostgres reference to the testing instance of Postgres
      * @throws Exception
      */
-    public static void deleteBitBucketToken(TestingPostgres testingPostgres) throws Exception {
+    public static void deleteBitBucketToken(TestingPostgres testingPostgres)  {
         LOG.info("Deleting BitBucket Token from Database");
         testingPostgres.runUpdateStatement("delete from token where tokensource = 'bitbucket.org'");
     }
