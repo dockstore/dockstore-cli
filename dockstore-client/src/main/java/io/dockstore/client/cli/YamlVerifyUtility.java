@@ -56,7 +56,7 @@ public final class YamlVerifyUtility {
     public static final String FILE_DOES_NOT_EXIST = " does not exist";
     public static final String INVALID_FILE_STRUCTURE = "Your file structure has the following errors:" + System.lineSeparator();
 
-    public static final String INVALID_YAML = " is not a valid " + YAML + "file:" + System.lineSeparator();
+    public static final String INVALID_YAML = " is not a valid " + YAML + " file:" + System.lineSeparator();
     // This message is displayed when it is determined that DOCKSTOREYML is a valid yaml file,
     // but displaying this message does NOT mean DOCKSTOREYML is a valid dockstore yaml file
     public static final String VALID_YAML_ONLY = " is a valid " + YAML + " file";
