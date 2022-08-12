@@ -46,15 +46,22 @@ workflows:
       - integration-tests:
           matrix:
             parameters:
-              testing_profile: ["non-confidential-tests",
-              "confidential-workflow-tests",
-              "confidential-tool-tests",
-              "singularity-tests",
-              "bitbucket-tests"]
+              testing_profile: ["singularity-tests", "bitbucket-tests"]
           <<: *common_filters
           requires:
             - build
-
+      - non-confidential-tests:
+          <<: *common_filters
+          requires:
+            - build
+      - confidential-workflow-tests:
+          <<: *common_filters
+          requires:
+            - build
+      - confidential-tool-tests:
+          <<: *common_filters
+          requires:
+            - build
       - wes-toil-test:
           <<: *common_filters
           requires:
@@ -76,6 +83,34 @@ jobs:
           name: SonarCloud scan - coverage
           command: ./mvnw sonar:sonar
 
+  non-confidential-tests:
+    executor: machine_integration_test_exec
+    parallelism: 5
+    environment:
+      TESTING_PROFILE: non-confidential-tests
+      MAVEN_GOAL: verify
+    steps:
+    - setup_and_run_integration_tests
+
+  confidential-workflow-tests:
+    executor: machine_integration_test_exec
+    parallelism: 5
+    environment:
+      TESTING_PROFILE: confidential-workflow-tests
+      MAVEN_GOAL: verify
+    steps:
+      - setup_and_run_integration_tests
+
+  confidential-tool-tests:
+    executor: machine_integration_test_exec
+    parallelism: 5
+    environment:
+      TESTING_PROFILE: confidential-tool-tests
+      MAVEN_GOAL: verify
+    steps:
+      - setup_and_run_integration_tests
+
+
   integration-tests:
     parameters:
       testing_profile:
@@ -90,18 +125,12 @@ jobs:
       TESTING_PROFILE: << parameters.testing_profile >>
       MAVEN_GOAL: verify
     steps:
-      - setup_for_integration_tests
-      - run_tests
-      - save_test_results
-      - send_coverage
+      - setup_and_run_integration_tests
 
   wes-toil-test:
     executor: toil_wes_test_executor
     steps:
-      - get_workspace_and_dependencies
-      - setup_for_unit_tests
-      - setup_toil_wes_server
-      - run_toil_wes_tests
+      - setup_and_run_integration_tests
 
 
   build:
@@ -129,6 +158,11 @@ jobs:
       - check_license_file
       - check_pom_files
       - clean_and_save_cache
+      - run:
+          name: Generate test lists
+          command: bash scripts/generate-test-lists.sh
+      - store_artifacts:
+          path: temp/test-lists
       - persist_to_workspace:
           root: .
           paths:
@@ -340,7 +374,16 @@ commands:
     steps:
       - run:
           name: run tests
-          command: mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+          command: |  
+            if [ $CIRCLE_NODE_TOTAL != 1 ] 
+            then
+              TESTS_TO_RUN=$(cat temp/test-list/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
+              echo $TESTS_TO_RUN
+              mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean $MAVEN_GOAL -Dit.test=$TESTS_TO_RUN -DfailIfNoTests=false \
+              -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+            else 
+              mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+            fi
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:
     steps:
@@ -383,3 +426,10 @@ commands:
           name: run toil tests
           command: ./mvnw -P wes-integration-tests verify
 
+
+  setup_and_run_integration_tests:
+    steps:
+      - setup_for_integration_tests
+      - run_tests
+      - save_test_results
+      - send_coverage
