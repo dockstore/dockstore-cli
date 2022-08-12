@@ -160,7 +160,7 @@ jobs:
       - clean_and_save_cache
       - run:
           name: Generate test lists
-          command: bash scripts/generate-test-lists.sh
+          command: bash scripts/generate-test-list.sh
       - store_artifacts:
           path: temp/test-lists
       - persist_to_workspace:
