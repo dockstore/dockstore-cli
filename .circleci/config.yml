@@ -85,7 +85,7 @@ jobs:
 
   non-confidential-tests:
     executor: machine_integration_test_exec
-    parallelism: 3
+    parallelism: 4
     environment:
       TESTING_PROFILE: non-confidential-tests
       MAVEN_GOAL: verify
@@ -94,7 +94,7 @@ jobs:
 
   confidential-workflow-tests:
     executor: machine_integration_test_exec
-    parallelism: 3
+    parallelism: 4
     environment:
       TESTING_PROFILE: confidential-workflow-tests
       MAVEN_GOAL: verify
@@ -103,7 +103,7 @@ jobs:
 
   confidential-tool-tests:
     executor: machine_integration_test_exec
-    parallelism: 3
+    parallelism: 4
     environment:
       TESTING_PROFILE: confidential-tool-tests
       MAVEN_GOAL: verify
