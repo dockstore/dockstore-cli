@@ -142,6 +142,7 @@ jobs:
       - setup_toil_wes_server
       - run_toil_wes_tests
       - persist_coverage
+      - send_coverage
 
 
   build:
