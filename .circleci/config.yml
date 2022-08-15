@@ -405,7 +405,7 @@ commands:
           command: |  
             if [ $CIRCLE_NODE_TOTAL != 1 ] 
             then
-              TESTS_TO_RUN=$(cat temp/test-list/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
+              TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
               echo $TESTS_TO_RUN
               mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean $MAVEN_GOAL -Dit.test=$TESTS_TO_RUN -DfailIfNoTests=false \
               -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"

@@ -39,7 +39,7 @@ function make_file_names_fully_qualified_class_paths {
 #####################################
 
 # Modify prefix for integration tests
-PREFIX="$BASE_PREFIX"
+PREFIX="$BASE_PREFIX"/IT
 mkdir -p "$PREFIX"
 
 
