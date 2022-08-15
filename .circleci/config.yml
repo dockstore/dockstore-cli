@@ -41,8 +41,6 @@ workflows:
           <<: *common_filters
           requires:
             - build
-          context:
-            - sonarcloud
       - integration-tests:
           matrix:
             parameters:
@@ -75,6 +73,8 @@ workflows:
             - confidential-workflow-tests
             - confidential-tool-tests
             - wes-toil-test
+          context:
+            - sonarcloud
 
 
 jobs:
