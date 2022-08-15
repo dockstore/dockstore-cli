@@ -183,6 +183,20 @@ public final class YamlVerifyUtility {
 
     }
 
+    public static int testCoverage(String str) {
+        int return1 = 1;
+        int return2 = 2;
+        if ("blue".equals(str)) {
+            return return1;
+        }
+        if ("orange".equals(str)) {
+            return return2;
+        }
+        if ("comb".equals(str)) {
+            return 0 - return1;
+        }
+        return 0 - return2;
+    }
 
     public static class ValidateYamlException extends Exception {
         public ValidateYamlException(final String msg) {

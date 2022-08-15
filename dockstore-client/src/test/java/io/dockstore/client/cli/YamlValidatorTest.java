@@ -240,6 +240,13 @@ public class YamlValidatorTest {
             assertEquals(errorMsg, ex.getMessage());
         }
     }
+
+    @Test
+    public void sonarcloudtest1() {
+        assertEquals(-2, YamlVerifyUtility.testCoverage("testing"));
+        assertEquals(2, YamlVerifyUtility.testCoverage("orange"));
+
+    }
 }
 
 
