@@ -66,6 +66,15 @@ workflows:
           <<: *common_filters
           requires:
             - build
+      - sonar-cloud:
+          <<: *common_filters
+          requires:
+            - unit-tests
+            - integration-tests
+            - non-confidential-tests
+            - confidential-workflow-tests
+            - confidential-tool-tests
+            - wes-toil-test
 
 
 jobs:
@@ -79,9 +88,7 @@ jobs:
       - run_tests
       - save_test_results
       - send_coverage
-      - run:
-          name: SonarCloud scan - coverage
-          command: ./mvnw sonar:sonar
+      - persist_coverage
 
   non-confidential-tests:
     executor: machine_integration_test_exec
@@ -130,7 +137,11 @@ jobs:
   wes-toil-test:
     executor: toil_wes_test_executor
     steps:
-      - setup_and_run_integration_tests
+      - get_workspace_and_dependencies
+      - setup_for_unit_tests
+      - setup_toil_wes_server
+      - run_toil_wes_tests
+      - persist_coverage
 
 
   build:
@@ -167,7 +178,23 @@ jobs:
           root: .
           paths:
             - .
-
+  sonar-cloud:
+    docker: # run the steps with Docker
+      - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: dockstore-java-{{ checksum "pom.xml" }}
+      - restore_cache:
+          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+      - run:
+          name: build
+          command: mvn clean install -DskipTests
+      - run:
+          name: SonarCloud scan - coverage
+          command: mvn -Dsonar.coverage.jacoco.xmlReportPaths=../coverage/* sonar:sonar
 
 commands:
   setup_machine:
@@ -433,3 +460,16 @@ commands:
       - run_tests
       - save_test_results
       - send_coverage
+      - persist_coverage
+
+  persist_coverage:
+    steps:
+      - run:
+          name: Rename and move coverage reports
+          command: |
+            mkdir coverage
+            cp ./reports/target/site/jacoco-aggregate/jacoco.xml coverage/${CIRCLE_JOB}-${CIRCLE_NODE_INDEX}.xml
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage
