@@ -189,6 +189,7 @@ jobs:
           key: dockstore-java-{{ checksum "pom.xml" }}
       - restore_cache:
           key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+      - install-git-secrets
       - run:
           name: build
           command: mvn clean install -DskipTests
