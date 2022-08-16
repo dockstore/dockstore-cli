@@ -217,8 +217,8 @@ public abstract class AbstractEntryClient<T> {
         out("  list             :  lists all the " + getEntryType() + "s published by the user");
         out("");
         if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
+            out("  nfl              :  returns the Nextflow " + getEntryType() + " defintion for this entry");
             out("");
-            out("  nfl              :  returns the Nextflow " + getEntryType() + "defintion for this entry");
         }
         out("  publish          :  publish/unpublish a " + getEntryType() + " in Dockstore");
         out("");
