@@ -16,35 +16,25 @@
 
 package io.dockstore.client.cli;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import io.dockstore.client.cli.nested.AbstractEntryClient;
-import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Utilities;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.dropwizard.testing.ResourceHelpers;
-import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,7 +46,6 @@ import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
-import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
@@ -186,440 +175,7 @@ public class LaunchTestIT {
         assertTrue("output should include a noop plugin run with metadata", systemOutRule.getLog().contains("really cool metadata"));
     }
 
-    @Test
-    public void wdlWorkflowCorrectFlags() {
-        wdlEntryCorrectFlags("workflow");
-    }
 
-    @Test
-    public void wdlToolCorrectFlags() {
-        wdlEntryCorrectFlags("tool");
-    }
-
-    private void wdlEntryCorrectFlags(String entryType) {
-        File yamlTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
-        File jsonTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.json"));
-
-        List<String> yamlFileWithJSONFlag = getLaunchStringList(entryType);
-        yamlFileWithJSONFlag.add("--json");
-        yamlFileWithJSONFlag.add(yamlTestParameterFile.getAbsolutePath());
-
-        List<String> yamlFileWithYAMLFlag = getLaunchStringList(entryType);
-        yamlFileWithYAMLFlag.add("--yaml");
-        yamlFileWithYAMLFlag.add(yamlTestParameterFile.getAbsolutePath());
-
-        List<String> jsonFileWithJSONFlag = getLaunchStringList(entryType);
-        jsonFileWithJSONFlag.add("--json");
-        jsonFileWithJSONFlag.add(jsonTestParameterFile.getAbsolutePath());
-
-        List<String> jsonFileWithYAMLFlag = getLaunchStringList(entryType);
-        jsonFileWithYAMLFlag.add("--yaml");
-        jsonFileWithYAMLFlag.add(jsonTestParameterFile.getAbsolutePath());
-
-        Client.main(yamlFileWithJSONFlag.toArray(new String[0]));
-        Client.main(yamlFileWithYAMLFlag.toArray(new String[0]));
-        Client.main(jsonFileWithJSONFlag.toArray(new String[0]));
-        Client.main(jsonFileWithYAMLFlag.toArray(new String[0]));
-    }
-
-    @Test
-    public void yamlAndJsonWorkflowCorrect() {
-        yamlAndJsonEntryCorrect("workflow");
-    }
-
-    @Test
-    public void yamlAndJsonToolCorrect() {
-        yamlAndJsonEntryCorrect("tool");
-    }
-
-    private void yamlAndJsonEntryCorrect(String entryType) {
-        File yamlTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
-        File jsonTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.json"));
-
-        List<String> args = getLaunchStringList(entryType);
-        args.add("--yaml");
-        args.add(yamlTestParameterFile.getAbsolutePath());
-        args.add("--json");
-        args.add(jsonTestParameterFile.getAbsolutePath());
-        exit.expectSystemExitWithStatus(CLIENT_ERROR);
-        exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
-        Client.main(args.toArray(new String[0]));
-    }
-
-    @Test
-    public void testMaliciousParameterYaml() {
-        File yamlTestParameterFile = new File(ResourceHelpers.resourceFilePath("malicious.input.yaml"));
-
-        List<String> args = getLaunchStringList("workflow");
-        args.add("--yaml");
-        args.add(yamlTestParameterFile.getAbsolutePath());
-        exit.expectSystemExit();
-        exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains("could not determine a constructor for the tag")));
-        Client.main(args.toArray(new String[0]));
-    }
-
-    private List<String> getLaunchStringList(String entryType) {
-        File descriptorFile = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
-        final List<String> strings = new ArrayList<>();
-        strings.add("--script");
-        strings.add("--config");
-        strings.add(ResourceHelpers.resourceFilePath("config"));
-        strings.add(entryType);
-        strings.add("launch");
-        strings.add("--local-entry");
-        strings.add(descriptorFile.getAbsolutePath());
-
-        return strings;
-    }
-
-    @Test
-    public void yamlToolCorrect() {
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-tool.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("echo-job.yml"));
-
-        ArrayList<String> args = new ArrayList<>();
-        args.add("--local-entry");
-        args.add("--yaml");
-        args.add(cwlJSON.getAbsolutePath());
-
-        ContainersApi api = mock(ContainersApi.class);
-        UsersApi usersApi = mock(UsersApi.class);
-        Client client = new Client();
-        // do not use a cache
-        runTool(cwlFile, args, api, usersApi, client, false);
-    }
-
-    @Test
-    public void runToolWithDirectories() {
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("dir6.cwl.json"));
-
-        ArrayList<String> args = new ArrayList<>();
-        args.add("--local-entry");
-        args.add("--cwl");
-        args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
-        args.add(cwlJSON.getAbsolutePath());
-
-        ContainersApi api = mock(ContainersApi.class);
-        UsersApi usersApi = mock(UsersApi.class);
-        Client client = new Client();
-        // do not use a cache
-        runTool(cwlFile, args, api, usersApi, client, false);
-    }
-
-    @Test
-    public void runToolWithDirectoriesThreaded() {
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("dir6.cwl.json"));
-
-        ArrayList<String> args = new ArrayList<>();
-        args.add("--local-entry");
-        args.add("--cwl");
-        args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
-        args.add(cwlJSON.getAbsolutePath());
-
-        ContainersApi api = mock(ContainersApi.class);
-        UsersApi usersApi = mock(UsersApi.class);
-        Client client = new Client();
-        // do not use a cache
-        runToolThreaded(cwlFile, args, api, usersApi, client);
-    }
-
-    @Test
-    public void runToolWithSecondaryFilesOnOutput() throws IOException {
-
-        FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files"));
-
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("split.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("split.json"));
-
-        runTool(cwlFile, cwlJSON);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 6, countMatches);
-        for (char y = 'a'; y <= 'f'; y++) {
-            String filename = "/tmp/provision_out_with_files/test.a" + y;
-            checkFileAndThenDeleteIt(filename);
-        }
-    }
-
-    @Test
-    public void runToolWithSecondaryFilesRenamedOnOutput() throws IOException {
-
-        FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files_renamed"));
-
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("split.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("split.renamed.json"));
-
-        runTool(cwlFile, cwlJSON);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 6, countMatches);
-        for (char y = 'a'; y <= 'f'; y++) {
-            String filename = "/tmp/provision_out_with_files_renamed/renamed.a" + y;
-            checkFileAndThenDeleteIt(filename);
-        }
-    }
-
-    @Test
-    public void runToolWithSecondaryFilesOfVariousKinds() throws IOException {
-
-        FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files_renamed"));
-
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("split.nocaret.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("split.renamed.json"));
-
-        runTool(cwlFile, cwlJSON);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 8, countMatches);
-        checkFileAndThenDeleteIt("/tmp/provision_out_with_files_renamed/renamed.aa");
-        for (char y = 'b'; y <= 'f'; y++) {
-            String filename = "/tmp/provision_out_with_files_renamed/renamed.aa.a" + y + "extra";
-            checkFileAndThenDeleteIt(filename);
-        }
-        checkFileAndThenDeleteIt("/tmp/provision_out_with_files_renamed/renamed.aa.funky.extra.stuff");
-        checkFileAndThenDeleteIt("/tmp/provision_out_with_files_renamed/renamed.aa.groovyextrastuff");
-    }
-
-    @Test
-    public void runToolWithSecondaryFilesOfEvenStrangerKinds() throws IOException {
-
-        FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files_renamed"));
-
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("split.more.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("split.extra.json"));
-
-        runTool(cwlFile, cwlJSON);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 6, countMatches);
-        for (char y = 'a'; y <= 'e'; y++) {
-            String filename = "/tmp/provision_out_with_files_renamed/renamed.txt.a" + y;
-            checkFileAndThenDeleteIt(filename);
-        }
-        checkFileAndThenDeleteIt("/tmp/provision_out_with_files_renamed/renamed.extra");
-    }
-
-    private void checkFileAndThenDeleteIt(String filename) {
-        assertTrue("output should provision out to correct locations, could not find " + filename + " in log",
-            systemOutRule.getLog().contains(filename));
-        assertTrue("file does not actually exist", Files.exists(Paths.get(filename)));
-        // cleanup
-        FileUtils.deleteQuietly(Paths.get(filename).toFile());
-    }
-
-    @Test
-    public void runToolSecondaryFilesToDirectory() throws IOException {
-
-        FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files"));
-
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_directory.json"));
-
-        runTool(cwlFile, cwlJSON);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 6, countMatches);
-        for (char y = 'a'; y <= 'f'; y++) {
-            String filename = "/tmp/provision_out_with_files/test.a" + y;
-            checkFileAndThenDeleteIt(filename);
-        }
-    }
-
-    @Test
-    public void runToolSecondaryFilesToDirectoryThreaded() throws IOException {
-
-        FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files"));
-
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_directory.json"));
-
-        runTool(cwlFile, cwlJSON, true);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 6, countMatches);
-        for (char y = 'a'; y <= 'f'; y++) {
-            String filename = "/tmp/provision_out_with_files/test.a" + y;
-            checkFileAndThenDeleteIt(filename);
-        }
-    }
-
-    @Test
-    public void runToolSecondaryFilesToCWD() {
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_missing_directory.json"));
-
-        runTool(cwlFile, cwlJSON);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 6, countMatches);
-        for (char y = 'a'; y <= 'f'; y++) {
-            String filename = "./test.a" + y;
-            checkFileAndThenDeleteIt(filename);
-        }
-    }
-
-    @Test
-    public void runToolMalformedToCWD() {
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_malformed.json"));
-
-        runTool(cwlFile, cwlJSON);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 6, countMatches);
-        for (char y = 'a'; y <= 'f'; y++) {
-            String filename = "./test.a" + y;
-            checkFileAndThenDeleteIt(filename);
-        }
-    }
-
-    @Test
-    public void runToolToMissingS3() {
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
-        ByteArrayOutputStream launcherOutput = null;
-        try {
-            launcherOutput = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(launcherOutput));
-
-            thrown.expect(AssertionError.class);
-            runTool(cwlFile, cwlJSON);
-            final String standardOutput = launcherOutput.toString();
-            assertTrue("Error should occur, caused by Amazon S3 Exception",
-                standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"));
-        } finally {
-            try {
-                if (launcherOutput != null) {
-                    launcherOutput.close();
-                }
-            } catch (IOException ex) {
-                assertTrue("Error closing output stream.", true);
-            }
-        }
-    }
-
-    @Test
-    public void runToolDirectoryMalformedToCWD() throws IOException {
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split_dir.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_malformed.json"));
-
-        runTool(cwlFile, cwlJSON);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include one provision out event, found " + countMatches, 1, countMatches);
-        String filename = "test1";
-        checkFileAndThenDeleteIt(filename);
-        FileUtils.deleteDirectory(new File(filename));
-    }
-
-    private void runTool(File cwlFile, File cwlJSON) {
-        runTool(cwlFile, cwlJSON, false);
-    }
-
-    private void runTool(File cwlFile, File cwlJSON, boolean threaded) {
-        ArrayList<String> args = new ArrayList<>();
-        args.add("--local-entry");
-        args.add("--cwl");
-        args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
-        args.add(cwlJSON.getAbsolutePath());
-
-        ContainersApi api = mock(ContainersApi.class);
-        UsersApi usersApi = mock(UsersApi.class);
-        Client client = new Client();
-        // do not use a cache
-        if (threaded) {
-            runToolThreaded(cwlFile, args, api, usersApi, client);
-        } else {
-            runTool(cwlFile, args, api, usersApi, client, true);
-        }
-    }
-
-    private void runTool(File cwlFile, ArrayList<String> args, ContainersApi api, UsersApi usersApi, Client client, boolean useCache) {
-        client.setConfigFile(ResourceHelpers.resourceFilePath(useCache ? "config.withCache" : "config"));
-        Client.SCRIPT.set(true);
-        runToolShared(cwlFile, args, api, usersApi, client);
-    }
-
-    @Test
-    public void runToolWithGlobbedFilesOnOutput() throws IOException {
-
-        File fileDir = new File("/tmp/provision_out_with_files");
-        FileUtils.deleteDirectory(fileDir);
-        FileUtils.forceMkdir(fileDir);
-
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("splitBlob.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("splitBlob.json"));
-
-        ArrayList<String> args = new ArrayList<>();
-        args.add("--local-entry");
-        args.add("--cwl");
-        args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
-        args.add(cwlJSON.getAbsolutePath());
-
-        ContainersApi api = mock(ContainersApi.class);
-        UsersApi usersApi = mock(UsersApi.class);
-        Client client = new Client();
-        // do not use a cache
-        runTool(cwlFile, args, api, usersApi, client, true);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Provisioning from");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 7, countMatches);
-        for (char y = 'a'; y <= 'f'; y++) {
-            assertTrue("output should provision out to correct locations",
-                systemOutRule.getLog().contains("/tmp/provision_out_with_files/"));
-            assertTrue(new File("/tmp/provision_out_with_files/test.a" + y).exists());
-        }
-    }
-
-    @Test
-    public void runToolWithoutProvisionOnOutput() throws IOException {
-
-        FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files"));
-
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("split.cwl"));
-        File cwlJSON = new File(ResourceHelpers.resourceFilePath("split_no_provision_out.json"));
-
-        ArrayList<String> args = new ArrayList<>();
-        args.add("--local-entry");
-        args.add("--cwl");
-        args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
-        args.add(cwlJSON.getAbsolutePath());
-
-        ContainersApi api = mock(ContainersApi.class);
-        UsersApi usersApi = mock(UsersApi.class);
-        Client client = new Client();
-        // do not use a cache
-        runTool(cwlFile, args, api, usersApi, client, true);
-
-        final int countMatches = StringUtils.countMatches(systemOutRule.getLog(), "Uploading");
-        assertEquals("output should include multiple provision out events, found " + countMatches, 0, countMatches);
-    }
-
-    @Test
-    public void runToolWithDirectoriesConversion() {
-        File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
-
-        ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
-        args.add("convert");
-        args.add("cwl2json");
-        args.add("--cwl");
-        args.add(cwlFile.getAbsolutePath());
-
-        runClientCommand(args);
-        final String log = systemOutRule.getLog();
-        Gson gson = new Gson();
-        final Map<String, Map<String, Object>> map = gson.fromJson(log, Map.class);
-        assertEquals(2, map.size());
-        assertEquals("Directory", map.get("indir").get("class"));
-    }
 
     @Test
     public void runWorkflowConvert() {
@@ -675,19 +231,6 @@ public class LaunchTestIT {
         Client.main(args.toArray(new String[0]));
     }
 
-    private void runToolThreaded(File cwlFile, ArrayList<String> args, ContainersApi api, UsersApi usersApi, Client client) {
-        Client.SCRIPT.set(true);
-        client.setConfigFile(ResourceHelpers.resourceFilePath("config.withThreads"));
-
-        runToolShared(cwlFile, args, api, usersApi, client);
-    }
-
-    private void runToolShared(File cwlFile, ArrayList<String> args, ContainersApi api, UsersApi usersApi, Client client) {
-        ToolClient toolClient = new ToolClient(api, null, usersApi, client, false);
-        toolClient.checkEntryFile(cwlFile.getAbsolutePath(), args, null);
-
-        assertTrue("output should include a successful cwltool run", systemOutRule.getLog().contains("Final process status is success"));
-    }
 
     private void runWorkflow(File cwlFile, ArrayList<String> args, WorkflowsApi api, UsersApi usersApi, Client client, boolean useCache) {
         client.setConfigFile(ResourceHelpers.resourceFilePath(useCache ? "config.withCache" : "config"));
@@ -1386,15 +929,6 @@ public class LaunchTestIT {
         assertTrue("output should include a successful cromwell run", systemOutRule.getLog().contains("Cromwell exit code: 0"));
     }
 
-    @Test
-    public void cwlNullInputParameter() {
-        // Tests if a null input parameter is correctly handled when converting json
-        File nullCWL = new File(ResourceHelpers.resourceFilePath("nullParam.cwl"));
-        File nullJSON = new File(ResourceHelpers.resourceFilePath("nullParam.json"));
-
-        // run simple echo null tool
-        runTool(nullCWL, nullJSON, false);
-    }
 
     @Test
     public void missingTestParameterFileWDLFailure() {
@@ -1454,27 +988,4 @@ public class LaunchTestIT {
         }
     }
 
-    @Test
-    public void duplicateTestParameterFile() {
-        // Return client failure if both --json and --yaml are passed
-        File file = new File(ResourceHelpers.resourceFilePath("wrongExtcwl.wdl"));
-        File helloJSON = new File(ResourceHelpers.resourceFilePath("helloSpaces.json"));
-        File helloYAML = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
-
-        ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
-        args.add("launch");
-        args.add("--entry");
-        args.add(file.getAbsolutePath());
-        args.add("--json");
-        args.add(helloJSON.getPath());
-        args.add("--yaml");
-        args.add(helloYAML.getPath());
-
-        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
-        exit.expectSystemExitWithStatus(CLIENT_ERROR);
-        exit.checkAssertionAfterwards(() -> assertTrue("Client error should be returned",
-                systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
-        runClientCommandConfig(args, config);
-    }
 }

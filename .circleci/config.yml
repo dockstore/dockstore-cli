@@ -41,24 +41,40 @@ workflows:
           <<: *common_filters
           requires:
             - build
-          context:
-            - sonarcloud
       - integration-tests:
           matrix:
             parameters:
-              testing_profile: ["non-confidential-tests",
-              "confidential-workflow-tests",
-              "confidential-tool-tests",
-              "singularity-tests",
-              "bitbucket-tests"]
+              testing_profile: ["singularity-tests", "bitbucket-tests"]
           <<: *common_filters
           requires:
             - build
-
+      - non-confidential-tests:
+          <<: *common_filters
+          requires:
+            - build
+      - confidential-workflow-tests:
+          <<: *common_filters
+          requires:
+            - build
+      - confidential-tool-tests:
+          <<: *common_filters
+          requires:
+            - build
       - wes-toil-test:
           <<: *common_filters
           requires:
             - build
+      - sonar-cloud:
+          <<: *common_filters
+          requires:
+            - unit-tests
+            - integration-tests
+            - non-confidential-tests
+            - confidential-workflow-tests
+            - confidential-tool-tests
+            - wes-toil-test
+          context:
+            - sonarcloud
 
 
 jobs:
@@ -72,9 +88,35 @@ jobs:
       - run_tests
       - save_test_results
       - send_coverage
-      - run:
-          name: SonarCloud scan - coverage
-          command: ./mvnw sonar:sonar
+      - persist_coverage
+
+  non-confidential-tests:
+    executor: machine_integration_test_exec
+    parallelism: 2
+    environment:
+      TESTING_PROFILE: non-confidential-tests
+      MAVEN_GOAL: verify
+    steps:
+    - setup_and_run_integration_tests
+
+  confidential-workflow-tests:
+    executor: machine_integration_test_exec
+    parallelism: 3
+    environment:
+      TESTING_PROFILE: confidential-workflow-tests
+      MAVEN_GOAL: verify
+    steps:
+      - setup_and_run_integration_tests
+
+  confidential-tool-tests:
+    executor: machine_integration_test_exec
+    parallelism: 3
+    environment:
+      TESTING_PROFILE: confidential-tool-tests
+      MAVEN_GOAL: verify
+    steps:
+      - setup_and_run_integration_tests
+
 
   integration-tests:
     parameters:
@@ -90,10 +132,7 @@ jobs:
       TESTING_PROFILE: << parameters.testing_profile >>
       MAVEN_GOAL: verify
     steps:
-      - setup_for_integration_tests
-      - run_tests
-      - save_test_results
-      - send_coverage
+      - setup_and_run_integration_tests
 
   wes-toil-test:
     executor: toil_wes_test_executor
@@ -102,6 +141,8 @@ jobs:
       - setup_for_unit_tests
       - setup_toil_wes_server
       - run_toil_wes_tests
+      - persist_coverage
+      - send_coverage
 
 
   build:
@@ -129,11 +170,33 @@ jobs:
       - check_license_file
       - check_pom_files
       - clean_and_save_cache
+      - run:
+          name: Generate test lists
+          command: bash scripts/generate-test-list.sh
+      - store_artifacts:
+          path: temp/test-lists
       - persist_to_workspace:
           root: .
           paths:
             - .
-
+  sonar-cloud:
+    docker: # run the steps with Docker
+      - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: dockstore-java-{{ checksum "pom.xml" }}
+      - restore_cache:
+          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+      - install-git-secrets
+      - run:
+          name: build
+          command: mvn clean install -DskipTests
+      - run:
+          name: SonarCloud scan - coverage
+          command: mvn -Dsonar.coverage.jacoco.xmlReportPaths=../coverage/* sonar:sonar
 
 commands:
   setup_machine:
@@ -340,7 +403,16 @@ commands:
     steps:
       - run:
           name: run tests
-          command: mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+          command: |  
+            if [ $CIRCLE_NODE_TOTAL != 1 ] 
+            then
+              TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
+              echo $TESTS_TO_RUN
+              mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean $MAVEN_GOAL -Dit.test=$TESTS_TO_RUN -DfailIfNoTests=false \
+              -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+            else 
+              mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+            fi
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:
     steps:
@@ -383,3 +455,23 @@ commands:
           name: run toil tests
           command: ./mvnw -P wes-integration-tests verify
 
+
+  setup_and_run_integration_tests:
+    steps:
+      - setup_for_integration_tests
+      - run_tests
+      - save_test_results
+      - send_coverage
+      - persist_coverage
+
+  persist_coverage:
+    steps:
+      - run:
+          name: Rename and move coverage reports
+          command: |
+            mkdir coverage
+            cp ./reports/target/site/jacoco-aggregate/jacoco.xml coverage/${CIRCLE_JOB}-${CIRCLE_NODE_INDEX}.xml
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage
