@@ -171,19 +171,22 @@ public abstract class BaseLanguageClient {
          endpoint.
         */
         if (!abstractEntryClient.isWesCommand()) {
-            try {
-                // Provision the input files
-                provisionedParameterFile = provisionInputFiles();
-            } catch (ApiException ex) {
-                if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool")) {
-                    exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
-                            ENTRY_NOT_FOUND);
-                } else {
-                    exceptionMessage(ex, "The workflow entry does not exist. Did you mean to launch a local workflow or a tool?",
-                            ENTRY_NOT_FOUND);
+            if (provisionedParameterFile != null || selectedParameterFile != null) {
+                try {
+                    provisionedParameterFile = provisionInputFiles();
+                } catch (ApiException ex) {
+                    if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool")) {
+                        exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
+                                ENTRY_NOT_FOUND);
+                    } else {
+                        exceptionMessage(ex, "The workflow entry does not exist. Did you mean to launch a local workflow or a tool?",
+                                ENTRY_NOT_FOUND);
+                    }
+                } catch (Exception ex) {
+                    exceptionMessage(ex, ex.getMessage(), GENERIC_ERROR);
                 }
-            } catch (Exception ex) {
-                exceptionMessage(ex, ex.getMessage(), GENERIC_ERROR);
+            } else {
+                LOG.debug("No test parameter file provided, skipping provisioning");
             }
         }
 

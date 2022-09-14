@@ -162,7 +162,7 @@ public class WDLFileProvisioning {
                     try {
                         newJSON.put(newEntry.getKey(), newEntry.getValue());
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        LOG.debug("json exception while processing input json", e.getCause());
                     }
                     break;
                 }
@@ -173,7 +173,7 @@ public class WDLFileProvisioning {
                 try {
                     newJSON.put(paramName, currentParam);
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    LOG.debug("json exception while processing non-file input", e.getCause());
                 }
             }
         }

@@ -62,7 +62,7 @@ public class ClientIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate1(SUPPORT);
+        CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
         Client.DEBUG.set(false);
     }
 
@@ -304,7 +304,6 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "tool", "update_tool" });
 
         checkCommandForHelp(new String[] { "tool", "convert", "entry2json" });
-        checkCommandForHelp(new String[] { "tool", "convert", "entry2tsv" });
         checkCommandForHelp(new String[] { "tool", "convert", "cwl2yaml" });
         checkCommandForHelp(new String[] { "tool", "convert", "cwl2json" });
         checkCommandForHelp(new String[] { "tool", "convert", "wdl2json" });
@@ -325,7 +324,6 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "tool", "convert", "cwl2yaml", "--help" });
         checkCommandForHelp(new String[] { "tool", "convert", "wdl2json", "--help" });
         checkCommandForHelp(new String[] { "tool", "convert", "entry2json", "--help" });
-        checkCommandForHelp(new String[] { "tool", "convert", "entry2tsv", "--help" });
         checkCommandForHelp(new String[] { "tool", "launch", "--help" });
         checkCommandForHelp(new String[] { "tool", "version_tag", "--help" });
         checkCommandForHelp(new String[] { "tool", "version_tag", "remove", "--help" });
@@ -339,7 +337,6 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "tool" });
 
         checkCommandForHelp(new String[] { "workflow", "convert", "entry2json" });
-        checkCommandForHelp(new String[] { "workflow", "convert", "entry2tsv" });
         checkCommandForHelp(new String[] { "workflow", "convert", "cwl2yaml" });
         checkCommandForHelp(new String[] { "workflow", "convert", "cwl2json" });
         checkCommandForHelp(new String[] { "workflow", "convert", "wdl2json" });
@@ -370,7 +367,6 @@ public class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { "workflow", "convert", "cwl2yaml", "--help" });
         checkCommandForHelp(new String[] { "workflow", "convert", "wd2json", "--help" });
         checkCommandForHelp(new String[] { "workflow", "convert", "entry2json", "--help" });
-        checkCommandForHelp(new String[] { "workflow", "convert", "entry2tsv", "--help" });
         checkCommandForHelp(new String[] { "workflow", "launch", "--help" });
         checkCommandForHelp(new String[] { "workflow", "version_tag", "--help" });
         checkCommandForHelp(new String[] { "workflow", "update_workflow", "--help" });

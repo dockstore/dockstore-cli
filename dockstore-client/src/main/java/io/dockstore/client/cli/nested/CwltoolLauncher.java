@@ -47,11 +47,13 @@ public class CwltoolLauncher extends BaseLauncher {
 
         extraFlags = extraFlags.stream().map(string -> string.split(",")).flatMap(Arrays::stream).map(this::trimAndPrintInput)
                 .collect(Collectors.toList());
-
         // Create base execution command
         CWLRunnerInterface cwlRunner = CWLRunnerFactory.createCWLRunner();
         command = cwlRunner.getExecutionCommand(workingDirectory + "/outputs/", workingDirectory + "/tmp/", workingDirectory + "/working/",
-                primaryDescriptor.getAbsolutePath(), provisionedParameterFile.getAbsolutePath());
+                primaryDescriptor.getAbsolutePath(), java.util.Optional.empty());
+        if (provisionedParameterFile != null) {
+            command.add(provisionedParameterFile.getAbsolutePath());
+        }
 
         command.addAll(1, extraFlags);
 

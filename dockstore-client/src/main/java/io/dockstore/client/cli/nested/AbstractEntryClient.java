@@ -37,10 +37,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.auth.profile.ProfilesConfigFile;
-import com.amazonaws.regions.AwsProfileRegionProvider;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -94,12 +90,17 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.parser.ParserException;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import wdl.draft3.parser.WdlParser;
 
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.MAX_DESCRIPTION;
+import static io.dockstore.client.cli.ArgumentUtility.conditionalErrorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
@@ -141,6 +142,7 @@ public abstract class AbstractEntryClient<T> {
     public static final String CHECKSUM_NULL_MESSAGE = "Unable to validate local descriptor checksum. Please refresh the entry. Missing checksum for descriptor ";
     public static final String CHECKSUM_MISMATCH_MESSAGE = "Launch halted. Local checksum does not match remote checksum for ";
     public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
+    public static final String MULTIPLE_TEST_FILE_ERROR_MESSAGE = "If specifying a test parameter file, use either --json or --yaml, but not both.";
 
     private static final String WORKFLOW = "workflow";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
@@ -199,32 +201,36 @@ public abstract class AbstractEntryClient<T> {
         printUsageHelp(getEntryType().toLowerCase());
         out("Commands:");
         out("");
-        out("  list             :  lists all the " + getEntryType() + "s published by the user");
-        out("");
-        out("  search           :  allows a user to search for all published " + getEntryType() + "s that match the criteria");
-        out("");
-        out("  publish          :  publish/unpublish a " + getEntryType() + " in Dockstore");
-        out("");
-        out("  info             :  print detailed information about a particular published " + getEntryType());
+        out("  " + CONVERT + "          :  utilities that allow you to convert file types");
         out("");
         out("  " + CWL.toString() + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
         out("                      which enables integration with Global Alliance compliant systems");
         out("");
-        out("  " + WDL.toString() + "              :  returns the Workflow Descriptor Language definition for this Docker image");
+        out("  " + DOWNLOAD + "         :  download " + getEntryType() + "s to the local directory");
+        out("");
+        out("  info             :  print detailed information about a particular published " + getEntryType());
+        out("");
+        out("  label            :  updates labels for an individual " + getEntryType() + "");
+        out("");
+        out("  " + LAUNCH + "           :  launch " + getEntryType() + "s (locally)");
+        out("");
+        out("  list             :  lists all the " + getEntryType() + "s published by the user");
+        out("");
+        if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
+            out("  nfl              :  returns the Nextflow " + getEntryType() + " defintion for this entry");
+            out("");
+        }
+        out("  publish          :  publish/unpublish a " + getEntryType() + " in Dockstore");
         out("");
         out("  refresh          :  updates your list of " + getEntryType() + "s stored on Dockstore or an individual " + getEntryType());
         out("");
-        out("  label            :  updates labels for an individual " + getEntryType() + "");
+        out("  search           :  allows a user to search for all published " + getEntryType() + "s that match the criteria");
         out("");
         out("  star             :  star/unstar a " + getEntryType() + " in Dockstore");
         out("");
         out("  test_parameter   :  updates test parameter files for a version of a " + getEntryType() + "");
         out("");
-        out("  " + CONVERT + "          :  utilities that allow you to convert file types");
-        out("");
-        out("  " + LAUNCH + "           :  launch " + getEntryType() + "s (locally)");
-        out("");
-        out("  " + DOWNLOAD + "         :  download " + getEntryType() + "s to the local directory");
+        out("  " + WDL.toString() + "              :  returns the Workflow Descriptor Language definition for this entry");
         if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
             out("");
             out("  wes              :  calls a Workflow Execution Schema API (WES) for a version of a " + getEntryType() + "");
@@ -619,7 +625,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void convert(final List<String> args) throws ApiException, IOException {
         if (args.isEmpty() || (containsHelpRequest(args) && !args.contains("cwl2json") && !args.contains("wdl2json") && !args
-                .contains("entry2json") && !args.contains("entry2tsv"))) {
+                .contains("entry2json"))) {
             convertHelp(); // Display general help
         } else {
             final String cmd = args.remove(0);
@@ -636,9 +642,6 @@ public abstract class AbstractEntryClient<T> {
                     break;
                 case "entry2json":
                     handleEntry2json(args);
-                    break;
-                case "entry2tsv":
-                    handleEntry2tsv(args);
                     break;
                 default:
                     invalid(cmd);
@@ -706,15 +709,6 @@ public abstract class AbstractEntryClient<T> {
             entry2jsonHelp();
         } else {
             final String runString = convertEntry2Json(args, true);
-            out(runString);
-        }
-    }
-
-    public void handleEntry2tsv(List<String> args) throws ApiException, IOException {
-        if (args.isEmpty() || containsHelpRequest(args)) {
-            entry2tsvHelp();
-        } else {
-            final String runString = convertEntry2Json(args, false);
             out(runString);
         }
     }
@@ -1022,6 +1016,9 @@ public abstract class AbstractEntryClient<T> {
         List<String> argsCopy = new ArrayList<>(args);
         String jsonFile = optVal(argsCopy, "--json", null);
         String yamlFile = optVal(argsCopy, "--yaml", null);
+        conditionalErrorMessage((jsonFile != null) && (yamlFile != null),
+                                MULTIPLE_TEST_FILE_ERROR_MESSAGE,
+                                CLIENT_ERROR);
         if (jsonFile != null) {
             try {
                 fileToJSON(jsonFile);
@@ -1321,14 +1318,13 @@ public abstract class AbstractEntryClient<T> {
                 // Parse AWS credentials from the provided config file. If the config file path is null, we can read the config file from
                 // the default home/.aws/credentials file.
                 final String profileToRead = authValue != null ? authValue : WesConfigOptions.AWS_DEFAULT_PROFILE_VALUE;
-                final ProfilesConfigFile profilesConfigFile = new ProfilesConfigFile();
-                final ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider(profilesConfigFile, profileToRead);
-                final AwsProfileRegionProvider regionProvider = new AwsProfileRegionProvider(profileToRead);
+                final ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileName(profileToRead).build();
+                final Region region = DefaultAwsRegionProviderChain.builder().profileName(profileToRead).build().getRegion();
 
                 // Build and return the request data
                 return new WesRequestData(wesEndpointUrl,
-                    credentialsProvider.getCredentials(),
-                    regionProvider.getRegion());
+                    credentialsProvider.resolveCredentials(),
+                        region.toString());
 
             } catch (IllegalArgumentException | SdkClientException e) {
                 // Some potential reasons for this exception are:
@@ -1429,10 +1425,6 @@ public abstract class AbstractEntryClient<T> {
         final String yamlRun = optVal(args, "--yaml", null);
         String jsonRun = optVal(args, "--json", null);
         final String uuid = optVal(args, "--uuid", null);
-
-        if (!(yamlRun != null ^ jsonRun != null)) {
-            errorMessage("One of  --json or --yaml is required", CLIENT_ERROR);
-        }
         CWLClient client = new CWLClient(this);
         client.launch(entry, isALocalEntry, yamlRun, jsonRun, null, uuid);
     }
@@ -1472,9 +1464,6 @@ public abstract class AbstractEntryClient<T> {
     private void launchWdl(String entry, final List<String> args, boolean isALocalEntry) throws ApiException {
         final String yamlRun = optVal(args, "--yaml", null);
         String jsonRun = optVal(args, "--json", null);
-        if (!(yamlRun != null ^ jsonRun != null)) {
-            errorMessage("dockstore: Missing required flag: one of --json or --yaml", CLIENT_ERROR);
-        }
         final String wdlOutputTarget = optVal(args, "--wdl-output-target", null);
         final String uuid = optVal(args, "--uuid", null);
         WDLClient client = new WDLClient(this);
@@ -1824,24 +1813,9 @@ public abstract class AbstractEntryClient<T> {
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2yaml [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " wdl2json [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2tsv [parameters]");
         out("");
         out("Description:");
         out("  They allow you to convert between file representations.");
-        printHelpFooter();
-    }
-
-    private void entry2tsvHelp() {
-        printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2tsv --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2tsv [parameters]");
-        out("");
-        out("Description:");
-        out("  Spit out a tsv run file for a given cwl document.");
-        out("");
-        out("Required parameters:");
-        out("  --entry <entry>                Complete " + getEntryType().toLowerCase()
-                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         printHelpFooter();
     }
 

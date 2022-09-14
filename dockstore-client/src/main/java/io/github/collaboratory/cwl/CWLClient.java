@@ -144,26 +144,21 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         try {
             parameterFile = convertYamlToJson(yamlParameterFile, jsonParameterFile);
         } catch (IOException ex) {
-            errorMessage("No parameter file found.", IO_ERROR);
+            LOG.info("No parameter file found.");
         }
 
-        // Ensure that there is a parameter file
-        if (parameterFile == null) {
-            errorMessage("No parameter file found.", IO_ERROR);
-        }
-
-        // Translate JSON path to absolute path
-        if (Paths.get(parameterFile).toFile().exists()) {
-            parameterFile = Paths.get(parameterFile).toFile().getAbsolutePath();
-        }
-
-        // Download parameter file if remote
-        try {
-            String jsonTempRun = File.createTempFile("parameter", "json").getAbsolutePath();
-            FileProvisioning.retryWrapper(null, parameterFile, Paths.get(jsonTempRun), 1, true, 1);
-            return jsonTempRun;
-        } catch (IOException | RuntimeException ex) {
-            errorMessage("No parameter file found.", IO_ERROR);
+        if (parameterFile != null) {
+            if (Paths.get(parameterFile).toFile().exists()) {
+                parameterFile = Paths.get(parameterFile).toFile().getAbsolutePath();
+            }
+            // Download parameter file if remote
+            try {
+                String jsonTempRun = File.createTempFile("parameter", "json").getAbsolutePath();
+                FileProvisioning.retryWrapper(null, parameterFile, Paths.get(jsonTempRun), 1, true, 1);
+                return jsonTempRun;
+            } catch (IOException | RuntimeException ex) {
+                errorMessage("No parameter file found.", IO_ERROR);
+            }
         }
         return null;
     }

@@ -279,30 +279,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         }
     }
 
-    @Override
-    public void handleEntry2tsv(List<String> args) throws ApiException, IOException {
-        String commandName = "entry2tsv";
-        String[] argv = args.toArray(new String[0]);
-        String[] argv1 = {commandName};
-        String[] both = ArrayUtils.addAll(argv1, argv);
-        CommandEntry2tsv commandEntry2tsv = new CommandEntry2tsv();
-        JCommander jc = new JCommander();
-        jc.addCommand(commandName, commandEntry2tsv);
-        jc.setProgramName("dockstore workflow convert");
-        try {
-            jc.parse(both);
-            if (commandEntry2tsv.help) {
-                printJCommanderHelp(jc, "dockstore workflow convert", commandName);
-            } else {
-                final String runString = convertWorkflow2Json(commandEntry2tsv.entry, false);
-                out(runString);
-            }
-        } catch (ParameterException e1) {
-            out(e1.getMessage());
-            printJCommanderHelp(jc, "dockstore workflow convert", commandName);
-        }
-    }
-
     private String convertWorkflow2Json(String entry, final boolean json) throws ApiException, IOException {
         // User may enter the version, so we have to extract the path
         String[] parts = entry.split(":");
@@ -490,16 +466,14 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         final String descriptor = descriptorType.getValue().toLowerCase();
                         LanguageClientInterface languageClientInterface = convertCLIStringToEnum(descriptor);
                         DescriptorLanguage language = DescriptorLanguage.convertShortStringToEnum(descriptor);
-
                         try {
                             switch (language) {
                             case CWL:
-                                conditionalErrorMessage((yamlRun != null) == (jsonRun != null), "One of  --json, --yaml, and --tsv is required", CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, yamlRun, jsonRun, null, uuid);
                                 break;
                             case WDL:
                             case NEXTFLOW:
-                                conditionalErrorMessage(jsonRun == null, "dockstore: missing required flag --json", CLIENT_ERROR);
+                                conditionalErrorMessage((yamlRun != null), "--yaml is not supported please use --json instead", CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
                                 break;
                             default:
@@ -510,7 +484,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                             // in addition to its checked exceptions, languageClientInterface.launch() can throw a variety of RuntimeExceptions, handle them all here
                             exceptionMessage(e, "Could not launch entry", IO_ERROR);
                         }
-                        
+
                     } catch (ApiException e) {
                         exceptionMessage(e, "Could not get workflow: " + path, ENTRY_NOT_FOUND);
                     }
@@ -1227,15 +1201,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     @Parameters(separators = "=", commandDescription = "Spit out a json run file for a given entry.")
     private static class CommandEntry2json {
-
-        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
-        private String entry;
-        @Parameter(names = "--help", description = "Prints help for entry2json command", help = true)
-        private boolean help = false;
-    }
-
-    @Parameters(separators = "=", commandDescription = "Spit out a tsv run file for a given entry.")
-    private static class CommandEntry2tsv {
 
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;

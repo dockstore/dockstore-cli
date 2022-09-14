@@ -1,5 +1,4 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bc446ce0a9bd4f81b3258c50f95e01b5)](https://app.codacy.com/app/dockstore/dockstore?utm_source=github.com&utm_medium=referral&utm_content=dockstore/dockstore&utm_campaign=Badge_Grade_Dashboard)
-[![Build Status](https://travis-ci.org/dockstore/dockstore-cli.svg?branch=develop)](https://travis-ci.org/dockstore/dockstore-cli)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/c583635906d84de5a1b5f62068fc26be)](https://www.codacy.com/gh/dockstore/dockstore-cli/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dockstore/dockstore-cli&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/dockstore/dockstore-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/dockstore/dockstore-cli)
 [![Website](https://img.shields.io/website/https/dockstore.org.svg)](https://dockstore.org)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ga4gh/dockstore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  
@@ -88,18 +87,17 @@ For users of Intellij or comparable IDEs, we also suggest loading the checkstyle
 
 ### Dockstore Command Line
 
-The dockstore command line should be installed in a location in your path.
+Be sure to have a configuration file in place. Follow the instructions in [Configuration File](#configuration-file) for help.
 
-  /dockstore-client/bin/dockstore
+Add the directory `dockstore-client/bin` to your PATH: 
 
-You then need to setup a `~/.dockstore/config` file with the following contents:
-
+```bash
+  cd dockstore-cli 
+  echo "export PATH=$(pwd)/dockstore-client/bin:"'$PATH' >> ~/.bash_profile
+  source ~/.bash_profile
 ```
-token: <dockstore_token_from_web_app>
-server-url: http://www.dockstore.org:8080
-```
 
-If you are working with a custom-built or updated dockstore client you will need to update the jar in: `~/.dockstore/config/self-installs`.
+If you are working with a custom-built or updated dockstore client you will need to update the jar in: `~/.dockstore/self-installs`.
 
 ### Encrypted Documents for Travis-CI
 
