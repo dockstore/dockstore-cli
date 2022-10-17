@@ -276,7 +276,6 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>profiles</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <!--
@@ -392,6 +391,9 @@
                                 <usedDependency>org.hibernate:hibernate-validator</usedDependency>
                                 <usedDependency>org.glassfish:jakarta.el</usedDependency>
                             </usedDependencies>
+                            <ignoredNonTestScopedDependencies>
+                                <ignoredNonTestScopedDependency>software.amazon.awssdk:profiles</ignoredNonTestScopedDependency>
+                            </ignoredNonTestScopedDependencies>
 
                         </configuration>
                     </execution>
