@@ -36,7 +36,7 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 public class CromwellLauncher extends BaseLauncher {
     // If the Cromwell version is changed be sure to update the table
     // in the documentation at advanced-topics/advanced-features.rst:317
-    protected static final String DEFAULT_CROMWELL_VERSION = "77";
+    protected static final String DEFAULT_CROMWELL_VERSION = "84";
     protected Map<String, List<FileProvisioning.FileInfo>> outputMap;
     protected List<String>  cromwellExtraParameters;
     protected List<String>  cromwellVmOptions;
