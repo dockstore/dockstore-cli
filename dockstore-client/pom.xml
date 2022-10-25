@@ -387,7 +387,7 @@
                             </ignoredUnusedDeclaredDependencies>
                             <usedDependencies>
                                 <usedDependency>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</usedDependency>
-                                <usedDependency>io.spray:spray-json_2.12</usedDependency>
+                                <usedDependency>io.spray:spray-json_2.13</usedDependency>
                                 <usedDependency>org.hibernate:hibernate-validator</usedDependency>
                                 <usedDependency>org.glassfish:jakarta.el</usedDependency>
                             </usedDependencies>
