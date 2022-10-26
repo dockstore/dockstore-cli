@@ -189,7 +189,7 @@ jobs:
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dockstore-java-{{ checksum "pom.xml" }}
       - restore_cache:
-          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.DOCKSTORE_CACHE_VERSION }}-segmented
       - install-git-secrets
       - run:
           name: build
@@ -352,7 +352,7 @@ commands:
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dockstore-java-{{ checksum "pom.xml" }}
       - restore_cache:
-          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.DOCKSTORE_CACHE_VERSION }}-segmented
 
   setup_for_tests:
     steps:
@@ -425,7 +425,7 @@ commands:
       - store_test_results:
           path: ~/test-results
       - save_cache:
-          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.DOCKSTORE_CACHE_VERSION }}-segmented
           paths:
             - /tmp/dockstore-web-cache
       - store_artifacts:
