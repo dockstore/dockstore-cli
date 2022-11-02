@@ -38,7 +38,7 @@
 
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.13.0-beta.3</dockstore-core.version>
+        <dockstore-core.version>1.14.0-alpha.0</dockstore-core.version>
         <maven-failsafe.version>2.22.2</maven-failsafe.version>
         <maven-surefire.version>2.22.2</maven-surefire.version>
         <skipTests>false</skipTests>
@@ -53,6 +53,7 @@
             ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../reports/target/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         <!-- end sonarcloud properties -->
+        <cwlavro.version>2.0.4.7</cwlavro.version>
     </properties>
 
     <organization>
@@ -156,6 +157,38 @@
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-migrations</artifactId>
                 <scope>test</scope>
+            </dependency>
+            <!--  cwl management -->
+            <dependency>
+                <groupId>io.cwl</groupId>
+                <artifactId>cwlavro-tools</artifactId>
+                <version>${cwlavro.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient-osgi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore-osgi</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- Used by cwlavro. Even though cwlavro uses 1.21, cwlavro's avro dependency uses 1.20 -->
+            <dependency>
+                <groupId>io.cwl</groupId>
+                <artifactId>cwlavro-generated</artifactId>
+                <version>${cwlavro.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient-osgi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore-osgi</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -693,7 +693,7 @@ public abstract class AbstractEntryClient<T> {
             final String wdlPath = reqVal(args, "--wdl");
             File wdlFile = new File(wdlPath);
             final List<String> wdlDocuments = Lists.newArrayList(wdlFile.getAbsolutePath());
-            final scala.collection.immutable.List<String> wdlList = scala.collection.JavaConversions.asScalaBuffer(wdlDocuments).toList();
+            final scala.collection.immutable.List<String> wdlList = scala.jdk.javaapi.CollectionConverters.asScala(wdlDocuments).toList();
             WdlBridge wdlBridge = new WdlBridge();
             try {
                 String inputs = wdlBridge.getParameterFile(wdlFile.getAbsolutePath());
