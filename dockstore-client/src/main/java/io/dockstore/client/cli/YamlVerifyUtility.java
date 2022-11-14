@@ -27,6 +27,7 @@ import java.util.List;
 import io.dockstore.common.yaml.DockstoreYaml12;
 import io.dockstore.common.yaml.DockstoreYamlHelper;
 import io.dockstore.common.yaml.Service12;
+import io.dockstore.common.yaml.YamlTool;
 import io.dockstore.common.yaml.YamlWorkflow;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
@@ -91,7 +92,7 @@ public final class YamlVerifyUtility {
             }
         }
         // Check Tools
-        List<YamlWorkflow> tools = dockstoreYaml12.getTools();
+        List<YamlTool> tools = dockstoreYaml12.getTools();
         if (!tools.isEmpty()) {
             for (YamlWorkflow tool : tools) {
                 List<String> filePaths = tool.getTestParameterFiles();
