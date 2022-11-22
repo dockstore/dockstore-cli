@@ -29,5 +29,12 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
            ${{ runner.os }}-maven-
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: java           
       - name: Build with mvnw
         run: ./mvnw clean install
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2            
