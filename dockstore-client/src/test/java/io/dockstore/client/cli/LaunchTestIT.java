@@ -124,6 +124,24 @@ public class LaunchTestIT {
     }
 
     @Test
+    public void cwlHandlesVersion12() {
+        // 1st-workflow-12.cwl is a version of 1st-workflow.cwl to which key new CWL version 1.2 features have been added.
+        File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow-12.cwl"));
+        File cwlJSON = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
+
+        WorkflowsApi api = mock(WorkflowsApi.class);
+        UsersApi usersApi = mock(UsersApi.class);
+        Client client = new Client();
+        // do not use a cache
+        runWorkflow(cwlFile, args, api, usersApi, client, false);
+    }
+
+    @Test
     public void wdlMetadataNoopPluginTest() {
         //Test when content and extension are wdl  --> no need descriptor
         File helloWDL = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
