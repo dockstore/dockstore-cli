@@ -38,6 +38,7 @@ import io.swagger.client.model.WorkflowVersion;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.Assertion;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -139,6 +140,33 @@ public class LaunchTestIT {
         Client client = new Client();
         // do not use a cache
         runWorkflow(cwlFile, args, api, usersApi, client, false);
+    }
+
+    /**
+     * cwltool should fail to run a workflow with a step of class "Operation"
+     */
+    @Test
+    public void cwlFailsClassOperation() {
+        File cwlFile = new File(ResourceHelpers.resourceFilePath("class-operation.cwl"));
+        File cwlJSON = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
+
+        WorkflowsApi api = mock(WorkflowsApi.class);
+        UsersApi usersApi = mock(UsersApi.class);
+        Client client = new Client();
+        // do not use a cache
+        exit.expectSystemExit();
+        exit.checkAssertionAfterwards(new Assertion() {
+            @Override
+            public void checkAssertion() throws Exception {
+                assertTrue("output should include a failed cwltool run", systemErrRule.getLog().contains("Workflow has unrunnable abstract Operation"));
+            }
+        });
+        runWorkflowUnchecked(cwlFile, args, api, usersApi, client, false);
     }
 
     @Test
@@ -250,12 +278,15 @@ public class LaunchTestIT {
     }
 
 
-    private void runWorkflow(File cwlFile, ArrayList<String> args, WorkflowsApi api, UsersApi usersApi, Client client, boolean useCache) {
+    private void runWorkflowUnchecked(File cwlFile, ArrayList<String> args, WorkflowsApi api, UsersApi usersApi, Client client, boolean useCache) {
         client.setConfigFile(ResourceHelpers.resourceFilePath(useCache ? "config.withCache" : "config"));
         Client.SCRIPT.set(true);
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         workflowClient.checkEntryFile(cwlFile.getAbsolutePath(), args, null);
+    }
 
+    private void runWorkflow(File cwlFile, ArrayList<String> args, WorkflowsApi api, UsersApi usersApi, Client client, boolean useCache) {
+        runWorkflowUnchecked(cwlFile, args, api, usersApi, client, useCache);
         assertTrue("output should include a successful cwltool run", systemOutRule.getLog().contains("Final process status is success"));
     }
 
