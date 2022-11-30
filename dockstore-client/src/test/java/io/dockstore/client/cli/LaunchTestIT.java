@@ -125,7 +125,7 @@ public class LaunchTestIT {
     }
 
     @Test
-    public void cwlHandlesVersion12() {
+    public void cwlSupportsVersion12() {
         // 1st-workflow-12.cwl is a version of 1st-workflow.cwl to which key new CWL version 1.2 features have been added.
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow-12.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
@@ -146,7 +146,7 @@ public class LaunchTestIT {
      * cwltool should fail to run a workflow with a step of class "Operation"
      */
     @Test
-    public void cwlFailsClassOperation() {
+    public void cwlFailsStepWithClassOperation() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("class-operation.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
 
@@ -166,7 +166,7 @@ public class LaunchTestIT {
                 assertTrue("output should include a failed cwltool run", systemErrRule.getLog().contains("Workflow has unrunnable abstract Operation"));
             }
         });
-        runWorkflowUnchecked(cwlFile, args, api, usersApi, client, false);
+        runWorkflow(cwlFile, args, api, usersApi, client, false);
     }
 
     @Test
@@ -278,15 +278,12 @@ public class LaunchTestIT {
     }
 
 
-    private void runWorkflowUnchecked(File cwlFile, ArrayList<String> args, WorkflowsApi api, UsersApi usersApi, Client client, boolean useCache) {
+    private void runWorkflow(File cwlFile, ArrayList<String> args, WorkflowsApi api, UsersApi usersApi, Client client, boolean useCache) {
         client.setConfigFile(ResourceHelpers.resourceFilePath(useCache ? "config.withCache" : "config"));
         Client.SCRIPT.set(true);
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         workflowClient.checkEntryFile(cwlFile.getAbsolutePath(), args, null);
-    }
 
-    private void runWorkflow(File cwlFile, ArrayList<String> args, WorkflowsApi api, UsersApi usersApi, Client client, boolean useCache) {
-        runWorkflowUnchecked(cwlFile, args, api, usersApi, client, useCache);
         assertTrue("output should include a successful cwltool run", systemOutRule.getLog().contains("Final process status is success"));
     }
 
