@@ -38,6 +38,7 @@ import io.swagger.client.model.WorkflowVersion;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.Assertion;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -120,6 +121,51 @@ public class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
         // do not use a cache
+        runWorkflow(cwlFile, args, api, usersApi, client, false);
+    }
+
+    @Test
+    public void cwlSupportsVersion12() {
+        // 1st-workflow-12.cwl is a version of 1st-workflow.cwl to which key new CWL version 1.2 features have been added.
+        File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow-12.cwl"));
+        File cwlJSON = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
+
+        WorkflowsApi api = mock(WorkflowsApi.class);
+        UsersApi usersApi = mock(UsersApi.class);
+        Client client = new Client();
+        // do not use a cache
+        runWorkflow(cwlFile, args, api, usersApi, client, false);
+    }
+
+    /**
+     * cwltool should fail to run a workflow with a step of class "Operation"
+     */
+    @Test
+    public void cwlFailsStepWithClassOperation() {
+        File cwlFile = new File(ResourceHelpers.resourceFilePath("class-operation.cwl"));
+        File cwlJSON = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--local-entry");
+        args.add("--json");
+        args.add(cwlJSON.getAbsolutePath());
+
+        WorkflowsApi api = mock(WorkflowsApi.class);
+        UsersApi usersApi = mock(UsersApi.class);
+        Client client = new Client();
+        // do not use a cache
+        exit.expectSystemExit();
+        exit.checkAssertionAfterwards(new Assertion() {
+            @Override
+            public void checkAssertion() throws Exception {
+                assertTrue("output should include a failed cwltool run", systemErrRule.getLog().contains("Workflow has unrunnable abstract Operation"));
+            }
+        });
         runWorkflow(cwlFile, args, api, usersApi, client, false);
     }
 
