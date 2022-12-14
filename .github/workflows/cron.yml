@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-      java: [ '17.0.4+8' ]
+        java: [ '17.0.4+8' ]
 
     steps:
       - name: install git secrets
