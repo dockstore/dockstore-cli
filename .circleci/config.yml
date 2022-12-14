@@ -386,14 +386,14 @@ commands:
             # but at this time how to do that is unknown
             # so we have to add /home/circleci/.local/bin to the PATH
             export CWLTOOL_PATH=${HOME}/.local/bin
-            echo "export CWLTOOL_PATH=${HOME}/.local/bin" >> $BASH_ENV
+            echo 'export CWLTOOL_PATH=${HOME}/.local/bin' >> $BASH_ENV
 
             export GO_PATH=/usr/local
-            echo "export GO_PATH=/usr/local" >> $BASH_ENV
+            echo 'export GO_PATH=/usr/local' >> $BASH_ENV
             export SINGULARITY_PATH=${HOME}/go
-            echo "export SINGULARITY_PATH=${HOME}/go" >> $BASH_ENV
+            echo 'export SINGULARITY_PATH=${HOME}/go' >> $BASH_ENV
 
-            echo "export PATH=${CWLTOOL_PATH}:${GO_PATH}/go/bin:${PATH}:${SINGULARITY_PATH}/bin" >> $BASH_ENV
+            echo 'export PATH=${CWLTOOL_PATH}:${GO_PATH}/go/bin:${PATH}:${SINGULARITY_PATH}/bin' >> $BASH_ENV
       - run:
           name: install pip dependencies
           command: scripts/install-tests.sh
