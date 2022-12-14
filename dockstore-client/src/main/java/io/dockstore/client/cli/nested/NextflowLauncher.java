@@ -25,7 +25,7 @@ public class NextflowLauncher extends BaseLauncher {
     @Override
     public List<String> buildRunCommand() {
         ArrayList<String> command = new ArrayList<>(
-                Arrays.asList("java", "-jar", executionFile.getAbsolutePath(), "run", "-with-docker", "--outdir", workingDirectory,
+                Arrays.asList("java", "--add-opens java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED", "-jar", executionFile.getAbsolutePath(), "run", "-with-docker", "--outdir", workingDirectory,
                         "-work-dir", workingDirectory));
         if (originalParameterFile != null) {
             command.addAll(Arrays.asList("-params-file", originalParameterFile));
