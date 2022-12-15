@@ -816,7 +816,7 @@ public abstract class AbstractEntryClient<T> {
 
         // get all the tool files and filter out anything not a descriptor
         try {
-            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, entryPath, versionID, null).stream()
+            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(entryPath, type, versionID, null).stream()
                 .filter(toolFile -> ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR.equals(toolFile.getFileType()) || ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR.equals(toolFile.getFileType()))
                 .collect(Collectors.toList());
         } catch (io.dockstore.openapi.client.ApiException ex) {
