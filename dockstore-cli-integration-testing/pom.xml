@@ -208,10 +208,14 @@
                     <runOrder>filesystem</runOrder>
                     <!-- workaround for Java 17 module issues with powermock -->
                     <argLine>
+                        --illegal-access=permit
                         --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-opens java.base/java.io=ALL-UNNAMED
                         --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.util.stream=ALL-UNNAMED
                         --add-opens java.base/java.base=ALL-UNNAMED
+                        --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+                        --add-opens java.base/sun.nio.fs=ALL-UNNAMED
                     </argLine>
                 </configuration>
             </plugin>
