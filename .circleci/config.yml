@@ -216,7 +216,7 @@ commands:
       - run:
           name: decrypt and expand confidential test data
           command: |
-            sudo apt install openssl -y
+            sudo NEEDRESTART_MODE=a apt install openssl
             bash scripts/decrypt.sh
 
   send_coverage:

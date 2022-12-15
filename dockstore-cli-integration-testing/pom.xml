@@ -206,6 +206,13 @@
                     <skipTests>${skipITs}</skipTests>
                     <!-- seems like some form of Jackson fork issue for this module with random order -->
                     <runOrder>filesystem</runOrder>
+                    <!-- workaround for Java 17 module issues with powermock -->
+                    <argLine>
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.io=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.base=ALL-UNNAMED
+                    </argLine>
                 </configuration>
             </plugin>
             <plugin>
