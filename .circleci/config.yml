@@ -408,10 +408,10 @@ commands:
             then
               TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
               echo $TESTS_TO_RUN
-              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean $MAVEN_GOAL -Dit.test=$TESTS_TO_RUN -DfailIfNoTests=false \
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Dit.test=$TESTS_TO_RUN -DfailIfNoTests=false \
               -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
             else 
-              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
             fi
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:
