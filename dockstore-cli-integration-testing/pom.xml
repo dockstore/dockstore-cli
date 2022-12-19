@@ -28,6 +28,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <argLine></argLine>
     </properties>
 
     <dependencies>
@@ -208,7 +209,7 @@
                     <runOrder>filesystem</runOrder>
                     <!-- workaround for Java 17 module issues with powermock -->
                     <argLine>
-                        ${argLine}
+                        @{argLine}
                         --illegal-access=permit
                         --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-opens java.base/java.io=ALL-UNNAMED

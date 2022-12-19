@@ -29,6 +29,7 @@
 
     <properties>
         <docker-client.version>3.2.8</docker-client.version>
+        <argLine></argLine>
     </properties>
 
     <dependencies>
@@ -436,7 +437,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <argLine>
-                        ${argLine}
+                        @{argLine}
                         --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-opens java.base/java.io=ALL-UNNAMED
                         --add-opens java.base/java.util=ALL-UNNAMED
