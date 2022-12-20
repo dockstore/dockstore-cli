@@ -2,7 +2,7 @@ version: 2.1
 parameters:
   java-tag:
     type: string
-    default: "11.0.12"
+    default: "17.0.3"
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
@@ -12,14 +12,14 @@ executors:
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2204:2022.10.1
     environment:
       PGHOST: 127.0.0.1
     resource_class: medium
 
   toil_wes_test_executor:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2204:2022.10.1
     resource_class: medium
 
 common_filters: &common_filters
@@ -216,7 +216,7 @@ commands:
       - run:
           name: decrypt and expand confidential test data
           command: |
-            sudo apt install openssl -y
+            sudo NEEDRESTART_MODE=a apt install openssl
             bash scripts/decrypt.sh
 
   send_coverage:
@@ -386,14 +386,14 @@ commands:
             # but at this time how to do that is unknown
             # so we have to add /home/circleci/.local/bin to the PATH
             export CWLTOOL_PATH=${HOME}/.local/bin
-            echo "export CWLTOOL_PATH=${HOME}/.local/bin" >> $BASH_ENV
+            echo 'export CWLTOOL_PATH=${HOME}/.local/bin' >> $BASH_ENV
 
             export GO_PATH=/usr/local
-            echo "export GO_PATH=/usr/local" >> $BASH_ENV
+            echo 'export GO_PATH=/usr/local' >> $BASH_ENV
             export SINGULARITY_PATH=${HOME}/go
-            echo "export SINGULARITY_PATH=${HOME}/go" >> $BASH_ENV
+            echo 'export SINGULARITY_PATH=${HOME}/go' >> $BASH_ENV
 
-            echo "export PATH=${CWLTOOL_PATH}:${GO_PATH}/go/bin:${PATH}:${SINGULARITY_PATH}/bin" >> $BASH_ENV
+            echo 'export PATH=${CWLTOOL_PATH}:${GO_PATH}/go/bin:${PATH}:${SINGULARITY_PATH}/bin' >> $BASH_ENV
       - run:
           name: install pip dependencies
           command: scripts/install-tests.sh
@@ -408,10 +408,10 @@ commands:
             then
               TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
               echo $TESTS_TO_RUN
-              mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean $MAVEN_GOAL -Dit.test=$TESTS_TO_RUN -DfailIfNoTests=false \
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Dit.test=$TESTS_TO_RUN -DfailIfNoTests=false \
               -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
             else 
-              mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
             fi
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:

@@ -20,7 +20,8 @@ fi
 if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     # Install singularity from source
     # need singularity > 3.0.0, which is not available as an ubuntu package
-    sudo apt-get update && sudo apt-get install -y \
+    # https://askubuntu.com/questions/1367139/apt-get-upgrade-auto-restart-services
+    sudo apt-get update && sudo NEEDRESTART_MODE=a apt install \
     build-essential \
     libssl-dev \
     uuid-dev \

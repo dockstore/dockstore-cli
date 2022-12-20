@@ -34,7 +34,12 @@ public class AbstractEntryClientTestIT {
     public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
     @Rule
     public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
+
+    /**
+     * @deprecated does not seem to play well with Java 17
+     */
     @Rule
+    @Deprecated(since = "1.14")
     public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     /**

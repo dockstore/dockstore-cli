@@ -249,7 +249,7 @@ public abstract class BaseLanguageClient {
             Optional<Checksum> remoteDescriptorChecksum = Optional.empty();
             try {
                 // The TRS endpoint only discovers published entries
-                final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, versionID, toolFile.getPath());
+                final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(ga4ghv20Path, type.toString(), versionID, toolFile.getPath());
                 remoteDescriptorChecksum = remoteDescriptor.getChecksum()
                     .stream()
                     .filter(c -> c.getType().equals(checksumFunction))

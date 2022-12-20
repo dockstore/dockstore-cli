@@ -29,6 +29,7 @@
 
     <properties>
         <docker-client.version>3.2.8</docker-client.version>
+        <argLine></argLine>
     </properties>
 
     <dependencies>
@@ -293,7 +294,7 @@
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>6.2.5.Final</version>
         </dependency>
@@ -389,7 +390,7 @@
                             <usedDependencies>
                                 <usedDependency>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</usedDependency>
                                 <usedDependency>io.spray:spray-json_2.13</usedDependency>
-                                <usedDependency>org.hibernate:hibernate-validator</usedDependency>
+                                <usedDependency>org.hibernate.validator:hibernate-validator</usedDependency>
                                 <usedDependency>org.glassfish:jakarta.el</usedDependency>
                             </usedDependencies>
                             <ignoredNonTestScopedDependencies>
@@ -418,10 +419,6 @@
                 <artifactId>spotbugs-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -439,6 +436,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <argLine>
+                        @{argLine}
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.io=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.base=ALL-UNNAMED
+                    </argLine>
                     <skipTests>${skipITs}</skipTests>
                     <excludedGroups>${excludeGroups}</excludedGroups>
                 </configuration>
