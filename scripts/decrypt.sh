@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # This script decrypts our test database
 # Bash3 Boilerplate. Copyright (c) 2014, kvz.io
-# You will need the environment variables CIRCLE_CI_KEY_2 and CIRCLE_CI_IV_2
+# You will need the environment variables CIRCLE_CI_CLI_KEY and CIRCLE_CI_CLI_IV
 
 set -o errexit
 set -o pipefail
