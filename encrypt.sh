@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # This script is used to encrypt the confidential test data
-# You will need the environment variables CIRCLE_CI_KEY_2 and CIRCLE_CI_IV_2 populated
+# You will need the environment variables CIRCLE_CI_CLI_KEY and CIRCLE_CI_CLI_IV populated
 
 set -o errexit
 set -o pipefail
