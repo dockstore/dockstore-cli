@@ -16,16 +16,14 @@
 
 package io.dockstore.client.cli;
 
-import java.util.Objects;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class UpgradeTestIT {
-    private ObjectMapper objectMapper;
 
     /**
      * This method will decide which version to upgrade to depending on the command "stable","unstable", and "none"
@@ -77,7 +75,7 @@ public class UpgradeTestIT {
     @BeforeEach
     public void setup() {
 
-        this.objectMapper = mock(ObjectMapper.class);
+        ObjectMapper objectMapper = mock(ObjectMapper.class);
         Client.setObjectMapper(objectMapper);
 
         /*
@@ -106,7 +104,7 @@ public class UpgradeTestIT {
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String desiredVersion = decideOutput("none", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(desiredVersion, "0.4-beta.1"));
+        assertEquals("0.4-beta.1", desiredVersion);
     }
 
     @Test
@@ -117,7 +115,7 @@ public class UpgradeTestIT {
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String optCommand = decideOutput("none", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(optCommand, "upgrade-stable"));
+        assertEquals("upgrade-stable", optCommand);
     }
 
     @Test
@@ -129,7 +127,7 @@ public class UpgradeTestIT {
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String optCommand = decideOutput("none", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(optCommand, "upgrade-unstable"));
+        assertEquals("upgrade-unstable", optCommand);
     }
 
     @Test
@@ -140,7 +138,7 @@ public class UpgradeTestIT {
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String desiredVersion = decideOutput("stable", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(desiredVersion, "0.4-beta.1"));
+        assertEquals("0.4-beta.1", desiredVersion);
     }
 
     @Test
@@ -151,7 +149,7 @@ public class UpgradeTestIT {
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String optCommand = decideOutput("stable", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(optCommand, "upgrade-unstable"));
+        assertEquals("upgrade-unstable", optCommand);
     }
 
     @Test
@@ -162,7 +160,7 @@ public class UpgradeTestIT {
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String desiredVersion = decideOutput("unstable", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(desiredVersion, "0.4-beta.0"));
+        assertEquals("0.4-beta.0", desiredVersion);
     }
 
     @Test
@@ -173,7 +171,7 @@ public class UpgradeTestIT {
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String optCommand = decideOutput("unstable", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(optCommand, "upgrade-stable"));
+        assertEquals("upgrade-stable", optCommand);
     }
 }
 

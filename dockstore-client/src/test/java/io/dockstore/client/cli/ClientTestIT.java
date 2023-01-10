@@ -15,36 +15,38 @@
  */
 package io.dockstore.client.cli;
 
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Utilities;
 import io.dropwizard.testing.ResourceHelpers;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.DEPRECATED_PORT_MESSAGE;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by dyuen on 2/23/17.
  */
+@ExtendWith(SystemStubsExtension.class)
 public class ClientTestIT {
 
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog();
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
+
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
     @Test
     public void testDependencies() {
         String config = ResourceHelpers.resourceFilePath("config");
         CWLRunnerFactory.setConfig(Utilities.parseConfig(config));
-        assertFalse(systemErrRule.getLog().contains("Override and run with"));
-        assertFalse(systemOutRule.getLog().contains("Override and run with"));
+        assertFalse(systemErrRule.getText().contains("Override and run with"));
+        assertFalse(systemOutRule.getText().contains("Override and run with"));
     }
 
     /**
@@ -57,8 +59,8 @@ public class ClientTestIT {
         String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
         String[] command = { "--help", "--config", clientConfig };
         Client.main(command);
-        assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
-        assertFalse("Should not have warned about port 8443", systemErrRule.getLog().contains(DEPRECATED_PORT_MESSAGE));
+        assertTrue(systemErrRule.getText().isBlank(), "There are unexpected error logs");
+        assertFalse(systemErrRule.getText().contains(DEPRECATED_PORT_MESSAGE), "Should not have warned about port 8443");
     }
 
     /**
@@ -69,6 +71,6 @@ public class ClientTestIT {
         String clientConfig = ResourceHelpers.resourceFilePath("oldClientConfig");
         String[] command = { "--help", "--config", clientConfig };
         Client.main(command);
-        assertTrue("Should have warned about port 8443", systemErrRule.getLog().contains(DEPRECATED_PORT_MESSAGE));
+        assertTrue(systemErrRule.getText().contains(DEPRECATED_PORT_MESSAGE), "Should have warned about port 8443");
     }
 }

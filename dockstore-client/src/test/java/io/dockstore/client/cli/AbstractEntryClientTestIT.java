@@ -4,43 +4,38 @@ import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.WesCommandParser;
 import io.dockstore.client.cli.nested.WesRequestData;
 import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static software.amazon.awssdk.profiles.ProfileFileSystemSetting.AWS_CONFIG_FILE;
 import static software.amazon.awssdk.profiles.ProfileFileSystemSetting.AWS_SHARED_CREDENTIALS_FILE;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
+@ExtendWith(SystemStubsExtension.class)
 public class AbstractEntryClientTestIT {
 
     static final String CONFIG_NO_CONTENT_RESOURCE = "configNoContent";
 
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
 
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
-    /**
-     * @deprecated does not seem to play well with Java 17
-     */
-    @Rule
-    @Deprecated(since = "1.14")
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+    @SystemStub
+    private EnvironmentVariables environmentVariables;
 
     /**
      * Tests the help messages for each of the WES command options
@@ -61,7 +56,7 @@ public class AbstractEntryClientTestIT {
             }
 
             Client.main(commandStatement);
-            assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+            assertTrue(systemErrRule.getText().isBlank(), "There are unexpected error logs");
         }
 
         // Empty config file
@@ -75,7 +70,7 @@ public class AbstractEntryClientTestIT {
             }
 
             Client.main(commandStatement);
-            assertTrue("There are unexpected error logs", systemErrRule.getLog().isBlank());
+            assertTrue(systemErrRule.getText().isBlank(), "There are unexpected error logs");
         }
     }
 
@@ -93,7 +88,7 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testNoArgs() {
+    public void testNoArgs() throws Exception {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);
 
@@ -101,13 +96,13 @@ public class AbstractEntryClientTestIT {
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
 
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(parser);
-        assertFalse("The config file doesn't exist", systemErrRule.getLog().isBlank());
+        int exitCode = catchSystemExit(() -> workflowClient.aggregateWesRequestData(parser));
+        assertTrue(exitCode != 0);
+        assertFalse(systemErrRule.getText().isBlank(), "The config file doesn't exist");
     }
 
     @Test
-    public void testAggregateAWSCredentialBadProfile() {
+    public void testAggregateAWSCredentialBadProfile() throws Exception {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configNoContent");
 
@@ -116,9 +111,9 @@ public class AbstractEntryClientTestIT {
         };
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(parser);
-        assertFalse("There should be error logs", systemErrRule.getLog().isEmpty());
+        int exitCode = catchSystemExit(() -> workflowClient.aggregateWesRequestData(parser));
+        assertTrue(exitCode != 0);
+        assertFalse(systemErrRule.getText().isEmpty(), "There should be error logs");
     }
 
     @Test
@@ -141,7 +136,7 @@ public class AbstractEntryClientTestIT {
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("AWS region should be parsed", "REGION", data.getAwsRegion());
+        assertEquals("REGION", data.getAwsRegion(), "AWS region should be parsed");
     }
 
     @Test
@@ -164,15 +159,16 @@ public class AbstractEntryClientTestIT {
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("AWS access key should be parsed", "KEY", data.getAwsAccessKey());
-        assertEquals("AWS secret key should be parsed", "SECRET_KEY", data.getAwsSecretKey());
-        assertEquals("AWS region should be parsed", "REGION", data.getAwsRegion());
-        assertEquals("AWS region should be parsed", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
+        assertEquals("KEY", data.getAwsAccessKey(), "AWS access key should be parsed");
+        assertEquals("SECRET_KEY", data.getAwsSecretKey(), "AWS secret key should be parsed");
+        assertEquals("REGION", data.getAwsRegion(), "AWS region should be parsed");
+        assertEquals(WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType(),
+                "AWS region should be parsed");
 
     }
 
     @Test
-    public void testAggregateAWSCredentialCompleteCommandMalformed() {
+    public void testAggregateAWSCredentialCompleteCommandMalformed() throws Exception {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
@@ -189,9 +185,9 @@ public class AbstractEntryClientTestIT {
 
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
-        systemExit.expectSystemExit();
-        workflowClient.aggregateWesRequestData(parser);
-        assertFalse("There should be error logs", systemErrRule.getLog().isEmpty());
+        int exitCode = catchSystemExit(() -> workflowClient.aggregateWesRequestData(parser));
+        assertTrue(exitCode != 0);
+        assertFalse(systemErrRule.getText().isEmpty(), "There should be error logs");
     }
 
     @Test
@@ -214,8 +210,9 @@ public class AbstractEntryClientTestIT {
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("AWS credential type should be set", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
-        assertEquals("AWS region should be parsed", "REGION2", data.getAwsRegion());
+        assertEquals(WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType(),
+                "AWS credential type should be set");
+        assertEquals("REGION2", data.getAwsRegion(), "AWS region should be parsed");
 
     }
 
@@ -239,10 +236,11 @@ public class AbstractEntryClientTestIT {
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("AWS access key should be parsed", "KEY2", data.getAwsAccessKey());
-        assertEquals("AWS secret key should be parsed", "SECRET_KEY2", data.getAwsSecretKey());
-        assertEquals("AWS region should be parsed", "REGION2", data.getAwsRegion());
-        assertEquals("AWS region should be parsed", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
+        assertEquals("KEY2", data.getAwsAccessKey(), "AWS access key should be parsed");
+        assertEquals("SECRET_KEY2", data.getAwsSecretKey(), "AWS secret key should be parsed");
+        assertEquals("REGION2", data.getAwsRegion(), "AWS region should be parsed");
+        assertEquals(WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType(),
+                "AWS region should be parsed");
     }
 
     @Test
@@ -260,9 +258,9 @@ public class AbstractEntryClientTestIT {
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("Bearer token should be parsed", "myToken", data.getBearerToken());
-        assertEquals("WES URL should be parsed", "myUrl", data.getUrl());
-        assertEquals("AWS region should be parsed", WesRequestData.CredentialType.BEARER_TOKEN, data.getCredentialType());
+        assertEquals("myToken", data.getBearerToken(), "Bearer token should be parsed");
+        assertEquals("myUrl", data.getUrl(), "WES URL should be parsed");
+        assertEquals(WesRequestData.CredentialType.BEARER_TOKEN, data.getCredentialType(), "AWS region should be parsed");
     }
 
     @Test
@@ -283,10 +281,11 @@ public class AbstractEntryClientTestIT {
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("AWS access key should be parsed", "KEY", data.getAwsAccessKey());
-        assertEquals("AWS secret key should be parsed", "SECRET_KEY", data.getAwsSecretKey());
-        assertEquals("AWS region should be parsed", "REGION", data.getAwsRegion());
-        assertEquals("AWS region should be parsed", WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType());
+        assertEquals("KEY", data.getAwsAccessKey(), "AWS access key should be parsed");
+        assertEquals("SECRET_KEY", data.getAwsSecretKey(), "AWS secret key should be parsed");
+        assertEquals("REGION", data.getAwsRegion(), "AWS region should be parsed");
+        assertEquals(WesRequestData.CredentialType.AWS_PERMANENT_CREDENTIALS, data.getCredentialType(),
+                "AWS region should be parsed");
 
     }
 
@@ -310,11 +309,12 @@ public class AbstractEntryClientTestIT {
         parser.jCommander.parse(args);
         WesRequestData data = workflowClient.aggregateWesRequestData(parser);
 
-        assertEquals("AWS access key should be parsed", "KEY3", data.getAwsAccessKey());
-        assertEquals("AWS secret key should be parsed", "SECRET_KEY3", data.getAwsSecretKey());
-        assertEquals("AWS session token should be parsed", "TOKEN3", data.getAwsSessionToken());
-        assertEquals("AWS region should be parsed", "REGION3", data.getAwsRegion());
-        assertEquals("AWS credentials type should be temporary", WesRequestData.CredentialType.AWS_TEMPORARY_CREDENTIALS, data.getCredentialType());
+        assertEquals("KEY3", data.getAwsAccessKey(), "AWS access key should be parsed");
+        assertEquals("SECRET_KEY3", data.getAwsSecretKey(), "AWS secret key should be parsed");
+        assertEquals("TOKEN3", data.getAwsSessionToken(), "AWS session token should be parsed");
+        assertEquals("REGION3", data.getAwsRegion(), "AWS region should be parsed");
+        assertEquals(WesRequestData.CredentialType.AWS_TEMPORARY_CREDENTIALS, data.getCredentialType(),
+                "AWS credentials type should be temporary");
 
     }
 

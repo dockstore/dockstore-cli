@@ -8,24 +8,23 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Utilities;
 import io.dropwizard.testing.ResourceHelpers;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 /**
  * Tests CLI launching with image on filesystem instead of internet
@@ -35,6 +34,7 @@ import static org.junit.Assert.assertTrue;
  * @author gluu
  * @since 1.6.0
  */
+@ExtendWith(SystemStubsExtension.class)
 public class LaunchNoInternetTestIT {
     private static final Logger LOG = LoggerFactory.getLogger(LaunchNoInternetTestIT.class);
     private static final File DESCRIPTOR_FILE = new File(ResourceHelpers.resourceFilePath("nonexistent_image/CWL/nonexistent_image.cwl"));
@@ -42,14 +42,11 @@ public class LaunchNoInternetTestIT {
     private static final File DOCKERFILE = new File(ResourceHelpers.resourceFilePath("nonexistent_image/Dockerfile"));
     private static final String FAKE_IMAGE_NAME = "dockstore.org/bashwithbinbash:0118999881999119725...3";
     private static String dockerImageDirectory;
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
-    @Rule
-    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
+
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
     /**
      * Downloading an image with bash (Nextflow needs it) and saving it on the filesystem as something weird that is unlikely to be on the internet
@@ -57,14 +54,14 @@ public class LaunchNoInternetTestIT {
      *
      * @throws IOException Something has gone terribly wrong with preparing the fake docker image
      */
-    @BeforeClass
+    @BeforeAll
     public static void downloadCustomDockerImage() throws IOException {
         Utilities.executeCommand("docker build -f " + DOCKERFILE + " . -t " + FAKE_IMAGE_NAME, System.out, System.err);
         dockerImageDirectory = Files.createTempDirectory("docker_images").toAbsolutePath().toString();
         Utilities.executeCommand("docker save -o " + dockerImageDirectory + "/fakeImage " + FAKE_IMAGE_NAME, System.out, System.err);
     }
 
-    @Before
+    @BeforeEach
     public void clearImage() {
         try {
             Utilities.executeCommand("docker rmi " + FAKE_IMAGE_NAME);
@@ -77,9 +74,7 @@ public class LaunchNoInternetTestIT {
      * When Docker image directory is not specified
      */
     @Test
-    public void directoryNotSpecified() {
-        checkFailed();
-
+    public void directoryNotSpecified() throws Exception {
         List<String> args = new ArrayList<>();
         args.add("tool");
         args.add("launch");
@@ -91,21 +86,22 @@ public class LaunchNoInternetTestIT {
         args.add(ResourceHelpers.resourceFilePath("config"));
         args.add("--script");
 
-        Client.main(args.toArray(new String[0]));
+        int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
+        assertTrue(exitCode != 0);
+        assertTrue(systemErrRule.getText().contains(
+                "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
+                        + "']' returned non-zero exit status 1"));
     }
 
     /**
      * Docker image directory specified but doesn't exist
      */
     @Test
-    public void directorySpecifiedDoesNotExist() throws IOException {
-        checkFailed();
-        exit.checkAssertionAfterwards(() -> assertTrue(systemOutRule.getLog().contains("The specified Docker image directory not found:")));
-
+    public void directorySpecifiedDoesNotExist() throws Exception {
         String toWrite = "docker-images = src/test/resources/nonexistent_image/docker_images/thisDirectoryShouldNotExist";
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
-            Assert.fail("Could create temp config file");
+            fail("Could create temp config file");
         }
 
         List<String> args = new ArrayList<>();
@@ -119,21 +115,23 @@ public class LaunchNoInternetTestIT {
         args.add(configPath.getAbsolutePath());
         args.add("--script");
 
-        Client.main(args.toArray(new String[0]));
+        int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
+        assertTrue(exitCode != 0);
+        assertTrue(systemOutRule.getText().contains("The specified Docker image directory not found:"));
+        assertTrue(systemErrRule.getText().contains(
+                "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
+                        + "']' returned non-zero exit status 1"));
     }
 
     /**
      * Docker image directory specified is actually a file
      */
     @Test
-    public void directorySpecifiedButIsAFile() throws IOException {
-        checkFailed();
-        exit.checkAssertionAfterwards(() -> assertTrue(systemOutRule.getLog().contains("The specified Docker image directory is a file:")));
-
+    public void directorySpecifiedButIsAFile() throws Exception {
         String toWrite = "docker-images = " + dockerImageDirectory + "/fakeImage";
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
-            Assert.fail("Could create temp config file");
+            fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
         args.add("tool");
@@ -146,26 +144,27 @@ public class LaunchNoInternetTestIT {
         args.add(configPath.getAbsolutePath());
         args.add("--script");
 
-        Client.main(args.toArray(new String[0]));
+        int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
+        assertTrue(exitCode != 0);
+        assertTrue(systemOutRule.getText().contains("The specified Docker image directory is a file:"));
+        assertTrue(systemErrRule.getText().contains(
+                "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
+                        + "']' returned non-zero exit status 1"));
     }
 
     /**
      * Docker image directory specified but has no files in there
      */
     @Test
-    public void directorySpecifiedButNoImages() throws IOException {
-        checkFailed();
-        exit.checkAssertionAfterwards(
-            () -> assertTrue(systemOutRule.getLog().contains("There are no files in the docker image directory")));
-
+    public void directorySpecifiedButNoImages() throws Exception {
         Path emptyTestDirectory = createEmptyTestDirectory();
         if (emptyTestDirectory == null) {
-            Assert.fail("Could not create empty temp directory");
+            fail("Could not create empty temp directory");
         }
         String toWrite = "docker-images = " + emptyTestDirectory.toAbsolutePath();
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
-            Assert.fail("Could not create temp config file");
+            fail("Could not create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
         args.add("tool");
@@ -178,7 +177,12 @@ public class LaunchNoInternetTestIT {
         args.add(configPath.getAbsolutePath());
         args.add("--script");
 
-        Client.main(args.toArray(new String[0]));
+        int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
+        assertTrue(exitCode != 0);
+        assertTrue(systemOutRule.getText().contains("There are no files in the docker image directory"));
+        assertTrue(systemErrRule.getText().contains(
+                "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
+                        + "']' returned non-zero exit status 1"));
     }
 
     /**
@@ -190,7 +194,7 @@ public class LaunchNoInternetTestIT {
         String toWrite = "docker-images = " + dockerImageDirectory;
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
-            Assert.fail("Could create temp config file");
+            fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
         args.add("tool");
@@ -204,7 +208,7 @@ public class LaunchNoInternetTestIT {
         args.add("--script");
 
         Client.main(args.toArray(new String[0]));
-        Assert.assertTrue("Final process status was not success", systemOutRule.getLog().contains("Final process status is success"));
+        assertTrue(systemOutRule.getText().contains("Final process status is success"), "Final process status was not success");
     }
 
     /**
@@ -218,7 +222,7 @@ public class LaunchNoInternetTestIT {
         String toWrite = "docker-images = " + dockerImageDirectory;
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
-            Assert.fail("Could create temp config file");
+            fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
         args.add("workflow");
@@ -231,7 +235,8 @@ public class LaunchNoInternetTestIT {
         args.add(configPath.getAbsolutePath());
 
         Client.main(args.toArray(new String[0]));
-        Assert.assertTrue("Final process status was not success", systemOutRule.getLog().contains("Saving copy of Nextflow stdout to: "));
+        assertTrue(systemOutRule.getText().contains("Saving copy of Nextflow stdout to: "),
+                "Final process status was not success");
     }
 
     /**
@@ -244,7 +249,7 @@ public class LaunchNoInternetTestIT {
         String toWrite = "docker-images = " + dockerImageDirectory;
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
-            Assert.fail("Could create temp config file");
+            fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
         args.add("workflow");
@@ -257,7 +262,7 @@ public class LaunchNoInternetTestIT {
         args.add(configPath.getAbsolutePath());
 
         Client.main(args.toArray(new String[0]));
-        Assert.assertTrue("Final process status was not success", systemOutRule.getLog().contains("Output files left in place"));
+        assertTrue(systemOutRule.getText().contains("Output files left in place"), "Final process status was not success");
     }
 
     /**
@@ -280,16 +285,6 @@ public class LaunchNoInternetTestIT {
             writer.write(contents);
             return tmpFile;
         }
-    }
-
-    /**
-     * Check that the launch failed with normal no image output
-     */
-    private void checkFailed() {
-        exit.expectSystemExit();
-        exit.checkAssertionAfterwards(() -> assertTrue(systemErrRule.getLog().contains(
-            "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
-                + "']' returned non-zero exit status 1")));
     }
 
     /**
