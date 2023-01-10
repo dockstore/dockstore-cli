@@ -9,9 +9,9 @@ import javax.ws.rs.core.HttpHeaders;
 import io.dockstore.client.cli.nested.ApiClientExtended;
 import io.dockstore.client.cli.nested.WesRequestData;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ApiClientExtendedIT {
 
@@ -42,7 +42,8 @@ public class ApiClientExtendedIT {
         ace.setAwsHeaderCalculationData(target, method, allHeaders);
         final String newlyCalculatedHeader = ace.generateAwsContentSignature(DigestUtils.sha256Hex(""));
 
-        assertEquals("The calculated header should match the original request that was made", expectedHeader, newlyCalculatedHeader);
+        assertEquals(expectedHeader, newlyCalculatedHeader,
+                "The calculated header should match the original request that was made");
     }
 
     @Test
@@ -62,7 +63,8 @@ public class ApiClientExtendedIT {
         final String fakeBodyChecksum = DigestUtils.sha256Hex("".getBytes());
         final String newlyCalculatedContentHeader = ace.generateAwsContentSignature(fakeBodyChecksum);
 
-        assertEquals("The calculated header should match the original request that was made", expectedSignature, newlyCalculatedContentHeader);
+        assertEquals(expectedSignature, newlyCalculatedContentHeader,
+                "The calculated header should match the original request that was made");
     }
 
     @Test
@@ -84,6 +86,7 @@ public class ApiClientExtendedIT {
         final String fakeBodyChecksum = "bf918205a9d2ce0cf8a0d1c7cc0eb2ecf42fdefc4ab387eaa1a7958edf26face";
         final String newlyCalculatedContentHeader = ace.generateAwsContentSignature(fakeBodyChecksum);
 
-        assertEquals("The calculated header should match the original request that was made", expectedHeader, newlyCalculatedContentHeader);
+        assertEquals(expectedHeader, newlyCalculatedContentHeader,
+                "The calculated header should match the original request that was made");
     }
 }

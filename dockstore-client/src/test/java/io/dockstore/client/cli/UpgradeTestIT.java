@@ -19,8 +19,8 @@ package io.dockstore.client.cli;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 
@@ -74,7 +74,7 @@ public class UpgradeTestIT {
         return null;
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         this.objectMapper = mock(ObjectMapper.class);

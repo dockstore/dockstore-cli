@@ -24,9 +24,9 @@ import io.swagger.client.api.UsersApi;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.SourceFile;
 import org.apache.http.HttpStatus;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.mockito.Mockito.when;
@@ -43,7 +43,7 @@ public class ToolClientTest {
     private UsersApi usersApi;
     private Client client;
 
-    @Before
+    @BeforeEach
     public void setup() {
         containersApi = Mockito.mock(ContainersApi.class);
         containertagsApi = Mockito.mock(ContainertagsApi.class);
@@ -69,7 +69,7 @@ public class ToolClientTest {
         } catch (Exception ex) {
             exceptionThrown = true;
         }
-        Assert.assertTrue(exceptionThrown);
+        Assertions.assertTrue(exceptionThrown);
     }
 
     @Test
@@ -81,13 +81,13 @@ public class ToolClientTest {
         } catch (Exception ex) {
             exceptionThrown = true;
         }
-        Assert.assertTrue(exceptionThrown);
+        Assertions.assertTrue(exceptionThrown);
     }
 
     @Test
     public void getDescriptorFromServerGoodTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         SourceFile cwl = toolClient.getDescriptorFromServer(REPOSITORY + ":" + GOOD_TAG, DescriptorLanguage.CWL);
-        Assert.assertNotNull(cwl);
+        Assertions.assertNotNull(cwl);
     }
 }
