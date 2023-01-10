@@ -38,22 +38,24 @@ import io.swagger.client.auth.ApiKeyAuth;
 import io.swagger.client.model.Repository;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Base integration test class
  * A default configuration that cleans the database between tests
  */
-@Category(ConfidentialTest.class)
+@ExtendWith(BaseIT.TestStatus.class)
+@ExtendWith(SystemStubsExtension.class)
+@Tag(ConfidentialTest.NAME)
 public class BaseIT {
 
     public static final String INSTALLATION_ID = "1179416";
@@ -64,15 +66,9 @@ public class BaseIT {
         DockstoreWebserviceApplication.class, CommonTestUtilities.CONFIDENTIAL_CONFIG_PATH);
     protected static TestingPostgres testingPostgres;
     static final String OTHER_USERNAME = "OtherUser";
-    @Rule
-    public final TestRule watcher = new TestWatcher() {
-        protected void starting(Description description) {
-            System.out.println("Starting test: " + description.getMethodName());
-        }
-    };
     final String curatorUsername = "curator@curator.com";
 
-    @BeforeClass
+    @BeforeAll
     public static void dropAndRecreateDB() throws Exception {
         CommonTestUtilities.dropAndRecreateNoTestData(SUPPORT);
         SUPPORT.before();
@@ -88,12 +84,12 @@ public class BaseIT {
             TimeUnit.SECONDS.sleep(10);
             active = (int)gauges.get("io.dropwizard.db.ManagedPooledDataSource.hibernate.active").getValue();
             waiting = (int)gauges.get("io.dropwizard.db.ManagedPooledDataSource.hibernate.waiting").getValue();
-            Assert.assertEquals("There should be no active connections", 0, active);
-            Assert.assertEquals("There should be no waiting connections", 0, waiting);
+            assertEquals(0, active, "There should be no active connections");
+            assertEquals(0, waiting, "There should be no waiting connections");
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() {
         SUPPORT.after();
     }
@@ -154,13 +150,25 @@ public class BaseIT {
         }
     }
 
-    @After
+    @AfterEach
     public void after() throws InterruptedException {
         assertNoMetricsLeaks(SUPPORT);
     }
 
-    @Before
+    @BeforeEach
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.dropAndCreateWithTestData(SUPPORT, false);
+    }
+
+    public static class TestStatus implements org.junit.jupiter.api.extension.TestWatcher {
+        @Override
+        public void testSuccessful(ExtensionContext context) {
+            System.out.printf("Test successful: %s%n", context.getTestMethod().get());
+        }
+
+        @Override
+        public void testFailed(ExtensionContext context, Throwable cause) {
+            System.out.printf("Test failed: %s%n", context.getTestMethod().get());
+        }
     }
 }

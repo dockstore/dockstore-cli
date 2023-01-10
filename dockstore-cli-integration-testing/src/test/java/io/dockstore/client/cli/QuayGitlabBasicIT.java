@@ -2,33 +2,31 @@ package io.dockstore.client.cli;
 
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Registry;
 import io.dockstore.common.SlowTest;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
-@Category({ ConfidentialTest.class, ToolTest.class })
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
+@org.junit.jupiter.api.Tag(ToolTest.NAME)
 public class QuayGitlabBasicIT extends BaseIT {
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
 
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
 
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
-    @Before
+    @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
@@ -49,17 +47,17 @@ public class QuayGitlabBasicIT extends BaseIT {
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from tool where  registry = '" + Registry.QUAY_IO.getDockerPath() + "' and giturl like 'git@gitlab.com%'",
             long.class);
-        Assert.assertEquals("there should be 2 registered from Quay and Gitlab", 2, count);
+        assertEquals(2, count, "there should be 2 registered from Quay and Gitlab");
     }
 
     /**
      * Ensures that you can't publish an automatically added Quay/Gitlab entry with an alternate structure unless you change the Dockerfile and Dockstore.cwl locations
      */
     @Test
-    public void testQuayGitlabPublishAlternateStructure() {
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
-            "quay.io/dockstoretestuser/quayandgitlabalternate", "--script" });
+    public void testQuayGitlabPublishAlternateStructure() throws Exception {
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+                "quay.io/dockstoretestuser/quayandgitlabalternate", "--script" }));
+        assertEquals(Client.API_ERROR, exitCode);
     }
 
     /**
@@ -73,7 +71,7 @@ public class QuayGitlabBasicIT extends BaseIT {
 
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where name = 'quayandgitlab' and ispublished='t'", long.class);
-        Assert.assertEquals("there should be 1 registered", 1, count);
+        assertEquals(1, count, "there should be 1 registered");
 
         // Unpublish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
@@ -81,7 +79,7 @@ public class QuayGitlabBasicIT extends BaseIT {
 
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where name = 'quayandgitlab' and ispublished='t'", long.class);
-        Assert.assertEquals("there should be 0 registered", 0, count2);
+        assertEquals(0, count2, "there should be 0 registered");
     }
 
     /**
@@ -99,7 +97,7 @@ public class QuayGitlabBasicIT extends BaseIT {
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
 
-        Assert.assertEquals("there should be 1 entries, there are " + count, 1, count);
+        assertEquals(1, count, "there should be 1 entries, there are " + count);
 
         // Unpublish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
@@ -107,7 +105,7 @@ public class QuayGitlabBasicIT extends BaseIT {
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
 
-        Assert.assertEquals("there should be 0 entries, there are " + count2, 0, count2);
+        assertEquals(0, count2, "there should be 0 entries, there are " + count2);
 
     }
 
@@ -115,11 +113,11 @@ public class QuayGitlabBasicIT extends BaseIT {
      * Ensures that one cannot register an existing Quay/Gitlab entry if you don't give it an alternate toolname
      */
     @Test
-    public void testQuayGitlabManuallyRegisterDuplicate() {
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgitlab",
-            "--git-url", "git@gitlab.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--script" });
+    public void testQuayGitlabManuallyRegisterDuplicate() throws Exception {
+        int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+                Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgitlab",
+                "--git-url", "git@gitlab.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--script" }));
+        assertEquals(Client.API_ERROR, exitCode);
     }
 
 

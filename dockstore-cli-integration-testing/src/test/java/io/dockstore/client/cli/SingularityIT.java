@@ -6,34 +6,37 @@ import java.nio.charset.StandardCharsets;
 
 import io.dockstore.client.cli.nested.SingularityTest;
 import io.dockstore.common.CommonTestUtilities;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.SourceControl;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.Workflow;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
-@Category(SingularityTest.class)
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@org.junit.jupiter.api.Tag(SingularityTest.NAME)
 public class SingularityIT extends BaseIT {
 
-    @ClassRule
+    @TempDir
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private static final String SINGULARITY_CONFIG_TEMPLATE = ResourceHelpers.resourceFilePath("config_for_singularity");
 
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
 
-    @Before
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
+
+    @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
@@ -64,7 +67,7 @@ public class SingularityIT extends BaseIT {
         });
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
-        Assert.assertTrue("assert output contains singularity command", systemOutRule.getLog().contains("Creating SIF file"));
+        assertTrue(systemOutRule.getText().contains("Creating SIF file"), "assert output contains singularity command");
     }
 
     /**
@@ -96,7 +99,7 @@ public class SingularityIT extends BaseIT {
         });
 
         // the phrase "singularity exec" will only be in the output if Singularity is actually being used
-        Assert.assertTrue("assert output contains singularity command", systemOutRule.getLog().contains("singularity exec"));
+        assertTrue(systemOutRule.getText().contains("singularity exec"), "assert output contains singularity command");
     }
 
     /**

@@ -22,44 +22,43 @@ import java.util.ArrayList;
 import com.google.common.collect.Lists;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Registry;
 import io.dockstore.common.TestUtility;
 import io.dockstore.common.ToilCompatibleTest;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
-import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.common.CommonTestUtilities.checkToolList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 /**
  * @author dyuen
  */
-@Category({ ToolTest.class, ConfidentialTest.class })
+@Tag(ConfidentialTest.NAME)
+@Tag(ToolTest.NAME)
 public class ClientIT extends BaseIT {
 
     private static final String FIRST_TOOL = ResourceHelpers.resourceFilePath("dockstore-tool-helloworld.cwl");
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
 
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
 
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
-    @Before
+    @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
@@ -69,58 +68,59 @@ public class ClientIT extends BaseIT {
     @Test
     public void testListEntries() throws IOException, ApiException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "list" });
-        checkToolList(systemOutRule.getLog());
+        checkToolList(systemOutRule.getText());
     }
 
     @Test
     public void testDebugModeListEntries() throws IOException, ApiException {
         Client.main(new String[] { "--debug", "--config", TestUtility.getConfigFileLocation(true), "tool", "list" });
-        checkToolList(systemOutRule.getLog());
+        checkToolList(systemOutRule.getText());
     }
 
     @Test
-    public void testListEntriesWithoutCreds() throws IOException, ApiException {
-        systemExit.expectSystemExitWithStatus(API_ERROR);
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(false), "tool", "list" });
+    public void testListEntriesWithoutCreds() throws Exception {
+        int exitCode = catchSystemExit(
+                () -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(false), "tool", "list" }));
+        assertEquals(Client.API_ERROR, exitCode);
     }
 
     @Test
-    public void testListEntriesOnWrongPort() throws IOException, ApiException {
-        systemExit.expectSystemExitWithStatus(Client.CONNECTION_ERROR);
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true, false, false), "tool", "list" });
+    public void testListEntriesOnWrongPort() throws Exception {
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true, false, false), "tool", "list" }));
+        assertEquals(Client.CONNECTION_ERROR, exitCode);
     }
 
     // Won't work as entry must be valid
-    @Ignore
+    @Disabled
     public void quickRegisterValidEntry() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test6" });
 
         // verify DB
         final long count = testingPostgres.runSelectStatement("select count(*) from tool where name = 'test6'", long.class);
-        Assert.assertEquals("should see three entries", 1, count);
+        assertEquals(1, count, "should see three entries");
     }
 
     @Test
     public void testPluginEnable() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), "plugin", "download" });
-        systemOutRule.clearLog();
+        systemOutRule.clear();
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), "plugin", "list" });
-        Assert.assertTrue(systemOutRule.getLog().contains("dockstore-file-synapse-plugin"));
-        Assert.assertTrue(systemOutRule.getLog().contains("dockstore-file-s3-plugin"));
-        Assert.assertFalse(systemOutRule.getLog().contains("dockstore-icgc-storage-client-plugin"));
+        assertTrue(systemOutRule.getText().contains("dockstore-file-synapse-plugin"));
+        assertTrue(systemOutRule.getText().contains("dockstore-file-s3-plugin"));
+        assertFalse(systemOutRule.getText().contains("dockstore-icgc-storage-client-plugin"));
     }
 
     @Test
     public void testPluginDisable() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), "plugin", "download" });
-        systemOutRule.clearLog();
+        systemOutRule.clear();
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), "plugin", "list" });
-        Assert.assertFalse(systemOutRule.getLog().contains("dockstore-file-synapse-plugin"));
-        Assert.assertFalse(systemOutRule.getLog().contains("dockstore-file-s3-plugin"));
-        Assert.assertTrue(systemOutRule.getLog().contains("dockstore-file-icgc-storage-client-plugin"));
+        assertFalse(systemOutRule.getText().contains("dockstore-file-synapse-plugin"));
+        assertFalse(systemOutRule.getText().contains("dockstore-file-s3-plugin"));
+        assertTrue(systemOutRule.getText().contains("dockstore-file-icgc-storage-client-plugin"));
     }
 
-    @Ignore
+    @Disabled
     public void quickRegisterDuplicateEntry() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test6" });
         Client.main(
@@ -130,27 +130,28 @@ public class ClientIT extends BaseIT {
 
         // verify DB
         final long count = testingPostgres.runSelectStatement("select count(*) from container where name = 'test6'", long.class);
-        Assert.assertEquals("should see three entries", 3, count);
+        assertEquals(3, count, "should see three entries");
     }
 
     @Test
-    public void quickRegisterInValidEntry() throws IOException {
-        systemExit.expectSystemExitWithStatus(Client.CLIENT_ERROR);
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test1" });
+    public void quickRegisterInValidEntry() throws Exception {
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test1" }));
+        assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
     @Test
-    public void quickRegisterUnknownEntry() throws IOException {
-        systemExit.expectSystemExitWithStatus(Client.CLIENT_ERROR);
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish",
-            "quay.io/funky_container_that_does_not_exist" });
+    public void quickRegisterUnknownEntry() throws Exception {
+        int exitCode = catchSystemExit(() -> Client.main(
+                new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish",
+                        "quay.io/funky_container_that_does_not_exist" }));
+        assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
     /* When you manually publish on the dockstore CLI, it will now refresh the container after it is added.
      Since the below containers use dummy data and don't connect with Github/Bitbucket/Quay, the refresh will throw an error.
      Todo: Set up these tests with real data (not confidential)
      */
-    @Ignore("Since dockstore now checks for associated tags for Quay container, manual publishing of nonexistant images won't work")
+    @Disabled("Since dockstore now checks for associated tags for Quay container, manual publishing of nonexistant images won't work")
     public void manualRegisterABunchOfValidEntries() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
@@ -170,21 +171,24 @@ public class ClientIT extends BaseIT {
 
         // verify DB
         final long count = testingPostgres.runSelectStatement("select count(*) from container where name = 'bd2k-python-lib'", long.class);
-        Assert.assertEquals("should see three entries", 5, count);
+        assertEquals(5, count, "should see three entries");
     }
 
     @Test
-    public void manualRegisterADuplicate() throws IOException {
-        systemExit.expectSystemExitWithStatus(API_ERROR);
+    public void manualRegisterADuplicate() throws Exception {
+
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
             "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master" });
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
             "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test1" });
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
-            "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test1" });
+        int exitCode = catchSystemExit(() -> Client.main(
+                new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
+                        Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib",
+                        "--git-url", "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname",
+                        "test1" }));
+        assertEquals(Client.API_ERROR, exitCode);
     }
 
     @Test
@@ -208,17 +212,17 @@ public class ClientIT extends BaseIT {
     @Test
     public void testMetadataMethods() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "--version" });
-        Assert.assertTrue(systemOutRule.getLog().contains("Dockstore version"));
-        systemOutRule.clearLog();
+        assertTrue(systemOutRule.getText().contains("Dockstore version"));
+        systemOutRule.clear();
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "--server-metadata" });
-        Assert.assertTrue(systemOutRule.getLog().contains("version"));
-        systemOutRule.clearLog();
+        assertTrue(systemOutRule.getText().contains("version"));
+        systemOutRule.clear();
     }
 
     @Test
     public void testCacheCleaning() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "--clean-cache" });
-        systemOutRule.clearLog();
+        systemOutRule.clear();
     }
 
     @Test
@@ -237,7 +241,7 @@ public class ClientIT extends BaseIT {
         Client.main(
             new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--client-version", "1.7.0", "--python-version",
                 "3" });
-        Assert.assertFalse(systemOutRule.getLog().contains("monotonic=="));
+        assertFalse(systemOutRule.getText().contains("monotonic=="));
         assertDepsCommandOutput();
     }
 
@@ -248,10 +252,11 @@ public class ClientIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    @Ignore("Ignored until there are more than one runner.")
-    public void testDepsCommandWithUnknownRunners() throws IOException {
-        systemExit.expectSystemExitWithStatus(API_ERROR);
-        systemExit.checkAssertionAfterwards(() -> Assert.assertTrue(systemOutRule.getLog().contains("Could not get runner dependencies")));
+    @Disabled("Ignored until there are more than one runner.")
+    public void testDepsCommandWithUnknownRunners() throws Exception {
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--runner", "cromwell" }));
+        assertEquals(Client.API_ERROR, exitCode);
+        assertTrue(systemOutRule.getText().contains("Could not get runner dependencies"));
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--runner", "cromwell" });
     }
 
@@ -264,7 +269,7 @@ public class ClientIT extends BaseIT {
     @Test
     public void testDepsCommand() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps" });
-        Assert.assertFalse("Python 3 does not have monotonic as a dependency", systemOutRule.getLog().contains("monotonic=="));
+        assertFalse(systemOutRule.getText().contains("monotonic=="), "Python 3 does not have monotonic as a dependency");
         assertDepsCommandOutput();
     }
 
@@ -277,16 +282,16 @@ public class ClientIT extends BaseIT {
     @Test
     public void testDepsCommandHelp() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--help" });
-        Assert.assertTrue(systemOutRule.getLog().contains("Print cwltool runner dependencies"));
+        assertTrue(systemOutRule.getText().contains("Print cwltool runner dependencies"));
     }
 
     private void assertDepsCommandOutput() {
         // cwl-runner is an alias for cwlref-runner, both should be fine
-        Assert.assertTrue(systemOutRule.getLog().contains("cwlref-runner") || systemOutRule.getLog().contains("cwl-runner"));
-        Assert.assertTrue(systemOutRule.getLog().contains("cwltool=="));
-        Assert.assertTrue(systemOutRule.getLog().contains("schema-salad=="));
-        Assert.assertTrue(systemOutRule.getLog().contains("ruamel.yaml=="));
-        Assert.assertTrue(systemOutRule.getLog().contains("requests=="));
+        assertTrue(systemOutRule.getText().contains("cwlref-runner") || systemOutRule.getText().contains("cwl-runner"));
+        assertTrue(systemOutRule.getText().contains("cwltool=="));
+        assertTrue(systemOutRule.getText().contains("schema-salad=="));
+        assertTrue(systemOutRule.getText().contains("ruamel.yaml=="));
+        assertTrue(systemOutRule.getText().contains("requests=="));
     }
 
     @Test
@@ -396,8 +401,8 @@ public class ClientIT extends BaseIT {
         strings.add(TestUtility.getConfigFileLocation(true));
 
         Client.main(strings.toArray(new String[0]));
-        Assert.assertTrue(systemOutRule.getLog().contains("Usage: dockstore"));
-        systemOutRule.clearLog();
+        assertTrue(systemOutRule.getText().contains("Usage: dockstore"));
+        systemOutRule.clear();
     }
 
 }

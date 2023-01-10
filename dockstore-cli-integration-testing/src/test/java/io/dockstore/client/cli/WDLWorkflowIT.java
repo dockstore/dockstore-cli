@@ -25,8 +25,6 @@ import java.util.List;
 
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.WorkflowTest;
 import io.dropwizard.testing.ResourceHelpers;
@@ -38,15 +36,14 @@ import io.swagger.client.model.SourceFile;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Gathers a few tests that focus on WDL workflows, testing things like generation of wdl test parameter files
@@ -54,7 +51,8 @@ import org.junit.rules.ExpectedException;
  *
  * @author dyuen
  */
-@Category({ConfidentialTest.class, WorkflowTest.class })
+@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
+@org.junit.jupiter.api.Tag(WorkflowTest.NAME)
 public class WDLWorkflowIT extends BaseIT {
 
     // TODO: Remove extra tags and branches on skylab workflows which are not needed
@@ -64,19 +62,13 @@ public class WDLWorkflowIT extends BaseIT {
     private static final String UNIFIED_WORKFLOW_REPO = "dockstore-testing/dockstore-workflow-md5sum-unified";
     private static final String UNIFIED_WORKFLOW = SourceControl.GITHUB.toString() + "/" + UNIFIED_WORKFLOW_REPO;
 
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
 
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
@@ -103,7 +95,7 @@ public class WDLWorkflowIT extends BaseIT {
 
         workflowApi.updateWorkflowVersion(refresh.getId(), workflowVersions);
         List<SourceFile> testParameterFiles = workflowApi.getTestParameterFiles(refresh.getId(), testVersion);
-        Assert.assertEquals(1, testParameterFiles.size());
+        assertEquals(1, testParameterFiles.size());
         Path tempFile = Files.createTempFile("test", "json");
 
         // Unhiding version because launching is not possible on hidden workflows (even for the owner)
@@ -171,8 +163,8 @@ public class WDLWorkflowIT extends BaseIT {
         stringList.add("\"" + prefix + ".rsem_ref_index\": \"File\"");
         stringList.add("\"" + prefix + ".gene_ref_flat\": \"File\"");
         stringList.forEach(string -> {
-            Assert.assertTrue(systemOutRule.getLog().contains(string));
+            assertTrue(systemOutRule.getText().contains(string));
         });
-        systemOutRule.clearLog();
+        systemOutRule.clear();
     }
 }

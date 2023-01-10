@@ -3,36 +3,31 @@ package io.dockstore.client.cli;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Registry;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
-@Category({ ConfidentialTest.class, ToolTest.class })
+@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
+@org.junit.jupiter.api.Tag(ToolTest.NAME)
 public class QuayGitHubBasicIT extends BaseIT {
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
 
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
 
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
-    @Before
+    @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
         CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
@@ -52,7 +47,7 @@ public class QuayGitHubBasicIT extends BaseIT {
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from tool where  registry = '" + Registry.QUAY_IO.getDockerPath() + "' and giturl like 'git@github.com%'",
             long.class);
-        Assert.assertEquals("there should be 5 registered from Quay and Github, there are " + count, 5, count);
+        assertEquals(5, count, "there should be 5 registered from Quay and Github, there are " + count);
     }
 
     /**
@@ -67,7 +62,7 @@ public class QuayGitHubBasicIT extends BaseIT {
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from tool where mode != 'MANUAL_IMAGE_PATH' and registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and toolname = 'regular'", long.class);
-        Assert.assertEquals("the tool should be Auto", 1, count);
+        assertEquals(1, count, "the tool should be Auto");
     }
 
     /**
@@ -83,7 +78,7 @@ public class QuayGitHubBasicIT extends BaseIT {
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from tool where mode = 'MANUAL_IMAGE_PATH' and registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and toolname = 'alternate'", long.class);
-        Assert.assertEquals("the tool should be Manual still", 1, count);
+        assertEquals(1, count, "the tool should be Manual still");
     }
 
     /**
@@ -102,7 +97,7 @@ public class QuayGitHubBasicIT extends BaseIT {
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from tool where mode != 'MANUAL_IMAGE_PATH' and registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and toolname = 'testtool'", long.class);
-        Assert.assertEquals("the tool should be Auto", 1, count);
+        assertEquals(1, count, "the tool should be Auto");
     }
 
     /**
@@ -122,7 +117,7 @@ public class QuayGitHubBasicIT extends BaseIT {
         // Check how many versions the entry has
         final long currentNumberOfTags = testingPostgres
             .runSelectStatement("select count(*) from tag where parentid = '" + id + "'", long.class);
-        assertTrue("There are no tags for this tool", currentNumberOfTags > 0);
+        assertTrue(currentNumberOfTags > 0, "There are no tags for this tool");
 
         // This grabs the first tag that belongs to the tool
         final long firstTag = testingPostgres.runSelectStatement("select id from tag where parentid = '" + id + "'", long.class);
@@ -134,7 +129,7 @@ public class QuayGitHubBasicIT extends BaseIT {
         // Double check that there is one less tag
         final long afterDeletionTags = testingPostgres
             .runSelectStatement("select count(*) from tag where parentId = '" + id + "'", long.class);
-        Assert.assertEquals(currentNumberOfTags - 1, afterDeletionTags);
+        assertEquals(currentNumberOfTags - 1, afterDeletionTags);
 
         // Refresh the tool
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--entry",
@@ -143,32 +138,32 @@ public class QuayGitHubBasicIT extends BaseIT {
         // Check how many tags there are after the refresh
         final long afterRefreshTags = testingPostgres
             .runSelectStatement("select count(*) from tag where parentid = '" + id + "'", long.class);
-        Assert.assertEquals(currentNumberOfTags, afterRefreshTags);
+        assertEquals(currentNumberOfTags, afterRefreshTags);
     }
 
     /**
      * Tests a user trying to add a quay tool that they do not own and are not in the owning organization
      */
     @Test
-    public void testAddQuayRepoOfNonOwnedOrg() {
+    public void testAddQuayRepoOfNonOwnedOrg() throws Exception {
         // Repo user isn't part of org
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstore2", "--name", "testrepo2", "--git-url",
-            "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "testOrg", "--cwl-path",
-            "/Dockstore.cwl", "--dockerfile-path", "/Dockerfile", "--script" });
-
+        int exitCode = catchSystemExit(() -> Client.main(
+                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+                        Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstore2", "--name", "testrepo2",
+                        "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname",
+                        "testOrg", "--cwl-path", "/Dockstore.cwl", "--dockerfile-path", "/Dockerfile", "--script" }));
+        assertEquals(Client.API_ERROR, exitCode);
     }
 
     /**
      * Tests that refresh workflows works, also that refreshing without a github token should not destroy workflows or their existing versions
      */
     @Test
-    public void testRefreshWorkflow() {
+    public void testRefreshWorkflow() throws Exception {
         refreshByOrganizationReplacement(USER_1_USERNAME);
         // should have a certain number of workflows based on github contents
         final long secondWorkflowCount = testingPostgres.runSelectStatement("select count(*) from workflow", long.class);
-        assertTrue("should find non-zero number of workflows", secondWorkflowCount > 0);
+        assertTrue(secondWorkflowCount > 0, "should find non-zero number of workflows");
 
         // refresh a specific workflow
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "refresh", "--entry",
@@ -186,26 +181,21 @@ public class QuayGitHubBasicIT extends BaseIT {
         final long updatedWorkflowVersionCount = testingPostgres.runSelectStatement("select count(*) from workflowversion", long.class);
         final long updatedWorkflowVersionName = testingPostgres
             .runSelectStatement("select count(*) from workflowversion where name='master'", long.class);
-        assertTrue("there should be only one version", updatedWorkflowVersionCount == 1 && updatedWorkflowVersionName == 1);
+        assertTrue(updatedWorkflowVersionCount == 1 && updatedWorkflowVersionName == 1, "there should be only one version");
 
         // delete quay.io token
         testingPostgres.runUpdateStatement("delete from token where tokensource = 'github.com'");
 
-        systemExit.checkAssertionAfterwards(() -> {
-            // should not delete workflows
-            final long thirdWorkflowCount = testingPostgres.runSelectStatement("select count(*) from workflow", long.class);
-            Assert.assertEquals("there should be no change in count of workflows", secondWorkflowCount, thirdWorkflowCount);
-        });
-
         // should include nextflow example workflow stub
         final long nfWorkflowCount = testingPostgres
             .runSelectStatement("select count(*) from workflow where giturl like '%ampa-nf%'", long.class);
-        assertTrue("should find non-zero number of next flow workflows", nfWorkflowCount > 0);
+        assertTrue(nfWorkflowCount > 0, "should find non-zero number of next flow workflows");
 
         // refresh
-        systemExit.expectSystemExit();
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "refresh", "--entry",
-            SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" });
+        catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "refresh", "--entry",
+                SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" }));
+        final long thirdWorkflowCount = testingPostgres.runSelectStatement("select count(*) from workflow", long.class);
+        assertEquals(secondWorkflowCount, thirdWorkflowCount, "there should be no change in count of workflows");
     }
 
     /**
@@ -213,25 +203,24 @@ public class QuayGitHubBasicIT extends BaseIT {
      * UPDATE: Should fail because you can't publish a tool with no valid tags
      */
     @Test
-    public void testManualQuayManualBuild() {
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "noautobuild", "--git-url",
-            "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
-            "--script" });
-
+    public void testManualQuayManualBuild() throws Exception {
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+                Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "noautobuild", "--git-url",
+                "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
+                "--script" }));
+        assertEquals(Client.API_ERROR, exitCode);
     }
 
     /**
      * Tests the case where a manually registered quay tool does not have any tags
      */
     @Test
-    public void testManualQuayNoTags() {
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "nobuildsatall",
-            "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
-            "--script" });
+    public void testManualQuayNoTags() throws Exception {
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+                Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "nobuildsatall",
+                "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
+                "--script" }));
+        assertEquals(Client.API_ERROR, exitCode);
     }
 
     /**
@@ -247,7 +236,7 @@ public class QuayGitHubBasicIT extends BaseIT {
         final long count = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'noautobuild' and giturl = 'git@github.com:DockstoreTestUser/dockstore-whalesay.git'",
             long.class);
-        assertEquals("the tool should now have an associated git repo", 1, count);
+        assertEquals(1, count, "the tool should now have an associated git repo");
 
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
@@ -257,7 +246,7 @@ public class QuayGitHubBasicIT extends BaseIT {
         final long count2 = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'nobuildsatall' and giturl = 'git@github.com:DockstoreTestUser/dockstore-whalesay.git'",
             long.class);
-        assertEquals("the tool should now have an associated git repo", 1, count2);
+        assertEquals(1, count2, "the tool should now have an associated git repo");
 
     }
 
@@ -286,18 +275,17 @@ public class QuayGitHubBasicIT extends BaseIT {
         //        });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--script" });
         final long thirdToolCount = testingPostgres.runSelectStatement("select count(*) from tool", long.class);
-        assertEquals("there should be no change in count of tools", secondToolCount, thirdToolCount);
+        assertEquals(secondToolCount, thirdToolCount, "there should be no change in count of tools");
     }
 
     /**
      * Ensures that you can't publish an automatically added Quay/Github tool with an alternate structure unless you change the Dockerfile and Dockstore.cwl locations
      */
     @Test
-    public void testQuayGithubPublishAlternateStructure() {
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
-            "quay.io/dockstoretestuser/quayandgithubalternate", "--script" });
-
+    public void testQuayGithubPublishAlternateStructure() throws Exception {
+        int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+                "quay.io/dockstoretestuser/quayandgithubalternate", "--script" }));
+        assertEquals(Client.API_ERROR, exitCode);
         // TODO: change the tag tag locations of Dockerfile and Dockstore.cwl, now should be able to publish
     }
 
@@ -312,7 +300,7 @@ public class QuayGitHubBasicIT extends BaseIT {
 
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where name = 'quayandgithub' and ispublished='t'", long.class);
-        Assert.assertEquals("there should be 1 registered", 1, count);
+        assertEquals(1, count, "there should be 1 registered");
 
         // Unpublish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
@@ -320,7 +308,7 @@ public class QuayGitHubBasicIT extends BaseIT {
 
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where name = 'quayandgithub' and ispublished='t'", long.class);
-        Assert.assertEquals("there should be 0 registered", 0, count2);
+        assertEquals(0, count2, "there should be 0 registered");
     }
 
     /**
@@ -337,7 +325,7 @@ public class QuayGitHubBasicIT extends BaseIT {
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
 
-        Assert.assertEquals("there should be 1 entries, there are " + count, 1, count);
+        assertEquals(1, count, "there should be 1 entries, there are " + count);
 
         // Unpublish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
@@ -345,18 +333,18 @@ public class QuayGitHubBasicIT extends BaseIT {
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
 
-        Assert.assertEquals("there should be 0 entries, there are " + count2, 0, count2);
+        assertEquals(0, count2, "there should be 0 entries, there are " + count2);
     }
 
     /**
      * Ensures that one cannot register an existing Quay/Github entry if you don't give it an alternate toolname
      */
     @Test
-    public void testQuayGithubManuallyRegisterDuplicate() {
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgithub",
-            "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--script" });
+    public void testQuayGithubManuallyRegisterDuplicate() throws Exception {
+        int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+                Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgithub",
+                "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--script" }));
+        assertEquals(Client.API_ERROR, exitCode);
     }
 
     /**
@@ -371,14 +359,14 @@ public class QuayGitHubBasicIT extends BaseIT {
 
         final long count = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
             + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and ispublished = 't'", long.class);
-        Assert.assertEquals("the given entry should be published", 1, count);
+        assertEquals(1, count, "the given entry should be published");
     }
 
     /**
      * This tests that a tool can be updated to have default version, and that metadata is set related to the default version
      */
     @Test
-    public void testSetDefaultTag() {
+    public void testSetDefaultTag() throws Exception {
         // Set up DB
 
         // Update tool with default version that has metadata
@@ -388,64 +376,63 @@ public class QuayGitHubBasicIT extends BaseIT {
 
         final long count = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
             + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and actualdefaultversion is not null", long.class);
-        Assert.assertEquals("the tool should have a default version set", 1, count);
+        assertEquals(1, count, "the tool should have a default version set");
 
         final long count2 = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
                 + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and actualdefaultversion is not null and author = 'Dockstore Test User'",
             long.class);
-        Assert.assertEquals("the tool should have any metadata set (author)", 1, count2);
+        assertEquals(1, count2, "the tool should have any metadata set (author)");
 
         // Invalidate tags
         testingPostgres.runUpdateStatement("UPDATE tag SET valid='f'");
 
         // Shouldn't be able to publish
-        systemExit.expectSystemExitWithStatus(Client.API_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
-            "quay.io/dockstoretestuser/quayandgithub", "--script" });
-
+        int exitCode = catchSystemExit(() ->   Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+                "quay.io/dockstoretestuser/quayandgithub", "--script" }));
+        assertEquals(Client.API_ERROR, exitCode);
     }
 
     /**
      * This tests that a tool can not be updated to have no default descriptor paths
      */
     @Test
-    public void testToolNoDefaultDescriptors() {
+    public void testToolNoDefaultDescriptors() throws Exception {
         // Update tool with empty WDL, shouldn't fail
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
                 "quay.io/dockstoretestuser/quayandgithub", "--wdl-path", "", "--script" });
 
         // Update tool with empty CWL, should now fail
-        systemExit.expectSystemExitWithStatus(Client.CLIENT_ERROR);
-        Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
-                "quay.io/dockstoretestuser/quayandgithub", "--cwl-path", "", "--script" });
+        int exitCode = catchSystemExit(() -> Client.main(
+                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
+                        "quay.io/dockstoretestuser/quayandgithub", "--cwl-path", "", "--script" }));
+        assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
     /**
      * This tests that a tool cannot be manually published if it has no default descriptor paths
      */
     @Test
-    public void testManualPublishToolNoDescriptorPaths() {
+    public void testManualPublishToolNoDescriptorPaths() throws Exception {
         // Manual publish, should fail
-        systemExit.expectSystemExitWithStatus(Client.CLIENT_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgithubalternate",
-            "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay-alternate.git", "--git-reference", "master", "--toolname",
-            "alternate", "--cwl-path", "", "--wdl-path", "", "--dockerfile-path", "/testDir/Dockerfile", "--script" });
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+                Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgithubalternate",
+                "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay-alternate.git", "--git-reference", "master", "--toolname",
+                "alternate", "--cwl-path", "", "--wdl-path", "", "--dockerfile-path", "/testDir/Dockerfile", "--script" }));
+        assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
     /**
      * This tests that a tool cannot be manually published if it has an incorrect registry
      */
     @Test
-    public void testManualPublishToolIncorrectRegistry() {
+    public void testManualPublishToolIncorrectRegistry() throws Exception {
         // Manual publish, should fail
-        systemExit.expectSystemExitWithStatus(Client.CLIENT_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
-            "thisisafakeregistry", "--namespace", "dockstoretestuser", "--name", "quayandgithubalternate", "--git-url",
-            "git@github.com:DockstoreTestUser/dockstore-whalesay-alternate.git", "--git-reference", "master", "--toolname", "alternate",
-            "--script" });
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+                "thisisafakeregistry", "--namespace", "dockstoretestuser", "--name", "quayandgithubalternate", "--git-url",
+                "git@github.com:DockstoreTestUser/dockstore-whalesay-alternate.git", "--git-reference", "master", "--toolname", "alternate",
+                "--script" }));
+        assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
     /**
@@ -457,7 +444,7 @@ public class QuayGitHubBasicIT extends BaseIT {
 
         // Check that no tags have a true dirty bit
         final long count = testingPostgres.runSelectStatement("select count(*) from tag where dirtybit = true", long.class);
-        Assert.assertEquals("there should be no tags with dirty bit, there are " + count, 0, count);
+        assertEquals(0, count, "there should be no tags with dirty bit, there are " + count);
 
         // Edit tag cwl
         Client.main(
@@ -471,7 +458,7 @@ public class QuayGitHubBasicIT extends BaseIT {
 
         // There should now be two true dirty bits
         final long count1 = testingPostgres.runSelectStatement("select count(*) from tag where dirtybit = true", long.class);
-        Assert.assertEquals("there should be two tags with dirty bit, there are " + count1, 2, count1);
+        assertEquals(2, count1, "there should be two tags with dirty bit, there are " + count1);
 
         // Update default cwl to /Dockstoreclean.cwl
         Client.main(
@@ -481,14 +468,14 @@ public class QuayGitHubBasicIT extends BaseIT {
         // There should only be one tag with /Dockstoreclean.cwl (both tag with new cwl and new wdl should be dirty and not changed)
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tag where cwlpath = '/Dockstoreclean.cwl'", long.class);
-        Assert.assertEquals("there should be only one tag with the cwl path /Dockstoreclean.cwl, there are " + count2, 1, count2);
+        assertEquals(1, count2, "there should be only one tag with the cwl path /Dockstoreclean.cwl, there are " + count2);
     }
 
     /**
      * Checks that you can properly publish and unpublish a Quay/Github tool using the --new-entry-name parameter
      */
     @Test
-    public void testQuayGithubPublishAndUnpublishAToolnewEntryName() {
+    public void testQuayGithubPublishAndUnpublishAToolnewEntryName() throws Exception {
 
         final String publishNameParameter = "--new-entry-name";
 
@@ -497,24 +484,25 @@ public class QuayGitHubBasicIT extends BaseIT {
             "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
 
         // Publish a second time, should fail
-        systemOutRule.clearLog();
+        systemOutRule.clear();
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
-        assertTrue("Attempting to publish a registered tool should notify the user",
-            systemOutRule.getLog().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+        assertTrue(
+                systemOutRule.getText().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
+                "Attempting to publish a registered tool should notify the user");
 
         final long countPublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
-        Assert.assertEquals("there should be 1 registered tool", 1, countPublish);
+        assertEquals(1, countPublish, "there should be 1 registered tool");
 
         // Unpublish incorrectly
-        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+                "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" }));
+        assertEquals(Client.COMMAND_ERROR, exitCode);
 
         final long countBadUnpublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
-        Assert.assertEquals("there should be 1 registered tool after invalid unpublish request", 1, countBadUnpublish);
+        assertEquals(1, countBadUnpublish, "there should be 1 registered tool after invalid unpublish request");
 
         // unpublish correctly
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
@@ -522,14 +510,15 @@ public class QuayGitHubBasicIT extends BaseIT {
 
         final long countGoodUnpublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
-        Assert.assertEquals("there should be 0 registered", 0, countGoodUnpublish);
+        assertEquals(0, countGoodUnpublish, "there should be 0 registered");
 
         // try to unpublish the unpublished tool
-        systemOutRule.clearLog();
+        systemOutRule.clear();
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
             "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
-        assertTrue("Attempting to publish a registered tool should notify the user",
-            systemOutRule.getLog().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+        assertTrue(
+                systemOutRule.getText().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
+                "Attempting to publish a registered tool should notify the user");
     }
 
     /**
@@ -537,7 +526,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * verifying backwards compatibility
      */
     @Test
-    public void testQuayGithubPublishAndUnpublishAToolEntryName() {
+    public void testQuayGithubPublishAndUnpublishAToolEntryName() throws Exception {
 
         final String publishNameParameter = "--entryname";
 
@@ -546,24 +535,25 @@ public class QuayGitHubBasicIT extends BaseIT {
             "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
 
         // Publish a second time, should fail
-        systemOutRule.clearLog();
+        systemOutRule.clear();
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
-        assertTrue("Attempting to publish a registered tool should notify the user",
-            systemOutRule.getLog().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+        assertTrue(
+                systemOutRule.getText().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
+                "Attempting to publish a registered tool should notify the user");
 
         final long countPublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
-        Assert.assertEquals("there should be 1 registered tool", 1, countPublish);
+        assertEquals(1, countPublish, "there should be 1 registered tool");
 
         // Unpublish incorrectly
-        systemExit.expectSystemExitWithStatus(Client.COMMAND_ERROR);
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" });
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+                "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", "--script" }));
+        assertEquals(Client.COMMAND_ERROR, exitCode);
 
         final long countBadUnpublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
-        Assert.assertEquals("there should be 1 registered tool after invalid unpublish request", 1, countBadUnpublish);
+        assertEquals(1, countBadUnpublish, "there should be 1 registered tool after invalid unpublish request");
 
         // unpublish correctly
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
@@ -571,14 +561,15 @@ public class QuayGitHubBasicIT extends BaseIT {
 
         final long countGoodUnpublish = testingPostgres
             .runSelectStatement("SELECT COUNT(*) FROM tool WHERE toolname = 'fake_tool_name' AND ispublished='t'", long.class);
-        Assert.assertEquals("there should be 0 registered", 0, countGoodUnpublish);
+        assertEquals(0, countGoodUnpublish, "there should be 0 registered");
 
         // try to unpublish the unpublished tool
-        systemOutRule.clearLog();
+        systemOutRule.clear();
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
             "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", "--script" });
-        assertTrue("Attempting to publish a registered tool should notify the user",
-            systemOutRule.getLog().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"));
+        assertTrue(
+                systemOutRule.getText().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
+                "Attempting to publish a registered tool should notify the user");
     }
 
 
