@@ -82,9 +82,9 @@ public class NotificationsIT extends BaseIT {
      */
     @Test
     public void launchCWLToolWithNotificationsUUIDInvalidURL() throws Exception {
-        catchSystemExit(() ->   Client.main(
+        Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocationWithInvalidNotifications(true), "tool", "launch", "--local-entry",
-                        SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" }));
+                        SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
         String log = systemOutRule.getText();
         assertTrue(log.contains(SENDING_NOTIFICATION), log);
         assertFalse(log.contains(SLACK_DESTINATION), log);
@@ -97,9 +97,9 @@ public class NotificationsIT extends BaseIT {
      */
     @Test
     public void launchCWLToolWithNotificationsUUIDValidURL() throws Exception {
-        catchSystemExit(() ->  Client.main(
+        Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
-                        SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" }));
+                        SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
         String log = systemOutRule.getText();
         assertTrue(log.contains(SENDING_NOTIFICATION), log);
         assertTrue(log.contains(SLACK_DESTINATION), log);
@@ -112,9 +112,9 @@ public class NotificationsIT extends BaseIT {
      */
     @Test
     public void launchCWLToolWithNotificationsNoUUIDValidURL() throws Exception {
-        catchSystemExit(() -> Client.main(
+        Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
-                        SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--info" }));
+                        SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--info" });
         String log = systemOutRule.getText();
         assertTrue(log.contains(SENDING_NOTIFICATION), log);
         assertTrue(log.contains(GENERATING_UUID), log);

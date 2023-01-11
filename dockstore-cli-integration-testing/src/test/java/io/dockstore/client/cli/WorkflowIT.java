@@ -44,6 +44,7 @@ import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
@@ -62,8 +63,8 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  *
  * @author dyuen
  */
-@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
-@org.junit.jupiter.api.Tag(WorkflowTest.NAME)
+@Tag(ConfidentialTest.NAME)
+@Tag(WorkflowTest.NAME)
 public class WorkflowIT extends BaseIT {
 
     @SystemStub

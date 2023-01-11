@@ -13,16 +13,20 @@ import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.Workflow;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@org.junit.jupiter.api.Tag(SingularityTest.NAME)
+@Tag(SingularityTest.NAME)
+@ExtendWith(SystemStubsExtension.class)
 public class SingularityIT extends BaseIT {
 
     @TempDir

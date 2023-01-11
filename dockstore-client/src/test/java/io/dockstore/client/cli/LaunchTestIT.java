@@ -45,6 +45,7 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -877,7 +878,7 @@ public class LaunchTestIT {
         args.add(file.getAbsolutePath());
 
         catchSystemExit(() -> runClientCommand(args));
-        assertTrue(systemErrRule.getText().contains("\"outputs section is not valid\""),
+        assertTrue(systemErrRule.getText().contains("\"outputs\" section is not valid"),
                 "output should include an error message");
     }
 
@@ -956,7 +957,7 @@ public class LaunchTestIT {
         File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
         int exitcode = catchSystemExit(() -> runClientCommandConfig(args, config));
         assertEquals(IO_ERROR, exitcode);
-        assertTrue(systemOutRule.getText().contains("problems running command:"),
+        assertTrue(systemOutRule.getText().contains("Required workflow input"),
                 "This workflow cannot run without test files, it should raise an exception from the workflow engine");
     }
 
@@ -992,7 +993,7 @@ public class LaunchTestIT {
         int exitcode = catchSystemExit(() -> runClientCommandConfig(args, config));
         assertEquals(1, exitcode);
 
-        runClientCommandConfig(args, config);
+        assertThrows(ArgumentUtility.Kill.class, () -> runClientCommandConfig(args, config));
         // FIXME: The CWLTool should be able to execute this workflow, there is an
         //        issue with how outputs are handled.
         //        https://github.com/dockstore/dockstore/issues/4922
