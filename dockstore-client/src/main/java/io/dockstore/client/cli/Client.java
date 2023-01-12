@@ -725,6 +725,11 @@ public class Client {
                         argsArray = args.toArray(argsArray);
                         handled = DepCommand.handleDepCommand(argsArray);
                     } else if (YAML.equals(mode)) {
+                        if (!DEBUG.get() && !INFO.get()) {
+                            // Switching log off if DEBUG or INFO is not set
+                            // yamlClient will generate unnecessary error logs
+                            root.setLevel(Level.OFF);
+                        }
                         yamlClient = new YamlClient();
                         handled = yamlClient.handleCommand(args);
                     }
