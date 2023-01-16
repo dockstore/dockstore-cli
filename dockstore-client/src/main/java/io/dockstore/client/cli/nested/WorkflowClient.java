@@ -364,6 +364,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             // If we unzip the file, we can provide a path to the primary descriptor, otherwise just provide a path to the zip file
             if (unzip) {
                 SwaggerUtility.unzipFile(zipFile, directory);
+                zipFile.delete();
                 return new File(directory, first.get().getWorkflowPath());
             }
             return zipFile;
