@@ -18,6 +18,7 @@ package io.dockstore.client.cli.nested;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -364,7 +365,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             // If we unzip the file, we can provide a path to the primary descriptor, otherwise just provide a path to the zip file
             if (unzip) {
                 SwaggerUtility.unzipFile(zipFile, directory);
-                zipFile.delete();
+                Files.delete(zipFile.toPath());
                 return new File(directory, first.get().getWorkflowPath());
             }
             return zipFile;
