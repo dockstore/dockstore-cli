@@ -190,9 +190,8 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
-          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: dockstore-cli-java-{{ checksum "pom.xml" }}
+      - restore_cache:
+          key: dockstore-cli-java-{{ checksum "THIRD-PARTY-LICENSES.txt" }}
       - restore_cache:
           keys:
             - dockstore-cli-web-cache-unit-test-{{ checksum "/tmp/tests-to-run.txt" }}-{{ .Branch }}
@@ -367,17 +366,15 @@ commands:
             # Find the most recent cache used from any branch
             - dockstore-cli-java-
       - run:
-          name: run tests
+          name: identify tests to run
           command: |
             if [ $CIRCLE_NODE_TOTAL != 1 ] 
             then
               TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
-              echo $TESTS_TO_RUN
             else 
-              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"            
               TESTS_TO_RUN=$(cat temp/test-lists/IT/all.txt | tr '\n' ',')
             fi
-            echo $TESTS_TO_RUN > /tmp/tests-to-run.txt
+            echo $TESTS_TO_RUN | tee /tmp/tests-to-run.txt
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
       - restore_cache:
           keys:
