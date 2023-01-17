@@ -179,7 +179,7 @@ jobs:
           name: Generate test lists
           command: bash scripts/generate-test-list.sh
       - store_artifacts:
-          path: temp/test-lists
+          path: temp/test-list
       - persist_to_workspace:
           root: .
           paths:
@@ -372,7 +372,7 @@ commands:
             then
               TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
             else 
-              TESTS_TO_RUN=$(cat temp/test-lists/IT/all.txt | tr '\n' ',')
+              TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | tr '\n' ',')
             fi
             echo $TESTS_TO_RUN | tee /tmp/tests-to-run.txt
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
