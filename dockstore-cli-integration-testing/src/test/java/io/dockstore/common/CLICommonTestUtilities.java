@@ -39,17 +39,15 @@ import org.slf4j.LoggerFactory;
 /**
  * @author xliu
  */
-public final class CommonTestUtilities {
+public final class CLICommonTestUtilities {
 
-    // Travis is slow, need to wait up to 1 min for webservice to return
-    public static final int WAIT_TIME = 60000;
-    public static final String PUBLIC_CONFIG_PATH = ResourceHelpers.resourceFilePath("dockstore.yml");
+
     /**
      * confidential testing config, includes keys
      */
     public static final String CONFIDENTIAL_CONFIG_PATH;
-    static final String DUMMY_TOKEN_1 = "08932ab0c9ae39a880905666902f8659633ae0232e94ba9f3d2094cb928397e7";
-    private static final Logger LOG = LoggerFactory.getLogger(CommonTestUtilities.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(CLICommonTestUtilities.class);
 
     static {
         String confidentialConfigPath = null;
@@ -62,29 +60,10 @@ public final class CommonTestUtilities {
         CONFIDENTIAL_CONFIG_PATH = confidentialConfigPath;
     }
 
-    private CommonTestUtilities() {
+    private CLICommonTestUtilities() {
 
     }
 
-    /**
-     * Drops the database and recreates from migrations, not including any test data, using new application
-     *
-     * @param support reference to testing instance of the dockstore web service
-     * @throws Exception
-     */
-    public static void dropAndRecreateNoTestData(DropwizardTestSupport<DockstoreWebserviceConfiguration> support) throws Exception {
-        dropAndRecreateNoTestData(support, CONFIDENTIAL_CONFIG_PATH);
-    }
-
-    public static void dropAndRecreateNoTestData(DropwizardTestSupport<DockstoreWebserviceConfiguration> support,
-        String dropwizardConfigurationFile) throws Exception {
-        LOG.info("Dropping and Recreating the database with no test data");
-        Application<DockstoreWebserviceConfiguration> application = support.newApplication();
-        application.run("db", "drop-all", "--confirm-delete-everything", dropwizardConfigurationFile);
-        application
-            .run("db", "migrate", dropwizardConfigurationFile, "--include", "1.3.0.generated,1.3.1.consistency,1.4.0,1.5.0,"
-                    + "1.6.0,1.7.0,1.8.0,1.9.0,1.10.0,1.11.0,1.12.0,1.13.0,1.14.0");
-    }
 
     /**
      * Drops the database and recreates from migrations for non-confidential tests
@@ -111,7 +90,7 @@ public final class CommonTestUtilities {
         List<String> migrationList = Arrays
             .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0",
                     "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0");
-        runMigration(migrationList, application, dropwizardConfigurationFile);
+        CommonTestUtilities.runMigration(migrationList, application, dropwizardConfigurationFile);
     }
 
     /**
@@ -201,21 +180,21 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", configPath);
 
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList(
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential1.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList(
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
     }
 
     private static void runExternalMigration(List<String> migrationList, Application<DockstoreWebserviceConfiguration> application,
@@ -223,16 +202,6 @@ public final class CommonTestUtilities {
         migrationList.forEach(migration -> {
             try {
                 application.run("db", "migrate", configPath, "--migrations", migration);
-            } catch (Exception e) {
-                Assert.fail();
-            }
-        });
-    }
-
-    public static void runMigration(List<String> migrationList, Application<DockstoreWebserviceConfiguration> application, String configPath) {
-        migrationList.forEach(migration -> {
-            try {
-                application.run("db", "migrate", configPath, "--include", migration);
             } catch (Exception e) {
                 Assert.fail();
             }
@@ -285,7 +254,7 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", configPath);
 
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList(
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential2.xml").getAbsolutePath());
@@ -293,14 +262,14 @@ public final class CommonTestUtilities {
 
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList(
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
     }
 
     public static void checkToolList(String log) {

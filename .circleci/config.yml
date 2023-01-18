@@ -192,12 +192,6 @@ jobs:
           at: .
       - restore_cache:
           key: dockstore-cli-java-{{ checksum "THIRD-PARTY-LICENSES.txt" }}
-      - restore_cache:
-          keys:
-            - dockstore-cli-web-cache-unit-test-{{ checksum "/tmp/tests-to-run.txt" }}-{{ .Branch }}
-            - dockstore-cli-web-cache-unit-test-{{ checksum "/tmp/tests-to-run.txt" }}-
-            - dockstore-cli-web-cache-unit-test-
-            - dockstore-cli-web-cache-
       - install-git-secrets
       - run:
           name: build

@@ -27,8 +27,6 @@ import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.dockstore.common.CommonTestUtilities.DUMMY_TOKEN_1;
-
 /**
  * @author jpatricia
  */
@@ -49,7 +47,7 @@ public final class TestUtility {
     public static String getConfigFileLocation(boolean correctUser, boolean validPort, boolean useCache) throws IOException {
         File tempDir = Files.createTempDir();
         final File tempFile = File.createTempFile("config", "config", tempDir);
-        FileUtils.write(tempFile, "token: " + (correctUser ? DUMMY_TOKEN_1 : "foobar") + "\n", StandardCharsets.UTF_8);
+        FileUtils.write(tempFile, "token: " + (correctUser ? CommonTestUtilities.DUMMY_TOKEN_1 : "foobar") + "\n", StandardCharsets.UTF_8);
         FileUtils.write(tempFile, "server-url: http://localhost:" + (validPort ? "8080" : "9001") + "\n", StandardCharsets.UTF_8, true);
         if (useCache) {
             FileUtils.write(tempFile, "use-cache: true\n", StandardCharsets.UTF_8, true);
