@@ -372,9 +372,9 @@ commands:
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
       - restore_cache:
           keys:
-            - dockstore-cli-web-cache-unit-test-{{ checksum "/tmp/tests-to-run.txt" }}-{{ .Branch }}
-            - dockstore-cli-web-cache-unit-test-{{ checksum "/tmp/tests-to-run.txt" }}-
-            - dockstore-cli-web-cache-unit-test-
+            - dockstore-cli-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/tests-to-run.txt" }}-{{ .Branch }}
+            - dockstore-cli-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/tests-to-run.txt" }}-
+            - dockstore-cli-web-cache-{{ .Environment.CIRCLE_JOB }}-
             - dockstore-cli-web-cache-
 
   setup_for_tests:
