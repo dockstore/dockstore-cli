@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.WorkflowTest;
@@ -71,7 +71,7 @@ public class WDLWorkflowIT extends BaseIT {
     @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
     }
 
     /**

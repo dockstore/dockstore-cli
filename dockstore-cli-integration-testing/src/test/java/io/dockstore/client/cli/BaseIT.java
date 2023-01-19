@@ -15,29 +15,24 @@
  */
 package io.dockstore.client.cli;
 
-import java.io.File;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
 import com.codahale.metrics.Gauge;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.Constants;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.TestingPostgres;
-import io.dockstore.common.Utilities;
 import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dockstore.webservice.DockstoreWebserviceConfiguration;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.swagger.client.ApiClient;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.auth.ApiKeyAuth;
 import io.swagger.client.model.Repository;
-import org.apache.commons.configuration2.INIConfiguration;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -63,7 +58,7 @@ public class BaseIT {
     public static final String USER_1_USERNAME = "DockstoreTestUser";
     public static final String USER_2_USERNAME = "DockstoreTestUser2";
     public static final DropwizardTestSupport<DockstoreWebserviceConfiguration> SUPPORT = new DropwizardTestSupport<>(
-        DockstoreWebserviceApplication.class, CommonTestUtilities.CONFIDENTIAL_CONFIG_PATH);
+        DockstoreWebserviceApplication.class, CLICommonTestUtilities.CONFIDENTIAL_CONFIG_PATH);
     protected static TestingPostgres testingPostgres;
     static final String OTHER_USERNAME = "OtherUser";
     final String curatorUsername = "curator@curator.com";
@@ -99,35 +94,7 @@ public class BaseIT {
      */
 
     protected static ApiClient getWebClient(String username, TestingPostgres testingPostgresParameter) {
-        return CommonTestUtilities.getWebClient(true, username, testingPostgresParameter);
-    }
-
-    protected static ApiClient getWebClient() {
-        return getWebClient(true, false);
-    }
-
-    protected static ApiClient getWebClient(boolean correctUser, boolean admin) {
-        File configFile = FileUtils.getFile("src", "test", "resources", "config");
-        INIConfiguration parseConfig = Utilities.parseConfig(configFile.getAbsolutePath());
-        ApiClient client = new ApiClient();
-        ApiKeyAuth bearer = (ApiKeyAuth)client.getAuthentication("BEARER");
-        bearer.setApiKeyPrefix("BEARER");
-        bearer.setApiKey((correctUser ? parseConfig.getString(admin ? Constants.WEBSERVICE_TOKEN_USER_1 : Constants.WEBSERVICE_TOKEN_USER_2)
-            : "foobar"));
-        client.setBasePath(parseConfig.getString(Constants.WEBSERVICE_BASE_PATH));
-        return client;
-    }
-
-    static ApiClient getAdminWebClient() {
-        return getWebClient(true, true);
-    }
-
-    protected static ApiClient getAnonymousWebClient() {
-        File configFile = FileUtils.getFile("src", "test", "resources", "config");
-        INIConfiguration parseConfig = Utilities.parseConfig(configFile.getAbsolutePath());
-        ApiClient client = new ApiClient();
-        client.setBasePath(parseConfig.getString(Constants.WEBSERVICE_BASE_PATH));
-        return client;
+        return CLICommonTestUtilities.getWebClient(true, username, testingPostgresParameter);
     }
 
     protected void refreshByOrganizationReplacement(final String username) {
@@ -157,7 +124,7 @@ public class BaseIT {
 
     @BeforeEach
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.dropAndCreateWithTestData(SUPPORT, false);
+        CLICommonTestUtilities.dropAndCreateWithTestData(SUPPORT, false);
     }
 
     public static class TestStatus implements org.junit.jupiter.api.extension.TestWatcher {

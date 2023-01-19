@@ -17,12 +17,21 @@
 package io.dockstore.common;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.hash.Hashing;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dockstore.webservice.DockstoreWebserviceConfiguration;
+import io.dockstore.webservice.core.Token;
+import io.dockstore.webservice.jdbi.TokenDAO;
 import io.dropwizard.Application;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
@@ -32,6 +41,9 @@ import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.Tag;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.context.internal.ManagedSessionContext;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,17 +51,15 @@ import org.slf4j.LoggerFactory;
 /**
  * @author xliu
  */
-public final class CommonTestUtilities {
+public final class CLICommonTestUtilities {
 
-    // Travis is slow, need to wait up to 1 min for webservice to return
-    public static final int WAIT_TIME = 60000;
-    public static final String PUBLIC_CONFIG_PATH = ResourceHelpers.resourceFilePath("dockstore.yml");
+
     /**
      * confidential testing config, includes keys
      */
     public static final String CONFIDENTIAL_CONFIG_PATH;
-    static final String DUMMY_TOKEN_1 = "08932ab0c9ae39a880905666902f8659633ae0232e94ba9f3d2094cb928397e7";
-    private static final Logger LOG = LoggerFactory.getLogger(CommonTestUtilities.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(CLICommonTestUtilities.class);
 
     static {
         String confidentialConfigPath = null;
@@ -62,29 +72,10 @@ public final class CommonTestUtilities {
         CONFIDENTIAL_CONFIG_PATH = confidentialConfigPath;
     }
 
-    private CommonTestUtilities() {
+    private CLICommonTestUtilities() {
 
     }
 
-    /**
-     * Drops the database and recreates from migrations, not including any test data, using new application
-     *
-     * @param support reference to testing instance of the dockstore web service
-     * @throws Exception
-     */
-    public static void dropAndRecreateNoTestData(DropwizardTestSupport<DockstoreWebserviceConfiguration> support) throws Exception {
-        dropAndRecreateNoTestData(support, CONFIDENTIAL_CONFIG_PATH);
-    }
-
-    public static void dropAndRecreateNoTestData(DropwizardTestSupport<DockstoreWebserviceConfiguration> support,
-        String dropwizardConfigurationFile) throws Exception {
-        LOG.info("Dropping and Recreating the database with no test data");
-        Application<DockstoreWebserviceConfiguration> application = support.newApplication();
-        application.run("db", "drop-all", "--confirm-delete-everything", dropwizardConfigurationFile);
-        application
-            .run("db", "migrate", dropwizardConfigurationFile, "--include", "1.3.0.generated,1.3.1.consistency,1.4.0,1.5.0,"
-                    + "1.6.0,1.7.0,1.8.0,1.9.0,1.10.0,1.11.0,1.12.0,1.13.0,1.14.0");
-    }
 
     /**
      * Drops the database and recreates from migrations for non-confidential tests
@@ -111,7 +102,7 @@ public final class CommonTestUtilities {
         List<String> migrationList = Arrays
             .asList("1.3.0.generated", "1.3.1.consistency", "test", "1.4.0", "1.5.0", "test_1.5.0", "1.6.0", "1.7.0",
                     "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0");
-        runMigration(migrationList, application, dropwizardConfigurationFile);
+        CommonTestUtilities.runMigration(migrationList, application, dropwizardConfigurationFile);
     }
 
     /**
@@ -154,7 +145,6 @@ public final class CommonTestUtilities {
      * Deletes BitBucket Tokens from Database
      *
      * @param testingPostgres reference to the testing instance of Postgres
-     * @throws Exception
      */
     public static void deleteBitBucketToken(TestingPostgres testingPostgres)  {
         LOG.info("Deleting BitBucket Token from Database");
@@ -166,16 +156,14 @@ public final class CommonTestUtilities {
      *
      * @param support reference to testing instance of the dockstore web service
      * @param testingPostgres reference to the testing instance of Postgres
-     * @param needBucketToken if false the bitbucket token will be deleted
+     * @param needBitBucketToken if false the bitbucket token will be deleted
      * @throws Exception
      */
     public static void cleanStatePrivate1(DropwizardTestSupport<DockstoreWebserviceConfiguration> support,
-        TestingPostgres testingPostgres, Boolean needBucketToken) throws Exception {
+        TestingPostgres testingPostgres, Boolean needBitBucketToken) throws Exception {
         LOG.info("Dropping and Recreating the database with confidential 1 test data");
         cleanStatePrivate1(support, CONFIDENTIAL_CONFIG_PATH);
-        if (!needBucketToken) {
-            deleteBitBucketToken(testingPostgres);
-        }
+        handleBitBucketTokens(support, testingPostgres, needBitBucketToken);
     }
     /**
      * Wrapper for dropping and recreating database from migrations for test confidential 1
@@ -201,21 +189,58 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", configPath);
 
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList(
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential1.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList(
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
+    }
+
+    /**
+     * TODO: do not modify, should be deleted with next webservice release if the method can be made public
+     * @param support
+     * @param testingPostgres
+     * @param needBitBucketToken
+     */
+    private static void handleBitBucketTokens(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, TestingPostgres testingPostgres, boolean needBitBucketToken) {
+        if (!needBitBucketToken) {
+            deleteBitBucketToken(testingPostgres);
+        } else {
+            DockstoreWebserviceApplication application = support.getApplication();
+            Session session = application.getHibernate().getSessionFactory().openSession();
+            ManagedSessionContext.bind(session);
+            //TODO restore bitbucket token from disk cache to reduce rate limit from busting cache with new access tokens
+            SessionFactory sessionFactory = application.getHibernate().getSessionFactory();
+            TokenDAO tokenDAO = new TokenDAO(sessionFactory);
+            final List<Token> allBitBucketTokens = tokenDAO.findAllBitBucketTokens();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            for (Token token : allBitBucketTokens) {
+                try {
+                    final String cacheCandidate = FileUtils.readFileToString(new File(CommonTestUtilities.BITBUCKET_TOKEN_CACHE + Hashing.sha256().hashString(token.getRefreshToken(), StandardCharsets.UTF_8) + ".json"),
+                            StandardCharsets.UTF_8);
+                    final Token cachedToken = gson.fromJson(cacheCandidate, Token.class);
+                    if (cachedToken != null) {
+                        testingPostgres.runUpdateStatement(
+                                "update token set content = '" + cachedToken.getContent() + "', dbUpdateDate = '" + cachedToken.getDbUpdateDate().toLocalDateTime().toString() + "' where id = "
+                                        + cachedToken.getId());
+                    }
+                } catch (IOException | UncheckedIOException e) {
+                    // probably ok
+                    LOG.debug("could not read bitbucket token", e);
+                }
+            }
+        }
     }
 
     private static void runExternalMigration(List<String> migrationList, Application<DockstoreWebserviceConfiguration> application,
@@ -229,16 +254,6 @@ public final class CommonTestUtilities {
         });
     }
 
-    public static void runMigration(List<String> migrationList, Application<DockstoreWebserviceConfiguration> application, String configPath) {
-        migrationList.forEach(migration -> {
-            try {
-                application.run("db", "migrate", configPath, "--include", migration);
-            } catch (Exception e) {
-                Assert.fail();
-            }
-        });
-    }
-
     /**
      * Wrapper for dropping and recreating database from migrations for test confidential 2 and optionally deleting BitBucket tokens
      *
@@ -246,12 +261,10 @@ public final class CommonTestUtilities {
      * @throws Exception
      */
     public static void cleanStatePrivate2(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, boolean isNewApplication,
-        TestingPostgres testingPostgres, boolean needBucketToken) throws Exception {
+        TestingPostgres testingPostgres, boolean needBitBucketToken) throws Exception {
         LOG.info("Dropping and Recreating the database with confidential 2 test data");
         cleanStatePrivate2(support, CONFIDENTIAL_CONFIG_PATH, isNewApplication);
-        if (!needBucketToken) {
-            deleteBitBucketToken(testingPostgres);
-        }
+        handleBitBucketTokens(support, testingPostgres, needBitBucketToken);
     }
 
     /**
@@ -285,7 +298,7 @@ public final class CommonTestUtilities {
         application.run("db", "drop-all", "--confirm-delete-everything", configPath);
 
         List<String> migrationList = Arrays.asList("1.3.0.generated", "1.3.1.consistency");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList(
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential2.xml").getAbsolutePath());
@@ -293,14 +306,14 @@ public final class CommonTestUtilities {
 
 
         migrationList = Arrays.asList("1.4.0", "1.5.0");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
 
         migrationList = Collections.singletonList(
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
         migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0");
-        runMigration(migrationList, application, configPath);
+        CommonTestUtilities.runMigration(migrationList, application, configPath);
     }
 
     public static void checkToolList(String log) {

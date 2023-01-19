@@ -19,7 +19,7 @@ package io.dockstore.client.cli;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.ToilCompatibleTest;
@@ -64,7 +64,7 @@ public class GeneralWorkflowIT extends BaseIT {
     @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
     }
 
     @Test

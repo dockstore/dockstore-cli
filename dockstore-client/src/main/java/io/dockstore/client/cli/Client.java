@@ -413,9 +413,7 @@ public class Client {
                         out("Download complete. You are now on version " + latestUnstable + " of Dockstore.");
                     } else {
                         //user input '--upgrade' without knowing the version or the optional commands
-                        out("You are running the latest stable version...");
-                        out("If you wish to upgrade to the newest unstable version, please use the following command:");
-                        out("   dockstore --upgrade-unstable"); // takes you to the newest unstable version
+                        out("You are running the latest stable version.");
                     }
                 } else {    //current is not the most stable version
                     switch (optVal) {
@@ -427,8 +425,7 @@ public class Client {
                     case "none":
                         if (compareVersion(currentVersion)) {
                             // current version is the latest unstable version
-                            out("You are currently on the latest unstable version. If you wish to upgrade to the latest stable version, please use the following command:");
-                            out("   dockstore --upgrade-stable");
+                            out("You are currently on the latest unstable version.");
                         } else {
                             // current version is the older unstable version
                             // upgrade to latest stable version
@@ -576,9 +573,7 @@ public class Client {
         }
         //check if the current version is the latest stable version or not
         if (Objects.equals(currentVersion, latestVersion)) {
-            out("You are running the latest stable version...");
-            out("If you wish to upgrade to the latest unstable version, please use the following command:");
-            out("   dockstore --upgrade-unstable"); // takes you to the newest unstable version
+            out("You are running the latest stable version."); // takes you to the newest unstable version
         } else {
             //not the latest stable version, could be on the newest unstable or older unstable/stable version
             out("The latest stable version is " + latestVersion);

@@ -1,6 +1,6 @@
 package io.dockstore.client.cli;
 
-import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.SourceControl;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ public class StarIT extends BaseIT {
     @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
     }
 
     @Test

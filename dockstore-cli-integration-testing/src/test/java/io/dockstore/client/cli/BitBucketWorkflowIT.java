@@ -1,9 +1,14 @@
 package io.dockstore.client.cli;
 
 import io.dockstore.common.BitBucketTest;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.SourceControl;
+import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dropwizard.testing.ResourceHelpers;
+import org.hibernate.Session;
+import org.hibernate.context.internal.ManagedSessionContext;
+import org.junit.After;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -26,7 +31,16 @@ public class BitBucketWorkflowIT extends BaseIT {
     @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres, true);
+        CLICommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres, true);
+    }
+
+    @After
+    public void preserveBitBucketTokens() {
+        // used to allow us to use cacheBitbucketTokens outside of the web service
+        DockstoreWebserviceApplication application = SUPPORT.getApplication();
+        Session session = application.getHibernate().getSessionFactory().openSession();
+        ManagedSessionContext.bind(session);
+        CommonTestUtilities.cacheBitbucketTokens(SUPPORT);
     }
 
     /**
@@ -37,17 +51,17 @@ public class BitBucketWorkflowIT extends BaseIT {
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
-                SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow", "--descriptor-type", "wdl",
+                SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--descriptor-type", "wdl",
                 "--workflow-path", "/Dockstore.wdl", "--default-test-parameter-path", "/foo.json", "--script" });
 
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
-            SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow", "--script" });
+            SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
-            SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow", "--script" });
+            SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--script" });
 
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "convert", "entry2json", "--entry",
-                SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow:wdl_import", "--script" });
+                SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow:wdl_import", "--script" });
         assertTrue(systemOutRule.getText().contains("\"three_step.cgrep.pattern\": \"String\""));
     }
 
@@ -74,7 +88,7 @@ public class BitBucketWorkflowIT extends BaseIT {
 
         // grab wdl file
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "wdl", "--entry",
-            SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow/testname:wdl_import", "--script" });
+            SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow/testname:wdl_import", "--script" });
     }
 
     /**
@@ -86,7 +100,7 @@ public class BitBucketWorkflowIT extends BaseIT {
 
         // refresh individual that is valid
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
-            SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow", "--script" });
+            SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--script" });
         final long nullLastModifiedWorkflowVersions = testingPostgres
             .runSelectStatement("select count(*) from workflowversion where lastmodified is null", long.class);
         assertEquals(0, nullLastModifiedWorkflowVersions,
@@ -97,7 +111,7 @@ public class BitBucketWorkflowIT extends BaseIT {
 
         // Edit workflow path for a version
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "version_tag", "--entry",
-            SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow", "--name", "master", "--workflow-path",
+            SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--name", "master", "--workflow-path",
             "/Dockstoredirty.cwl", "--script" });
 
         // There should be on dirty bit
@@ -107,7 +121,7 @@ public class BitBucketWorkflowIT extends BaseIT {
         // Update default cwl
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
-                SourceControl.BITBUCKET.toString() + "/dockstore_testuser2/dockstore-workflow", "--workflow-path", "/Dockstoreclean.cwl",
+                SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--workflow-path", "/Dockstoreclean.cwl",
                 "--script" });
 
         // There should be 3 versions with new cwl

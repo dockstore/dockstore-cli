@@ -31,7 +31,7 @@ import javax.ws.rs.core.GenericType;
 
 import com.google.common.collect.Lists;
 import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.WorkflowTest;
@@ -79,7 +79,7 @@ public class WorkflowIT extends BaseIT {
     @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class WorkflowIT extends BaseIT {
         boolean thrownException = false;
         try {
             SwaggerUtility.getArbitraryURL("/workflows/" + workflowId + "/zip/" + versionId, new GenericType<byte[]>() {
-            }, CommonTestUtilities.getWebClient(false, null, testingPostgres));
+            }, CLICommonTestUtilities.getWebClient(false, null, testingPostgres));
         } catch (Exception e) {
             thrownException = true;
         }
@@ -153,7 +153,7 @@ public class WorkflowIT extends BaseIT {
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
                 "--script" });
         arbitraryURL = SwaggerUtility.getArbitraryURL("/workflows/" + workflowId + "/zip/" + versionId, new GenericType<byte[]>() {
-        }, CommonTestUtilities.getWebClient(false, null, testingPostgres));
+        }, CLICommonTestUtilities.getWebClient(false, null, testingPostgres));
         File tempZip2 = File.createTempFile("temp", "zip");
         write = Files.write(tempZip2.toPath(), arbitraryURL);
         zipFile = new ZipFile(write.toFile());
@@ -333,7 +333,7 @@ public class WorkflowIT extends BaseIT {
      */
     @Test
     public void cwlVersion11() {
-        final ApiClient userApiClient = CommonTestUtilities.getWebClient(true, USER_2_USERNAME, testingPostgres);
+        final ApiClient userApiClient = CLICommonTestUtilities.getWebClient(true, USER_2_USERNAME, testingPostgres);
         WorkflowsApi userWorkflowsApi = new WorkflowsApi(userApiClient);
         userWorkflowsApi.manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/metadata.cwl", "metadata", "cwl",
             "/cwl/v1.1/cat-job.json");
@@ -351,7 +351,7 @@ public class WorkflowIT extends BaseIT {
         WorkflowVersion workflowVersion = optionalWorkflowVersion.get();
 
         // verify sourcefiles
-        final io.dockstore.openapi.client.ApiClient userOpenApiClient = CommonTestUtilities.getOpenApiWebClient(true, USER_2_USERNAME, testingPostgres);
+        final io.dockstore.openapi.client.ApiClient userOpenApiClient = CLICommonTestUtilities.getOpenApiWebClient(true, USER_2_USERNAME, testingPostgres);
         io.dockstore.openapi.client.api.WorkflowsApi openApiWorkflowApi = new io.dockstore.openapi.client.api.WorkflowsApi(userOpenApiClient);
         List<io.dockstore.openapi.client.model.SourceFile> sourceFileList = openApiWorkflowApi.getWorkflowVersionsSourcefiles(workflow.getId(), workflowVersion.getId(), null);
 
