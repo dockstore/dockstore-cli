@@ -98,7 +98,7 @@ public class GitHubAppToolIT extends BaseIT {
     public void wdl() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[]{"workflow", DescriptorType.WDL.toString(), "--entry", ENTRY_PATH_WITH_VERSION, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.API_ERROR, exitCode);
-        assertTrue(systemOutRule.getText().contains("Invalid version"), "output missing invalid version message, looked like " + systemOutRule.getText());
+        assertTrue(systemOutRule.getOutput().getText().contains("Invalid version"), "output missing invalid version message, looked like " + systemOutRule.getOutput().getText());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class GitHubAppToolIT extends BaseIT {
         assertTrue(systemOutRule.getText().contains("GET /workflows/1001/zip/1001 HTTP/1.1"));
         systemOutRule.clear();
         Client.main(new String[]{"workflow", "download", "--entry", ENTRY_PATH_WITH_VERSION, "--zip", "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
-        assertEquals(1, StringUtils.countMatches(systemOutRule.getText(), "GET /workflows/1001/zip/1001 HTTP/1.1"), "not matching, output looked like " + systemOutRule.getText());
+        assertEquals(1, StringUtils.countMatches(systemOutRule.getOutput().getText(), "GET /workflows/1001/zip/1001 HTTP/1.1"), "not matching, output looked like " + systemOutRule.getOutput().getText());
     }
 
     @Test
@@ -174,7 +174,7 @@ public class GitHubAppToolIT extends BaseIT {
     public void restub() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(new String[]{"workflow", "restub", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
-        assertTrue(systemOutRule.getText().contains("Command not supported for GitHub App entries"));
+        assertTrue(systemOutRule.getOutput().getText().contains("Command not supported for GitHub App entries"), "looked like: " + systemOutRule.getOutput().getText());
     }
 
     private void publishWorkflow() {

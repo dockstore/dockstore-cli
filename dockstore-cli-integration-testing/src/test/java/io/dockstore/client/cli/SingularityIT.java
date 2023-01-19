@@ -23,6 +23,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @Tag(SingularityTest.NAME)
 @ExtendWith(SystemStubsExtension.class)
@@ -49,7 +50,7 @@ public class SingularityIT extends BaseIT {
      * Tests that a simple CWL workflow can be run in Singularity instead of Docker
      */
     @Test
-    public void runCwlWorkflow() {
+    public void runCwlWorkflow() throws Exception {
         // manually register the CWL version of the md5sum-checker workflow locally
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
@@ -59,14 +60,11 @@ public class SingularityIT extends BaseIT {
         workflowApi.refresh(workflow.getId(), true);
 
         // run the md5sum-checker workflow
-        Client.main(new String[] {
-            "--config",  // this config file passes the --singularity option to cwltool
-            SINGULARITY_CONFIG_TEMPLATE,
-            "workflow",
-            "launch",
-            "--entry",
-            SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
-            "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json")
+        catchSystemExit(() -> {
+            Client.main(new String[] { "--config",  // this config file passes the --singularity option to cwltool
+                    SINGULARITY_CONFIG_TEMPLATE, "workflow", "launch", "--entry",
+                    SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
+                    ResourceHelpers.resourceFilePath("md5sum_cwl.json") });
         });
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
@@ -77,7 +75,7 @@ public class SingularityIT extends BaseIT {
      * Tests that a simple WDL workflow can be run in Singularity instead of Docker
      */
     @Test
-    public void runWDLWorkflow() throws IOException {
+    public void runWDLWorkflow() throws Exception {
         // manually register the WDL version of the md5sum-checker workflow locally
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
@@ -91,14 +89,10 @@ public class SingularityIT extends BaseIT {
         File tmpConfig = generateCromwellConfig();
 
         // run the md5sum-checker workflow
-        Client.main(new String[] {
-            "--config",
-            tmpConfig.getAbsolutePath(),
-            "workflow",
-            "launch",
-            "--entry",
-            SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test",
-            "--json", ResourceHelpers.resourceFilePath("md5sum_wdl.json")
+        catchSystemExit(() -> {
+            Client.main(new String[] { "--config", tmpConfig.getAbsolutePath(), "workflow", "launch", "--entry",
+                    SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
+                    ResourceHelpers.resourceFilePath("md5sum_wdl.json") });
         });
 
         // the phrase "singularity exec" will only be in the output if Singularity is actually being used
