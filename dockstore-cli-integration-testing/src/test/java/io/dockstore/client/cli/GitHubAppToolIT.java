@@ -44,6 +44,10 @@ public class GitHubAppToolIT extends BaseIT {
         CLICommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         final WorkflowsApi workflowApi = new WorkflowsApi(webClient);
+        systemErrRule.clear();
+        systemOutRule.clear();
+
+        // the following change the DB state
         workflowApi.handleGitHubRelease(WORKFLOW_REPO, USER_2_USERNAME, "refs/heads/main", INSTALLATION_ID);
         publishWorkflow();
     }
