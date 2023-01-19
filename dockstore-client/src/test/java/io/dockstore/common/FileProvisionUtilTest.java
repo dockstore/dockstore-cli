@@ -31,14 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class FileProvisionUtilTest {
     @Test
-    public void downloadPlugins() {
+    void downloadPlugins() {
         File iniFile = FileUtils.getFile("src", "test", "resources", "launcher.cwltool.ini");
         INIConfiguration config = Utilities.parseConfig(iniFile.getAbsolutePath());
         FileProvisionUtil.downloadPlugins(config);
     }
 
     @Test
-    public void createPluginJSONFile() {
+    void createPluginJSONFile() {
         String userHome = System.getProperty("user.home");
         String pluginFile = userHome + File.separator + ".dockstore" + File.separator + PLUGINS_JSON_FILENAME;
         FileProvisionUtil.createPluginJSONFile(pluginFile);
@@ -48,7 +48,7 @@ class FileProvisionUtilTest {
     }
 
     @Test
-    public void testFileProvisioningCustom() {
+    void testFileProvisioningCustom() {
         File iniFile = FileUtils.getFile("src", "test", "resources", "config.withTestPlugin");
         FileProvisioning fileProvisioning = new FileProvisioning(iniFile.getAbsolutePath());
         assertNotNull(fileProvisioning);

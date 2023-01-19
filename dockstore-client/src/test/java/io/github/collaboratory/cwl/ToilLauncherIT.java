@@ -23,7 +23,7 @@ import org.junit.Ignore;
  */
 @Ignore
 // @Category(ToilOnlyTest.class)
-class ToilLauncherIT extends LauncherIT {
+public class ToilLauncherIT extends LauncherIT {
 
     public String getConfigFile() {
         return FileUtils.getFile("src", "test", "resources", "launcher.toil.ini").getAbsolutePath();

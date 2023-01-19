@@ -15,26 +15,25 @@
  */
 package io.github.collaboratory;
 
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.TabExpansionUtil;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 /**
  * Created by dyuen on 2/23/17.
  */
 class TabExpansionTest {
 
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog();
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
+
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
     @Test
-    public void testForNonCrashing() {
+    void testForNonCrashing() {
         TabExpansionUtil.main(null);
     }
 }

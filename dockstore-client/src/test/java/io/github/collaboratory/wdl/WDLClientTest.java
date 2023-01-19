@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author gluu
  * @since 2019-08-23
  */
-public class WDLClientTest {
+class WDLClientTest {
 
     /**
      * Tests that all file-like inputs are recognized (File, Array[File], File?, Array[File]?)

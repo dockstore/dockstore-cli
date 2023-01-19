@@ -98,7 +98,7 @@ class AbstractEntryClientTestIT {
         parser.jCommander.parse(args);
 
         int exitCode = catchSystemExit(() -> workflowClient.aggregateWesRequestData(parser));
-        assertTrue(exitCode != 0);
+        assertNotEquals(0, exitCode);
         assertFalse(systemErrRule.getText().isBlank(), "The config file doesn't exist");
     }
 

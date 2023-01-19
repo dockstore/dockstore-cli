@@ -21,7 +21,7 @@ import org.apache.commons.io.FileUtils;
 /**
  * @author dyuen
  */
-class CWLToolLauncherIT extends LauncherIT {
+public class CWLToolLauncherIT extends LauncherIT {
 
     public String getConfigFile() {
         return FileUtils.getFile("src", "test", "resources", "launcher.cwltool.ini").getAbsolutePath();
