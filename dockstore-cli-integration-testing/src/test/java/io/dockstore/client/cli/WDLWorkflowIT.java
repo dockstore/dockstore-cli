@@ -54,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @Tag(ConfidentialTest.NAME)
 @Tag(WorkflowTest.NAME)
-public class WDLWorkflowIT extends BaseIT {
+class WDLWorkflowIT extends BaseIT {
 
     // TODO: Remove extra tags and branches on skylab workflows which are not needed
     private static final String SKYLAB_WORKFLOW_REPO = "dockstore-testing/skylab";

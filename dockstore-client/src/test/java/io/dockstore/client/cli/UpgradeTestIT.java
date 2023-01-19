@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class UpgradeTestIT {
+class UpgradeTestIT {
 
     /**
      * This method will decide which version to upgrade to depending on the command "stable","unstable", and "none"

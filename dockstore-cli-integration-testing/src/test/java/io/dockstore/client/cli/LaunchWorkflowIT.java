@@ -22,7 +22,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @Tag(ConfidentialTest.NAME)
 @Tag(WorkflowTest.NAME)
-public class LaunchWorkflowIT extends BaseIT {
+class LaunchWorkflowIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();
@@ -43,7 +43,7 @@ public class LaunchWorkflowIT extends BaseIT {
      * Todo: Works locally but not on Travis.  This is due the the relative position of the file paths in the input JSON
      */
     @Test
-    @Disabled
+    @Disabled("broken on CI")
     void testLocalLaunchCWL() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("filtercount.cwl.yaml"), "--json", ResourceHelpers.resourceFilePath("filtercount-job.json"),
@@ -118,7 +118,7 @@ public class LaunchWorkflowIT extends BaseIT {
      * TODO: cromwell needs to support HTTP/HTTPS file prov
      */
     @Test
-    @Disabled
+    @Disabled("cromwell needs to support HTTP/HTTPS file prov")
     void testLocalLaunchWDLImportHTTP() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("wdlhttpimport.wdl"), "--json", ResourceHelpers.resourceFilePath("wdlhttp.json"),

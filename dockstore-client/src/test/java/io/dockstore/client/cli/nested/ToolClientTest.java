@@ -31,7 +31,7 @@ import org.mockito.Mockito;
 
 import static org.mockito.Mockito.when;
 
-public class ToolClientTest {
+class ToolClientTest {
 
     private static final String MISSING_TAG = "0.3.1";
     private static final String GOOD_TAG = "0.3.0";

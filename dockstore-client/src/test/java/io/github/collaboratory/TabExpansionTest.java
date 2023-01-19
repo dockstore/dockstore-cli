@@ -26,7 +26,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 /**
  * Created by dyuen on 2/23/17.
  */
-public class TabExpansionTest {
+class TabExpansionTest {
 
     @Rule
     public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog();

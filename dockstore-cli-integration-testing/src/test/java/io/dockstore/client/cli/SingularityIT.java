@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag(SingularityTest.NAME)
 @ExtendWith(SystemStubsExtension.class)
-public class SingularityIT extends BaseIT {
+class SingularityIT extends BaseIT {
 
     @TempDir
     public static File temporaryFolder;

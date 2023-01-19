@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Created by dyuen on 2/23/17.
  */
 @ExtendWith(SystemStubsExtension.class)
-public class ClientTestIT {
+class ClientTestIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();

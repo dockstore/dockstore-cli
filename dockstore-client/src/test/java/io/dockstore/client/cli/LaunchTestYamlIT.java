@@ -22,7 +22,7 @@ import org.junit.runner.Description;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static org.junit.Assert.assertTrue;
 
-public class LaunchTestYamlIT {
+class LaunchTestYamlIT {
 
     @Rule
     public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();

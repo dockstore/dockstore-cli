@@ -29,7 +29,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class WesLauncherTest {
+class WesLauncherTest {
 
     public static final String RUN_ID = "123456-098765-123123-04983782";
     public static final String WORKFLOW_PATH = "github.com/org/repo";

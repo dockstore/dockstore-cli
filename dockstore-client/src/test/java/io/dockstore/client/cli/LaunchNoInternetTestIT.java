@@ -22,6 +22,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
@@ -35,7 +36,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  * @since 1.6.0
  */
 @ExtendWith(SystemStubsExtension.class)
-public class LaunchNoInternetTestIT {
+class LaunchNoInternetTestIT {
     private static final Logger LOG = LoggerFactory.getLogger(LaunchNoInternetTestIT.class);
     private static final File DESCRIPTOR_FILE = new File(ResourceHelpers.resourceFilePath("nonexistent_image/CWL/nonexistent_image.cwl"));
     private static final File YAML_FILE = new File(ResourceHelpers.resourceFilePath("echo-job.yml"));
@@ -87,7 +88,7 @@ public class LaunchNoInternetTestIT {
         args.add("--script");
 
         int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
-        assertTrue(exitCode != 0);
+        assertNotEquals(0, exitCode);
         assertTrue(systemErrRule.getText().contains(
                 "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
                         + "']' returned non-zero exit status 1"));
@@ -116,7 +117,7 @@ public class LaunchNoInternetTestIT {
         args.add("--script");
 
         int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
-        assertTrue(exitCode != 0);
+        assertNotEquals(0, exitCode);
         assertTrue(systemOutRule.getText().contains("The specified Docker image directory not found:"));
         assertTrue(systemErrRule.getText().contains(
                 "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
@@ -145,7 +146,7 @@ public class LaunchNoInternetTestIT {
         args.add("--script");
 
         int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
-        assertTrue(exitCode != 0);
+        assertNotEquals(0, exitCode);
         assertTrue(systemOutRule.getText().contains("The specified Docker image directory is a file:"));
         assertTrue(systemErrRule.getText().contains(
                 "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME
@@ -178,7 +179,7 @@ public class LaunchNoInternetTestIT {
         args.add("--script");
 
         int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
-        assertTrue(exitCode != 0);
+        assertNotEquals(0, exitCode);
         assertTrue(systemOutRule.getText().contains("There are no files in the docker image directory"));
         assertTrue(systemErrRule.getText().contains(
                 "Docker is required to run this tool: Command '['docker', 'pull', '" + FAKE_IMAGE_NAME

@@ -31,7 +31,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class YamlClientIT extends BaseIT {
+class YamlClientIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();

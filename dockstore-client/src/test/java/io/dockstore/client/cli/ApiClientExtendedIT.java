@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ApiClientExtendedIT {
+class ApiClientExtendedIT {
 
     // These are old keys that have been deleted.
     static final String WES_ENDPOINT = "https://eoof9s4bbe.execute-api.us-west-2.amazonaws.com/prod/ga4gh/wes/v1";

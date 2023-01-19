@@ -39,7 +39,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  */
 @Tag(ConfidentialTest.NAME)
 @Tag(ToolTest.NAME)
-public class NotificationsIT extends BaseIT {
+class NotificationsIT extends BaseIT {
     private static final String SAMPLE_CWL_DESCRIPTOR = ResourceHelpers.resourceFilePath("dockstore-tool-helloworld.cwl");
     private static final String SAMPLE_WDL_DESCRIPTOR = ResourceHelpers.resourceFilePath("wdl.wdl");
     private static final String SAMPLE_CWL_TEST_JSON = "https://raw.githubusercontent.com/dockstore/dockstore/f343bcd6e4465a8ef790208f87740bd4d5a9a4da/dockstore-client/src/test/resources/test.cwl.json";

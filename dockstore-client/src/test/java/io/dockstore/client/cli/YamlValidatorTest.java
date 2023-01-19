@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(SystemStubsExtension.class)
-public class YamlValidatorTest {
+class YamlValidatorTest {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();

@@ -21,7 +21,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @Tag(ConfidentialTest.NAME)
 @Tag(WorkflowTest.NAME)
-public class ManualPublishWorkflowIT extends BaseIT {
+class ManualPublishWorkflowIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();
@@ -160,7 +160,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
     /**
      * This tests getting branches and tags from gitlab repositories
      */
-    @Disabled
+    @Disabled("probably rate-limited on gitlab")
     @Test
     @Category(SlowTest.class)
     void testGitLabTagAndBranchTracking() {

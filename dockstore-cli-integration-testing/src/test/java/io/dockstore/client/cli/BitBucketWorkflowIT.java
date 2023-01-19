@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag(BitBucketTest.NAME)
-public class BitBucketWorkflowIT extends BaseIT {
+class BitBucketWorkflowIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();

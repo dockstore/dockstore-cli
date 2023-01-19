@@ -28,7 +28,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @ExtendWith(LaunchTestIT.TestStatus.class)
 @ExtendWith(SystemStubsExtension.class)
-public class LaunchTestRunToolIT {
+class LaunchTestRunToolIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();

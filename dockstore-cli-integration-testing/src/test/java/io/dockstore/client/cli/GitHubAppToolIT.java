@@ -29,7 +29,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  * Tests every command in the workflow mode with a GitHub App Tool except manual_publish (because it's unrelated) and wes
  */
 @ExtendWith(SystemStubsExtension.class)
-public class GitHubAppToolIT extends BaseIT {
+class GitHubAppToolIT extends BaseIT {
 
     private static final String WORKFLOW_REPO = "DockstoreTestUser2/test-workflows-and-tools";
     private static final String ENTRY_PATH = String.format("github.com/%s/test-workflows-and-tools/md5sum", USER_2_USERNAME);

@@ -51,7 +51,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 @Tag(ConfidentialTest.NAME)
 @Tag(ToolTest.NAME)
 @ExtendWith(SystemStubsExtension.class)
-public class ClientIT extends BaseIT {
+class ClientIT extends BaseIT {
 
     private static final String FIRST_TOOL = ResourceHelpers.resourceFilePath("dockstore-tool-helloworld.cwl");
 
@@ -93,8 +93,8 @@ public class ClientIT extends BaseIT {
         assertEquals(Client.CONNECTION_ERROR, exitCode);
     }
 
-    // Won't work as entry must be valid
-    @Disabled
+    //
+    @Disabled("Won't work as entry must be valid")
     void quickRegisterValidEntry() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test6" });
 
@@ -123,7 +123,7 @@ public class ClientIT extends BaseIT {
         assertTrue(systemOutRule.getText().contains("dockstore-file-icgc-storage-client-plugin"));
     }
 
-    @Disabled
+    @Disabled("seems to have been disabled for ages")
     void quickRegisterDuplicateEntry() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test6" });
         Client.main(

@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author gluu
  * @since 14/03/17
  */
-public class FileProvisionUtilTest {
+class FileProvisionUtilTest {
     @Test
     public void downloadPlugins() {
         File iniFile = FileUtils.getFile("src", "test", "resources", "launcher.cwltool.ini");

@@ -53,7 +53,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  */
 @Tag(ConfidentialTest.NAME)
 @Tag(ToolTest.NAME)
-public class BasicIT extends BaseIT {
+class BasicIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();
@@ -183,7 +183,7 @@ public class BasicIT extends BaseIT {
     /**
      * Will test attempting to manually publish a Dockerhub/Github entry using incorrect CWL and/or dockerfile locations
      */
-    @Disabled
+    @Disabled("probably broken with changes to manual publish")
     void testDockerhubGithubWrongStructure() throws Exception {
         // Todo : Manual publish entry with wrong cwl and dockerfile locations, should not be able to manual publish
         int exitCode = catchSystemExit(() -> Client.main(

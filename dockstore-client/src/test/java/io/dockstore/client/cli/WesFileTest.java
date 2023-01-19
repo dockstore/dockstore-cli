@@ -11,7 +11,7 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class WesFileTest {
+class WesFileTest {
 
     @Rule
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();

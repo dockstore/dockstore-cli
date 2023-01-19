@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author gluu
  * @since 18/09/17
  */
-public class SecondaryFilesUtilityIT {
+class SecondaryFilesUtilityIT {
 
     private static final String IMAGE_DESCRIPTOR_PATH = FileUtils
         .getFile("src", "test", "resources", "gdc/cwl/workflows/dnaseq/transform.cwl").getAbsolutePath();

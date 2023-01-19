@@ -25,7 +25,7 @@ import static software.amazon.awssdk.profiles.ProfileFileSystemSetting.AWS_SHARE
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @ExtendWith(SystemStubsExtension.class)
-public class AbstractEntryClientTestIT {
+class AbstractEntryClientTestIT {
 
     static final String CONFIG_NO_CONTENT_RESOURCE = "configNoContent";
 

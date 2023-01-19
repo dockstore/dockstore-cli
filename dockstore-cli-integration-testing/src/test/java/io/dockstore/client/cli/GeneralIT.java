@@ -55,7 +55,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  */
 @org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
 @org.junit.jupiter.api.Tag(ToolTest.NAME)
-public class GeneralIT extends BaseIT {
+class GeneralIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();
@@ -73,7 +73,7 @@ public class GeneralIT extends BaseIT {
      * Checks that auto upgrade works and that the dockstore CLI is updated to the latest tag
      * Must be run after class since upgrading before tests may cause them to fail
      */
-    @Disabled
+    @Disabled("seems to have been disabled for ages")
     public static void testAutoUpgrade() {
         String installLocation = Client.getInstallLocation();
         String latestVersion = Client.getLatestVersion();

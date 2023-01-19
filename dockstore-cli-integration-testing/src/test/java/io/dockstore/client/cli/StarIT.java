@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author gluu
  * @since 2020-02-28
  */
-public class StarIT extends BaseIT {
+class StarIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();

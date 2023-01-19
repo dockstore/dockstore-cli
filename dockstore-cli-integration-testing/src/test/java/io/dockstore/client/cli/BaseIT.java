@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(BaseIT.TestStatus.class)
 @ExtendWith(SystemStubsExtension.class)
 @Tag(ConfidentialTest.NAME)
-public class BaseIT {
+class BaseIT {
 
     public static final String INSTALLATION_ID = "1179416";
     public static final String ADMIN_USERNAME = "admin@admin.com";

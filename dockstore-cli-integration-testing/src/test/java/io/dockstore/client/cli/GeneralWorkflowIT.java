@@ -53,7 +53,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  */
 @Tag(ConfidentialTest.NAME)
 @Tag(WorkflowTest.NAME)
-public class GeneralWorkflowIT extends BaseIT {
+class GeneralWorkflowIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();
@@ -555,10 +555,10 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests that you can refresh user data by refreshing a workflow
      * ONLY WORKS if the current user in the database dump has no metadata, and on Github there is metadata (bio, location)
      * If the user has metadata, test will pass as long as the user's metadata isn't the same as Github already
-     *
+     * <p>
      * Ignoring this one for 1.9, since we don't have the refresh endpoint any more
      */
-    @Disabled
+    @Disabled("refresh has changed")
     @Test
     void testRefreshingUserMetadata() {
         // Refresh all workflows

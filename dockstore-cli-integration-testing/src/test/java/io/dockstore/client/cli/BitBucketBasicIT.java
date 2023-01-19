@@ -26,7 +26,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 @Tag(ConfidentialTest.NAME)
 @Tag(BitBucketTest.NAME)
 @ExtendWith(SystemStubsExtension.class)
-public class BitBucketBasicIT extends BaseIT {
+class BitBucketBasicIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();
@@ -193,7 +193,7 @@ public class BitBucketBasicIT extends BaseIT {
     /**
      * Will test attempting to manually publish a Dockerhub/Bitbucket entry using incorrect CWL and/or dockerfile locations
      */
-    @Disabled
+    @Disabled("probably broken with changes to manual publish")
     @Test
     void testDockerhubBitbucketWrongStructure() throws Exception {
         // Todo : Manual publish entry with wrong cwl and dockerfile locations, should not be able to manual publish

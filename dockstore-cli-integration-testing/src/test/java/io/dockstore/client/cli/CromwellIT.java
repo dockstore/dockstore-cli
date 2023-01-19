@@ -59,7 +59,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 @ExtendWith(SystemStubsExtension.class)
 @Tag(ConfidentialTest.NAME)
 @Tag(ToolTest.NAME)
-public class CromwellIT {
+class CromwellIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();

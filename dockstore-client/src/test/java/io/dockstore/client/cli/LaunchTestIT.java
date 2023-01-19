@@ -55,7 +55,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @ExtendWith(LaunchTestIT.TestStatus.class)
 @ExtendWith(SystemStubsExtension.class)
-public class LaunchTestIT {
+class LaunchTestIT {
     public static final long LAST_MODIFIED_TIME_100 = 100L;
     public static final long LAST_MODIFIED_TIME_1000 = 1000L;
 

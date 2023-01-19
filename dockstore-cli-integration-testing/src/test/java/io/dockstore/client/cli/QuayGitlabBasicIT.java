@@ -19,7 +19,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @Tag(ConfidentialTest.NAME)
 @Tag(ToolTest.NAME)
-public class QuayGitlabBasicIT extends BaseIT {
+class QuayGitlabBasicIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();

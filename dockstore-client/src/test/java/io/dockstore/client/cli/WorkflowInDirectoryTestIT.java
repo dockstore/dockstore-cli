@@ -34,7 +34,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
  * @author gluu
  * @since 02/08/17
  */
-public class WorkflowInDirectoryTestIT {
+class WorkflowInDirectoryTestIT {
 
     private static File configFile;
     @Rule

@@ -65,7 +65,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  */
 @Tag(ConfidentialTest.NAME)
 @Tag(WorkflowTest.NAME)
-public class WorkflowIT extends BaseIT {
+class WorkflowIT extends BaseIT {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();
