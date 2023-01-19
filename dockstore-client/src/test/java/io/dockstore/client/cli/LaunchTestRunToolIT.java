@@ -37,7 +37,7 @@ public class LaunchTestRunToolIT {
     public final SystemErr systemErrRule = new SystemErr();
 
     @Test
-    public void yamlToolCorrect() {
+    void yamlToolCorrect() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-tool.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("echo-job.yml"));
 
@@ -83,7 +83,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolWithGlobbedFilesOnOutput() throws IOException {
+    void runToolWithGlobbedFilesOnOutput() throws IOException {
 
         File fileDir = new File("/tmp/provision_out_with_files");
         FileUtils.deleteDirectory(fileDir);
@@ -115,7 +115,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolWithoutProvisionOnOutput() throws IOException {
+    void runToolWithoutProvisionOnOutput() throws IOException {
 
         FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files"));
 
@@ -140,7 +140,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolWithDirectoriesConversion() {
+    void runToolWithDirectoriesConversion() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
 
         ArrayList<String> args = new ArrayList<>();
@@ -159,7 +159,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolWithDirectories() {
+    void runToolWithDirectories() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("dir6.cwl.json"));
 
@@ -178,7 +178,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolWithDirectoriesThreaded() {
+    void runToolWithDirectoriesThreaded() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("dir6.cwl.json"));
 
@@ -197,7 +197,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolWithSecondaryFilesOnOutput() throws IOException {
+    void runToolWithSecondaryFilesOnOutput() throws IOException {
 
         FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files"));
 
@@ -217,7 +217,7 @@ public class LaunchTestRunToolIT {
 
 
     @Test
-    public void runToolSecondaryFilesToDirectory() throws IOException {
+    void runToolSecondaryFilesToDirectory() throws IOException {
 
         FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files"));
 
@@ -235,7 +235,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolSecondaryFilesToDirectoryThreaded() throws IOException {
+    void runToolSecondaryFilesToDirectoryThreaded() throws IOException {
 
         FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files"));
 
@@ -253,7 +253,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolSecondaryFilesToCWD() {
+    void runToolSecondaryFilesToCWD() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_missing_directory.json"));
 
@@ -268,7 +268,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolMalformedToCWD() {
+    void runToolMalformedToCWD() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_malformed.json"));
 
@@ -283,7 +283,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolToMissingS3() throws Exception {
+    void runToolToMissingS3() throws Exception {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
 
@@ -293,7 +293,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolDirectoryMalformedToCWD() throws IOException {
+    void runToolDirectoryMalformedToCWD() throws IOException {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split_dir.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_malformed.json"));
 
@@ -322,7 +322,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void cwlNullInputParameter() {
+    void cwlNullInputParameter() {
         // Tests if a null input parameter is correctly handled when converting json
         File nullCWL = new File(ResourceHelpers.resourceFilePath("nullParam.cwl"));
         File nullJSON = new File(ResourceHelpers.resourceFilePath("nullParam.json"));
@@ -348,7 +348,7 @@ public class LaunchTestRunToolIT {
 
 
     @Test
-    public void runToolWithSecondaryFilesRenamedOnOutput() throws IOException {
+    void runToolWithSecondaryFilesRenamedOnOutput() throws IOException {
 
         FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files_renamed"));
 
@@ -366,7 +366,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolWithSecondaryFilesOfVariousKinds() throws IOException {
+    void runToolWithSecondaryFilesOfVariousKinds() throws IOException {
 
         FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files_renamed"));
 
@@ -387,7 +387,7 @@ public class LaunchTestRunToolIT {
     }
 
     @Test
-    public void runToolWithSecondaryFilesOfEvenStrangerKinds() throws IOException {
+    void runToolWithSecondaryFilesOfEvenStrangerKinds() throws IOException {
 
         FileUtils.deleteDirectory(new File("/tmp/provision_out_with_files_renamed"));
 

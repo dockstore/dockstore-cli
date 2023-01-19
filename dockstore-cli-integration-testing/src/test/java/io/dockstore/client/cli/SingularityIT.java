@@ -51,7 +51,7 @@ public class SingularityIT extends BaseIT {
      * Tests that a simple CWL workflow can be run in Singularity instead of Docker
      */
     @Test
-    public void runCwlWorkflow() throws Exception {
+    void runCwlWorkflow() throws Exception {
         // manually register the CWL version of the md5sum-checker workflow locally
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
@@ -74,7 +74,7 @@ public class SingularityIT extends BaseIT {
      * Tests that a simple WDL workflow can be run in Singularity instead of Docker
      */
     @Test
-    public void runWDLWorkflow() throws Exception {
+    void runWDLWorkflow() throws Exception {
         // manually register the WDL version of the md5sum-checker workflow locally
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);

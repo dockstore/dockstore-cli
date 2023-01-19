@@ -78,7 +78,7 @@ public class BasicIT extends BaseIT {
      * Tests manually adding, updating, and removing a dockerhub tool
      */
     @Test
-    public void testVersionTagDockerhub() {
+    void testVersionTagDockerhub() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
@@ -117,7 +117,7 @@ public class BasicIT extends BaseIT {
      * Tests that a git reference for a tool can include branches named like feature/...
      */
     @Test
-    public void testGitReferenceFeatureBranch() {
+    void testGitReferenceFeatureBranch() {
 
         final long count = testingPostgres.runSelectStatement("select count(*) from tag where reference = 'feature/test'", long.class);
         assertEquals(2, count, "there should be 2 tags with the reference feature/test");
@@ -135,7 +135,7 @@ public class BasicIT extends BaseIT {
      * Tests manual registration and unpublishing of a Dockerhub/Github entry
      */
     @Test
-    public void testDockerhubGithubManualRegistration() {
+    void testDockerhubGithubManualRegistration() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
@@ -160,7 +160,7 @@ public class BasicIT extends BaseIT {
      * Will test manually publishing and unpublishing a Dockerhub/Github entry with an alternate structure
      */
     @Test
-    public void testDockerhubGithubAlternateStructure() {
+    void testDockerhubGithubAlternateStructure() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay-alternate.git", "--git-reference", "master", "--toolname",
@@ -184,7 +184,7 @@ public class BasicIT extends BaseIT {
      * Will test attempting to manually publish a Dockerhub/Github entry using incorrect CWL and/or dockerfile locations
      */
     @Disabled
-    public void testDockerhubGithubWrongStructure() throws Exception {
+    void testDockerhubGithubWrongStructure() throws Exception {
         // Todo : Manual publish entry with wrong cwl and dockerfile locations, should not be able to manual publish
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
@@ -199,7 +199,7 @@ public class BasicIT extends BaseIT {
      * Checks that you can manually publish and unpublish a Dockerhub/Github duplicate if different toolnames are set (but same Path)
      */
     @Test
-    public void testDockerhubGithubManualRegistrationDuplicates() {
+    void testDockerhubGithubManualRegistrationDuplicates() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
@@ -249,7 +249,7 @@ public class BasicIT extends BaseIT {
      */
     @Test
     @Tag(SlowTest.NAME)
-    public void testDockerhubGitlabManualRegistration() {
+    void testDockerhubGitlabManualRegistration() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
             "--git-url", "git@gitlab.com:dockstore.test.user/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
@@ -274,7 +274,7 @@ public class BasicIT extends BaseIT {
      */
     @Test
     @Tag(SlowTest.NAME)
-    public void testDockerhubGitlabAlternateStructure() {
+    void testDockerhubGitlabAlternateStructure() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
             "--git-url", "git@gitlab.com:dockstore.test.user/quayandgitlabalternate.git", "--git-reference", "master", "--toolname",
@@ -299,7 +299,7 @@ public class BasicIT extends BaseIT {
      */
     @Test
     @Tag(SlowTest.NAME)
-    public void testDockerhubGitlabManualRegistrationDuplicates() {
+    void testDockerhubGitlabManualRegistrationDuplicates() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
             "--git-url", "git@gitlab.com:dockstore.test.user/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
@@ -343,7 +343,7 @@ public class BasicIT extends BaseIT {
      * This tests basic concepts with tool test parameter files
      */
     @Test
-    public void testTestJson() {
+    void testTestJson() {
         // Refresh
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--entry",
             "quay.io/dockstoretestuser/test_input_json" });
@@ -398,7 +398,7 @@ public class BasicIT extends BaseIT {
     }
 
     @Test
-    public void testTestParameterOtherUsers() {
+    void testTestParameterOtherUsers() {
         final ApiClient correctWebClient = getWebClient(BaseIT.USER_1_USERNAME, testingPostgres);
         final ApiClient otherWebClient = getWebClient(BaseIT.OTHER_USERNAME, testingPostgres);
 
@@ -455,7 +455,7 @@ public class BasicIT extends BaseIT {
      * This tests some cases for private tools
      */
     @Test
-    public void testPrivateManualPublish() throws Exception {
+    void testPrivateManualPublish() throws Exception {
         // Setup DB
 
         // Manual publish private repo with tool maintainer email
@@ -494,7 +494,7 @@ public class BasicIT extends BaseIT {
      * This tests that you can convert a published public tool to private if it has a tool maintainer email set
      */
     @Test
-    public void testPublicToPrivateToPublicTool() {
+    void testPublicToPrivateToPublicTool() {
         // Setup DB
 
         // Manual publish public repo
@@ -534,7 +534,7 @@ public class BasicIT extends BaseIT {
      * This tests that you can change a tool from public to private without a tool maintainer email, as long as an email is found in the descriptor
      */
     @Test
-    public void testDefaultToEmailInDescriptorForPrivateRepos() {
+    void testDefaultToEmailInDescriptorForPrivateRepos() {
         // Setup DB
 
         // Manual publish public repo
@@ -584,7 +584,7 @@ public class BasicIT extends BaseIT {
      * This tests that you cannot manually publish a private tool unless it has a tool maintainer email
      */
     @Test
-    public void testPrivateManualPublishNoToolMaintainerEmail() throws Exception {
+    void testPrivateManualPublishNoToolMaintainerEmail() throws Exception {
         // Manual publish private repo without tool maintainer email
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
@@ -599,7 +599,7 @@ public class BasicIT extends BaseIT {
      */
     @Test
     @Tag(SlowTest.NAME)
-    public void testManualPublishGitlabDocker() throws Exception {
+    void testManualPublishGitlabDocker() throws Exception {
         // Setup database
 
         // Manual publish
@@ -618,7 +618,7 @@ public class BasicIT extends BaseIT {
      * This tests that you can manually publish a private only registry (Amazon ECR), but you can't change the tool to public
      */
     @Test
-    public void testManualPublishPrivateOnlyRegistry() throws Exception {
+    void testManualPublishPrivateOnlyRegistry() throws Exception {
         // Setup database
 
         // Manual publish
@@ -645,7 +645,7 @@ public class BasicIT extends BaseIT {
      * This tests that you can manually publish a private only registry (Seven Bridges), but you can't change the tool to public
      */
     @Test
-    public void testManualPublishSevenBridgesTool() throws Exception {
+    void testManualPublishSevenBridgesTool() throws Exception {
         // Setup database
 
         // Manual publish
@@ -671,7 +671,7 @@ public class BasicIT extends BaseIT {
      * This tests that you can't manually publish a private only registry (Seven Bridges) with an incorrect registry path
      */
     @Test
-    public void testManualPublishSevenBridgesToolIncorrectRegistryPath() throws Exception {
+    void testManualPublishSevenBridgesToolIncorrectRegistryPath() throws Exception {
         // Setup database
 
         // Manual publish correct path
@@ -701,7 +701,7 @@ public class BasicIT extends BaseIT {
      * This tests that you can't manually publish a private only registry as public
      */
     @Test
-    public void testManualPublishPrivateOnlyRegistryAsPublic() throws Exception {
+    void testManualPublishPrivateOnlyRegistryAsPublic() throws Exception {
         // Manual publish
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
@@ -715,7 +715,7 @@ public class BasicIT extends BaseIT {
      * This tests that you can't manually publish a tool from a registry that requires a custom docker path without specifying the path
      */
     @Test
-    public void testManualPublishCustomDockerPathRegistry() throws Exception {
+    void testManualPublishCustomDockerPathRegistry() throws Exception {
         // Manual publish
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
@@ -729,7 +729,7 @@ public class BasicIT extends BaseIT {
      * Test the "dockstore tool publish" command
      */
     @Test
-    public void testPublishList() {
+    void testPublishList() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--script" });
         assertTrue(systemOutRule.getText().contains("quay.io/dockstoretestuser/noautobuild"),
                 "Should have contained the unpublished tool belonging to the user");
@@ -740,7 +740,7 @@ public class BasicIT extends BaseIT {
 
 
     @Test
-    public void launchToolChecksumValidation() {
+    void launchToolChecksumValidation() {
 
         // manual publish the tool
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",

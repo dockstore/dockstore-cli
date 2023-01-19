@@ -50,7 +50,7 @@ public class BitBucketBasicIT extends BaseIT {
      * Checks that you can properly publish and unpublish a Quay/Bitbucket entry
      */
     @Test
-    public void testQuayAndBitbucketPublishAndUnpublishAentry() {
+    void testQuayAndBitbucketPublishAndUnpublishAentry() {
         // Publish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser/quayandbitbucket", "--script" });
@@ -74,7 +74,7 @@ public class BitBucketBasicIT extends BaseIT {
      * If the user has metadata, test will pass as long as the user's metadata isn't the same as Github already
      */
     @Test
-    public void testRefreshingUserMetadata() {
+    void testRefreshingUserMetadata() {
         // Setup database
 
         // Refresh a tool
@@ -93,7 +93,7 @@ public class BitBucketBasicIT extends BaseIT {
      * Todo: Update test to check the outcome of a refresh
      */
     @Test
-    public void testRefreshCorrectTool() {
+    void testRefreshCorrectTool() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--entry",
             "quay.io/dockstoretestuser/quayandbitbucket", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
@@ -114,7 +114,7 @@ public class BitBucketBasicIT extends BaseIT {
      * Ensures that one cannot register an existing Quay/Bitbucket entry if you don't give it an alternate toolname
      */
     @Test
-    public void testQuayBitbucketManuallyRegisterDuplicate() throws Exception {
+    void testQuayBitbucketManuallyRegisterDuplicate() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                         Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name",
@@ -127,7 +127,7 @@ public class BitBucketBasicIT extends BaseIT {
      * Ensures that you can't publish an automatically added Quay/Bitbucket entry with an alternate structure unless you change the Dockerfile and Dockstore.cwl locations
      */
     @Test
-    public void testQuayBitbucketPublishAlternateStructure() throws Exception {
+    void testQuayBitbucketPublishAlternateStructure() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
                         "quay.io/dockstoretestuser/quayandbitbucketalternate", "--script" }));
@@ -139,7 +139,7 @@ public class BitBucketBasicIT extends BaseIT {
      * Checks that you can manually publish and unpublish a Quay/Bitbucket entry with an alternate structure, if the CWL and Dockerfile paths are defined properly
      */
     @Test
-    public void testQuayBitbucketManualPublishAndUnpublishAlternateStructure() {
+    void testQuayBitbucketManualPublishAndUnpublishAlternateStructure() {
         // Manual Publish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandbitbucketalternate",
@@ -165,7 +165,7 @@ public class BitBucketBasicIT extends BaseIT {
      * Will test manually publishing and unpublishing a Dockerhub/Bitbucket entry with an alternate structure
      */
     @Test
-    public void testDockerhubBitbucketAlternateStructure() {
+    void testDockerhubBitbucketAlternateStructure() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
             "dockerhubandbitbucket", "--git-url", "git@bitbucket.org:DockstoreTestUser/quayandbitbucketalternate.git", "--git-reference",
@@ -192,7 +192,7 @@ public class BitBucketBasicIT extends BaseIT {
      */
     @Disabled
     @Test
-    public void testDockerhubBitbucketWrongStructure() throws Exception {
+    void testDockerhubBitbucketWrongStructure() throws Exception {
         // Todo : Manual publish entry with wrong cwl and dockerfile locations, should not be able to manual publish
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
@@ -208,7 +208,7 @@ public class BitBucketBasicIT extends BaseIT {
      * Checks that you can manually publish and unpublish a Dockerhub/Bitbucket duplicate if different toolnames are set (but same Path)
      */
     @Test
-    public void testDockerhubBitbucketManualRegistrationDuplicates() {
+    void testDockerhubBitbucketManualRegistrationDuplicates() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
             "dockerhubandbitbucket", "--git-url", "git@bitbucket.org:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master",
@@ -255,7 +255,7 @@ public class BitBucketBasicIT extends BaseIT {
      * Tests manual registration and unpublishing of a Dockerhub/Bitbucket entry
      */
     @Test
-    public void testDockerhubBitbucketManualRegistration() {
+    void testDockerhubBitbucketManualRegistration() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
             "dockerhubandbitbucket", "--git-url", "git@bitbucket.org:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master",
@@ -284,7 +284,7 @@ public class BitBucketBasicIT extends BaseIT {
      * Checks that the two Quay/Bitbucket entrys were automatically found
      */
     @Test
-    public void testQuayBitbucketAutoRegistration() {
+    void testQuayBitbucketAutoRegistration() {
 
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath() + "' and giturl like 'git@bitbucket.org%'",

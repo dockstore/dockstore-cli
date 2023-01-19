@@ -44,7 +44,7 @@ public class ToolClientTest {
     private Client client;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         containersApi = Mockito.mock(ContainersApi.class);
         containertagsApi = Mockito.mock(ContainertagsApi.class);
         usersApi = Mockito.mock(UsersApi.class);
@@ -61,7 +61,7 @@ public class ToolClientTest {
     }
 
     @Test
-    public void getDescriptorFromServerMissingTag() {
+    void getDescriptorFromServerMissingTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         boolean exceptionThrown = false;
         try {
@@ -73,7 +73,7 @@ public class ToolClientTest {
     }
 
     @Test
-    public void getDescriptorFromServerNoTag() {
+    void getDescriptorFromServerNoTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         boolean exceptionThrown = false;
         try {
@@ -85,7 +85,7 @@ public class ToolClientTest {
     }
 
     @Test
-    public void getDescriptorFromServerGoodTag() {
+    void getDescriptorFromServerGoodTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         SourceFile cwl = toolClient.getDescriptorFromServer(REPOSITORY + ":" + GOOD_TAG, DescriptorLanguage.CWL);
         Assertions.assertNotNull(cwl);

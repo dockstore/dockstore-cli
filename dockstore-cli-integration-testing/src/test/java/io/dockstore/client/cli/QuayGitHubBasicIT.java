@@ -8,6 +8,7 @@ import io.dockstore.common.SourceControl;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
@@ -17,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
-@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
-@org.junit.jupiter.api.Tag(ToolTest.NAME)
+@Tag(ConfidentialTest.NAME)
+@Tag(ToolTest.NAME)
 public class QuayGitHubBasicIT extends BaseIT {
 
     @SystemStub
@@ -42,7 +43,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Checks that the two Quay/Github tools were automatically found
      */
     @Test
-    public void testQuayGithubAutoRegistration() {
+    void testQuayGithubAutoRegistration() {
 
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from tool where  registry = '" + Registry.QUAY_IO.getDockerPath() + "' and giturl like 'git@github.com%'",
@@ -54,7 +55,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Tests the case where a manually registered quay tool matching an automated build should be treated as a separate auto build (see issue 106)
      */
     @Test
-    public void testManualQuaySameAsAutoQuay() {
+    void testManualQuaySameAsAutoQuay() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.name(), "--namespace", "dockstoretestuser", "--name", "quayandgithub", "--git-url",
             "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular", "--script" });
@@ -69,7 +70,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Tests the case where a manually registered quay tool has the same path as an auto build but different git repo
      */
     @Test
-    public void testManualQuayToAutoSamePathDifferentGitRepo() {
+    void testManualQuayToAutoSamePathDifferentGitRepo() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.name(), "--namespace", "dockstoretestuser", "--name", "quayandgithub", "--git-url",
             "git@github.com:DockstoreTestUser/dockstore-whalesay-alternate.git", "--git-reference", "master", "--toolname", "alternate",
@@ -85,7 +86,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Tests that a manually published tool still becomes manual even after the existing similar auto tools all have toolnames (see issue 120)
      */
     @Test
-    public void testManualQuayToAutoNoAutoWithoutToolname() {
+    void testManualQuayToAutoNoAutoWithoutToolname() {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
                 "quay.io/dockstoretestuser/quayandgithub", "--toolname", "testToolname", "--script" });
@@ -108,7 +109,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * - Checks if the tag is back
      */
     @Test
-    public void testRefreshAfterDeletingAVersion() {
+    void testRefreshAfterDeletingAVersion() {
         // Get the tool id of the entry whose path is quay.io/dockstoretestuser/quayandgithub
         final long id = testingPostgres
             .runSelectStatement("select id from tool where name = 'quayandgithub' and namespace='dockstoretestuser' and registry='quay.io'",
@@ -145,7 +146,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Tests a user trying to add a quay tool that they do not own and are not in the owning organization
      */
     @Test
-    public void testAddQuayRepoOfNonOwnedOrg() throws Exception {
+    void testAddQuayRepoOfNonOwnedOrg() throws Exception {
         // Repo user isn't part of org
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
@@ -159,7 +160,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Tests that refresh workflows works, also that refreshing without a github token should not destroy workflows or their existing versions
      */
     @Test
-    public void testRefreshWorkflow() throws Exception {
+    void testRefreshWorkflow() throws Exception {
         refreshByOrganizationReplacement(USER_1_USERNAME);
         // should have a certain number of workflows based on github contents
         final long secondWorkflowCount = testingPostgres.runSelectStatement("select count(*) from workflow", long.class);
@@ -203,7 +204,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * UPDATE: Should fail because you can't publish a tool with no valid tags
      */
     @Test
-    public void testManualQuayManualBuild() throws Exception {
+    void testManualQuayManualBuild() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "noautobuild", "--git-url",
                 "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
@@ -215,7 +216,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Tests the case where a manually registered quay tool does not have any tags
      */
     @Test
-    public void testManualQuayNoTags() throws Exception {
+    void testManualQuayNoTags() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "nobuildsatall",
                 "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
@@ -227,7 +228,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Tests that a quick registered quay tool with no autobuild can be updated to have a manually set CWL file from git (see issue 19)
      */
     @Test
-    public void testQuayNoAutobuild() {
+    void testQuayNoAutobuild() {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
                 "quay.io/dockstoretestuser/noautobuild", "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git",
@@ -255,7 +256,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Tests that refresh all works, also that refreshing without a quay.io token should not destroy tools
      */
     @Test
-    public void testRefresh() {
+    void testRefresh() {
         final long startToolCount = testingPostgres.runSelectStatement("select count(*) from tool", long.class);
         // should have 0 tools to start with
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--script" });
@@ -282,7 +283,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Ensures that you can't publish an automatically added Quay/Github tool with an alternate structure unless you change the Dockerfile and Dockstore.cwl locations
      */
     @Test
-    public void testQuayGithubPublishAlternateStructure() throws Exception {
+    void testQuayGithubPublishAlternateStructure() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
                 "quay.io/dockstoretestuser/quayandgithubalternate", "--script" }));
         assertEquals(Client.API_ERROR, exitCode);
@@ -293,7 +294,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Checks that you can properly publish and unpublish a Quay/Github tool
      */
     @Test
-    public void testQuayGithubPublishAndUnpublishATool() {
+    void testQuayGithubPublishAndUnpublishATool() {
         // Publish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser/quayandgithub", "--script" });
@@ -315,7 +316,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Checks that you can manually publish and unpublish a Quay/Github tool with an alternate structure, if the CWL and Dockerfile paths are defined properly
      */
     @Test
-    public void testQuayGithubManualPublishAndUnpublishAlternateStructure() {
+    void testQuayGithubManualPublishAndUnpublishAlternateStructure() {
         // Manual publish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgithubalternate",
@@ -340,7 +341,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Ensures that one cannot register an existing Quay/Github entry if you don't give it an alternate toolname
      */
     @Test
-    public void testQuayGithubManuallyRegisterDuplicate() throws Exception {
+    void testQuayGithubManuallyRegisterDuplicate() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgithub",
                 "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--script" }));
@@ -351,7 +352,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Tests that a WDL file is supported
      */
     @Test
-    public void testQuayGithubQuickRegisterWithWDL() {
+    void testQuayGithubQuickRegisterWithWDL() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "refresh", "--entry",
             "quay.io/dockstoretestuser/quayandgithub", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
@@ -366,7 +367,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * This tests that a tool can be updated to have default version, and that metadata is set related to the default version
      */
     @Test
-    public void testSetDefaultTag() throws Exception {
+    void testSetDefaultTag() throws Exception {
         // Set up DB
 
         // Update tool with default version that has metadata
@@ -396,7 +397,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * This tests that a tool can not be updated to have no default descriptor paths
      */
     @Test
-    public void testToolNoDefaultDescriptors() throws Exception {
+    void testToolNoDefaultDescriptors() throws Exception {
         // Update tool with empty WDL, shouldn't fail
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
@@ -413,7 +414,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * This tests that a tool cannot be manually published if it has no default descriptor paths
      */
     @Test
-    public void testManualPublishToolNoDescriptorPaths() throws Exception {
+    void testManualPublishToolNoDescriptorPaths() throws Exception {
         // Manual publish, should fail
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgithubalternate",
@@ -426,7 +427,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * This tests that a tool cannot be manually published if it has an incorrect registry
      */
     @Test
-    public void testManualPublishToolIncorrectRegistry() throws Exception {
+    void testManualPublishToolIncorrectRegistry() throws Exception {
         // Manual publish, should fail
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 "thisisafakeregistry", "--namespace", "dockstoretestuser", "--name", "quayandgithubalternate", "--git-url",
@@ -439,7 +440,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * This tests the dirty bit attribute for tool tags with quay
      */
     @Test
-    public void testQuayDirtyBit() {
+    void testQuayDirtyBit() {
         // Setup db
 
         // Check that no tags have a true dirty bit
@@ -475,7 +476,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * Checks that you can properly publish and unpublish a Quay/Github tool using the --new-entry-name parameter
      */
     @Test
-    public void testQuayGithubPublishAndUnpublishAToolnewEntryName() throws Exception {
+    void testQuayGithubPublishAndUnpublishAToolnewEntryName() throws Exception {
 
         final String publishNameParameter = "--new-entry-name";
 
@@ -526,7 +527,7 @@ public class QuayGitHubBasicIT extends BaseIT {
      * verifying backwards compatibility
      */
     @Test
-    public void testQuayGithubPublishAndUnpublishAToolEntryName() throws Exception {
+    void testQuayGithubPublishAndUnpublishAToolEntryName() throws Exception {
 
         final String publishNameParameter = "--entryname";
 

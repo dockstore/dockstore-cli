@@ -8,6 +8,7 @@ import io.dropwizard.testing.ResourceHelpers;
 import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
@@ -19,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
-@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
-@org.junit.jupiter.api.Tag(WorkflowTest.NAME)
+@Tag(ConfidentialTest.NAME)
+@Tag(WorkflowTest.NAME)
 public class LaunchWorkflowIT extends BaseIT {
 
     @SystemStub
@@ -43,7 +44,7 @@ public class LaunchWorkflowIT extends BaseIT {
      */
     @Test
     @Disabled
-    public void testLocalLaunchCWL() {
+    void testLocalLaunchCWL() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("filtercount.cwl.yaml"), "--json", ResourceHelpers.resourceFilePath("filtercount-job.json"),
             "--script" });
@@ -53,7 +54,7 @@ public class LaunchWorkflowIT extends BaseIT {
      * This tests that attempting to launch a workflow locally, where no file exists, an IOError will occur
      */
     @Test
-    public void testLocalLaunchCWLNoFile() throws Exception {
+    void testLocalLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
                 "imnotreal.cwl", "--json", "imnotreal-job.json", "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
@@ -64,7 +65,7 @@ public class LaunchWorkflowIT extends BaseIT {
      * This tests that attempting to launch a WDL workflow locally, where no file exists, an IOError will occur
      */
     @Test
-    public void testLocalLaunchWDLNoFile() throws Exception {
+    void testLocalLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
                 "imnotreal.wdl", "--json", "imnotreal-job.json", "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
@@ -75,7 +76,7 @@ public class LaunchWorkflowIT extends BaseIT {
      */
     @Test
     @Category(ToilCompatibleTest.class)
-    public void testRemoteLaunchCWLNoFile() throws Exception {
+    void testRemoteLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
                 "imnotreal.cwl", "--json", "imnotreal-job.json", "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
@@ -85,7 +86,7 @@ public class LaunchWorkflowIT extends BaseIT {
      * This tests that attempting to launch a WDL workflow remotely, where no file exists, an APIError will occur
      */
     @Test
-    public void testRemoteLaunchWDLNoFile() throws Exception {
+    void testRemoteLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
                 "imnotreal.wdl", "--json", "imnotreal-job.json", "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
@@ -95,7 +96,7 @@ public class LaunchWorkflowIT extends BaseIT {
      * Tests that a developer can launch a WDL workflow locally, instead of getting files from Dockstore
      */
     @Test
-    public void testLocalLaunchWDL() {
+    void testLocalLaunchWDL() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("wdl.wdl"), "--json", ResourceHelpers.resourceFilePath("wdl.json"), "--script" });
     }
@@ -105,7 +106,7 @@ public class LaunchWorkflowIT extends BaseIT {
      * Tests that a developer can launch a WDL workflow with a File input being a directory
      */
     @Test
-    public void testLocalLaunchWDLWithDir() {
+    void testLocalLaunchWDLWithDir() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("directorytest.wdl"), "--json", ResourceHelpers.resourceFilePath("directorytest.json"),
             "--script" });
@@ -118,7 +119,7 @@ public class LaunchWorkflowIT extends BaseIT {
      */
     @Test
     @Disabled
-    public void testLocalLaunchWDLImportHTTP() {
+    void testLocalLaunchWDLImportHTTP() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("wdlhttpimport.wdl"), "--json", ResourceHelpers.resourceFilePath("wdlhttp.json"),
             "--script" });
@@ -128,7 +129,7 @@ public class LaunchWorkflowIT extends BaseIT {
      * Tests that a only Github, Gitlab and bitbucket http/https imports are valid
      */
     @Test
-    public void testLocalLaunchWDLImportIncorrectHTTP() throws Exception {
+    void testLocalLaunchWDLImportIncorrectHTTP() throws Exception {
         // TODO: looking at the system log doesn't seem to work deterministically with checkAssertionAfterwards
         // re-enable and test with versions of system rules newer than 1.17.1
         //        systemExit.checkAssertionAfterwards(
@@ -144,7 +145,7 @@ public class LaunchWorkflowIT extends BaseIT {
      *
      */
     @Test
-    public void launchWorkflowChecksumValidation() {
+    void launchWorkflowChecksumValidation() {
         // register and publish a workflow
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",

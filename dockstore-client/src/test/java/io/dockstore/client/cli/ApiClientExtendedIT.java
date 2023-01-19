@@ -27,7 +27,7 @@ public class ApiClientExtendedIT {
      * and we confirm that the signing function is still producing the same signature.
      */
     @Test
-    public void testAwsSigCalculation() {
+    void testAwsSigCalculation() {
         WesRequestData wrd = new WesRequestData(WES_ENDPOINT + "/service-info", OLD_AWS_ACCESS_KEY, OLD_AWS_SECRET_KEY, AWS_REGION);
         ApiClientExtended ace = new ApiClientExtended(wrd);
 
@@ -47,7 +47,7 @@ public class ApiClientExtendedIT {
     }
 
     @Test
-    public void testSameSigForEmptyPayload() {
+    void testSameSigForEmptyPayload() {
         WesRequestData wrd = new WesRequestData(WES_ENDPOINT + "/runs", OLD_AWS_ACCESS_KEY, OLD_AWS_SECRET_KEY, AWS_REGION);
         ApiClientExtended ace = new ApiClientExtended(wrd);
 
@@ -68,7 +68,7 @@ public class ApiClientExtendedIT {
     }
 
     @Test
-    public void testAwsSigCalculationForBody() {
+    void testAwsSigCalculationForBody() {
         WesRequestData wrd = new WesRequestData(WES_ENDPOINT + "/runs", OLD_AWS_ACCESS_KEY, OLD_AWS_SECRET_KEY, AWS_REGION);
         ApiClientExtended ace = new ApiClientExtended(wrd);
 

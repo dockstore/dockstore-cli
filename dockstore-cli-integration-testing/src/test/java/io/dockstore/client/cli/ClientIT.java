@@ -69,33 +69,33 @@ public class ClientIT extends BaseIT {
     }
 
     @Test
-    public void testListEntries() throws IOException, ApiException {
+    void testListEntries() throws IOException, ApiException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "list" });
         checkToolList(systemOutRule.getText());
     }
 
     @Test
-    public void testDebugModeListEntries() throws IOException, ApiException {
+    void testDebugModeListEntries() throws IOException, ApiException {
         Client.main(new String[] { "--debug", "--config", TestUtility.getConfigFileLocation(true), "tool", "list" });
         checkToolList(systemOutRule.getText());
     }
 
     @Test
-    public void testListEntriesWithoutCreds() throws Exception {
+    void testListEntriesWithoutCreds() throws Exception {
         int exitCode = catchSystemExit(
                 () -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(false), "tool", "list" }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
     @Test
-    public void testListEntriesOnWrongPort() throws Exception {
+    void testListEntriesOnWrongPort() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true, false, false), "tool", "list" }));
         assertEquals(Client.CONNECTION_ERROR, exitCode);
     }
 
     // Won't work as entry must be valid
     @Disabled
-    public void quickRegisterValidEntry() throws IOException {
+    void quickRegisterValidEntry() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test6" });
 
         // verify DB
@@ -104,7 +104,7 @@ public class ClientIT extends BaseIT {
     }
 
     @Test
-    public void testPluginEnable() {
+    void testPluginEnable() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), "plugin", "download" });
         systemOutRule.clear();
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), "plugin", "list" });
@@ -114,7 +114,7 @@ public class ClientIT extends BaseIT {
     }
 
     @Test
-    public void testPluginDisable() {
+    void testPluginDisable() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), "plugin", "download" });
         systemOutRule.clear();
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), "plugin", "list" });
@@ -124,7 +124,7 @@ public class ClientIT extends BaseIT {
     }
 
     @Disabled
-    public void quickRegisterDuplicateEntry() throws IOException {
+    void quickRegisterDuplicateEntry() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test6" });
         Client.main(
             new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test6", "view1" });
@@ -137,13 +137,13 @@ public class ClientIT extends BaseIT {
     }
 
     @Test
-    public void quickRegisterInValidEntry() throws Exception {
+    void quickRegisterInValidEntry() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish", "quay.io/test_org/test1" }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
     @Test
-    public void quickRegisterUnknownEntry() throws Exception {
+    void quickRegisterUnknownEntry() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "publish",
                         "quay.io/funky_container_that_does_not_exist" }));
@@ -155,7 +155,7 @@ public class ClientIT extends BaseIT {
      Todo: Set up these tests with real data (not confidential)
      */
     @Disabled("Since dockstore now checks for associated tags for Quay container, manual publishing of nonexistant images won't work")
-    public void manualRegisterABunchOfValidEntries() throws IOException {
+    void manualRegisterABunchOfValidEntries() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
             "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master" });
@@ -178,7 +178,7 @@ public class ClientIT extends BaseIT {
     }
 
     @Test
-    public void manualRegisterADuplicate() throws Exception {
+    void manualRegisterADuplicate() throws Exception {
         //TODO: this test is actually dying on the first command, I suspect that this has been broken for a while before migration to junit5
         int exitCode = catchSystemExit(() -> {
             Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
@@ -196,7 +196,7 @@ public class ClientIT extends BaseIT {
 
     @Test
     @Category(ToilCompatibleTest.class)
-    public void launchingCWLWorkflow() throws IOException {
+    void launchingCWLWorkflow() throws IOException {
         final String firstWorkflowCWL = ResourceHelpers.resourceFilePath("1st-workflow.cwl");
         final String firstWorkflowJSON = ResourceHelpers.resourceFilePath("1st-workflow-job.json");
         Client.main(new String[] { "--script", "--config", TestUtility.getConfigFileLocation(true), "workflow", "launch", "--local-entry",
@@ -205,7 +205,7 @@ public class ClientIT extends BaseIT {
 
     @Test
     @Category(ToilCompatibleTest.class)
-    public void launchingCWLToolWithRemoteParameters() throws IOException {
+    void launchingCWLToolWithRemoteParameters() throws IOException {
         Client.main(
             new String[] { "--script", "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--local-entry", FIRST_TOOL,
                 "--json",
@@ -213,7 +213,7 @@ public class ClientIT extends BaseIT {
     }
 
     @Test
-    public void testMetadataMethods() throws IOException {
+    void testMetadataMethods() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "--version" });
         assertTrue(systemOutRule.getText().contains("Dockstore version"));
         systemOutRule.clear();
@@ -223,13 +223,13 @@ public class ClientIT extends BaseIT {
     }
 
     @Test
-    public void testCacheCleaning() throws IOException {
+    void testCacheCleaning() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "--clean-cache" });
         systemOutRule.clear();
     }
 
     @Test
-    public void pluginDownload() throws IOException {
+    void pluginDownload() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "plugin", "download" });
     }
 
@@ -240,7 +240,7 @@ public class ClientIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void testDepsCommandWithVersionAndPython3() throws IOException {
+    void testDepsCommandWithVersionAndPython3() throws IOException {
         Client.main(
             new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--client-version", "1.7.0", "--python-version",
                 "3" });
@@ -256,7 +256,7 @@ public class ClientIT extends BaseIT {
      */
     @Test
     @Disabled("Ignored until there are more than one runner.")
-    public void testDepsCommandWithUnknownRunners() throws Exception {
+    void testDepsCommandWithUnknownRunners() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--runner", "cromwell" }));
         assertEquals(Client.API_ERROR, exitCode);
         assertTrue(systemOutRule.getText().contains("Could not get runner dependencies"));
@@ -270,7 +270,7 @@ public class ClientIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void testDepsCommand() throws IOException {
+    void testDepsCommand() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps" });
         assertFalse(systemOutRule.getText().contains("monotonic=="), "Python 3 does not have monotonic as a dependency");
         assertDepsCommandOutput();
@@ -283,7 +283,7 @@ public class ClientIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void testDepsCommandHelp() throws IOException {
+    void testDepsCommandHelp() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "deps", "--help" });
         assertTrue(systemOutRule.getText().contains("Print cwltool runner dependencies"));
     }
@@ -298,7 +298,7 @@ public class ClientIT extends BaseIT {
     }
 
     @Test
-    public void touchOnAllHelpMessages() throws IOException {
+    void touchOnAllHelpMessages() throws IOException {
 
         checkCommandForHelp(new String[] { "tool", "search" });
         checkCommandForHelp(new String[] { "tool", "info" });

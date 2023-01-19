@@ -50,7 +50,7 @@ public class YamlClientIT extends BaseIT {
     }
 
     @Test
-    public void missingPathParameter() throws IOException {
+    void missingPathParameter() throws IOException {
         Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", "validate"});
         assertTrue(systemOutRule.getText().contains("The following option is required: [--path]"));
         assertTrue(systemOutRule.getText().contains("Usage: dockstore"));
@@ -58,7 +58,7 @@ public class YamlClientIT extends BaseIT {
     }
 
     @Test
-    public void verifyErrorMessagesArePrinted() throws IOException {
+    void verifyErrorMessagesArePrinted() throws IOException {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
         System.out.println(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
@@ -71,7 +71,7 @@ public class YamlClientIT extends BaseIT {
     }
 
     @Test
-    public void completeRun() throws IOException {
+    void completeRun() throws IOException {
         final String testDirectory = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory";
         System.out.println(Lists.newArrayList("--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME,
                 "--path", testDirectory));
@@ -86,7 +86,7 @@ public class YamlClientIT extends BaseIT {
     // Tests for when Help message should be generated
 
     @Test
-    public void testHelpCommands() throws Exception {
+    void testHelpCommands() throws Exception {
         checkCommandForHelp(new String[]{YAML, "--help"}, yamlHelpMsg);
         checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME, "--help"}, validateHelpMsg);
     }
@@ -96,7 +96,7 @@ public class YamlClientIT extends BaseIT {
     // This tests for when a help message should be generated even though no help flag was given
     // it also tests for the appropriate error message
     @Test
-    public void testHelpCommandsNoHelpFlag() throws Exception {
+    void testHelpCommandsNoHelpFlag() throws Exception {
         checkCommandForHelp(new String[]{YAML}, yamlHelpMsg, YamlClient.ERROR_NO_COMMAND);
         checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME}, validateHelpMsg, "The following option is required: [--path]");
         checkCommandForHelp(new String[]{YAML, "--path", YamlVerifyUtility.COMMAND_NAME}, "Usage: dockstore yaml");

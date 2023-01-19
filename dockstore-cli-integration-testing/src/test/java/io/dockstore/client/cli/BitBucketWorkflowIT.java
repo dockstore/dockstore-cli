@@ -47,7 +47,7 @@ public class BitBucketWorkflowIT extends BaseIT {
      * Tests that convert with valid imports will work (for WDL)
      */
     @Test
-    public void testRefreshAndConvertWithImportsWDL() {
+    void testRefreshAndConvertWithImportsWDL() {
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
@@ -69,7 +69,7 @@ public class BitBucketWorkflowIT extends BaseIT {
      * This tests manually publishing a Bitbucket workflow
      */
     @Test
-    public void testManualPublishBitbucket() {
+    void testManualPublishBitbucket() {
         // manual publish
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -95,7 +95,7 @@ public class BitBucketWorkflowIT extends BaseIT {
      * This tests the dirty bit attribute for workflow versions with bitbucket
      */
     @Test
-    public void testBitbucketDirtyBit() {
+    void testBitbucketDirtyBit() {
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // refresh individual that is valid

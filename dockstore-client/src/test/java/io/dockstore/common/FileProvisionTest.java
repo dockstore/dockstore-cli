@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class FileProvisionTest {
 
     @Test
-    public void testFindSupportedTargetPath() {
+    void testFindSupportedTargetPath() {
         ProvisionInterface s3Mock = Mockito.mock(ProvisionInterface.class);
         when(s3Mock.schemesHandled()).thenReturn(new HashSet<>(List.of("s3")));
         ProvisionInterface httpMock = Mockito.mock(ProvisionInterface.class);
@@ -38,7 +38,7 @@ public class FileProvisionTest {
     }
 
     @Test
-    public void testFindPluginName() {
+    void testFindPluginName() {
         String s3Class = "io.dockstore.provision.S3Plugin$S3Provision";
         String dosClass = "io.dockstore.provision.DOSPlugin$DOSPreProvision";
 
@@ -47,7 +47,7 @@ public class FileProvisionTest {
     }
 
     @Test
-    public void testCreateFileURISpaces() {
+    void testCreateFileURISpaces() {
         //verifies that creation of URI for input file provisioning can encode paths with space characters
         String encodedPath = "src/test/resources/testDirectory%20With%20Spaces/hello.txt";
         File inputFile = FileUtils.getFile("src", "test", "resources", "testDirectory With Spaces", "hello.txt");

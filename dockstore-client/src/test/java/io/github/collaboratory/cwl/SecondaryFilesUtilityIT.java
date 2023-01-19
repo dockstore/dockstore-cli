@@ -40,7 +40,7 @@ public class SecondaryFilesUtilityIT {
     private static final Gson GSON = CWL.getTypeSafeCWLToolDocument();
 
     @Test
-    public void modifyWorkflowToIncludeToolSecondaryFiles() {
+    void modifyWorkflowToIncludeToolSecondaryFiles() {
         IntStream.range(0, 5).forEach(i -> modifyWorkflow());
     }
 

@@ -8,6 +8,7 @@ import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
@@ -16,8 +17,8 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
-@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
-@org.junit.jupiter.api.Tag(ToolTest.NAME)
+@Tag(ConfidentialTest.NAME)
+@Tag(ToolTest.NAME)
 public class QuayGitlabBasicIT extends BaseIT {
 
     @SystemStub
@@ -41,7 +42,7 @@ public class QuayGitlabBasicIT extends BaseIT {
      * Checks that the two Quay/Gitlab entries were automatically found
      */
     @Test
-    public void testQuayGitlabAutoRegistration() {
+    void testQuayGitlabAutoRegistration() {
         // Need to add these to the db dump (db dump 1)
 
         final long count = testingPostgres.runSelectStatement(
@@ -54,7 +55,7 @@ public class QuayGitlabBasicIT extends BaseIT {
      * Ensures that you can't publish an automatically added Quay/Gitlab entry with an alternate structure unless you change the Dockerfile and Dockstore.cwl locations
      */
     @Test
-    public void testQuayGitlabPublishAlternateStructure() throws Exception {
+    void testQuayGitlabPublishAlternateStructure() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
                 "quay.io/dockstoretestuser/quayandgitlabalternate", "--script" }));
         assertEquals(Client.API_ERROR, exitCode);
@@ -64,7 +65,7 @@ public class QuayGitlabBasicIT extends BaseIT {
      * Checks that you can properly publish and unpublish a Quay/Gitlab entry
      */
     @Test
-    public void testQuayAndGitlabPublishAndUnpublishAnentry() {
+    void testQuayAndGitlabPublishAndUnpublishAnentry() {
         // Publish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser/quayandgitlab", "--script" });
@@ -87,7 +88,7 @@ public class QuayGitlabBasicIT extends BaseIT {
      */
     @Test
     @Category(SlowTest.class)
-    public void testQuayGitlabManualPublishAndUnpublishAlternateStructure() {
+    void testQuayGitlabManualPublishAndUnpublishAlternateStructure() {
         // Manual Publish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgitlabalternate",
@@ -113,7 +114,7 @@ public class QuayGitlabBasicIT extends BaseIT {
      * Ensures that one cannot register an existing Quay/Gitlab entry if you don't give it an alternate toolname
      */
     @Test
-    public void testQuayGitlabManuallyRegisterDuplicate() throws Exception {
+    void testQuayGitlabManuallyRegisterDuplicate() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgitlab",
                 "--git-url", "git@gitlab.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--script" }));

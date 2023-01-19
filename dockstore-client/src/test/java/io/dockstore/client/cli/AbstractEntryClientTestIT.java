@@ -17,6 +17,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static software.amazon.awssdk.profiles.ProfileFileSystemSetting.AWS_CONFIG_FILE;
@@ -41,7 +42,7 @@ public class AbstractEntryClientTestIT {
      * Tests the help messages for each of the WES command options
      */
     @Test
-    public void testWESHelpMessages() {
+    void testWESHelpMessages() {
         final String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
         final String[] commandNames = {"", "launch", "status", "cancel", "service-info", "logs", "list"};
 
@@ -88,7 +89,7 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testNoArgs() throws Exception {
+    void testNoArgs() throws Exception {
 
         AbstractEntryClient workflowClient = testAggregateHelper(null);
 
@@ -102,7 +103,7 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testAggregateAWSCredentialBadProfile() throws Exception {
+    void testAggregateAWSCredentialBadProfile() throws Exception {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configNoContent");
 
@@ -112,12 +113,12 @@ public class AbstractEntryClientTestIT {
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
         int exitCode = catchSystemExit(() -> workflowClient.aggregateWesRequestData(parser));
-        assertTrue(exitCode != 0);
+        assertNotEquals(0, exitCode);
         assertFalse(systemErrRule.getText().isEmpty(), "There should be error logs");
     }
 
     @Test
-    public void testAggregateAWSCredentialNoRegion() {
+    void testAggregateAWSCredentialNoRegion() {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
@@ -140,7 +141,7 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testAggregateAWSCredentialCompleteCommand() {
+    void testAggregateAWSCredentialCompleteCommand() {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
@@ -168,7 +169,7 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testAggregateAWSCredentialCompleteCommandMalformed() throws Exception {
+    void testAggregateAWSCredentialCompleteCommandMalformed() throws Exception {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
@@ -186,12 +187,12 @@ public class AbstractEntryClientTestIT {
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
         int exitCode = catchSystemExit(() -> workflowClient.aggregateWesRequestData(parser));
-        assertTrue(exitCode != 0);
+        assertNotEquals(0, exitCode);
         assertFalse(systemErrRule.getText().isEmpty(), "There should be error logs");
     }
 
     @Test
-    public void testAggregateAWSCredentialNoProfileAuth() {
+    void testAggregateAWSCredentialNoProfileAuth() {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfileNoAuth");
 
@@ -217,7 +218,7 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testAggregateAWSCredentialNoProfileAuthDefault() {
+    void testAggregateAWSCredentialNoProfileAuthDefault() {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfileNoAuth");
 
@@ -244,7 +245,7 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testAggregateBearerCredentialCompleteCommand() {
+    void testAggregateBearerCredentialCompleteCommand() {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithBearerToken");
         
@@ -264,7 +265,7 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testAggregateBearerCredentialAWSConfigFile() {
+    void testAggregateBearerCredentialAWSConfigFile() {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
@@ -290,7 +291,7 @@ public class AbstractEntryClientTestIT {
     }
 
     @Test
-    public void testAggregateAWSCredentialSessionToken() {
+    void testAggregateAWSCredentialSessionToken() {
 
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsSessionProfile");
 

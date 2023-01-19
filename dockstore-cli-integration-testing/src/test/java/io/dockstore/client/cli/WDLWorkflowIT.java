@@ -37,6 +37,7 @@ import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
@@ -51,8 +52,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author dyuen
  */
-@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
-@org.junit.jupiter.api.Tag(WorkflowTest.NAME)
+@Tag(ConfidentialTest.NAME)
+@Tag(WorkflowTest.NAME)
 public class WDLWorkflowIT extends BaseIT {
 
     // TODO: Remove extra tags and branches on skylab workflows which are not needed
@@ -78,7 +79,7 @@ public class WDLWorkflowIT extends BaseIT {
      * This checks that the working directory is set as we expect by running a WDL checker workflow
      */
     @Test
-    public void testRunningCheckerWDLWorkflow() throws IOException {
+    void testRunningCheckerWDLWorkflow() throws IOException {
         final ApiClient webClient = getWebClient(USER_1_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi
@@ -111,7 +112,7 @@ public class WDLWorkflowIT extends BaseIT {
      * This tests workflow convert entry2json when the main descriptor is nested far within the GitHub repo with secondary descriptors too
      */
     @Test
-    public void testEntryConvertWDLWithSecondaryDescriptors() {
+    void testEntryConvertWDLWithSecondaryDescriptors() {
         final ApiClient webClient = getWebClient(USER_1_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), SKYLAB_WORKFLOW_REPO,
@@ -126,7 +127,7 @@ public class WDLWorkflowIT extends BaseIT {
      * This tests workflow convert entry2json when the main descriptor is nested far within the GitHub repo with secondary descriptors too
      */
     @Test
-    public void testEntryConvertCheckerWDLWithSecondaryDescriptors() {
+    void testEntryConvertCheckerWDLWithSecondaryDescriptors() {
         final ApiClient webClient = getWebClient(USER_1_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         // register underlying workflow

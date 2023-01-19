@@ -68,7 +68,7 @@ public class CromwellIT {
     public final SystemErr systemErrRule = new SystemErr();
 
     @Test
-    public void runWDLWorkflow() throws IOException, ApiException {
+    void runWDLWorkflow() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
@@ -82,7 +82,7 @@ public class CromwellIT {
     }
 
     @Test
-    public void failRunWDLWorkflow() throws Exception {
+    void failRunWDLWorkflow() throws Exception {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
@@ -96,7 +96,7 @@ public class CromwellIT {
     }
 
     @Test
-    public void fileProvisioning() throws IOException, ApiException {
+    void fileProvisioning() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
@@ -136,7 +136,7 @@ public class CromwellIT {
      * This tests compatibility with Cromwell 30.2 by running a workflow (https://github.com/dockstore/dockstore/issues/1211)
      */
     @Test
-    public void testRunWorkflow() throws IOException, ApiException {
+    void testRunWorkflow() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
@@ -153,7 +153,7 @@ public class CromwellIT {
      * This tests that backslashes are not removed from the input and show up when the input is echoed by the workflow
      */
     @Test
-    public void testRunWorkflowWithBackslashInInput() throws IOException, ApiException {
+    void testRunWorkflowWithBackslashInInput() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);

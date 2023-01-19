@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class WesCommandParserTest {
 
     @Test
-    public void testWesMainHelp() {
+    void testWesMainHelp() {
         final String[] args = {
             "--help"
         };
@@ -28,7 +28,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testWesMainUrl() {
+    void testWesMainUrl() {
         final String wesUrl = "my.wes.url.com/ga4gh/v1/";
         final String[] args = {
             "--wes-url",
@@ -44,7 +44,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testWesMainAuth() {
+    void testWesMainAuth() {
         final String[] args = {};
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -55,7 +55,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandLaunchHelp() {
+    void testCommandLaunchHelp() {
         final String[] args = {
             "launch",
             "--help"
@@ -70,7 +70,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandLaunch1() {
+    void testCommandLaunch1() {
         final String[] args = {
             "launch",
             "--entry",
@@ -86,7 +86,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandLaunch2() {
+    void testCommandLaunch2() {
         final String[] args = {
             "launch",
             "--entry",
@@ -102,7 +102,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandLaunch3() {
+    void testCommandLaunch3() {
         final String[] args = {
             "launch",
             "--wes-url",
@@ -121,7 +121,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandLaunchNoEntry() {
+    void testCommandLaunchNoEntry() {
         final String[] args = {
             "launch",
             "--yaml",
@@ -140,7 +140,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandCancel() {
+    void testCommandCancel() {
         final String[] args = {
             "cancel",
             "--id",
@@ -156,7 +156,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandCancelNoID() {
+    void testCommandCancelNoID() {
         final String[] args = {
             "cancel"
         };
@@ -172,7 +172,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandCancelHelp() {
+    void testCommandCancelHelp() {
         final String[] args = {
             "cancel",
             "--help"
@@ -185,7 +185,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandStatus1() {
+    void testCommandStatus1() {
         final String[] args = {
             "status",
             "--id",
@@ -201,7 +201,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandStatus2() {
+    void testCommandStatus2() {
         final String[] args = {
             "status",
             "--id",
@@ -217,7 +217,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandStatusNoID() {
+    void testCommandStatusNoID() {
         final String[] args = {
             "status"
         };
@@ -233,7 +233,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandStatusHelp() {
+    void testCommandStatusHelp() {
         final String[] args = {
             "status",
             "--help"
@@ -246,7 +246,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandServiceInfo() {
+    void testCommandServiceInfo() {
         final String[] args = {
             "service-info"
         };
@@ -257,7 +257,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandServiceInfoHelp() {
+    void testCommandServiceInfoHelp() {
         final String[] args = {
             "service-info",
             "--help"
@@ -270,7 +270,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandRunListHelp() {
+    void testCommandRunListHelp() {
         final String[] args = {
             "list",
             "--help"
@@ -283,7 +283,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandRunList() {
+    void testCommandRunList() {
         final int count = 3;
         final String[] args = {
             "list",
@@ -303,7 +303,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandRunLogsHelp() {
+    void testCommandRunLogsHelp() {
         final String[] args = {
             "logs",
             "--help"
@@ -316,7 +316,7 @@ public class WesCommandParserTest {
     }
 
     @Test
-    public void testCommandRunlogs1() {
+    void testCommandRunlogs1() {
         final String[] args = {
             "logs",
             "--id",

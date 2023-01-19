@@ -83,7 +83,7 @@ public class WorkflowIT extends BaseIT {
     }
 
     @Test
-    public void testWorkflowLaunchOrNotLaunchBasedOnCredentials() throws Exception {
+    void testWorkflowLaunchOrNotLaunchBasedOnCredentials() throws Exception {
         String toolpath = SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test";
 
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
@@ -113,7 +113,7 @@ public class WorkflowIT extends BaseIT {
      * This tests that you are able to download zip files for versions of a workflow
      */
     @Test
-    public void downloadZipFile() throws IOException {
+    void downloadZipFile() throws IOException {
         String toolpath = SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test";
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
@@ -182,7 +182,7 @@ public class WorkflowIT extends BaseIT {
     }
 
     @Test
-    public void testCheckerWorkflowDownloadBasedOnCredentials() throws Exception {
+    void testCheckerWorkflowDownloadBasedOnCredentials() throws Exception {
         String toolpath = SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test";
 
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
@@ -227,7 +227,7 @@ public class WorkflowIT extends BaseIT {
     }
 
     @Test
-    public void testCheckerWorkflowLaunchBasedOnCredentials() throws Exception {
+    void testCheckerWorkflowLaunchBasedOnCredentials() throws Exception {
         String toolpath = SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test";
 
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
@@ -268,7 +268,7 @@ public class WorkflowIT extends BaseIT {
     }
 
     @Test
-    public void testHostedWorkflowMetadataAndLaunch() throws IOException {
+    void testHostedWorkflowMetadataAndLaunch() throws IOException {
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         HostedApi hostedApi = new HostedApi(webClient);
         Workflow hostedWorkflow = hostedApi.createHostedWorkflow("name", null, CWL.toString(), null, null);
@@ -332,7 +332,7 @@ public class WorkflowIT extends BaseIT {
      * Launch remote workflow
      */
     @Test
-    public void cwlVersion11() {
+    void cwlVersion11() {
         final ApiClient userApiClient = CLICommonTestUtilities.getWebClient(true, USER_2_USERNAME, testingPostgres);
         WorkflowsApi userWorkflowsApi = new WorkflowsApi(userApiClient);
         userWorkflowsApi.manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/metadata.cwl", "metadata", "cwl",

@@ -41,7 +41,7 @@ public class YamlValidatorTest {
     public final SystemErr systemErrRule = new SystemErr();
 
     @Test
-    public void invalidDirectory() {
+    void invalidDirectory() {
         final String invalidDirectory = "/orange/julius";
         try {
             YamlVerifyUtility.dockstoreValidate(invalidDirectory);
@@ -54,7 +54,7 @@ public class YamlValidatorTest {
 
     // This test has a valid directory, but .dockstore.yml does not exist
     @Test
-    public void invalidFile() {
+    void invalidFile() {
         final String validDirectory = "src/test/resources/testDirectory2";
         try {
             YamlVerifyUtility.dockstoreValidate(validDirectory);
@@ -68,7 +68,7 @@ public class YamlValidatorTest {
 
     // Determines if .dockstore.yml is empty
     @Test
-    public void emptyDockstoreYml() {
+    void emptyDockstoreYml() {
         final String emptyDockstoreYmlDirectory = "src/test/resources/testDirectory4";
         try {
             YamlVerifyUtility.dockstoreValidate(emptyDockstoreYmlDirectory);
@@ -80,7 +80,7 @@ public class YamlValidatorTest {
     }
 
     @Test
-    public void invalidYaml() {
+    void invalidYaml() {
         final String baseTestDirectory = "src/test/resources/InvalidYamlSyntax/test";
         final int numberTestDirectories = 3;
         for (int i = 1; i <= numberTestDirectories; i++) {
@@ -98,7 +98,7 @@ public class YamlValidatorTest {
     // Invalid Yaml test
     @Disabled("This test case is failing due to errors in DockstoreYamlHelper.readAsDockstoreYaml12(contents) see GitHub issue 4985")
     @Test
-    public void yamlNotAcceptableForDockstore() {
+    void yamlNotAcceptableForDockstore() {
         final String testDirectory1 = "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory1);
@@ -110,7 +110,7 @@ public class YamlValidatorTest {
     }
 
     @Test
-    public void allFilesNotPresent() {
+    void allFilesNotPresent() {
         final String baseTestDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present/";
         List<String> directoryEnds1 = Arrays.asList("tool", "service", "workflow");
         for (String directoryEnd : directoryEnds1) {
@@ -149,7 +149,7 @@ public class YamlValidatorTest {
     }
 
     @Test
-    public void allFilesNotPresentService() {
+    void allFilesNotPresentService() {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present/service";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
@@ -165,7 +165,7 @@ public class YamlValidatorTest {
     }
 
     @Test
-    public void correctYamlAndFiles() {
+    void correctYamlAndFiles() {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/correct-directory";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
@@ -179,7 +179,7 @@ public class YamlValidatorTest {
     }
 
     @Test
-    public void someFilesNotPresent() {
+    void someFilesNotPresent() {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
@@ -193,7 +193,7 @@ public class YamlValidatorTest {
     }
 
     @Test
-    public void missingFields() {
+    void missingFields() {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/invalid-dockstore-yml";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
@@ -206,7 +206,7 @@ public class YamlValidatorTest {
     }
 
     @Test
-    public void incorrectlyNamedField() {
+    void incorrectlyNamedField() {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/incorrectly-named-parameter-in-yml";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
@@ -222,7 +222,7 @@ public class YamlValidatorTest {
     }
 
     @Test
-    public void dotGitHubDirectory() {
+    void dotGitHubDirectory() {
         String testDirectory = "src/test/resources/YamlVerifyTestDirectory/github-test/correct-directory/.github";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);

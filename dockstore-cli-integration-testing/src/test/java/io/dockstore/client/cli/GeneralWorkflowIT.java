@@ -68,7 +68,7 @@ public class GeneralWorkflowIT extends BaseIT {
     }
 
     @Test
-    public void refreshAll() {
+    void refreshAll() {
         // refresh all
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
@@ -94,7 +94,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This test checks that refresh all workflows (with a mix of stub and full) and refresh individual.  It then tries to publish them
      */
     @Test
-    public void testRefreshAndPublish() {
+    void testRefreshAndPublish() {
         // refresh all
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
@@ -146,7 +146,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests attempting to publish a workflow with no valid versions
      */
     @Test
-    public void testRefreshAndPublishInvalid() throws Exception {
+    void testRefreshAndPublishInvalid() throws Exception {
         // refresh all
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
@@ -172,7 +172,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests that a restub will work on an unpublished, full workflow
      */
     @Test
-    public void testRestub() {
+    void testRestub() {
         // Refresh and then restub
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -188,7 +188,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests that a restub will not work on an published, full workflow
      */
     @Test
-    public void testRestubError() throws Exception {
+    void testRestubError() throws Exception {
         // Refresh and then restub
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -205,7 +205,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * Tests updating workflow descriptor type when a workflow is FULL and when it is a STUB
      */
     @Test
-    public void testDescriptorTypes() throws Exception {
+    void testDescriptorTypes() throws Exception {
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
@@ -226,7 +226,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * Tests updating a workflow tag with invalid workflow descriptor path
      */
     @Test
-    public void testWorkflowVersionIncorrectPath() throws Exception {
+    void testWorkflowVersionIncorrectPath() throws Exception {
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
@@ -250,7 +250,7 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     @Category(ToilCompatibleTest.class)
-    public void testRefreshAndConvertWithImportsCWL() throws Exception {
+    void testRefreshAndConvertWithImportsCWL() throws Exception {
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
@@ -273,7 +273,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This test tests a bunch of different assumptions for how refresh should work for workflows
      */
     @Test
-    public void testRefreshRelatedConcepts() throws Exception {
+    void testRefreshRelatedConcepts() throws Exception {
         // refresh all
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
@@ -335,7 +335,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests the dirty bit attribute for workflow versions with github
      */
     @Test
-    public void testGithubDirtyBit() {
+    void testGithubDirtyBit() {
         // refresh all
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
@@ -375,7 +375,7 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     @Disabled("Ignoring for 1.8.6, enable for 1.9.0")
-    public void testGitLab() {
+    void testGitLab() {
         // Refresh workflow
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
@@ -469,7 +469,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests that WDL files are properly parsed for secondary WDL files
      */
     @Test
-    public void testWDLWithImports() {
+    void testWDLWithImports() {
         // Refresh all
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
@@ -489,7 +489,7 @@ public class GeneralWorkflowIT extends BaseIT {
      * This tests basic concepts with workflow test parameter files
      */
     @Test
-    public void testTestParameterFile() {
+    void testTestParameterFile() {
         // Refresh all
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
@@ -560,7 +560,7 @@ public class GeneralWorkflowIT extends BaseIT {
      */
     @Disabled
     @Test
-    public void testRefreshingUserMetadata() {
+    void testRefreshingUserMetadata() {
         // Refresh all workflows
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
@@ -572,7 +572,7 @@ public class GeneralWorkflowIT extends BaseIT {
     }
 
     @Test
-    public void testGenerateDOIFrozenVersion() throws ApiException {
+    void testGenerateDOIFrozenVersion() throws ApiException {
         // Set up webservice
         ApiClient webClient = WorkflowIT.getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);

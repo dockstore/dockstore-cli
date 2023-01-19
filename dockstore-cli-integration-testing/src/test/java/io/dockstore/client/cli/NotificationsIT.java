@@ -22,6 +22,7 @@ import io.dockstore.common.TestUtility;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
@@ -36,8 +37,8 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  * @author gluu
  * @since 16/01/18
  */
-@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
-@org.junit.jupiter.api.Tag(ToolTest.NAME)
+@Tag(ConfidentialTest.NAME)
+@Tag(ToolTest.NAME)
 public class NotificationsIT extends BaseIT {
     private static final String SAMPLE_CWL_DESCRIPTOR = ResourceHelpers.resourceFilePath("dockstore-tool-helloworld.cwl");
     private static final String SAMPLE_WDL_DESCRIPTOR = ResourceHelpers.resourceFilePath("wdl.wdl");
@@ -66,7 +67,7 @@ public class NotificationsIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void launchCWLToolWithNotificationsUUIDNoURL() throws Exception {
+    void launchCWLToolWithNotificationsUUIDNoURL() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--local-entry", SAMPLE_CWL_DESCRIPTOR,
                         "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" }));
@@ -81,7 +82,7 @@ public class NotificationsIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void launchCWLToolWithNotificationsUUIDInvalidURL() throws Exception {
+    void launchCWLToolWithNotificationsUUIDInvalidURL() throws Exception {
         Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocationWithInvalidNotifications(true), "tool", "launch", "--local-entry",
                         SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
@@ -96,7 +97,7 @@ public class NotificationsIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void launchCWLToolWithNotificationsUUIDValidURL() throws Exception {
+    void launchCWLToolWithNotificationsUUIDValidURL() throws Exception {
         Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
                         SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
@@ -111,7 +112,7 @@ public class NotificationsIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void launchCWLToolWithNotificationsNoUUIDValidURL() throws Exception {
+    void launchCWLToolWithNotificationsNoUUIDValidURL() throws Exception {
         Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
                         SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--info" });
@@ -128,7 +129,7 @@ public class NotificationsIT extends BaseIT {
      *
      */
     @Test
-    public void launchWDLToolWithNotificationsUUIDNoURL() throws Exception {
+    void launchWDLToolWithNotificationsUUIDNoURL() throws Exception {
         int exitCode = catchSystemExit(() ->   Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--local-entry", SAMPLE_WDL_DESCRIPTOR,
                         "--json", SAMPLE_WDL_TEST_JSON, "--uuid", "potato" }));
@@ -143,7 +144,7 @@ public class NotificationsIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void launchWDLToolWithNotificationsUUIDInvalidURL() throws Exception {
+    void launchWDLToolWithNotificationsUUIDInvalidURL() throws Exception {
         Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocationWithInvalidNotifications(true), "tool", "launch", "--local-entry",
                         SAMPLE_WDL_DESCRIPTOR, "--json", SAMPLE_WDL_TEST_JSON, "--uuid", "potato", "--info" });
@@ -158,7 +159,7 @@ public class NotificationsIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void launchWDLToolWithNotificationsUUIDValidURL() throws Exception {
+    void launchWDLToolWithNotificationsUUIDValidURL() throws Exception {
         Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
                         SAMPLE_WDL_DESCRIPTOR, "--json", SAMPLE_WDL_TEST_JSON, "--uuid", "potato", "--info" });
@@ -173,7 +174,7 @@ public class NotificationsIT extends BaseIT {
      * @throws IOException
      */
     @Test
-    public void launchWDLToolWithNotificationsNoUUIDValidURL() throws Exception {
+    void launchWDLToolWithNotificationsNoUUIDValidURL() throws Exception {
         Client.main(
                 new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
                         SAMPLE_WDL_DESCRIPTOR, "--json", SAMPLE_WDL_TEST_JSON, "--info" });

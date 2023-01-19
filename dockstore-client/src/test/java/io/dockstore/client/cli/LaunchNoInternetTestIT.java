@@ -62,7 +62,7 @@ public class LaunchNoInternetTestIT {
     }
 
     @BeforeEach
-    public void clearImage() {
+    void clearImage() {
         try {
             Utilities.executeCommand("docker rmi " + FAKE_IMAGE_NAME);
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class LaunchNoInternetTestIT {
      * When Docker image directory is not specified
      */
     @Test
-    public void directoryNotSpecified() throws Exception {
+    void directoryNotSpecified() throws Exception {
         List<String> args = new ArrayList<>();
         args.add("tool");
         args.add("launch");
@@ -97,7 +97,7 @@ public class LaunchNoInternetTestIT {
      * Docker image directory specified but doesn't exist
      */
     @Test
-    public void directorySpecifiedDoesNotExist() throws Exception {
+    void directorySpecifiedDoesNotExist() throws Exception {
         String toWrite = "docker-images = src/test/resources/nonexistent_image/docker_images/thisDirectoryShouldNotExist";
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
@@ -127,7 +127,7 @@ public class LaunchNoInternetTestIT {
      * Docker image directory specified is actually a file
      */
     @Test
-    public void directorySpecifiedButIsAFile() throws Exception {
+    void directorySpecifiedButIsAFile() throws Exception {
         String toWrite = "docker-images = " + dockerImageDirectory + "/fakeImage";
         File configPath = createTempFile(toWrite);
         if (configPath == null) {
@@ -156,7 +156,7 @@ public class LaunchNoInternetTestIT {
      * Docker image directory specified but has no files in there
      */
     @Test
-    public void directorySpecifiedButNoImages() throws Exception {
+    void directorySpecifiedButNoImages() throws Exception {
         Path emptyTestDirectory = createEmptyTestDirectory();
         if (emptyTestDirectory == null) {
             fail("Could not create empty temp directory");
@@ -189,7 +189,7 @@ public class LaunchNoInternetTestIT {
      * Everything correctly configured with CWL tool
      */
     @Test
-    public void correctCWL() throws IOException {
+    void correctCWL() throws IOException {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/CWL/nonexistent_image.cwl"));
         String toWrite = "docker-images = " + dockerImageDirectory;
         File configPath = createTempFile(toWrite);
@@ -215,7 +215,7 @@ public class LaunchNoInternetTestIT {
      * Everything correctly configured with NFL workflow
      */
     @Test
-    public void correctNFL() throws IOException {
+    void correctNFL() throws IOException {
         copyNFLFiles();
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/NFL/nextflow.config"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("nextflow_rnatoy/test.json"));
@@ -243,7 +243,7 @@ public class LaunchNoInternetTestIT {
      * Everything correctly configured with WDL workflow
      */
     @Test
-    public void correctWDL() throws IOException {
+    void correctWDL() throws IOException {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/WDL/nonexistent_image.wdl"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/WDL/test.json"));
         String toWrite = "docker-images = " + dockerImageDirectory;

@@ -9,6 +9,7 @@ import io.dropwizard.testing.ResourceHelpers;
 import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
@@ -18,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
-@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
-@org.junit.jupiter.api.Tag(WorkflowTest.NAME)
+@Tag(ConfidentialTest.NAME)
+@Tag(WorkflowTest.NAME)
 public class ManualPublishWorkflowIT extends BaseIT {
 
     @SystemStub
@@ -39,7 +40,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * This tests manually publishing a duplicate workflow (should fail)
      */
     @Test
-    public void testManualPublishDuplicate() throws Exception {
+    void testManualPublishDuplicate() throws Exception {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
@@ -57,7 +58,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * This tests that a user can update a workflow version
      */
     @Test
-    public void testUpdateWorkflowVersion() {
+    void testUpdateWorkflowVersion() {
         // Update workflow
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -78,7 +79,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * This tests that a workflow can be updated to have default version, and that metadata is set related to the default version
      */
     @Test
-    public void testUpdateWorkflowDefaultVersion() throws Exception {
+    void testUpdateWorkflowDefaultVersion() throws Exception {
         // Setup workflow
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -136,7 +137,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      */
     @Test
     @Disabled("Ignoring for 1.8.6, enable for 1.9.0")
-    public void testManualPublishGitlab() {
+    void testManualPublishGitlab() {
         // manual publish
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -162,7 +163,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
     @Disabled
     @Test
     @Category(SlowTest.class)
-    public void testGitLabTagAndBranchTracking() {
+    void testGitLabTagAndBranchTracking() {
         // manual publish
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -183,7 +184,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * This tests that you can verify and unverify a workflow
      */
     @Test
-    public void testVerify() {
+    void testVerify() {
         // Versions should be unverified
         final long count = testingPostgres
             .runSelectStatement("select count(*) from workflowversion wv, version_metadata vm where vm.verified='true' and wv.id = vm.id",
@@ -260,7 +261,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * This tests that the information for a workflow can only be seen if it is published
      */
     @Test
-    public void testInfo() throws Exception {
+    void testInfo() throws Exception {
         // manual publish
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -289,7 +290,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * This test manually publishing a workflow and grabbing valid descriptor
      */
     @Test
-    public void testManualPublishAndGrabWDL() {
+    void testManualPublishAndGrabWDL() {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
@@ -302,7 +303,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * This tests attempting to manually publish a workflow with no valid versions
      */
     @Test
-    public void testManualPublishInvalid() throws Exception {
+    void testManualPublishInvalid() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                         "dockstore_empty_repo", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
@@ -314,7 +315,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * This tests adding and removing labels from a workflow
      */
     @Test
-    public void testLabelEditing() {
+    void testLabelEditing() {
         // Set up workflow
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
@@ -342,7 +343,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * This tests manually publishing a workflow and grabbing invalid descriptor (should fail)
      */
     @Test
-    public void testGetInvalidDescriptor() throws Exception {
+    void testGetInvalidDescriptor() throws Exception {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
@@ -357,7 +358,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * Tests publishing/unpublishing workflows with the --new-entry-name parameter
      */
     @Test
-    public void testPublishWithNewEntryName() throws Exception {
+    void testPublishWithNewEntryName() throws Exception {
 
         final String publishNameParameter = "--new-entry-name";
 
@@ -424,7 +425,7 @@ public class ManualPublishWorkflowIT extends BaseIT {
      * Tests publishing/unpublishing workflows with the original --entryname parameter to ensure backwards compatibility
      */
     @Test
-    public void testPublishWithEntryName() throws Exception {
+    void testPublishWithEntryName() throws Exception {
 
         final String publishNameParameter = "--entryname";
 

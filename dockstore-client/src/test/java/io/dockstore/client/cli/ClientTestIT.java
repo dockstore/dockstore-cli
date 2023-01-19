@@ -42,7 +42,7 @@ public class ClientTestIT {
     public final SystemErr systemErrRule = new SystemErr();
 
     @Test
-    public void testDependencies() {
+    void testDependencies() {
         String config = ResourceHelpers.resourceFilePath("config");
         CWLRunnerFactory.setConfig(Utilities.parseConfig(config));
         assertFalse(systemErrRule.getText().contains("Override and run with"));
@@ -55,7 +55,7 @@ public class ClientTestIT {
      * Careful, test scope may interfere with validity of this test
      */
     @Test
-    public void noErrorLogs() {
+    void noErrorLogs() {
         String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
         String[] command = { "--help", "--config", clientConfig };
         Client.main(command);
@@ -67,7 +67,7 @@ public class ClientTestIT {
      * When the old 8443 port is used, the user should be warned
      */
     @Test
-    public void testPort8443() {
+    void testPort8443() {
         String clientConfig = ResourceHelpers.resourceFilePath("oldClientConfig");
         String[] command = { "--help", "--config", clientConfig };
         Client.main(command);
