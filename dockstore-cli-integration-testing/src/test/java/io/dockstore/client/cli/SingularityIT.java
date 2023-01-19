@@ -25,7 +25,6 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @Tag(SingularityTest.NAME)
 @ExtendWith(SystemStubsExtension.class)
@@ -62,12 +61,10 @@ public class SingularityIT extends BaseIT {
         workflowApi.refresh(workflow.getId(), true);
 
         // run the md5sum-checker workflow
-        catchSystemExit(() -> {
-            Client.main(new String[] { "--config",  // this config file passes the --singularity option to cwltool
-                    SINGULARITY_CONFIG_TEMPLATE, "workflow", "launch", "--entry",
-                    SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
-                    ResourceHelpers.resourceFilePath("md5sum_cwl.json") });
-        });
+        Client.main(new String[] { "--config",  // this config file passes the --singularity option to cwltool
+                SINGULARITY_CONFIG_TEMPLATE, "workflow", "launch", "--entry",
+                SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
+                ResourceHelpers.resourceFilePath("md5sum_cwl.json") });
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
         assertTrue(systemOutRule.getText().contains("Creating SIF file"), "assert output does not contain singularity command: " + systemOutRule.getText());
@@ -91,11 +88,9 @@ public class SingularityIT extends BaseIT {
         File tmpConfig = generateCromwellConfig();
 
         // run the md5sum-checker workflow
-        catchSystemExit(() -> {
-            Client.main(new String[] { "--config", tmpConfig.getAbsolutePath(), "workflow", "launch", "--entry",
-                    SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
-                    ResourceHelpers.resourceFilePath("md5sum_wdl.json") });
-        });
+        Client.main(new String[] { "--config", tmpConfig.getAbsolutePath(), "workflow", "launch", "--entry",
+                SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
+                ResourceHelpers.resourceFilePath("md5sum_wdl.json") });
 
         // the phrase "singularity exec" will only be in the output if Singularity is actually being used
         assertTrue(systemOutRule.getText().contains("singularity exec"), "assert output contains singularity command");
