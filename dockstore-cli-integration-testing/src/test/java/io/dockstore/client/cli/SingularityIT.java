@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.rules.TemporaryFolder;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
@@ -30,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SingularityIT extends BaseIT {
 
     @TempDir
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+    public static File temporaryFolder;
 
     private static final String SINGULARITY_CONFIG_TEMPLATE = ResourceHelpers.resourceFilePath("config_for_singularity");
 
@@ -118,7 +117,7 @@ public class SingularityIT extends BaseIT {
         String cromwellConfPath = ResourceHelpers.resourceFilePath("cromwell_singularity.conf");
 
         // make a new file in the tmp folder for this test
-        File tmpFile = temporaryFolder.newFile("config_for_singularity");
+        File tmpFile = new File(temporaryFolder, "config_for_singularity");
         // copy the dockstore config for singularity from the resources directory into the new tmp file
         File configTemplate = new File(SINGULARITY_CONFIG_TEMPLATE);
         FileUtils.copyFile(configTemplate, tmpFile);

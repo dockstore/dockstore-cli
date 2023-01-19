@@ -3,7 +3,6 @@ package io.dockstore.client.cli;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -291,23 +290,10 @@ public class LaunchTestRunToolIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
         ByteArrayOutputStream launcherOutput = null;
-        try {
-            launcherOutput = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(launcherOutput));
 
-            catchSystemExit(() -> assertThrows(AbortExecutionException.class, () -> runTool(cwlFile, cwlJSON)));
-            final String standardOutput = launcherOutput.toString();
-            assertTrue(standardOutput.contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
-                    "Error should occur, caused by Amazon S3 Exception");
-        } finally {
-            try {
-                if (launcherOutput != null) {
-                    launcherOutput.close();
-                }
-            } catch (IOException ex) {
-                assertTrue(true, "Error closing output stream.");
-            }
-        }
+        catchSystemExit(() -> assertThrows(AbortExecutionException.class, () -> runTool(cwlFile, cwlJSON)));
+        assertTrue(systemErrRule.getText().contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
+                "Error should occur, caused by Amazon S3 Exception");
     }
 
     @Test
