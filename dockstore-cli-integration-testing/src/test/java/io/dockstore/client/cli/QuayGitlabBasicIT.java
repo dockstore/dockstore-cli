@@ -1,6 +1,6 @@
 package io.dockstore.client.cli;
 
-import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
@@ -31,7 +31,7 @@ public class QuayGitlabBasicIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
     }
 
     /*

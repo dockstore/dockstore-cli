@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.dockstore.client.cli.nested.ToolClient;
-import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
@@ -67,7 +67,7 @@ public class BasicIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
     }
 
 

@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.google.common.collect.Lists;
-import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
@@ -41,7 +41,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 
 import static io.dockstore.client.cli.Client.API_ERROR;
-import static io.dockstore.common.CommonTestUtilities.checkToolList;
+import static io.dockstore.common.CLICommonTestUtilities.checkToolList;
 
 /**
  * @author dyuen
@@ -62,7 +62,7 @@ public class ClientIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
         Client.DEBUG.set(false);
     }
 

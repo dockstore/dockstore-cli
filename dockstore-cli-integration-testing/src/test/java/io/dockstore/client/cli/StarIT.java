@@ -1,6 +1,6 @@
 package io.dockstore.client.cli;
 
-import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.SourceControl;
@@ -30,7 +30,7 @@ public class StarIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
     }
 
     @Test

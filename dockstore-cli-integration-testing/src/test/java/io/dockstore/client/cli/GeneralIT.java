@@ -24,7 +24,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import io.dockstore.client.cli.nested.ToolClient;
-import io.dockstore.common.CommonTestUtilities;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
@@ -72,7 +72,7 @@ public class GeneralIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres);
     }
 
     /**
@@ -455,14 +455,14 @@ public class GeneralIT extends BaseIT {
         final ApiClient ownerWebClient = getWebClient(USER_2_USERNAME, testingPostgres);
         ContainersApi ownerContainersApi = new ContainersApi(ownerWebClient);
 
-        final ApiClient anonWebClient = CommonTestUtilities.getWebClient(false, null, testingPostgres);
+        final ApiClient anonWebClient = CLICommonTestUtilities.getWebClient(false, null, testingPostgres);
         ContainersApi anonContainersApi = new ContainersApi(anonWebClient);
 
-        final ApiClient otherUserWebClient = CommonTestUtilities.getWebClient(true, OTHER_USERNAME, testingPostgres);
+        final ApiClient otherUserWebClient = CLICommonTestUtilities.getWebClient(true, OTHER_USERNAME, testingPostgres);
         ContainersApi otherUserContainersApi = new ContainersApi(otherUserWebClient);
 
         // Register and refresh tool
-        DockstoreTool tool = ownerContainersApi.registerManual(CommonTestUtilities.getContainer());
+        DockstoreTool tool = ownerContainersApi.registerManual(CLICommonTestUtilities.getContainer());
         DockstoreTool refresh = ownerContainersApi.refresh(tool.getId());
         Long toolId = refresh.getId();
         Tag tag = refresh.getWorkflowVersions().get(0);

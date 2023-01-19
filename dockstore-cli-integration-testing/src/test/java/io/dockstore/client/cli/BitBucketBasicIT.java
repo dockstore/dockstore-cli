@@ -1,11 +1,16 @@
 package io.dockstore.client.cli;
 
 import io.dockstore.common.BitBucketTest;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.Registry;
+import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dropwizard.testing.ResourceHelpers;
+import org.hibernate.Session;
+import org.hibernate.context.internal.ManagedSessionContext;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -30,7 +35,16 @@ public class BitBucketBasicIT extends BaseIT {
     @Before
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres, true);
+        CLICommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres, true);
+    }
+
+    @After
+    public void preserveBitBucketTokens() {
+        // used to allow us to use cacheBitbucketTokens outside of the web service
+        DockstoreWebserviceApplication application = SUPPORT.getApplication();
+        Session session = application.getHibernate().getSessionFactory().openSession();
+        ManagedSessionContext.bind(session);
+        CommonTestUtilities.cacheBitbucketTokens(SUPPORT);
     }
 
     /**
