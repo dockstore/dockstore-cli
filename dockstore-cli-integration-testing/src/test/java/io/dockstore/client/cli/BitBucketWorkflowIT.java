@@ -8,7 +8,7 @@ import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dropwizard.testing.ResourceHelpers;
 import org.hibernate.Session;
 import org.hibernate.context.internal.ManagedSessionContext;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class BitBucketWorkflowIT extends BaseIT {
         CLICommonTestUtilities.cleanStatePrivate2(SUPPORT, false, testingPostgres, true);
     }
 
-    @After
+    @AfterEach
     public void preserveBitBucketTokens() {
         // used to allow us to use cacheBitbucketTokens outside of the web service
         DockstoreWebserviceApplication application = SUPPORT.getApplication();

@@ -36,7 +36,6 @@ import io.swagger.client.model.User;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -50,6 +49,8 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -140,7 +141,7 @@ public class MockedIT {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry",
             "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testOneRun.json"), "--script", "--ignore-checksums" });
 
-        Assert.assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
+        assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
     }
 
     // TODO: This is returning false positives, disabling for now until we add array support
@@ -163,8 +164,8 @@ public class MockedIT {
             new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry", "quay.io/collaboratory/arrays",
                 "--json", ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
 
-        Assert.assertTrue(new File("/tmp/example.bedGraph").exists());
-        Assert.assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
+        assertTrue(new File("/tmp/example.bedGraph").exists());
+        assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
     }
 
     /**
@@ -183,15 +184,15 @@ public class MockedIT {
         Client.main(new String[] { "--config", configFileLocation, "tool", "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
             ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
 
-        Assert.assertTrue(new File("/tmp/example.bedGraph").exists());
-        Assert.assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
+        assertTrue(new File("/tmp/example.bedGraph").exists());
+        assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
         systemOutRule.clearLog();
 
         // try again, things should be cached now
         Client.main(new String[] { "--config", configFileLocation, "tool", "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
             ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
-        Assert.assertEquals("output should contain only hard linking", 6, StringUtils.countMatches(systemOutRule.getLog(), "hard-linking"));
-        Assert.assertTrue("output should not contain warnings about skipping files", !systemOutRule.getLog().contains("skipping"));
+        assertEquals("output should contain only hard linking", 6, StringUtils.countMatches(systemOutRule.getLog(), "hard-linking"));
+        assertTrue("output should not contain warnings about skipping files", !systemOutRule.getLog().contains("skipping"));
     }
 
     /**
@@ -206,10 +207,10 @@ public class MockedIT {
             new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry", "quay.io/collaboratory/arrays",
                 "--json", ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), "--script", "--ignore-checksums" });
 
-        Assert.assertTrue(new File("/tmp/wc1.out").exists());
-        Assert.assertTrue(new File("/tmp/wc2.out").exists());
-        Assert.assertTrue(new File("/tmp/example.bedGraph").exists());
+        assertTrue(new File("/tmp/wc1.out").exists());
+        assertTrue(new File("/tmp/wc2.out").exists());
+        assertTrue(new File("/tmp/example.bedGraph").exists());
 
-        Assert.assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
+        assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
     }
 }

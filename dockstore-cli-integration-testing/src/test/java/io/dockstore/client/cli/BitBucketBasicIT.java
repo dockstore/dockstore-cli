@@ -9,12 +9,14 @@ import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dropwizard.testing.ResourceHelpers;
 import org.hibernate.Session;
 import org.hibernate.context.internal.ManagedSessionContext;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
@@ -23,6 +25,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @Tag(ConfidentialTest.NAME)
 @Tag(BitBucketTest.NAME)
+@ExtendWith(SystemStubsExtension.class)
 public class BitBucketBasicIT extends BaseIT {
 
     @SystemStub
@@ -37,7 +40,7 @@ public class BitBucketBasicIT extends BaseIT {
         CLICommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres, true);
     }
 
-    @After
+    @AfterEach
     public void preserveBitBucketTokens() {
         // used to allow us to use cacheBitbucketTokens outside of the web service
         DockstoreWebserviceApplication application = SUPPORT.getApplication();
