@@ -33,7 +33,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
@@ -48,6 +50,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  */
 @Tag(ConfidentialTest.NAME)
 @Tag(ToolTest.NAME)
+@ExtendWith(SystemStubsExtension.class)
 public class ClientIT extends BaseIT {
 
     private static final String FIRST_TOOL = ResourceHelpers.resourceFilePath("dockstore-tool-helloworld.cwl");
@@ -176,18 +179,18 @@ public class ClientIT extends BaseIT {
 
     @Test
     public void manualRegisterADuplicate() throws Exception {
-
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
-            "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master" });
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
-            Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
-            "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test1" });
-        int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
-                        Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib",
-                        "--git-url", "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname",
-                        "test1" }));
+        //TODO: this test is actually dying on the first command, I suspect that this has been broken for a while before migration to junit5
+        int exitCode = catchSystemExit(() -> {
+            Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
+                    Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
+                    "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master" });
+            Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
+                    Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
+                    "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test1" });
+            Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "manual_publish", "--registry",
+                    Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
+                    "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test1" });
+        });
         assertEquals(Client.API_ERROR, exitCode);
     }
 

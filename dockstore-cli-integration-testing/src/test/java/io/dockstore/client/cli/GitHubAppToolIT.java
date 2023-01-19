@@ -13,7 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
@@ -24,6 +26,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 /**
  * Tests every command in the workflow mode with a GitHub App Tool except manual_publish (because it's unrelated) and wes
  */
+@ExtendWith(SystemStubsExtension.class)
 public class GitHubAppToolIT extends BaseIT {
 
     private static final String WORKFLOW_REPO = "DockstoreTestUser2/test-workflows-and-tools";
@@ -95,14 +98,14 @@ public class GitHubAppToolIT extends BaseIT {
     public void wdl() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[]{"workflow", DescriptorType.WDL.toString(), "--entry", ENTRY_PATH_WITH_VERSION, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.API_ERROR, exitCode);
-        assertTrue(systemOutRule.getText().contains("Invalid version"));
+        assertTrue(systemOutRule.getText().contains("Invalid version"), "output missing invalid version message, looked like " + systemOutRule.getText());
     }
 
     @Test
     public void refresh() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[]{"workflow", "refresh", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
-        assertTrue(systemOutRule.getText().contains("GitHub Apps entries cannot be refreshed"));
+        assertTrue(systemOutRule.getText().contains("GitHub Apps entries cannot be refreshed"), "output missing error message, looked like: " + systemOutRule.getText());
     }
 
     @Test
@@ -148,8 +151,9 @@ public class GitHubAppToolIT extends BaseIT {
     public void download() {
         Client.main(new String[]{"workflow", "download", "--entry", ENTRY_PATH_WITH_VERSION, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("GET /workflows/1001/zip/1001 HTTP/1.1"));
+        systemOutRule.clear();
         Client.main(new String[]{"workflow", "download", "--entry", ENTRY_PATH_WITH_VERSION, "--zip", "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
-        assertEquals(2, StringUtils.countMatches(systemOutRule.getText(), "GET /workflows/1001/zip/1001 HTTP/1.1"));
+        assertEquals(1, StringUtils.countMatches(systemOutRule.getText(), "GET /workflows/1001/zip/1001 HTTP/1.1"), "not matching, output looked like " + systemOutRule.getText());
     }
 
     @Test

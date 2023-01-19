@@ -289,7 +289,7 @@ public class LaunchTestRunToolIT {
 
         catchSystemExit(() -> runTool(cwlFile, cwlJSON));
         assertTrue(systemErrRule.getText().contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
-                "Error should occur, caused by Amazon S3 Exception");
+                "Error should occur, caused by Amazon S3 Exception, output looked like: " + systemErrRule.getText());
     }
 
     @Test
