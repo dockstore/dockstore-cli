@@ -30,9 +30,9 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.model.DescriptorType;
-import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
@@ -51,8 +51,8 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  *
  * @author aduncan
  */
-@org.junit.jupiter.api.Tag(ConfidentialTest.NAME)
-@org.junit.jupiter.api.Tag(ToolTest.NAME)
+@Tag(ConfidentialTest.NAME)
+@Tag(ToolTest.NAME)
 public class BasicIT extends BaseIT {
 
     @SystemStub
@@ -248,7 +248,7 @@ public class BasicIT extends BaseIT {
      * Tests manual registration and unpublishing of a Dockerhub/Gitlab entry
      */
     @Test
-    @Category(SlowTest.class)
+    @Tag(SlowTest.NAME)
     public void testDockerhubGitlabManualRegistration() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
@@ -273,7 +273,7 @@ public class BasicIT extends BaseIT {
      * Will test manually publishing and unpublishing a Dockerhub/Gitlab entry with an alternate structure
      */
     @Test
-    @Category(SlowTest.class)
+    @Tag(SlowTest.NAME)
     public void testDockerhubGitlabAlternateStructure() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
@@ -298,7 +298,7 @@ public class BasicIT extends BaseIT {
      * Checks that you can manually publish and unpublish a Dockerhub/Gitlab duplicate if different toolnames are set (but same Path)
      */
     @Test
-    @Category(SlowTest.class)
+    @Tag(SlowTest.NAME)
     public void testDockerhubGitlabManualRegistrationDuplicates() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
@@ -598,7 +598,7 @@ public class BasicIT extends BaseIT {
      * This tests that you can manually publish a gitlab registry image
      */
     @Test
-    @Category(SlowTest.class)
+    @Tag(SlowTest.NAME)
     public void testManualPublishGitlabDocker() throws Exception {
         // Setup database
 

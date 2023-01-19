@@ -470,8 +470,8 @@ public class ManualPublishWorkflowIT extends BaseIT {
                 "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
 
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
-            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
+        catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+            "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"}));
 
         // unpublish workflow with name 'test_entryname'
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",

@@ -70,7 +70,7 @@ public class SingularityIT extends BaseIT {
         });
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
-        assertTrue(systemOutRule.getText().contains("Creating SIF file"), "assert output contains singularity command");
+        assertTrue(systemOutRule.getText().contains("Creating SIF file"), "assert output does not contain singularity command: " + systemOutRule.getText());
     }
 
     /**
