@@ -599,14 +599,14 @@ public class BasicIT extends BaseIT {
      */
     @Test
     @Category(SlowTest.class)
-    public void testManualPublishGitlabDocker() {
+    public void testManualPublishGitlabDocker() throws Exception {
         // Setup database
 
         // Manual publish
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+        catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.GITLAB.name(), Registry.GITLAB.toString(), "--namespace", "dockstore.test.user", "--name", "dockstore-whalesay",
             "--git-url", "git@gitlab.com:dockstore.test.user/dockstore-whalesay.git", "--git-reference", "master", "--toolname",
-            "alternate", "--private", "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--script" });
+            "alternate", "--private", "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--script" }));
 
         // Check that tool exists and is published
         final long count = testingPostgres

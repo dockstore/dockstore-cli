@@ -1,6 +1,8 @@
 package io.dockstore.client.cli;
 
 import io.dockstore.common.CLICommonTestUtilities;
+import io.dockstore.common.FlushingSystemErr;
+import io.dockstore.common.FlushingSystemOut;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.dropwizard.testing.ResourceHelpers;
 import io.openapi.model.DescriptorType;
@@ -35,10 +37,10 @@ public class GitHubAppToolIT extends BaseIT {
     private static final String ENTRY_PATH_WITH_VERSION = String.format("%s:%s", ENTRY_PATH, VERSION);
 
     @SystemStub
-    public final SystemOut systemOutRule = new SystemOut();
+    public final SystemOut systemOutRule = new FlushingSystemOut();
 
     @SystemStub
-    public final SystemErr systemErrRule = new SystemErr();
+    public final SystemErr systemErrRule = new FlushingSystemErr();
 
 
     @BeforeEach
