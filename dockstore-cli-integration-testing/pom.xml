@@ -50,6 +50,13 @@
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
+            <artifactId>dockstore-client</artifactId>
+            <version>${revision}${changelist}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.dockstore</groupId>
             <artifactId>dockstore-integration-testing</artifactId>
             <version>${dockstore-core.version}</version>
             <classifier>tests</classifier>

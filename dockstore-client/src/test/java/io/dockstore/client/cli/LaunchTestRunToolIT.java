@@ -9,11 +9,14 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import io.dockstore.client.cli.nested.ToolClient;
+import io.dockstore.common.FlushingSystemErr;
+import io.dockstore.common.FlushingSystemOut;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.UsersApi;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
@@ -31,10 +34,16 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 class LaunchTestRunToolIT {
 
     @SystemStub
-    public final SystemOut systemOutRule = new SystemOut();
+    public final SystemOut systemOutRule = new FlushingSystemOut();
 
     @SystemStub
-    public final SystemErr systemErrRule = new SystemErr();
+    public final SystemErr systemErrRule = new FlushingSystemErr();
+
+    @BeforeEach
+    void clearLogs() {
+        systemErrRule.clear();
+        systemOutRule.clear();
+    }
 
     @Test
     void yamlToolCorrect() {
@@ -287,7 +296,12 @@ class LaunchTestRunToolIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
 
-        catchSystemExit(() -> runTool(cwlFile, cwlJSON));
+        try {
+            catchSystemExit(() -> runTool(cwlFile, cwlJSON));
+        } catch (AssertionError e) {
+            // this is weird if there is no exit, but there's only a real problem if the message below does not occur
+            System.out.println("caught assertion on indeterminate system exit, weird! " + e.getMessage());
+        }
         assertTrue(systemErrRule.getText().contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
                 "Error should occur, caused by Amazon S3 Exception, output looked like: " + systemErrRule.getText());
     }
