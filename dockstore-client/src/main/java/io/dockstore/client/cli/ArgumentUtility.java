@@ -82,12 +82,16 @@ public final class ArgumentUtility {
         err(ExceptionUtils.getStackTrace(exception));
 
         if (exitCode != 0) {
+            System.out.flush();
+            System.err.flush();
             System.exit(exitCode);
         }
     }
 
     public static void errorMessage(String message, int exitCode) {
         err(message);
+        System.out.flush();
+        System.err.flush();
         System.exit(exitCode);
     }
 
