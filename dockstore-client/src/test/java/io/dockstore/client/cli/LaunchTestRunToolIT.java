@@ -303,7 +303,7 @@ class LaunchTestRunToolIT {
             System.out.println("caught assertion on indeterminate system exit, weird! " + e.getMessage());
         }
         assertTrue(systemErrRule.getText().contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
-                "Error should occur, caused by Amazon S3 Exception, output looked like: " + systemErrRule.getText());
+                "Error should occur, caused by Amazon S3 Exception, err output looked like: " + systemErrRule.getText() + "std out looked like" + systemOutRule.getText());
     }
 
     @Test
