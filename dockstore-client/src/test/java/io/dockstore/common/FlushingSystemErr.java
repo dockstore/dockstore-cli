@@ -9,7 +9,7 @@ public class FlushingSystemErr extends SystemErr {
     @SuppressWarnings("EmptyCatchBlock")
     private void pauseAndFlush() {
         try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
             System.err.flush();
         } catch (Exception e) {
         }

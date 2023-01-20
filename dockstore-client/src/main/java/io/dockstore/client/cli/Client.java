@@ -775,8 +775,6 @@ public class Client {
                     }
                 } catch (Kill k) {
                     LOG.debug("client ran into unclassified error", k.getCause());
-                    System.out.flush();
-                    System.err.flush();
                     System.exit(GENERIC_ERROR);
                 }
             }

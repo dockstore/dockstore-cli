@@ -235,8 +235,6 @@ public final class FileProvisionUtil {
         if (!f.exists()) {
             if (f.isDirectory()) {
                 LOG.error(PLUGINS_JSON_FILENAME + " is actually a directory.");
-                System.out.flush();
-                System.err.flush();
                 System.exit(1);
             } else {
                 createPluginJSONFile(pluginJSONPath);

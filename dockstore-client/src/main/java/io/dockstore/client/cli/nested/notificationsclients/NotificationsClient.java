@@ -52,8 +52,6 @@ public class NotificationsClient {
             if (!invalidUUID) {
                 System.err.println(
                         "Notifications UUID is specified but no notifications webhook URL found in config file.  Aborting launch.");
-                System.out.flush();
-                System.err.flush();
                 System.exit(Client.CLIENT_ERROR);
             }
             disabled = true;
