@@ -1,25 +1,27 @@
 package io.dockstore.client.cli;
 
 import io.dockstore.client.cli.nested.WesFile;
-import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemErr;
+import io.dockstore.common.FlushingSystemOut;
 import io.dropwizard.testing.ResourceHelpers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
-class WesFileTest {
+public class WesFileTest {
 
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemOut systemOutRule = new FlushingSystemOut();
+
+    @SystemStub
+    public final SystemErr systemErrRule = new FlushingSystemErr();
 
     @Test
-    public void testFileSuffixNaming() {
+    void testFileSuffixNaming() {
         final String descriptorPath = ResourceHelpers.resourceFilePath("hello.wdl");
 
         for (int i = descriptorPath.length() - 2; i >= 0; i--) {
@@ -28,71 +30,68 @@ class WesFileTest {
             // Skip absolute paths, that will be tested elsewhere
             if (!desiredSuffix.startsWith("/")) {
                 WesFile wesFile = new WesFile(descriptorPath, null, desiredSuffix);
-                assertEquals("The WesFile object name should be the same as the suffix", desiredSuffix, wesFile.getName());
+                Assertions.assertEquals(desiredSuffix, wesFile.getName(), "The WesFile object name should be the same as the suffix");
             }
 
         }
     }
 
     @Test
-    public void testFileSuffixBadNaming() {
+    void testFileSuffixBadNaming() throws Exception {
         final String descriptorPath = ResourceHelpers.resourceFilePath("hello.wdl");
 
         final String desiredSuffix = "/resources/hello.wdl";
         WesFile wesFile = new WesFile(descriptorPath, null, desiredSuffix);
-        systemExit.expectSystemExit();
-        wesFile.getName();
-        fail("Should have failed when given an absolute path");
+        catchSystemExit(wesFile::getName);
+        // Should have failed when given an absolute path
     }
 
     @Test
-    public void testFileSuffixBadNaming2() {
+    void testFileSuffixBadNaming2() throws Exception {
         final String descriptorPath = ResourceHelpers.resourceFilePath("hello.wdl");
 
         final String desiredSuffix = "/resources/badSuffix.wdl";
         WesFile wesFile = new WesFile(descriptorPath, null, desiredSuffix);
-        systemExit.expectSystemExit();
-        wesFile.getName();
-        fail("Should have failed when given an absolute path");
+        catchSystemExit(wesFile::getName);
+        // Should have failed when given an absolute path
     }
 
     @Test
-    public void testFileSuffixBadNaming3() {
+    void testFileSuffixBadNaming3() throws Exception {
         final String descriptorPath = ResourceHelpers.resourceFilePath("hello.wdl");
 
         final String desiredSuffix = "resources/badSuffix.wdl";
         WesFile wesFile = new WesFile(descriptorPath, null, desiredSuffix);
-        systemExit.expectSystemExit();
-        wesFile.getName();
-        fail("Should have failed when given an invalid suffix");
+        catchSystemExit(wesFile::getName);
+        // Should have failed when given an invalid suffix
     }
 
     @Test
-    public void testFilePrefix() {
+    void testFilePrefix() {
         final String descriptorPath = ResourceHelpers.resourceFilePath("hello.wdl");
 
         for (int i = 1; i < descriptorPath.length(); i++) {
             final String removablePrefix = descriptorPath.substring(0, i);
             WesFile wesFile = new WesFile(descriptorPath, removablePrefix, null);
             final String expectedSuffix = descriptorPath.substring(removablePrefix.length()).replaceAll("^/+", "");
-            assertEquals("We should be given all text content after the removed prefix, no leading slashes.", expectedSuffix, wesFile.getName());
+            Assertions.assertEquals(expectedSuffix, wesFile.getName(),
+                    "We should be given all text content after the removed prefix, no leading slashes.");
         }
     }
 
     @Test
-    public void testAllNull() {
+    void testAllNull() {
         final String descriptorPath = ResourceHelpers.resourceFilePath("hello.wdl");
 
         WesFile wesFile = new WesFile(descriptorPath, null, null);
-        assertEquals("The default File getName() functionality should be used if no additional constructor parameters are given",
-            "hello.wdl", wesFile.getName());
+        Assertions.assertEquals("hello.wdl", wesFile.getName(),
+                "The default File getName() functionality should be used if no additional constructor parameters are given");
     }
 
     @Test
-    public void testRelativeDirectory() {
+    void testRelativeDirectory() throws Exception {
         WesFile wesFile = new WesFile("/fake/path/to/file", "not/absolute", null);
-        systemExit.expectSystemExit();
-        wesFile.getName();
-        fail("Should have failed when given a relative directory path");
+        catchSystemExit(wesFile::getName);
+        // Should have failed when given a relative directory path
     }
 }
