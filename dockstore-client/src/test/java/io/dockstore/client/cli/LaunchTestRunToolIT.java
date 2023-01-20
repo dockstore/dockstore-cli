@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -297,7 +298,7 @@ class LaunchTestRunToolIT {
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
         // failure relies on plugin, imagine that!
         try {
-            catchSystemExit(() -> Client.main(new String[]{"plugin", "download"}));
+            runClientCommand(new ArrayList<>(List.of("plugin", "download")));
         } catch (AssertionError e) {
             System.out.println("caught assertion error, might depend on workspace caching, doesn't really matter " + e.getMessage());
         }
@@ -358,7 +359,7 @@ class LaunchTestRunToolIT {
         FileUtils.deleteQuietly(Paths.get(filename).toFile());
     }
 
-    private void runClientCommand(ArrayList<String> args) {
+    private void runClientCommand(List<String> args) {
         args.add(0, ResourceHelpers.resourceFilePath("config"));
         args.add(0, "--config");
         args.add(0, "--script");
