@@ -296,18 +296,9 @@ class LaunchTestRunToolIT {
     void runToolToMissingS3() throws Exception {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
-        // failure relies on plugin, imagine that!
-        try {
-            runClientCommand(new ArrayList<>(List.of("plugin", "download")));
-        } catch (AssertionError e) {
-            System.out.println("caught assertion error, might depend on workspace caching, doesn't really matter " + e.getMessage());
-        }
-        systemOutRule.clear();
-        try {
-            catchSystemExit(() -> runTool(cwlFile, cwlJSON));
-        } catch (AssertionError e) {
-            System.out.println("caught another assertion error, might depend on workspace caching, doesn't really matter if the last assertion passes " + e.getMessage());
-        }
+        // failure relies on file provisioning plugins, oy!
+        runClientCommand(new ArrayList<>(List.of("plugin", "download")));
+        catchSystemExit(() -> runTool(cwlFile, cwlJSON));
         assertTrue(systemErrRule.getText().contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
                 "Error should occur, caused by Amazon S3 Exception, err output looked like: " + systemErrRule.getText() + "std out looked like" + systemOutRule.getText());
     }
