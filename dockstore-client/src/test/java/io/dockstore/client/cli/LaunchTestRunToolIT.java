@@ -295,13 +295,10 @@ class LaunchTestRunToolIT {
     void runToolToMissingS3() throws Exception {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
-
-        try {
-            catchSystemExit(() -> runTool(cwlFile, cwlJSON));
-        } catch (AssertionError e) {
-            // this is weird if there is no exit, but there's only a real problem if the message below does not occur
-            System.out.println("caught assertion on indeterminate system exit, weird! " + e.getMessage());
-        }
+        // failure relies on plugin, imagine that!
+        Client.main(new String[] { "plugin", "download" });
+        systemOutRule.clear();
+        catchSystemExit(() -> runTool(cwlFile, cwlJSON));
         assertTrue(systemErrRule.getText().contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
                 "Error should occur, caused by Amazon S3 Exception, err output looked like: " + systemErrRule.getText() + "std out looked like" + systemOutRule.getText());
     }
