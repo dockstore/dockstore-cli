@@ -1,12 +1,5 @@
 package io.dockstore.client.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Map;
-
 import com.google.gson.Gson;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.FlushingSystemErr;
@@ -23,6 +16,13 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -296,7 +296,11 @@ class LaunchTestRunToolIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
         // failure relies on plugin, imagine that!
-        Client.main(new String[] { "plugin", "download" });
+        try {
+            catchSystemExit(() -> Client.main(new String[]{"plugin", "download"}));
+        } catch (AssertionError e) {
+            System.out.println("caught assertion error, might depend on workspace caching, doesn't really matter " + e.getMessage());
+        }
         systemOutRule.clear();
         catchSystemExit(() -> runTool(cwlFile, cwlJSON));
         assertTrue(systemErrRule.getText().contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
