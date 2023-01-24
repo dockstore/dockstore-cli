@@ -21,34 +21,28 @@ import java.util.ArrayList;
 
 import com.google.common.collect.Lists;
 import io.dockstore.common.CLICommonTestUtilities;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.TestUtility;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class YamlClientIT extends BaseIT {
+class YamlClientIT extends BaseIT {
 
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
 
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
-
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
     public final String yamlHelpMsg = "dockstore yaml --help";
     public final String validateHelpMsg = "dockstore yaml validate --help";
 
-    @Before
+    @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
         CLICommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
@@ -56,15 +50,15 @@ public class YamlClientIT extends BaseIT {
     }
 
     @Test
-    public void missingPathParameter() throws IOException {
+    void missingPathParameter() throws IOException {
         Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", "validate"});
-        assertTrue(systemOutRule.getLog().contains("The following option is required: [--path]"));
-        assertTrue(systemOutRule.getLog().contains("Usage: dockstore"));
-        systemOutRule.clearLog();
+        assertTrue(systemOutRule.getText().contains("The following option is required: [--path]"));
+        assertTrue(systemOutRule.getText().contains("Usage: dockstore"));
+        systemOutRule.clear();
     }
 
     @Test
-    public void verifyErrorMessagesArePrinted() throws IOException {
+    void verifyErrorMessagesArePrinted() throws IOException {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
         System.out.println(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
@@ -72,26 +66,27 @@ public class YamlClientIT extends BaseIT {
             + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
             + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
         System.out.println(errorMsg);
-        assertTrue(systemOutRule.getLog().contains(errorMsg));
-        systemOutRule.clearLog();
+        assertTrue(systemOutRule.getText().contains(errorMsg));
+        systemOutRule.clear();
     }
 
     @Test
-    public void completeRun() throws IOException {
+    void completeRun() throws IOException {
         final String testDirectory = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory";
-        System.out.println(Lists.newArrayList(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory}));
+        System.out.println(Lists.newArrayList("--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME,
+                "--path", testDirectory));
         Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         String successMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
             + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
-        assertTrue(systemOutRule.getLog().contains(successMsg));
-        systemOutRule.clearLog();
+        assertTrue(systemOutRule.getText().contains(successMsg));
+        systemOutRule.clear();
     }
 
 
     // Tests for when Help message should be generated
 
     @Test
-    public void testHelpCommands() throws Exception {
+    void testHelpCommands() throws Exception {
         checkCommandForHelp(new String[]{YAML, "--help"}, yamlHelpMsg);
         checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME, "--help"}, validateHelpMsg);
     }
@@ -101,7 +96,7 @@ public class YamlClientIT extends BaseIT {
     // This tests for when a help message should be generated even though no help flag was given
     // it also tests for the appropriate error message
     @Test
-    public void testHelpCommandsNoHelpFlag() throws Exception {
+    void testHelpCommandsNoHelpFlag() throws Exception {
         checkCommandForHelp(new String[]{YAML}, yamlHelpMsg, YamlClient.ERROR_NO_COMMAND);
         checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME}, validateHelpMsg, "The following option is required: [--path]");
         checkCommandForHelp(new String[]{YAML, "--path", YamlVerifyUtility.COMMAND_NAME}, "Usage: dockstore yaml");
@@ -117,8 +112,8 @@ public class YamlClientIT extends BaseIT {
         strings.add("--config");
         strings.add(TestUtility.getConfigFileLocation(true));
         Client.main(strings.toArray(new String[0]));
-        assertTrue(systemOutRule.getLog().contains(helpMsg));
-        assertTrue(systemOutRule.getLog().contains(errorMsg));
-        systemOutRule.clearLog();
+        assertTrue(systemOutRule.getText().contains(helpMsg));
+        assertTrue(systemOutRule.getText().contains(errorMsg));
+        systemOutRule.clear();
     }
 }

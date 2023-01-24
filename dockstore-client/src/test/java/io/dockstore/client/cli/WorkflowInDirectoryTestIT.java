@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import io.dockstore.common.FlushingSystemErrRule;
 import io.dockstore.common.FlushingSystemOutRule;
 import io.dropwizard.testing.ResourceHelpers;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -29,6 +28,8 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author gluu
@@ -108,7 +109,7 @@ public class WorkflowInDirectoryTestIT {
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow-job.json"));
         exit.expectSystemExitWithStatus(Client.IO_ERROR);
         this.baseWorkflowTest(cwlFile, cwlJSON, true, "workflow");
-        systemErrRule.getLog().contains("Missing required secondary file");
+        assertTrue(systemErrRule.getLog().contains("Missing required secondary file"));
     }
 
     /**
@@ -120,7 +121,7 @@ public class WorkflowInDirectoryTestIT {
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow-job.json"));
         exit.expectSystemExitWithStatus(3);
         this.baseWorkflowTest(cwlFile, cwlJSON, true, "workflow");
-        Assert.assertTrue(systemErrRule.getLog().contains("Missing required secondary file"));
+        assertTrue(systemErrRule.getLog().contains("Missing required secondary file"));
     }
 
     @Test

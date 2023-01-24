@@ -23,15 +23,15 @@ import com.google.gson.Gson;
 import io.cwl.avro.CWL;
 import io.cwl.avro.Workflow;
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author gluu
  * @since 18/09/17
  */
-public class SecondaryFilesUtilityIT {
+class SecondaryFilesUtilityIT {
 
     private static final String IMAGE_DESCRIPTOR_PATH = FileUtils
         .getFile("src", "test", "resources", "gdc/cwl/workflows/dnaseq/transform.cwl").getAbsolutePath();
@@ -40,7 +40,7 @@ public class SecondaryFilesUtilityIT {
     private static final Gson GSON = CWL.getTypeSafeCWLToolDocument();
 
     @Test
-    public void modifyWorkflowToIncludeToolSecondaryFiles() {
+    void modifyWorkflowToIncludeToolSecondaryFiles() {
         IntStream.range(0, 5).forEach(i -> modifyWorkflow());
     }
 

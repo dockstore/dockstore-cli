@@ -22,18 +22,21 @@ import java.nio.charset.StandardCharsets;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 /**
  * @author jpatricia
  */
+@ExtendWith(SystemStubsExtension.class)
 public final class TestUtility {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestUtility.class);
-    @Rule
+    @TempDir
     public TemporaryFolder folder = new TemporaryFolder();
 
     private TestUtility() {
@@ -68,7 +71,7 @@ public final class TestUtility {
     }
 
     /**
-     * Currently in production, the basePath is "/api/" and Nginx removes first /api it finds and redirects it to "http://webservice:8080/$uri"
+     * Currently in production, the basePath is "/api/" and Nginx removes first /api it finds and redirects it to "<a href="http://webservice:8080/$uri">...</a>"
      * This mimics the nginx functionality
      *
      * @param originalUrl The original URL that the UI2 and the Swagger UI displays

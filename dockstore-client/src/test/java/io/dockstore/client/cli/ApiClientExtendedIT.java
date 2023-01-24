@@ -9,11 +9,11 @@ import javax.ws.rs.core.HttpHeaders;
 import io.dockstore.client.cli.nested.ApiClientExtended;
 import io.dockstore.client.cli.nested.WesRequestData;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ApiClientExtendedIT {
+class ApiClientExtendedIT {
 
     // These are old keys that have been deleted.
     static final String WES_ENDPOINT = "https://eoof9s4bbe.execute-api.us-west-2.amazonaws.com/prod/ga4gh/wes/v1";
@@ -27,7 +27,7 @@ public class ApiClientExtendedIT {
      * and we confirm that the signing function is still producing the same signature.
      */
     @Test
-    public void testAwsSigCalculation() {
+    void testAwsSigCalculation() {
         WesRequestData wrd = new WesRequestData(WES_ENDPOINT + "/service-info", OLD_AWS_ACCESS_KEY, OLD_AWS_SECRET_KEY, AWS_REGION);
         ApiClientExtended ace = new ApiClientExtended(wrd);
 
@@ -42,11 +42,12 @@ public class ApiClientExtendedIT {
         ace.setAwsHeaderCalculationData(target, method, allHeaders);
         final String newlyCalculatedHeader = ace.generateAwsContentSignature(DigestUtils.sha256Hex(""));
 
-        assertEquals("The calculated header should match the original request that was made", expectedHeader, newlyCalculatedHeader);
+        assertEquals(expectedHeader, newlyCalculatedHeader,
+                "The calculated header should match the original request that was made");
     }
 
     @Test
-    public void testSameSigForEmptyPayload() {
+    void testSameSigForEmptyPayload() {
         WesRequestData wrd = new WesRequestData(WES_ENDPOINT + "/runs", OLD_AWS_ACCESS_KEY, OLD_AWS_SECRET_KEY, AWS_REGION);
         ApiClientExtended ace = new ApiClientExtended(wrd);
 
@@ -62,11 +63,12 @@ public class ApiClientExtendedIT {
         final String fakeBodyChecksum = DigestUtils.sha256Hex("".getBytes());
         final String newlyCalculatedContentHeader = ace.generateAwsContentSignature(fakeBodyChecksum);
 
-        assertEquals("The calculated header should match the original request that was made", expectedSignature, newlyCalculatedContentHeader);
+        assertEquals(expectedSignature, newlyCalculatedContentHeader,
+                "The calculated header should match the original request that was made");
     }
 
     @Test
-    public void testAwsSigCalculationForBody() {
+    void testAwsSigCalculationForBody() {
         WesRequestData wrd = new WesRequestData(WES_ENDPOINT + "/runs", OLD_AWS_ACCESS_KEY, OLD_AWS_SECRET_KEY, AWS_REGION);
         ApiClientExtended ace = new ApiClientExtended(wrd);
 
@@ -84,6 +86,7 @@ public class ApiClientExtendedIT {
         final String fakeBodyChecksum = "bf918205a9d2ce0cf8a0d1c7cc0eb2ecf42fdefc4ab387eaa1a7958edf26face";
         final String newlyCalculatedContentHeader = ace.generateAwsContentSignature(fakeBodyChecksum);
 
-        assertEquals("The calculated header should match the original request that was made", expectedHeader, newlyCalculatedContentHeader);
+        assertEquals(expectedHeader, newlyCalculatedContentHeader,
+                "The calculated header should match the original request that was made");
     }
 }

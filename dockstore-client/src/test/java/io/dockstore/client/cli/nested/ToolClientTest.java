@@ -24,14 +24,14 @@ import io.swagger.client.api.UsersApi;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.SourceFile;
 import org.apache.http.HttpStatus;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.mockito.Mockito.when;
 
-public class ToolClientTest {
+class ToolClientTest {
 
     private static final String MISSING_TAG = "0.3.1";
     private static final String GOOD_TAG = "0.3.0";
@@ -43,8 +43,8 @@ public class ToolClientTest {
     private UsersApi usersApi;
     private Client client;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         containersApi = Mockito.mock(ContainersApi.class);
         containertagsApi = Mockito.mock(ContainertagsApi.class);
         usersApi = Mockito.mock(UsersApi.class);
@@ -61,7 +61,7 @@ public class ToolClientTest {
     }
 
     @Test
-    public void getDescriptorFromServerMissingTag() {
+    void getDescriptorFromServerMissingTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         boolean exceptionThrown = false;
         try {
@@ -69,11 +69,11 @@ public class ToolClientTest {
         } catch (Exception ex) {
             exceptionThrown = true;
         }
-        Assert.assertTrue(exceptionThrown);
+        Assertions.assertTrue(exceptionThrown);
     }
 
     @Test
-    public void getDescriptorFromServerNoTag() {
+    void getDescriptorFromServerNoTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         boolean exceptionThrown = false;
         try {
@@ -81,13 +81,13 @@ public class ToolClientTest {
         } catch (Exception ex) {
             exceptionThrown = true;
         }
-        Assert.assertTrue(exceptionThrown);
+        Assertions.assertTrue(exceptionThrown);
     }
 
     @Test
-    public void getDescriptorFromServerGoodTag() {
+    void getDescriptorFromServerGoodTag() {
         ToolClient toolClient = new ToolClient(containersApi, containertagsApi, usersApi, client, false);
         SourceFile cwl = toolClient.getDescriptorFromServer(REPOSITORY + ":" + GOOD_TAG, DescriptorLanguage.CWL);
-        Assert.assertNotNull(cwl);
+        Assertions.assertNotNull(cwl);
     }
 }

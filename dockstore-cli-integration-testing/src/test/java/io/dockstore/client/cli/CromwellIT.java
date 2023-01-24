@@ -31,42 +31,44 @@ import io.dockstore.client.cli.nested.LanguageClientInterface;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.DescriptorLanguage;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
 import io.dockstore.common.ToolTest;
 import io.dockstore.common.WDLFileProvisioning;
 import io.dockstore.common.WdlBridge;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiException;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 import wdl.draft3.parser.WdlParser;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 /**
  * This tests integration with the CromWell engine and what will eventually be wdltool.
  *
  * @author dyuen
  */
-@Category({ToolTest.class, ConfidentialTest.class})
-public class CromwellIT {
+@ExtendWith(SystemStubsExtension.class)
+@Tag(ConfidentialTest.NAME)
+@Tag(ToolTest.NAME)
+class CromwellIT {
 
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
 
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
-
-    @Rule
-    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
     @Test
-    public void runWDLWorkflow() throws IOException, ApiException {
+    void runWDLWorkflow() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
@@ -76,12 +78,11 @@ public class CromwellIT {
         File parameterFile = new File(ResourceHelpers.resourceFilePath("wdl.json"));
         // run a workflow
         final long run = wdlClient.launch(workflowFile.getAbsolutePath(), true, null, parameterFile.getAbsolutePath(), null, null);
-        Assert.assertEquals(0, run);
+        assertEquals(0, run);
     }
 
     @Test
-    public void failRunWDLWorkflow() throws IOException, ApiException {
-        exit.expectSystemExitWithStatus(3);
+    void failRunWDLWorkflow() throws Exception {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
@@ -90,12 +91,12 @@ public class CromwellIT {
         File workflowFile = new File(ResourceHelpers.resourceFilePath("wdl.wdl"));
         File parameterFile = new File(ResourceHelpers.resourceFilePath("wdl_wrong.json"));
         // run a workflow
-        final long run = wdlClient.launch(workflowFile.getAbsolutePath(), true, null, parameterFile.getAbsolutePath(), null, null);
-        Assert.assertTrue(run != 0);
+        int exitCode = catchSystemExit(() -> wdlClient.launch(workflowFile.getAbsolutePath(), true, null, parameterFile.getAbsolutePath(), null, null));
+        assertEquals(Client.IO_ERROR, exitCode);
     }
 
     @Test
-    public void fileProvisioning() throws IOException, ApiException {
+    void fileProvisioning() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
@@ -108,7 +109,7 @@ public class CromwellIT {
         try {
             wdlInputs = wdlBridge.getInputFiles(workflowFile.getAbsolutePath(), "/wdlfileprov.wdl");
         } catch (WdlParser.SyntaxError ex) {
-            Assert.fail("Should not have any issue parsing file");
+            fail("Should not have any issue parsing file");
         }
 
         WDLFileProvisioning wdlFileProvisioning = new WDLFileProvisioning(ResourceHelpers.resourceFilePath("config_file.txt"));
@@ -125,17 +126,17 @@ public class CromwellIT {
         String newJsonPath = wdlFileProvisioning.createUpdatedInputsJson(inputJson, fileMap);
         // run a workflow
         final long run = wdlClient.launch(workflowFile.getAbsolutePath(), true, null, newJsonPath, tempDir.getAbsolutePath(), null);
-        Assert.assertEquals(0, run);
+        assertEquals(0, run);
         // let's check that provisioning out occured
         final Collection<File> files = FileUtils.listFiles(tempDir, null, true);
-        Assert.assertEquals(2, files.size());
+        assertEquals(2, files.size());
     }
 
     /**
      * This tests compatibility with Cromwell 30.2 by running a workflow (https://github.com/dockstore/dockstore/issues/1211)
      */
     @Test
-    public void testRunWorkflow() throws IOException, ApiException {
+    void testRunWorkflow() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
@@ -145,14 +146,14 @@ public class CromwellIT {
         File parameterFile = new File(ResourceHelpers.resourceFilePath("hello_world.json"));
         // run a workflow
         final long run = wdlClient.launch(workflowFile.getAbsolutePath(), true, null, parameterFile.getAbsolutePath(), null, null);
-        Assert.assertEquals(0, run);
+        assertEquals(0, run);
     }
 
     /**
      * This tests that backslashes are not removed from the input and show up when the input is echoed by the workflow
      */
     @Test
-    public void testRunWorkflowWithBackslashInInput() throws IOException, ApiException {
+    void testRunWorkflowWithBackslashInInput() throws IOException, ApiException {
         Client client = new Client();
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         AbstractEntryClient main = new ToolClient(client, false);
@@ -161,9 +162,9 @@ public class CromwellIT {
         File workflowFile = new File(ResourceHelpers.resourceFilePath("pass_escape_in_input.wdl"));
         File parameterFile = new File(ResourceHelpers.resourceFilePath("pass_escape_in_input.wdl.json"));
         // run a workflow
-        systemOutRule.clearLog();
+        systemOutRule.clear();
         final long run = wdlClient.launch(workflowFile.getAbsolutePath(), true, null, parameterFile.getAbsolutePath(), null, null);
-        Assert.assertEquals(0, run);
-        Assert.assertTrue(systemOutRule.getLog().contains("\"test_location.find_tools.result\": \"t t\\t\\\\t\""));
+        assertEquals(0, run);
+        assertTrue(systemOutRule.getText().contains("\"test_location.find_tools.result\": \"t t\\t\\\\t\""));
     }
 }
