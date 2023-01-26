@@ -665,7 +665,7 @@ public class Client {
         final String cacheDirectory = getCacheDirectory(configuration);
         FileUtils.deleteDirectory(new File(cacheDirectory));
     }
-    
+
     private void run(String[] argv) {
         List<String> args = new ArrayList<>(Arrays.asList(argv));
 
