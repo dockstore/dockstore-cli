@@ -113,6 +113,7 @@ public class Client {
     private static ObjectMapper objectMapper;
 
     private String configFile = null;
+    private String serverUrl = null;
     private Ga4GhApi ga4ghApi;
     private Ga4Ghv20Api ga4ghv20Api;
     private ExtendedGa4GhApi extendedGA4GHApi;
@@ -643,6 +644,7 @@ public class Client {
             final Metadata metadata = ga4ghApi.metadataGet();
             final Gson gson = io.cwl.avro.CWL.getTypeSafeCWLToolDocument();
             out(gson.toJson(metadata));
+            out("Dockstore server: " + serverUrl);
         } catch (ApiException ex) {
             exceptionMessage(ex, "", API_ERROR);
         } catch (CWL.GsonBuildException ex) {
@@ -795,7 +797,7 @@ public class Client {
         INIConfiguration config = getIniConfiguration(args);
         // pull out the variables from the config
         String token = config.getString("token", "");
-        String serverUrl = config.getString("server-url", "https://dockstore.org/api");
+        serverUrl = config.getString("server-url", "https://dockstore.org/api");
         if (serverUrl.contains(":8443")) {
             err(DEPRECATED_PORT_MESSAGE);
         }
