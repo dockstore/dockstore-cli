@@ -644,7 +644,7 @@ public class Client {
             final Metadata metadata = ga4ghApi.metadataGet();
             final Gson gson = io.cwl.avro.CWL.getTypeSafeCWLToolDocument();
             out(gson.toJson(metadata));
-            out("server-url: " + serverUrl);
+            out("Dockstore server: " + serverUrl);
         } catch (ApiException ex) {
             exceptionMessage(ex, "", API_ERROR);
         } catch (CWL.GsonBuildException ex) {
