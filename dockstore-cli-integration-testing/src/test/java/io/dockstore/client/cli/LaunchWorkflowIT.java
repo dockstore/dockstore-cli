@@ -137,7 +137,7 @@ class LaunchWorkflowIT extends BaseIT {
         // re-enable and test with versions of system rules newer than 1.17.1
         //        systemExit.checkAssertionAfterwards(
         //            () -> assertTrue("Output should indicate issues with WDL imports and exit", systemOutRule.getLog().contains("Could not get WDL imports")));
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--local-entry",
                 ResourceHelpers.resourceFilePath("wdlincorrecthttp.wdl"), "--json", ResourceHelpers.resourceFilePath("wdl.json"), SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
@@ -151,13 +151,13 @@ class LaunchWorkflowIT extends BaseIT {
     void launchWorkflowChecksumValidation() {
         // register and publish a workflow
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "manual_publish", "--repository",
                 "md5sum-checker", "--organization", "DockstoreTestUser2", "--git-version-control", "github",
                 "--workflow-path", "/checker-workflow-wrapping-tool.cwl", "--descriptor-type", "cwl", "--workflow-name", "checksumTester", SCRIPT_FLAG });
 
         // ensure checksum validation is acknowledged, and no null checksums were discovered
         systemOutRule.clear();
-        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
+        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--entry",
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),
@@ -165,11 +165,11 @@ class LaunchWorkflowIT extends BaseIT {
 
         // unpublish the workflow
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub", "--entry", "github.com/DockstoreTestUser2/md5sum-checker/checksumTester"});
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--unpub", "--entry", "github.com/DockstoreTestUser2/md5sum-checker/checksumTester"});
 
         // ensure checksum validation is acknowledged for the unpublished workflow, and no null checksums were discovered
         systemOutRule.clear();
-        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
+        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--entry",
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),

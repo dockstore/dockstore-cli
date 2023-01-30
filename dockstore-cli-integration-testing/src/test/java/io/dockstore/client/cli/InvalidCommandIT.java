@@ -30,6 +30,8 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 import static io.dockstore.client.cli.Client.CHECKER;
 import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.PLUGIN;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 
 @ExtendWith(SystemStubsExtension.class)
 public class InvalidCommandIT extends BaseIT {
@@ -44,8 +46,8 @@ public class InvalidCommandIT extends BaseIT {
     @Test
     public void noSuggestions() {
         List<String> acceptedCommands = new ArrayList<String>();
-        acceptedCommands.add("tool");
-        acceptedCommands.add("workflow");
+        acceptedCommands.add(TOOL);
+        acceptedCommands.add(WORKFLOW);
         acceptedCommands.add(CHECKER);
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);

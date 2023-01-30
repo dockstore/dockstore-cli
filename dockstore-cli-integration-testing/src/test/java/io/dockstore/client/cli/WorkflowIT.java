@@ -179,7 +179,7 @@ class WorkflowIT extends BaseIT {
         });
 
         // download zip via CLI
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "download", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "download", "--entry",
             toolpath + ":" + workflowVersion.getName(), "--zip", SCRIPT_FLAG });
         File downloadedZip = new File(new WorkflowClient(null, null, null, false).zipFilename(workflow));
         assert (downloadedZip.exists());
@@ -213,7 +213,7 @@ class WorkflowIT extends BaseIT {
                 SCRIPT_FLAG });
 
         // Publish the workflow
-        Client.main(new String[] { CONFIG, fileWithCorrectCredentials, "workflow", "publish", "--entry", toolpath, SCRIPT_FLAG });
+        Client.main(new String[] { CONFIG, fileWithCorrectCredentials, WORKFLOW, "publish", "--entry", toolpath, SCRIPT_FLAG });
 
         // should be able to download properly with incorrect credentials because the entry is published
         Client.main(
@@ -222,7 +222,7 @@ class WorkflowIT extends BaseIT {
 
         // Unpublish the workflow
         Client.main(
-            new String[] { CONFIG, fileWithCorrectCredentials, "workflow", "publish", "--entry", toolpath, "--unpub", SCRIPT_FLAG });
+            new String[] { CONFIG, fileWithCorrectCredentials, WORKFLOW, "publish", "--entry", toolpath, "--unpub", SCRIPT_FLAG });
 
         // should not be able to download properly with incorrect credentials because the entry is not published
         int exitCode = catchSystemExit(() ->  Client.main(
@@ -256,7 +256,7 @@ class WorkflowIT extends BaseIT {
 
         // should be able to launch properly with incorrect credentials but the entry is published
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry", toolpath,
                 SCRIPT_FLAG });
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, "launch", "--entry", toolpath,
@@ -264,7 +264,7 @@ class WorkflowIT extends BaseIT {
 
         // should not be able to launch properly with incorrect credentials
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry", toolpath,
                 "--unpub", SCRIPT_FLAG });
         int exitCode = catchSystemExit(() ->  Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, "launch", "--entry", toolpath,
@@ -318,13 +318,13 @@ class WorkflowIT extends BaseIT {
         assertFalse(workflow.getOutputFileFormats().isEmpty());
 
         // launch the workflow, note that the latest version of the workflow should launch (i.e. the working one)
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--entry",
             workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), SCRIPT_FLAG });
 
         WorkflowsApi workflowsApi = new WorkflowsApi(webClient);
         workflowsApi.publish(workflow.getId(), SwaggerUtility.createPublishRequest(true));
         // should also launch successfully with the wrong credentials when published
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "launch", "--entry",
             workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), SCRIPT_FLAG });
     }
 
@@ -382,7 +382,7 @@ class WorkflowIT extends BaseIT {
         assertTrue(workflowVersion2.isValid());
         userWorkflowsApi.publish(workflowByPathGithub2.getId(), SwaggerUtility.createPublishRequest(true));
         List<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--entry");
         args.add("github.com/dockstore-testing/Workflows-For-CI/count-lines1-wf");

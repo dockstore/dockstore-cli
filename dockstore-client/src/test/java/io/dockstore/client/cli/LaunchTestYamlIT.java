@@ -22,6 +22,7 @@ import org.junit.runner.Description;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.Assert.assertTrue;
 
@@ -53,7 +54,7 @@ public class LaunchTestYamlIT {
 
     @Test
     public void yamlAndJsonToolCorrect() {
-        yamlAndJsonEntryCorrect("tool");
+        yamlAndJsonEntryCorrect(TOOL);
     }
 
     private void yamlAndJsonEntryCorrect(String entryType) {
@@ -117,7 +118,7 @@ public class LaunchTestYamlIT {
 
     @Test
     public void wdlToolCorrectFlags() {
-        wdlEntryCorrectFlags("tool");
+        wdlEntryCorrectFlags(TOOL);
     }
 
     private void wdlEntryCorrectFlags(String entryType) {

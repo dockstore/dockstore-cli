@@ -48,6 +48,7 @@ import org.junit.rules.ExpectedException;
 
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 import static org.junit.Assert.assertTrue;
@@ -97,7 +98,7 @@ public abstract class LauncherIT {
         }
 
         Client.SCRIPT.set(true);
-        Client.main(new String[] { CONFIG, getConfigFile(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
+        Client.main(new String[] { CONFIG, getConfigFile(), TOOL, "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
             jobFile.getAbsolutePath(), SCRIPT_FLAG });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
@@ -122,7 +123,7 @@ public abstract class LauncherIT {
 
         Client.SCRIPT.set(true);
         Client.main(
-            new String[] { CONFIG, getConfigFileWithExtraParameters(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(),
+            new String[] { CONFIG, getConfigFileWithExtraParameters(), TOOL, "launch", "--local-entry", cwlFile.getAbsolutePath(),
                 "--json", jobFile.getAbsolutePath(), SCRIPT_FLAG });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
@@ -145,7 +146,7 @@ public abstract class LauncherIT {
         }
 
         Client.SCRIPT.set(true);
-        Client.main(new String[] { CONFIG, getConfigFile(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
+        Client.main(new String[] { CONFIG, getConfigFile(), TOOL, "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
             jobFile.getAbsolutePath(), SCRIPT_FLAG });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {

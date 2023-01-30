@@ -31,6 +31,8 @@ import static io.dockstore.client.cli.Client.CHECKER;
 import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.Assert.assertTrue;
 
 @ExtendWith(SystemStubsExtension.class)
@@ -81,8 +83,8 @@ public class SuggestClosestMatchTest {
     public void noSuggestions() {
         systemOutRule.clear();
         List<String> acceptedCommands = new ArrayList<String>();
-        acceptedCommands.add("tool");
-        acceptedCommands.add("workflow");
+        acceptedCommands.add(TOOL);
+        acceptedCommands.add(WORKFLOW);
         acceptedCommands.add(CHECKER);
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
@@ -117,8 +119,8 @@ public class SuggestClosestMatchTest {
     public void usedUpperCase() {
         systemOutRule.clear();
         List<String> acceptedCommands = new ArrayList<String>();
-        acceptedCommands.add("tool");
-        acceptedCommands.add("workflow");
+        acceptedCommands.add(TOOL);
+        acceptedCommands.add(WORKFLOW);
         acceptedCommands.add(CHECKER);
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
@@ -160,7 +162,7 @@ public class SuggestClosestMatchTest {
     public void onlyOneCloseMatch() {
         systemOutRule.clear();
         List<String> acceptedCommands = new ArrayList<String>();
-        acceptedCommands.add("tool");
+        acceptedCommands.add(TOOL);
 
         ArgumentUtility.invalid("", "too", acceptedCommands);
         Assertions.assertEquals("""
@@ -172,7 +174,7 @@ public class SuggestClosestMatchTest {
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        acceptedCommands.add("workflow");
+        acceptedCommands.add(WORKFLOW);
         acceptedCommands.add(CHECKER);
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
@@ -204,7 +206,7 @@ public class SuggestClosestMatchTest {
     public void severalCloseMatches() {
         systemOutRule.clear();
         List<String> acceptedCommands = new ArrayList<String>();
-        acceptedCommands.add("workflow");
+        acceptedCommands.add(WORKFLOW);
         acceptedCommands.add(CHECKER);
         acceptedCommands.add("test1");
         acceptedCommands.add(PLUGIN);

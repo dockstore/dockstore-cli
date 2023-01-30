@@ -24,6 +24,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -80,7 +81,7 @@ class LaunchNoInternetTestIT {
     @Test
     void directoryNotSpecified() throws Exception {
         List<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
@@ -109,7 +110,7 @@ class LaunchNoInternetTestIT {
         }
 
         List<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
@@ -138,7 +139,7 @@ class LaunchNoInternetTestIT {
             fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
@@ -171,7 +172,7 @@ class LaunchNoInternetTestIT {
             fail("Could not create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
@@ -201,7 +202,7 @@ class LaunchNoInternetTestIT {
             fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());

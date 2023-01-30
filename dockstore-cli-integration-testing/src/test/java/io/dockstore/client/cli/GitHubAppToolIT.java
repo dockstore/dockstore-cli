@@ -134,50 +134,50 @@ class GitHubAppToolIT extends BaseIT {
 
     @Test
     void testParameter() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[]{"workflow", "test_parameter", VERSION, "main", "--add", "test.json", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
+        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, "test_parameter", VERSION, "main", "--add", "test.json", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
         assertTrue(systemOutRule.getText().contains("Cannot update test parameter files of GitHub App entries"));
     }
 
     @Test
     void convert() {
-        Client.main(new String[]{"workflow", "convert", "entry2json", "--entry", ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "convert", "entry2json", "--entry", ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("tmp/fill_me_in.txt"));
     }
 
     @Test
     void launch() throws ApiException {
-        Client.main(new String[]{"workflow", "launch", "--entry", ENTRY_PATH_WITH_VERSION, "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG, CONFIG,
+        Client.main(new String[]{WORKFLOW, "launch", "--entry", ENTRY_PATH_WITH_VERSION, "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG, CONFIG,
             ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("Final process status is success"));
     }
 
     @Test
     void download() {
-        Client.main(new String[]{"workflow", "download", "--entry", ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "download", "--entry", ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("GET /workflows/1001/zip/1001 HTTP/1.1"));
         systemOutRule.clear();
-        Client.main(new String[]{"workflow", "download", "--entry", ENTRY_PATH_WITH_VERSION, "--zip", CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "download", "--entry", ENTRY_PATH_WITH_VERSION, "--zip", CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertEquals(1, StringUtils.countMatches(systemOutRule.getOutput().getText(), "GET /workflows/1001/zip/1001 HTTP/1.1"), "not matching, output looked like " + systemOutRule.getOutput().getText());
     }
 
     @Test
     void updateWorkflow() throws Exception {
-        int exitCode = catchSystemExit(() ->  Client.main(new String[]{"workflow", "update_workflow", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
+        int exitCode = catchSystemExit(() ->  Client.main(new String[]{WORKFLOW, "update_workflow", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
         assertTrue(systemOutRule.getText().contains("Command not supported for GitHub App entries"));
     }
 
     @Test
     void versionTag() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[]{"workflow", "version_tag", "--name", "main", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
+        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, "version_tag", "--name", "main", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
         assertTrue(systemOutRule.getText().contains("Command not supported for GitHub App entries"));
     }
 
     @Test
     void restub() throws Exception {
-        int exitCode = catchSystemExit(() ->  Client.main(new String[]{"workflow", "restub", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
+        int exitCode = catchSystemExit(() ->  Client.main(new String[]{WORKFLOW, "restub", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
         assertTrue(systemOutRule.getOutput().getText().contains("Command not supported for GitHub App entries"), "looked like: " + systemOutRule.getOutput().getText());
     }

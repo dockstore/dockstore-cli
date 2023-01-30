@@ -31,6 +31,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -141,7 +142,7 @@ public class WorkflowInDirectoryTestIT {
     public void testArrayOfArrayOfInputs() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/arrays.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/testArrayLocalInputLocalOutput.json"));
-        this.baseWorkflowTest(cwlFile, cwlJSON, false, "tool");
+        this.baseWorkflowTest(cwlFile, cwlJSON, false, TOOL);
     }
 
     /**
@@ -151,7 +152,7 @@ public class WorkflowInDirectoryTestIT {
     public void testArrayOfArrayOfInputsv1() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/arraysv1.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/testArrayLocalInputLocalOutput.json"));
-        this.baseWorkflowTest(cwlFile, cwlJSON, false, "tool");
+        this.baseWorkflowTest(cwlFile, cwlJSON, false, TOOL);
     }
 
     /**
@@ -161,7 +162,7 @@ public class WorkflowInDirectoryTestIT {
     public void testArrayOfArrayOfInputsv2() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/arrays.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("arrayOfArrays/testArrayLocalInputLocalOutput2.json"));
-        this.baseWorkflowTest(cwlFile, cwlJSON, false, "tool");
+        this.baseWorkflowTest(cwlFile, cwlJSON, false, TOOL);
     }
 
     private void baseWorkflowTest(File descriptor, File testParameter, boolean script, String entryType) {

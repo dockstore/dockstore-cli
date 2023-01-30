@@ -1358,7 +1358,7 @@ public abstract class AbstractEntryClient<T> {
             InfoCmd infoCmd = instance.infoCmd(); // attempt to get information about docker
             infoCmd.exec();
         } catch (Exception e) {  // couldn't access docker, this library is wonderfully non-specific about exceptions
-            String type = this.getEntryType().toLowerCase(); // "tool" or "workflow"
+            String type = this.getEntryType().toLowerCase(); // TOOL or WORKFLOW
             out("WARNING: Docker is not running. If this " + type + " uses Docker, it will fail.");
         }
     }

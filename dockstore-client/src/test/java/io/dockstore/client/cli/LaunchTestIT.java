@@ -45,6 +45,7 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
@@ -724,7 +725,7 @@ class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("noInput.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
@@ -740,7 +741,7 @@ class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("noOutput.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
@@ -757,7 +758,7 @@ class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("incompleteOutput.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
@@ -774,7 +775,7 @@ class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("idNonWord.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
@@ -791,7 +792,7 @@ class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("missingIdParameters.cwl"));
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
@@ -875,7 +876,7 @@ class LaunchTestIT {
     void cwl2jsonNoOutput() throws Exception {
         File file = new File(ResourceHelpers.resourceFilePath("noOutput.cwl"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("convert");
         args.add("cwl2json");
         args.add("--cwl");
@@ -913,7 +914,7 @@ class LaunchTestIT {
         File helloWdl = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("testInvalidJSON.json"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
+        args.add(TOOL);
         args.add("launch");
         args.add("--local-entry");
         args.add(helloWdl.getAbsolutePath());

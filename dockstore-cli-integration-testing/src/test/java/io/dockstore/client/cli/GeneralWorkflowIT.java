@@ -155,7 +155,7 @@ class GeneralWorkflowIT extends BaseIT {
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // refresh individual
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/dockstore_empty_repo", SCRIPT_FLAG });
 
         // check that no valid versions
@@ -163,7 +163,7 @@ class GeneralWorkflowIT extends BaseIT {
         assertEquals(0, count, "there should be 0 valid versions, there are " + count);
 
         // try and publish
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/dockstore_empty_repo", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
@@ -179,9 +179,9 @@ class GeneralWorkflowIT extends BaseIT {
     void testRestub() {
         // Refresh and then restub
         refreshByOrganizationReplacement(USER_2_USERNAME);
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "restub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement("select count(*) from workflowversion", long.class);
@@ -195,12 +195,12 @@ class GeneralWorkflowIT extends BaseIT {
     void testRestubError() throws Exception {
         // Refresh and then restub
         refreshByOrganizationReplacement(USER_2_USERNAME);
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "restub", "--entry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
@@ -212,16 +212,16 @@ class GeneralWorkflowIT extends BaseIT {
     void testDescriptorTypes() throws Exception {
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--descriptor-type", "wdl", SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement("select count(*) from workflow where descriptortype = 'wdl'", long.class);
         assertEquals(1, count, "there should be 1 wdl workflow, there are " + count);
 
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                         SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--descriptor-type", "cwl", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
@@ -232,9 +232,9 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testWorkflowVersionIncorrectPath() throws Exception {
         refreshByOrganizationReplacement(USER_2_USERNAME);
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "version_tag", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "version_tag", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--name", "master", "--workflow-path",
             "/newdescriptor.cwl", SCRIPT_FLAG });
 
@@ -243,7 +243,7 @@ class GeneralWorkflowIT extends BaseIT {
                 long.class);
         assertEquals(1, count, "the workflow version should now have a new descriptor path");
 
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "version_tag", "--entry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "version_tag", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--name", "master", "--workflow-path",
                 "/Dockstore.wdl", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
@@ -256,16 +256,16 @@ class GeneralWorkflowIT extends BaseIT {
     @Category(ToilCompatibleTest.class)
     void testRefreshAndConvertWithImportsCWL() throws Exception {
         refreshByOrganizationReplacement(USER_2_USERNAME);
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "convert", "entry2json", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "convert", "entry2json", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow:testBoth", SCRIPT_FLAG });
 
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "convert", "entry2json", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "convert", "entry2json", "--entry",
                         SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow:testCWL", SCRIPT_FLAG }));
         assertEquals(Client.GENERIC_ERROR, exitCode);
     }
@@ -282,7 +282,7 @@ class GeneralWorkflowIT extends BaseIT {
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // refresh individual that is valid
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         // check that workflow is valid and full
@@ -293,7 +293,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // Change path for each version so that it is invalid
         testingPostgres.runUpdateStatement("UPDATE workflowversion SET workflowpath='thisisnotarealpath.cwl', dirtybit=true");
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         // Workflow has no valid versions so you cannot publish
@@ -303,26 +303,26 @@ class GeneralWorkflowIT extends BaseIT {
         assertTrue(4 <= count4, "there should be at least 4 invalid versions, there are " + count4);
 
         // Restub
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "restub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         // Update workflow to WDL
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--workflow-path", "Dockstore.wdl",
                 "--descriptor-type", "wdl", SCRIPT_FLAG });
 
         // Can now publish workflow
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         // unpublish
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--unpub", SCRIPT_FLAG });
 
         // Set paths to invalid
         testingPostgres.runUpdateStatement("UPDATE workflowversion SET workflowpath='thisisnotarealpath.wdl', dirtybit=true");
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         // Check that versions are invalid
@@ -330,7 +330,7 @@ class GeneralWorkflowIT extends BaseIT {
         assertTrue(4 <= count5, "there should be at least 4 invalid versions, there are " + count5);
 
         // should now not be able to publish
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
@@ -344,7 +344,7 @@ class GeneralWorkflowIT extends BaseIT {
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // refresh individual that is valid
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         // Check that no versions have a true dirty bit
@@ -352,7 +352,7 @@ class GeneralWorkflowIT extends BaseIT {
         assertEquals(0, count, "there should be no versions with dirty bit, there are " + count);
 
         // Edit workflow path for a version
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "version_tag", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "version_tag", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--name", "master", "--workflow-path",
             "/Dockstoredirty.cwl", SCRIPT_FLAG });
 
@@ -362,7 +362,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // Update default cwl
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--workflow-path", "/Dockstoreclean.cwl",
                 SCRIPT_FLAG });
 
@@ -382,7 +382,7 @@ class GeneralWorkflowIT extends BaseIT {
     void testGitLab() {
         // Refresh workflow
         refreshByOrganizationReplacement(USER_2_USERNAME);
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", SCRIPT_FLAG });
         final long nullLastModifiedWorkflowVersions = testingPostgres
             .runSelectStatement("select count(*) from workflowversion where lastmodified is null", long.class);
@@ -404,7 +404,7 @@ class GeneralWorkflowIT extends BaseIT {
         assertEquals(1, count3, "there should be 1 workflow, there are " + count3);
 
         // publish
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
             SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", SCRIPT_FLAG });
         final long count4 = testingPostgres.runSelectStatement(
             "select count(*) from workflow where mode='FULL' and sourcecontrol = '" + SourceControl.GITLAB
@@ -413,15 +413,15 @@ class GeneralWorkflowIT extends BaseIT {
         assertEquals(1, count4, "there should be 1 published workflow, there are " + count4);
 
         // Should be able to get info since it is published
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "info", "--entry",
             SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", SCRIPT_FLAG });
 
         // Should be able to grab descriptor
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "cwl", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "cwl", "--entry",
             SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example:master", SCRIPT_FLAG });
 
         // unpublish
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
             SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", "--unpub", SCRIPT_FLAG });
         final long count5 = testingPostgres.runSelectStatement(
             "select count(*) from workflow where mode='FULL' and sourcecontrol = '" + SourceControl.GITLAB
@@ -437,7 +437,7 @@ class GeneralWorkflowIT extends BaseIT {
         assertEquals(1, count6, "The given workflow shouldn't have any contact info");
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", "--default-version", "test",
                 SCRIPT_FLAG });
 
@@ -447,7 +447,7 @@ class GeneralWorkflowIT extends BaseIT {
         assertEquals(0, count7, "The given workflow should now have contact info and description");
 
         // restub
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "restub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", "--entry",
             SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", SCRIPT_FLAG });
         final long count8 = testingPostgres.runSelectStatement(
             "select count(*) from workflow where mode='STUB' and sourcecontrol = '" + SourceControl.GITLAB
@@ -456,7 +456,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // Convert to WDL workflow
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", "--descriptor-type", "wdl",
                 SCRIPT_FLAG });
 
@@ -479,7 +479,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // Update workflow to be WDL with correct path
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/test_workflow_wdl", "--descriptor-type", "wdl", "--workflow-path",
                 "/hello.wdl", SCRIPT_FLAG });
 
@@ -498,7 +498,7 @@ class GeneralWorkflowIT extends BaseIT {
         refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // Refresh specific
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", SCRIPT_FLAG });
 
         // There should be no sourcefiles
@@ -507,7 +507,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // Update version master with test parameters
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "test_parameter", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION, "master", "--add",
                 // Trying to remove a non-existent test parameter file now causes an error. It didn't use to and test was relying
                 // on that behavior.
@@ -517,7 +517,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // Update version with test parameters
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "test_parameter", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION, "master", "--add",
                 "test.cwl.json", "--remove", "test2.cwl.json", SCRIPT_FLAG });
         final long count3 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
@@ -525,19 +525,19 @@ class GeneralWorkflowIT extends BaseIT {
 
         // Update other version with test parameters
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "test_parameter", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION, "wdltest", "--add",
                 "test.wdl.json", SCRIPT_FLAG });
         final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='CWL_TEST_JSON'", long.class);
         assertEquals(2, count4, "there should be two sourcefiles that are cwl test parameter files, there are " + count4);
 
         // Restub
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "restub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", SCRIPT_FLAG });
 
         // Change to WDL
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", "--descriptor-type", "wdl",
                 "--workflow-path", "Dockstore.wdl", SCRIPT_FLAG });
 
@@ -547,7 +547,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // Update version wdltest with test parameters
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "test_parameter", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION, "wdltest", "--add",
                 "test.wdl.json", SCRIPT_FLAG });
         final long count6 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='WDL_TEST_JSON'", long.class);
