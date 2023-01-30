@@ -24,6 +24,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -62,7 +63,7 @@ class SingularityIT extends BaseIT {
         workflowApi.refresh(workflow.getId(), true);
 
         // run the md5sum-checker workflow
-        Client.main(new String[] { "--config",  // this config file passes the --singularity option to cwltool
+        Client.main(new String[] { CONFIG,  // this config file passes the --singularity option to cwltool
                 SINGULARITY_CONFIG_TEMPLATE, WORKFLOW, "launch", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
                 ResourceHelpers.resourceFilePath("md5sum_cwl.json") });
@@ -89,7 +90,7 @@ class SingularityIT extends BaseIT {
         File tmpConfig = generateCromwellConfig();
 
         // run the md5sum-checker workflow
-        Client.main(new String[] { "--config", tmpConfig.getAbsolutePath(), WORKFLOW, "launch", "--entry",
+        Client.main(new String[] { CONFIG, tmpConfig.getAbsolutePath(), WORKFLOW, "launch", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
                 ResourceHelpers.resourceFilePath("md5sum_wdl.json") });
 

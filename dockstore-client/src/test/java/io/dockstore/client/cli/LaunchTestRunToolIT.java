@@ -25,6 +25,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -353,7 +354,7 @@ class LaunchTestRunToolIT {
 
     private void runClientCommand(List<String> args) {
         args.add(0, ResourceHelpers.resourceFilePath("config"));
-        args.add(0, "--config");
+        args.add(0, CONFIG);
         args.add(0, "--script");
         Client.main(args.toArray(new String[0]));
     }

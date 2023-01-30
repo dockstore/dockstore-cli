@@ -21,6 +21,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -61,7 +62,7 @@ class GitHubAppToolIT extends BaseIT {
     @Test
     void list() {
         systemOutRule.clear();
-        Client.main(new String[]{WORKFLOW, "list", "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "list", CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains(ENTRY_PATH));
     }
 
@@ -75,57 +76,57 @@ class GitHubAppToolIT extends BaseIT {
 
     @Test
     void publish() {
-        Client.main(new String[]{WORKFLOW, "publish", "--unpub", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "publish", "--unpub", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(
                 systemOutRule.getText().contains("Successfully unpublished  github.com/DockstoreTestUser2/test-workflows-and-tools/md5sum"));
         systemOutRule.clear();
-        Client.main(new String[]{WORKFLOW, "publish", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "publish", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(
                 systemOutRule.getText().contains("Successfully published  github.com/DockstoreTestUser2/test-workflows-and-tools/md5sum"));
     }
 
     @Test
     void info() {
-        Client.main(new String[]{WORKFLOW, "info", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "info", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("git@github.com:DockstoreTestUser2/test-workflows-and-tools.git"));
         assertTrue(systemOutRule.getText().contains(ENTRY_PATH));
     }
 
     @Test
     void cwl() {
-        Client.main(new String[]{WORKFLOW, DescriptorType.CWL.toString(), "--entry", ENTRY_PATH_WITH_VERSION, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, DescriptorType.CWL.toString(), "--entry", ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("label: Simple md5sum tool"));
     }
 
     @Test
     void wdl() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, DescriptorType.WDL.toString(), "--entry", ENTRY_PATH_WITH_VERSION, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
+        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, DescriptorType.WDL.toString(), "--entry", ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.API_ERROR, exitCode);
         assertTrue(systemOutRule.getOutput().getText().contains("Invalid version"), "output missing invalid version message, looked like " + systemOutRule.getOutput().getText());
     }
 
     @Test
     void refresh() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, "refresh", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
+        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, "refresh", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
         assertTrue(systemOutRule.getText().contains("GitHub Apps entries cannot be refreshed"), "output missing error message, looked like: " + systemOutRule.getText());
     }
 
     @Test
     void label() {
-        Client.main(new String[]{WORKFLOW, "label", "--add", "potato", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "label", "--add", "potato", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("The workflow has the following labels:"));
         systemOutRule.clear();
-        Client.main(new String[]{WORKFLOW, "label", "--remove", "potato", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "label", "--remove", "potato", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("The workflow has no labels"));
     }
 
     @Test
     void star() {
-        Client.main(new String[]{WORKFLOW, "star", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "star", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("Successfully starred github.com/DockstoreTestUser2/test-workflows-and-tools/md5sum"));
         systemOutRule.clear();
-        Client.main(new String[]{WORKFLOW, "star", "--unstar", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, "star", "--unstar", "--entry", ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(
                 systemOutRule.getText().contains("Successfully unstarred github.com/DockstoreTestUser2/test-workflows-and-tools/md5sum"));
     }

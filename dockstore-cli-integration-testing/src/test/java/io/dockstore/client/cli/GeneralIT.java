@@ -43,6 +43,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.UPGRADE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -80,7 +81,7 @@ class GeneralIT extends BaseIT {
         String installLocation = Client.getInstallLocation();
         String latestVersion = Client.getLatestVersion();
 
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), UPGRADE, "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), UPGRADE, "--script" });
         String currentVersion = Client.getCurrentVersion();
 
         if (installLocation != null && latestVersion != null && currentVersion != null) {
@@ -94,7 +95,7 @@ class GeneralIT extends BaseIT {
     @Test
     @Category(ToilCompatibleTest.class)
     void testLocalLaunchCWL() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("arrays.cwl"), "--json",
             ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), "--script" });
     }
@@ -105,7 +106,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testLocalLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
                         "imnotreal.cwl", "--json", "filtercount-job.json", "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -116,7 +117,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testLocalLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
                         "imnotreal.wdl", "--json", "imnotreal-job.json", "--descriptor", "wdl", "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -127,7 +128,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testRemoteLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--entry",
                         "imnotreal.cwl", "--json", "imnotreal-job.json", "--script" }));
         assertEquals(Client.IO_ERROR, exitCode);
     }
@@ -138,7 +139,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testRemoteLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--entry", "imnotreal.wdl",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--entry", "imnotreal.wdl",
                         "--json", "imnotreal-job.json", "--descriptor", "wdl", "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -149,7 +150,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testLabelIncorrectInput() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
                         "quay.io/dockstoretestuser2/quayandgithub", "--add", "docker-hub", "--add", "quay.io", "--script" }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
@@ -160,12 +161,12 @@ class GeneralIT extends BaseIT {
     @Test
     void testAddEditRemoveLabel() {
         // Test adding/removing labels for different containers
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
             "quay.io/dockstoretestuser2/quayandgithub", "--add", "quay", "--add", "github", "--remove", "dockerhub", "--script" });
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
             "quay.io/dockstoretestuser2/quayandgithub", "--add", "github", "--add", "dockerhub", "--remove", "quay", "--script" });
 
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
             "quay.io/dockstoretestuser2/quayandgithubalternate", "--add", "alternate", "--add", "github", "--script" });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
             "quay.io/dockstoretestuser2/quayandgithubalternate", "--remove", "github", "--script" });

@@ -20,6 +20,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.Assert.assertTrue;
 
@@ -103,7 +104,7 @@ public class LaunchTestYamlIT {
         exit.checkAssertionAfterwards(() -> assertTrue("Client error should be returned",
             systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
         args.add(0, config.getPath());
-        args.add(0, "--config");
+        args.add(0, CONFIG);
         args.add(0, "--script");
         Client.main(args.toArray(new String[0]));
     }
@@ -148,7 +149,7 @@ public class LaunchTestYamlIT {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         final List<String> strings = new ArrayList<>();
         strings.add("--script");
-        strings.add("--config");
+        strings.add(CONFIG);
         strings.add(ResourceHelpers.resourceFilePath("config"));
         strings.add(entryType);
         strings.add("launch");

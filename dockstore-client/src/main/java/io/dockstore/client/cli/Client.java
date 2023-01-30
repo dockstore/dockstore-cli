@@ -122,6 +122,7 @@ public class Client {
     public static final String UPGRADE = "--upgrade";
     public static final String UPGRADE_STABLE = "--upgrade-stable";
     public static final String UPGRADE_UNSTABLE = "--upgrade-unstable";
+    public static final String CONFIG = "--config";
     private static ObjectMapper objectMapper;
 
     private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
@@ -625,7 +626,7 @@ public class Client {
         out("                       Default: false");
         out("  " + UPGRADE_UNSTABLE + "   Force upgrade to the latest unstable release of Dockstore");
         out("                       Default: false");
-        out("  --config <file>      Override config file");
+        out("  " + CONFIG + " <file>      Override config file");
         out("                       Default: ~/.dockstore/config");
         out("  --script             Will not check Github for newer versions of Dockstore, or ask for user input");
         out("                       Default: false");
@@ -788,7 +789,7 @@ public class Client {
                             List<String> possibleCommands = new ArrayList<String>();
                             possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML,
                                     HELP, DEBUG_FLAG, VERSION, SERVER_METADATA, UPGRADE,
-                                    UPGRADE_STABLE, UPGRADE_UNSTABLE, "--config", "--script", "--clean-cache"));
+                                    UPGRADE_STABLE, UPGRADE_UNSTABLE, CONFIG, "--script", "--clean-cache"));
                             invalid("", cmd, possibleCommands);
                             break;
                         }
@@ -871,7 +872,7 @@ public class Client {
 
     private INIConfiguration getIniConfiguration(List<String> args) {
         String userHome = System.getProperty("user.home");
-        String commandLineConfigFile = optVal(args, "--config", userHome + File.separator + ".dockstore" + File.separator + "config");
+        String commandLineConfigFile = optVal(args, CONFIG, userHome + File.separator + ".dockstore" + File.separator + "config");
         if (this.configFile == null) {
             this.configFile = commandLineConfigFile;
         }

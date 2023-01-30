@@ -11,6 +11,7 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.Assert.assertTrue;
 
@@ -64,7 +65,7 @@ public class WesToilIT {
 
             // Check on a workflow's run status
             String[] commandStatementStatus = new String[]{ WORKFLOW, "wes", "status",
-                "--config", TOIL_CONFIG,
+                CONFIG, TOIL_CONFIG,
                 "--id", runId
             };
             Client.main(commandStatementStatus);
@@ -83,7 +84,7 @@ public class WesToilIT {
     @Test
     public void testBasicLaunch1() throws InterruptedException {
         String[] commandStatementRun = new String[]{ WORKFLOW, "wes", "launch",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
             "--inline-workflow"
@@ -99,7 +100,7 @@ public class WesToilIT {
     @Test
     public void testBasicLaunch2() throws InterruptedException {
         String[] commandStatementRun = new String[]{ WORKFLOW, "wes", "launch",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/multi-descriptor-no-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"), // Toil requires workflow_params to be provided
             "--inline-workflow",
@@ -119,7 +120,7 @@ public class WesToilIT {
     @Test
     public void testBasicLaunch3() throws InterruptedException {
         String[] commandStatementRun = new String[]{ WORKFLOW, "wes", "launch",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-no-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"), // Toil requires workflow_params to be provided
             "--inline-workflow"
@@ -135,7 +136,7 @@ public class WesToilIT {
     @Test
     public void testCancel() throws InterruptedException {
         String[] commandStatementRun = new String[]{ WORKFLOW, "wes", "launch",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
             "--inline-workflow"
@@ -145,7 +146,7 @@ public class WesToilIT {
         final String runId = findWorkflowIdFromDefaultLaunch(systemOutRule.getLog());
 
         String[] commandStatementCancel = new String[]{ WORKFLOW, "wes", "cancel",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--id", runId
         };
         Client.main(commandStatementCancel);
@@ -159,7 +160,7 @@ public class WesToilIT {
     public void testDirectoryAttachment() throws InterruptedException {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
         String[] commandStatementRun = new String[]{ WORKFLOW, "wes", "launch",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
             "-a", ResourceHelpers.resourceFilePath("wesIt/w4_nested"),
@@ -179,7 +180,7 @@ public class WesToilIT {
     public void testRelativeFileAttachment() throws InterruptedException {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
         String[] commandStatementRun = new String[]{ WORKFLOW, "wes", "launch",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
             "-a", "src/test/resources/wesIt/w4_nested/w4_2_test.txt",
@@ -200,7 +201,7 @@ public class WesToilIT {
         // When we pass the relative path to a directory, the CLI will convert it to an absolute path and upload
         // all nested files relative to said absolute path. This means that the attachment JSON will be at the wrong path.
         String[] commandStatementRun = new String[]{ WORKFLOW, "wes", "launch",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
             "--attach", "src/test/resources/wesIt/w4_nested",
@@ -221,7 +222,7 @@ public class WesToilIT {
         // When we pass the relative path to a directory, the CLI will convert it to an absolute path and upload
         // all nested files relative to said absolute path. This means that the attachment JSON will be at the wrong path.
         String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
             "-a", "src/test/resources/wesIt/w4_nested",

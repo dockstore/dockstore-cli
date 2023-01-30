@@ -22,6 +22,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -84,7 +85,7 @@ class LaunchNoInternetTestIT {
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(ResourceHelpers.resourceFilePath("config"));
         args.add("--script");
 
@@ -113,7 +114,7 @@ class LaunchNoInternetTestIT {
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
         args.add("--script");
 
@@ -142,7 +143,7 @@ class LaunchNoInternetTestIT {
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
         args.add("--script");
 
@@ -175,7 +176,7 @@ class LaunchNoInternetTestIT {
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
         args.add("--script");
 
@@ -205,7 +206,7 @@ class LaunchNoInternetTestIT {
         args.add(descriptorFile.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
         args.add("--script");
 
@@ -233,7 +234,7 @@ class LaunchNoInternetTestIT {
         args.add(descriptorFile.getAbsolutePath());
         args.add("--json");
         args.add(jsonFile.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
 
         Client.main(args.toArray(new String[0]));
@@ -260,7 +261,7 @@ class LaunchNoInternetTestIT {
         args.add(descriptorFile.getAbsolutePath());
         args.add("--json");
         args.add(jsonFile.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
 
         Client.main(args.toArray(new String[0]));

@@ -46,6 +46,7 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.ExpectedException;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 import static org.junit.Assert.assertTrue;
@@ -95,7 +96,7 @@ public abstract class LauncherIT {
         }
 
         Client.SCRIPT.set(true);
-        Client.main(new String[] { "--config", getConfigFile(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
+        Client.main(new String[] { CONFIG, getConfigFile(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
             jobFile.getAbsolutePath(), "--script" });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
@@ -120,7 +121,7 @@ public abstract class LauncherIT {
 
         Client.SCRIPT.set(true);
         Client.main(
-            new String[] { "--config", getConfigFileWithExtraParameters(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(),
+            new String[] { CONFIG, getConfigFileWithExtraParameters(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(),
                 "--json", jobFile.getAbsolutePath(), "--script" });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
@@ -143,7 +144,7 @@ public abstract class LauncherIT {
         }
 
         Client.SCRIPT.set(true);
-        Client.main(new String[] { "--config", getConfigFile(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
+        Client.main(new String[] { CONFIG, getConfigFile(), "tool", "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
             jobFile.getAbsolutePath(), "--script" });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
@@ -166,7 +167,7 @@ public abstract class LauncherIT {
         }
 
         Client.SCRIPT.set(true);
-        Client.main(new String[] { "--config", getConfigFile(), WORKFLOW, "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
+        Client.main(new String[] { CONFIG, getConfigFile(), WORKFLOW, "launch", "--local-entry", cwlFile.getAbsolutePath(), "--json",
             jobFile.getAbsolutePath(), "--script" });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {

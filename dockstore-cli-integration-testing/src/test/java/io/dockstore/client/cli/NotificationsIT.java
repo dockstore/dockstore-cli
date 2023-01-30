@@ -28,6 +28,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -69,7 +70,7 @@ class NotificationsIT extends BaseIT {
     @Test
     void launchCWLToolWithNotificationsUUIDNoURL() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--local-entry", SAMPLE_CWL_DESCRIPTOR,
+                new String[] { CONFIG, TestUtility.getConfigFileLocation(true), "tool", "launch", "--local-entry", SAMPLE_CWL_DESCRIPTOR,
                         "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
         String log = systemErrRule.getText();

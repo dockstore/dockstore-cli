@@ -42,6 +42,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.DEBUG_FLAG;
 import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.HELP;
@@ -81,26 +82,26 @@ class ClientIT extends BaseIT {
 
     @Test
     void testListEntries() throws IOException, ApiException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "list" });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "list" });
         checkToolList(systemOutRule.getText());
     }
 
     @Test
     void testDebugModeListEntries() throws IOException, ApiException {
-        Client.main(new String[] { DEBUG_FLAG, "--config", TestUtility.getConfigFileLocation(true), TOOL, "list" });
+        Client.main(new String[] { DEBUG_FLAG, CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "list" });
         checkToolList(systemOutRule.getText());
     }
 
     @Test
     void testListEntriesWithoutCreds() throws Exception {
         int exitCode = catchSystemExit(
-                () -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(false), TOOL, "list" }));
+                () -> Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(false), TOOL, "list" }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
     @Test
     void testListEntriesOnWrongPort() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true, false, false), TOOL, "list" }));
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true, false, false), TOOL, "list" }));
         assertEquals(Client.CONNECTION_ERROR, exitCode);
     }
 

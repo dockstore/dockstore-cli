@@ -29,6 +29,7 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -164,7 +165,7 @@ public class WorkflowInDirectoryTestIT {
 
     private void baseWorkflowTest(File descriptor, File testParameter, boolean script, String entryType) {
         ArrayList<String> args = new ArrayList<>();
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configFile.getPath());
         args.add(entryType);
         args.add("launch");
