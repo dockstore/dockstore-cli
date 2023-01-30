@@ -153,12 +153,12 @@ class LaunchWorkflowIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "md5sum-checker", "--organization", "DockstoreTestUser2", "--git-version-control", "github",
-                "--workflow-path", "/checker-workflow-wrapping-tool.cwl", "--descriptor-type", "cwl", "--workflow-name", "checksumTester", "--script" });
+                "--workflow-path", "/checker-workflow-wrapping-tool.cwl", "--descriptor-type", "cwl", "--workflow-name", "checksumTester", SCRIPT_FLAG });
 
         // ensure checksum validation is acknowledged, and no null checksums were discovered
         systemOutRule.clear();
         Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),
                 "Output should indicate that checksums have been validated");
@@ -170,7 +170,7 @@ class LaunchWorkflowIT extends BaseIT {
         // ensure checksum validation is acknowledged for the unpublished workflow, and no null checksums were discovered
         systemOutRule.clear();
         Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),
                 "Output should indicate that checksums have been validated");

@@ -177,7 +177,7 @@ class BasicIT extends BaseIT {
 
         // Unpublish
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/alternate", "--script" });
+            "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/alternate", SCRIPT_FLAG });
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='f'", long.class);
 
@@ -195,7 +195,7 @@ class BasicIT extends BaseIT {
                         Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
                         "dockerhubandgithubalternate", "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay-alternate.git",
                         "--git-reference", "master", "--toolname", "regular", "--cwl-path", "/Dockstore.cwl", "--dockerfile-path",
-                        "/Dockerfile", "--script" }));
+                        "/Dockerfile", SCRIPT_FLAG }));
         assertEquals(Client.GENERIC_ERROR, exitCode);
     }
 
@@ -207,7 +207,7 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
-            "--script" });
+            SCRIPT_FLAG });
 
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'regular' and ispublished='t'", long.class);
@@ -218,7 +218,7 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular2",
-            "--script" });
+            SCRIPT_FLAG });
 
         // Unpublish the duplicate entrys
         final long count2 = testingPostgres
@@ -226,14 +226,14 @@ class BasicIT extends BaseIT {
         assertEquals(2, count2, "there should be 2 entries");
 
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular", "--script" });
+            "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular", SCRIPT_FLAG });
         final long count3 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'regular2' and ispublished='t'", long.class);
 
         assertEquals(1, count3, "there should be 1 entry");
 
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular2", "--script" });
+            "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular2", SCRIPT_FLAG });
         final long count4 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname like 'regular%' and ispublished='t'", long.class);
 
@@ -257,7 +257,7 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
             "--git-url", "git@gitlab.com:dockstore.test.user/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
-            "--script" });
+            SCRIPT_FLAG });
 
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'regular' and ispublished='t'", long.class);
@@ -266,7 +266,7 @@ class BasicIT extends BaseIT {
 
         // Unpublish
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandgitlab/regular", "--script" });
+            "registry.hub.docker.com/dockstoretestuser/dockerhubandgitlab/regular", SCRIPT_FLAG });
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'regular' and ispublished='t'", long.class);
 
@@ -282,7 +282,7 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
             "--git-url", "git@gitlab.com:dockstore.test.user/quayandgitlabalternate.git", "--git-reference", "master", "--toolname",
-            "alternate", "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", "--script" });
+            "alternate", "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", SCRIPT_FLAG });
 
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
@@ -290,7 +290,7 @@ class BasicIT extends BaseIT {
 
         // Unpublish
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandgitlab/alternate", "--script" });
+            "registry.hub.docker.com/dockstoretestuser/dockerhubandgitlab/alternate", SCRIPT_FLAG });
 
         final long count3 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='f'", long.class);
@@ -307,7 +307,7 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
             "--git-url", "git@gitlab.com:dockstore.test.user/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
-            "--script" });
+            SCRIPT_FLAG });
 
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'regular' and ispublished='t'", long.class);
@@ -318,7 +318,7 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgitlab",
             "--git-url", "git@gitlab.com:dockstore.test.user/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular2",
-            "--script" });
+            SCRIPT_FLAG });
 
         // Unpublish the duplicate entries
         final long count2 = testingPostgres
@@ -326,14 +326,14 @@ class BasicIT extends BaseIT {
         assertEquals(2, count2, "there should be 2 entries");
 
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandgitlab/regular", "--script" });
+            "registry.hub.docker.com/dockstoretestuser/dockerhubandgitlab/regular", SCRIPT_FLAG });
         final long count3 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'regular2' and ispublished='t'", long.class);
 
         assertEquals(1, count3, "there should be 1 entry");
 
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
-            "registry.hub.docker.com/dockstoretestuser/dockerhubandgitlab/regular2", "--script" });
+            "registry.hub.docker.com/dockstoretestuser/dockerhubandgitlab/regular2", SCRIPT_FLAG });
         final long count4 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname like 'regular%' and ispublished='t'", long.class);
 
@@ -360,27 +360,27 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "test_parameter", "--entry",
             "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", "cwl", "--add", "test.cwl.json",
             // Trying to remove a non-existent parameter file now fails
-            "--add", "test2.cwl.json", "--add", "fake.cwl.json", /*"--remove", "notreal.cwl.json",*/ "--script" });
+            "--add", "test2.cwl.json", "--add", "fake.cwl.json", /*"--remove", "notreal.cwl.json",*/ SCRIPT_FLAG });
         final long count2 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals(2, count2, "there should be two sourcefiles that are test parameter files, there are " + count2);
 
         // Update tag with test parameters
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "test_parameter", "--entry",
             "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", "cwl", "--add", "test.cwl.json",
-            "--remove", "test2.cwl.json", "--script" });
+            "--remove", "test2.cwl.json", SCRIPT_FLAG });
         final long count3 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals(1, count3, "there should be one sourcefile that is a test parameter file, there are " + count3);
 
         // Update tag wdltest with test parameters
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "test_parameter", "--entry",
             "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", "wdl", "--add", "test.wdl.json",
-            "--script" });
+            SCRIPT_FLAG });
         final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='WDL_TEST_JSON'", long.class);
         assertEquals(1, count4, "there should be one sourcefile that is a wdl test parameter file, there are " + count4);
 
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "test_parameter", "--entry",
             "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", "cwl", "--add", "test.cwl.json",
-            "--script" });
+            SCRIPT_FLAG });
         final long count5 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='CWL_TEST_JSON'", long.class);
         assertEquals(2, count5, "there should be two sourcefiles that are test parameter files, there are " + count5);
 
@@ -466,7 +466,7 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), "--namespace", "dockstoretestuser", "--name", "private_test_repo", "--git-url",
             "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "tool1",
-            "--tool-maintainer-email", "testemail@domain.com", "--private", "true", "--script" });
+            "--tool-maintainer-email", "testemail@domain.com", "--private", "true", SCRIPT_FLAG });
 
         // The tool should be private, published and have the correct email
         final long count = testingPostgres.runSelectStatement(
@@ -477,21 +477,21 @@ class BasicIT extends BaseIT {
         // Manual publish public repo
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), "--namespace", "dockstoretestuser", "--name", "private_test_repo", "--git-url",
-            "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "tool2", "--script" });
+            "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "tool2", SCRIPT_FLAG });
 
         // NOTE: The tool should not have an associated email
 
         // Should not be able to convert to a private repo since it is published and has no email
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, ToolClient.UPDATE_TOOL, "--entry",
-                        "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool2", "--private", "true", "--script" }));
+                        "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool2", "--private", "true", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
 
         // Give the tool a tool maintainer email
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, ToolClient.UPDATE_TOOL, "--entry",
                 "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool2", "--private", "true", "--tool-maintainer-email",
-                "testemail@domain.com", "--script" });
+                "testemail@domain.com", SCRIPT_FLAG });
     }
 
     /**
@@ -505,7 +505,7 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "private_test_repo",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "tool1",
-            "--script" });
+            SCRIPT_FLAG });
 
         // NOTE: The tool should not have an associated email
 
@@ -513,7 +513,7 @@ class BasicIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, ToolClient.UPDATE_TOOL, "--entry",
                 "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool1", "--private", "true", "--tool-maintainer-email",
-                "testemail@domain.com", "--script" });
+                "testemail@domain.com", SCRIPT_FLAG });
 
         // The tool should be private, published and have the correct email
         final long count = testingPostgres.runSelectStatement(
@@ -524,7 +524,7 @@ class BasicIT extends BaseIT {
         // Convert the tool back to public
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, ToolClient.UPDATE_TOOL, "--entry",
-                "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool1", "--private", "false", "--script" });
+                "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool1", "--private", "false", SCRIPT_FLAG });
 
         // Check that the tool is no longer private
         final long count2 = testingPostgres.runSelectStatement(
@@ -545,14 +545,14 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "private_test_repo",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay-2.git", "--git-reference", "master", "--toolname", "tool1",
-            "--script" });
+            SCRIPT_FLAG });
 
         // NOTE: The tool should have an associated email
 
         // Make the tool private
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, ToolClient.UPDATE_TOOL, "--entry",
-                "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool1", "--private", "true", "--script" });
+                "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool1", "--private", "true", SCRIPT_FLAG });
 
         // The tool should be private, published and not have a maintainer email
         final long count = testingPostgres
@@ -563,7 +563,7 @@ class BasicIT extends BaseIT {
         // Convert the tool back to public
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, ToolClient.UPDATE_TOOL, "--entry",
-                "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool1", "--private", "false", "--script" });
+                "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool1", "--private", "false", SCRIPT_FLAG });
 
         // Check that the tool is no longer private
         final long count2 = testingPostgres.runSelectStatement(
@@ -575,7 +575,7 @@ class BasicIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, ToolClient.UPDATE_TOOL, "--entry",
                 "registry.hub.docker.com/dockstoretestuser/private_test_repo/tool1", "--private", "true", "--tool-maintainer-email",
-                "testemail2@domain.com", "--script" });
+                "testemail2@domain.com", SCRIPT_FLAG });
 
         // Check that the tool is no longer private
         final long count3 = testingPostgres.runSelectStatement(
@@ -594,7 +594,7 @@ class BasicIT extends BaseIT {
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
                         Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
                         "private_test_repo", "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference",
-                        "master", "--private", "true", "--script" }));
+                        "master", "--private", "true", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
@@ -610,7 +610,7 @@ class BasicIT extends BaseIT {
         catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.GITLAB.name(), Registry.GITLAB.toString(), "--namespace", "dockstore.test.user", "--name", "dockstore-whalesay",
             "--git-url", "git@gitlab.com:dockstore.test.user/dockstore-whalesay.git", "--git-reference", "master", "--toolname",
-            "alternate", "--private", "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--script" }));
+            "alternate", "--private", "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", SCRIPT_FLAG }));
 
         // Check that tool exists and is published
         final long count = testingPostgres
@@ -630,7 +630,7 @@ class BasicIT extends BaseIT {
             Registry.AMAZON_ECR.name(), "--namespace", "notarealnamespace", "--name", "notarealname", "--git-url",
             "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate", "--private",
             "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--custom-docker-path", "test.dkr.ecr.test.amazonaws.com",
-            "--script" });
+            SCRIPT_FLAG });
 
         // Check that tool is published and has correct values
         final long count = testingPostgres.runSelectStatement(
@@ -641,7 +641,7 @@ class BasicIT extends BaseIT {
         // Update tool to public (shouldn't work)
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "update_tool", "--entry",
-                        "test.dkr.ecr.test.amazonaws.com/notarealnamespace/notarealname/alternate", "--private", "false", "--script" }));
+                        "test.dkr.ecr.test.amazonaws.com/notarealnamespace/notarealname/alternate", "--private", "false", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
@@ -656,7 +656,7 @@ class BasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.SEVEN_BRIDGES.name(), "--namespace", "notarealnamespace", "--name", "notarealname", "--git-url",
             "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate", "--private",
-            "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--custom-docker-path", "images.sbgenomics.com", "--script" });
+            "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--custom-docker-path", "images.sbgenomics.com", SCRIPT_FLAG });
 
         // Check that tool is published and has correct values
         final long count = testingPostgres.runSelectStatement(
@@ -667,7 +667,7 @@ class BasicIT extends BaseIT {
         // Update tool to public (shouldn't work)
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "update_tool", "--entry",
-                        "images.sbgenomics.com/notarealnamespace/notarealname/alternate", "--private", "false", "--script" }));
+                        "images.sbgenomics.com/notarealnamespace/notarealname/alternate", "--private", "false", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
@@ -683,7 +683,7 @@ class BasicIT extends BaseIT {
             Registry.SEVEN_BRIDGES.name(), "--namespace", "notarealnamespace", "--name", "notarealname", "--git-url",
             "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate", "--private",
             "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--custom-docker-path", "test-images.sbgenomics.com",
-            "--script" });
+            SCRIPT_FLAG });
 
         // Check that tool is published and has correct values
         final long count = testingPostgres.runSelectStatement(
@@ -697,7 +697,7 @@ class BasicIT extends BaseIT {
                         Registry.SEVEN_BRIDGES.name(), "--namespace", "notarealnamespace", "--name", "notarealname", "--git-url",
                         "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
                         "--private", "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--custom-docker-path",
-                        "testimages.sbgenomics.com", "--script" }));
+                        "testimages.sbgenomics.com", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
@@ -711,7 +711,7 @@ class BasicIT extends BaseIT {
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
                         Registry.AMAZON_ECR.name(), "--namespace", "notarealnamespace", "--name", "notarealname", "--git-url",
                         "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
-                        "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--custom-docker-path", "amazon.registry", "--script" }));
+                        "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--custom-docker-path", "amazon.registry", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
@@ -725,7 +725,7 @@ class BasicIT extends BaseIT {
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
                         Registry.AMAZON_ECR.name(), "--namespace", "notarealnamespace", "--name", "notarealname", "--git-url",
                         "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
-                        "--private", "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", "--script" }));
+                        "--private", "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
@@ -734,7 +734,7 @@ class BasicIT extends BaseIT {
      */
     @Test
     void testPublishList() {
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", SCRIPT_FLAG });
         assertTrue(systemOutRule.getText().contains("quay.io/dockstoretestuser/noautobuild"),
                 "Should have contained the unpublished tool belonging to the user");
         assertFalse(systemOutRule.getText().contains("quay.io/test_org/test1"),
@@ -748,28 +748,28 @@ class BasicIT extends BaseIT {
 
         // manual publish the tool
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--entry",
-            "quay.io/dockstoretestuser/test_input_json", "--script" });
+            "quay.io/dockstoretestuser/test_input_json", SCRIPT_FLAG });
 
         // refresh the tool
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "refresh", "--entry",
-            "quay.io/dockstoretestuser/test_input_json", "--script" });
+            "quay.io/dockstoretestuser/test_input_json", SCRIPT_FLAG });
 
         // launch the tool
         systemOutRule.clear();
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "launch", "--entry",
-            "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+            "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),
                 "Output should indicate that checksums have been validated");
 
         // unpublish the tool
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
-            "quay.io/dockstoretestuser/test_input_json", "--script" });
+            "quay.io/dockstoretestuser/test_input_json", SCRIPT_FLAG });
 
         // launch the unpublished tool
         systemOutRule.clear();
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "launch", "--entry",
-            "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), "--script" });
+            "quay.io/dockstoretestuser/test_input_json", "--json", ResourceHelpers.resourceFilePath("tool_hello_world.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),
                 "Output should indicate that checksums have been validated");

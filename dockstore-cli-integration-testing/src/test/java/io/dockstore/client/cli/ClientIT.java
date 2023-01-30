@@ -48,6 +48,7 @@ import static io.dockstore.client.cli.Client.DEBUG_FLAG;
 import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.SERVER_METADATA;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
@@ -212,7 +213,7 @@ class ClientIT extends BaseIT {
     void launchingCWLWorkflow() throws IOException {
         final String firstWorkflowCWL = ResourceHelpers.resourceFilePath("1st-workflow.cwl");
         final String firstWorkflowJSON = ResourceHelpers.resourceFilePath("1st-workflow-job.json");
-        Client.main(new String[] { "--script", CONFIG, TestUtility.getConfigFileLocation(true), WORKFLOW, "launch", "--local-entry",
+        Client.main(new String[] { SCRIPT_FLAG, CONFIG, TestUtility.getConfigFileLocation(true), WORKFLOW, "launch", "--local-entry",
             firstWorkflowCWL, "--json", firstWorkflowJSON });
     }
 
@@ -220,7 +221,7 @@ class ClientIT extends BaseIT {
     @Category(ToilCompatibleTest.class)
     void launchingCWLToolWithRemoteParameters() throws IOException {
         Client.main(
-            new String[] { "--script", CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "launch", "--local-entry", FIRST_TOOL,
+            new String[] { SCRIPT_FLAG, CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "launch", "--local-entry", FIRST_TOOL,
                 "--json",
                 "https://raw.githubusercontent.com/dockstore/dockstore/f343bcd6e4465a8ef790208f87740bd4d5a9a4da/dockstore-client/src/test/resources/test.cwl.json" });
     }

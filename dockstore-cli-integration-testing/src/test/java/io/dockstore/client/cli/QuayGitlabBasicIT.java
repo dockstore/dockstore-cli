@@ -119,7 +119,7 @@ class QuayGitlabBasicIT extends BaseIT {
     void testQuayGitlabManuallyRegisterDuplicate() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgitlab",
-                "--git-url", "git@gitlab.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--script" }));
+                "--git-url", "git@gitlab.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
