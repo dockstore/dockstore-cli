@@ -14,6 +14,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
@@ -167,7 +168,7 @@ class QuayGitHubBasicIT extends BaseIT {
         assertTrue(secondWorkflowCount > 0, "should find non-zero number of workflows");
 
         // refresh a specific workflow
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" });
 
         // artificially create an invalid version
@@ -175,7 +176,7 @@ class QuayGitHubBasicIT extends BaseIT {
         testingPostgres.runUpdateStatement("update workflowversion set reference = 'test'");
 
         // refresh
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" });
 
         // check that the version was deleted
@@ -193,7 +194,7 @@ class QuayGitHubBasicIT extends BaseIT {
         assertTrue(nfWorkflowCount > 0, "should find non-zero number of next flow workflows");
 
         // refresh
-        catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "refresh", "--entry",
+        catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "refresh", "--entry",
                 SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" }));
         final long thirdWorkflowCount = testingPostgres.runSelectStatement("select count(*) from workflow", long.class);
         assertEquals(secondWorkflowCount, thirdWorkflowCount, "there should be no change in count of workflows");

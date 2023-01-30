@@ -6,6 +6,8 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
+import static io.dockstore.client.cli.Client.HELP;
+
 public class WesCommandParser {
 
     public WesMain wesMain;
@@ -47,7 +49,7 @@ public class WesCommandParser {
     public static class WesMain {
         @Parameter(names = "--wes-url", description = "The URL of the WES server.", required = false)
         private String wesUrl = null;
-        @Parameter(names = "--help", description = "Prints help for launch command", help = true)
+        @Parameter(names = HELP, description = "Prints help for launch command", help = true)
         private boolean help = false;
         @Parameter(names = "--verbose", description = "Sets the CLI to verbose mode.")
         private boolean verbose = false;

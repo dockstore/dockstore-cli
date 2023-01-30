@@ -86,6 +86,8 @@ import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.SCRIPT;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 
 /**
  * Grouping code for launching CWL tools and workflows
@@ -339,14 +341,14 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                 } else if (matchSteps.find()) {
                     stepsFound = true;
                 } else {
-                    if (abstractEntryClient.getEntryType().equalsIgnoreCase("workflow") && matchWf.find()) {
+                    if (abstractEntryClient.getEntryType().equalsIgnoreCase(WORKFLOW) && matchWf.find()) {
                         classWfFound = true;
-                    } else if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool") && matchTool.find()) {
+                    } else if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL) && matchTool.find()) {
                         classToolFound = true;
-                    } else if ((abstractEntryClient.getEntryType().equalsIgnoreCase("tool") && matchWf.find())) {
+                    } else if ((abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL) && matchWf.find())) {
                         errorMessage("Expected a tool but the CWL file specified a workflow. Use 'dockstore workflow launch ...' instead.",
                             CLIENT_ERROR);
-                    } else if (abstractEntryClient.getEntryType().equalsIgnoreCase("workflow") && matchTool.find()) {
+                    } else if (abstractEntryClient.getEntryType().equalsIgnoreCase(WORKFLOW) && matchTool.find()) {
                         errorMessage("Expected a workflow but the CWL file specified a tool. Use 'dockstore tool launch ...' instead.",
                             CLIENT_ERROR);
                     }

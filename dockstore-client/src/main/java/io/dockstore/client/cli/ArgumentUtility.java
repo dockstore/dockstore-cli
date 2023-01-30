@@ -23,8 +23,12 @@ import java.util.List;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.Workflow;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static io.dockstore.client.cli.Client.HELP;
+import static java.lang.Math.max;
 
 /**
  * Organizes all methods that have to do with parsing of input and creation of output.
@@ -41,6 +45,7 @@ public final class ArgumentUtility {
     public static final String DESCRIPTION_HEADER = "DESCRIPTION";
     public static final String GIT_HEADER = "GIT REPO";
     public static final int MAX_DESCRIPTION = 50;
+    public static final int LEV_THRESHOLD = 5;
 
     private static final Logger LOG = LoggerFactory.getLogger(ArgumentUtility.class);
 
@@ -206,7 +211,7 @@ public final class ArgumentUtility {
     }
 
     static boolean isHelpRequest(String first) {
-        return "-h".equals(first) || "--help".equals(first);
+        return "-h".equals(first) || HELP.equals(first);
     }
 
     public static boolean containsHelpRequest(List<String> args) {
@@ -260,8 +265,51 @@ public final class ArgumentUtility {
         out("");
     }
 
-    public static void invalid(String cmd) {
-        errorMessage("dockstore: " + cmd + " is not a dockstore command. See 'dockstore --help'.", Client.CLIENT_ERROR);
+    public static List<String> minDistance(String invalidCommand, List<String> possibleCommands) {
+        List<String> minDistanceArray = new ArrayList<String>();
+        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
+        int minDistance = -1;
+        for (String str: possibleCommands) {
+            int distance = levenshteinDistance.apply(str, invalidCommand);
+            if (distance >= max(str.length(), invalidCommand.length())) {
+                continue;
+            } else if (distance < minDistance || minDistance == -1) {
+                minDistance = distance;
+                minDistanceArray.clear();
+                minDistanceArray.add(str);
+            } else if (distance == minDistance) {
+                minDistanceArray.add(str);
+            }
+        }
+        return minDistanceArray;
+    }
+
+    public static void invalid(String correctCommand, String invalidCommand, List<String> possibleCommands) {
+
+        List<String> mostSimilarCommands = minDistance(invalidCommand.toLowerCase(), possibleCommands);
+        String formattedCorrectCommand;
+        if (correctCommand.isBlank()) {
+            formattedCorrectCommand = "";
+        } else {
+            formattedCorrectCommand = " " + correctCommand;
+        }
+
+        out("dockstore" + formattedCorrectCommand + ": \'" + invalidCommand + "\'" + " is not a dockstore command. "
+                + "See 'dockstore" + formattedCorrectCommand + " --help'.");
+
+        if (mostSimilarCommands.isEmpty()) {
+            return;
+        } else if (mostSimilarCommands.size() == 1) {
+            out("");
+            out("The most similar command is:");
+        } else {
+            out("");
+            out("The most similar commands are:");
+        }
+        for (String possibleCommand: mostSimilarCommands) {
+            out("    " + possibleCommand);
+        }
+
     }
 
     static boolean flag(List<String> args, String flag) {

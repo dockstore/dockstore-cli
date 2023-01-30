@@ -121,6 +121,8 @@ import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
 import static io.dockstore.common.DescriptorLanguage.WDL;
@@ -144,7 +146,7 @@ public abstract class AbstractEntryClient<T> {
     public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
     public static final String MULTIPLE_TEST_FILE_ERROR_MESSAGE = "If specifying a test parameter file, use either --json or --yaml, but not both.";
 
-    private static final String WORKFLOW = "workflow";
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
 
     protected boolean isAdmin = false;
@@ -644,7 +646,9 @@ public abstract class AbstractEntryClient<T> {
                     handleEntry2json(args);
                     break;
                 default:
-                    invalid(cmd);
+                    List<String> placeholder = new ArrayList<String>();
+                    placeholder.add("hold");
+                    invalid(cmd, "", placeholder);
                     break;
                 }
             }
@@ -756,7 +760,7 @@ public abstract class AbstractEntryClient<T> {
 
             String parentEntry = optVal(args, "--parent-entry", entry);
 
-            if (getEntryType().equalsIgnoreCase("tool")) {
+            if (getEntryType().equalsIgnoreCase(TOOL)) {
                 descriptorType = reqVal(args, "--descriptor-type").toUpperCase();
                 boolean validType = false;
                 for (DescriptorLanguage type : DescriptorLanguage.values()) {
@@ -860,7 +864,7 @@ public abstract class AbstractEntryClient<T> {
         Optional<DescriptorLanguage> optExt = checkFileExtension(file.getPath());     //file extension could be cwl,wdl or ""
 
         if (!file.exists() || file.isDirectory()) {
-            if (getEntryType().equalsIgnoreCase("tool")) {
+            if (getEntryType().equalsIgnoreCase(TOOL)) {
                 errorMessage("The tool file " + file.getPath() + " does not exist. Did you mean to launch a remote tool or a workflow?",
                     ENTRY_NOT_FOUND);
             } else {
@@ -1702,7 +1706,7 @@ public abstract class AbstractEntryClient<T> {
         out("  --entry <entry>                                                          Complete " + getEntryType()
                 + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --version <version>                                                      " + getEntryType() + " version name");
-        if (getEntryType().equalsIgnoreCase("tool")) {
+        if (getEntryType().equalsIgnoreCase(TOOL)) {
             out("  --descriptor-type <descriptor-type>                                      " + DescriptorLanguage.CWL.toString() + "/" + DescriptorLanguage.WDL.toString());
         }
         out("");

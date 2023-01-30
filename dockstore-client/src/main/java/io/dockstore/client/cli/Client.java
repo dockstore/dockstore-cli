@@ -107,11 +107,20 @@ public class Client {
     public static final AtomicBoolean INFO = new AtomicBoolean(false);
     public static final AtomicBoolean SCRIPT = new AtomicBoolean(false);
     public static final String DEPRECATED_PORT_MESSAGE = "Dockstore webservice has deprecated port 8443 and may remove it without warning. Please use 'https://dockstore.org/api' via the Dockstore config file (\"~/.dockstore/config\" by default) instead.";
-    private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
 
-    private static final Logger LOG = LoggerFactory.getLogger(Client.class);
+    // Command Names
+    public static final String TOOL = "tool";
+    public static final String WORKFLOW = "workflow";
+    public static final String CHECKER = "checker";
+    public static final String PLUGIN = "plugin";
+    public static final String DEPS = "deps";
+    public static final String DEBUG_FLAG = "--debug";
+
+    public static final String HELP = "--help";
     private static ObjectMapper objectMapper;
 
+    private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
+    private static final Logger LOG = LoggerFactory.getLogger(Client.class);
     private String configFile = null;
     private String serverUrl = null;
     private Ga4GhApi ga4ghApi;
@@ -587,19 +596,19 @@ public class Client {
         out("Usage: dockstore [mode] [flags] [command] [command parameters]");
         out("");
         out("Modes:");
-        out("   tool                Puts dockstore into tool mode.");
-        out("   workflow            Puts dockstore into workflow mode.");
-        out("   checker             Puts dockstore into checker mode.");
-        out("   plugin              Configure and debug plugins.");
-        out("   deps                Print tool/workflow runner dependencies.");
+        out("   " + TOOL + "                Puts dockstore into " + TOOL + " mode.");
+        out("   " + WORKFLOW + "            Puts dockstore into " + WORKFLOW + " mode.");
+        out("   " + CHECKER + "             Puts dockstore into " + CHECKER + " mode.");
+        out("   " + PLUGIN + "              Configure and debug plugins.");
+        out("   " + DEPS + "                Print tool/workflow runner dependencies.");
         out("   " + YAML + "                Puts dockstore into " + YAML + " mode.");
         out("");
         printLineBreak();
         out("");
         out("Flags:");
-        out("  --help               Print help information");
+        out("  " + HELP + "               Print help information");
         out("                       Default: false");
-        out("  --debug              Print debugging information");
+        out("  " + DEBUG_FLAG + "              Print debugging information");
         out("                       Default: false");
         out("  --version            Print dockstore's version");
         out("                       Default: false");
@@ -671,7 +680,7 @@ public class Client {
 
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)org.slf4j.LoggerFactory
                 .getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        if (flag(args, "--debug") || flag(args, "--d")) {
+        if (flag(args, DEBUG_FLAG) || flag(args, "--d")) {
             DEBUG.set(true);
             // turn on logback
             root.setLevel(Level.DEBUG);
@@ -706,18 +715,18 @@ public class Client {
                     // see if this is a tool command
                     boolean handled = false;
                     AbstractEntryClient targetClient = null;
-                    if ("tool".equals(mode)) {
+                    if (TOOL.equals(mode)) {
                         targetClient = getToolClient();
-                    } else if ("workflow".equals(mode)) {
+                    } else if (WORKFLOW.equals(mode)) {
                         targetClient = getWorkflowClient();
-                    } else if ("plugin".equals(mode)) {
+                    } else if (PLUGIN.equals(mode)) {
                         handled = PluginClient.handleCommand(args, Utilities.parseConfig(configFile));
                     } else if ("search".equals(mode)) {
                         handled = SearchClient.handleCommand(args, this.extendedGA4GHApi);
-                    } else if ("checker".equals(mode)) {
+                    } else if (CHECKER.equals(mode)) {
                         targetClient = getCheckerClient();
-                    } else if ("deps".equals(mode)) {
-                        args.add(0, "deps");
+                    } else if (DEPS.equals(mode)) {
+                        args.add(0, DEPS);
                         String[] argsArray = new String[args.size()];
                         argsArray = args.toArray(argsArray);
                         handled = DepCommand.handleDepCommand(argsArray);
@@ -771,7 +780,11 @@ public class Client {
                             clean();
                             break;
                         default:
-                            invalid(cmd);
+                            List<String> possibleCommands = new ArrayList<String>();
+                            possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML,
+                                    HELP, DEBUG_FLAG, "--version", "--server-metadata", "--upgrade",
+                                    "--upgrade-stable", "--upgrade-unstable", "--config", "--script", "--clean-cache"));
+                            invalid("", cmd, possibleCommands);
                             break;
                         }
                     }

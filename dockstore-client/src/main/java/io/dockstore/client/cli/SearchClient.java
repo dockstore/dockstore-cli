@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 
 /**
@@ -80,7 +82,7 @@ public final class SearchClient {
         jcPlugin.parse(argv);
         try {
             if (args.isEmpty() || searchPlugin.help) {
-                printJCommanderHelp(jc, "dockstore", "plugin");
+                printJCommanderHelp(jc, "dockstore", PLUGIN);
             } else {
                 switch (jcPlugin.getParsedCommand()) {
                 case "index":
@@ -140,19 +142,19 @@ public final class SearchClient {
 
     @Parameters(separators = "=", commandDescription = "Search operations")
     private static class SearchPlugin {
-        @Parameter(names = "--help", description = "Prints help for search in general command", help = true)
+        @Parameter(names = HELP, description = "Prints help for search in general command", help = true)
         private boolean help = false;
     }
 
     @Parameters(separators = "=", commandDescription = "Trigger an explicit index update, should be admin-only eventually")
     private static class IndexPlugin {
-        @Parameter(names = "--help", description = "Prints help for index command", help = true)
+        @Parameter(names = HELP, description = "Prints help for index command", help = true)
         private boolean help = false;
     }
 
     @Parameters(separators = "=", commandDescription = "Search currently published tools and workflows")
     private static class SearchPluginList {
-        @Parameter(names = "--help", description = "Prints help for search command ", help = true)
+        @Parameter(names = HELP, description = "Prints help for search command ", help = true)
         private boolean help = false;
     }
 

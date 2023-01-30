@@ -28,6 +28,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -87,8 +88,8 @@ class YamlClientIT extends BaseIT {
 
     @Test
     void testHelpCommands() throws Exception {
-        checkCommandForHelp(new String[]{YAML, "--help"}, yamlHelpMsg);
-        checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME, "--help"}, validateHelpMsg);
+        checkCommandForHelp(new String[]{YAML, HELP}, yamlHelpMsg);
+        checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME, HELP}, validateHelpMsg);
     }
 
 

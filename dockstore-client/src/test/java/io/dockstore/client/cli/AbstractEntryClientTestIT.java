@@ -15,6 +15,8 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -51,9 +53,9 @@ class AbstractEntryClientTestIT {
             String[] commandStatement;
 
             if (command.length() == 0) {
-                commandStatement = new String[]{ "workflow", "wes", "--help", "--config", clientConfig };
+                commandStatement = new String[]{ WORKFLOW, "wes", HELP, "--config", clientConfig };
             } else {
-                commandStatement = new String[]{ "workflow", "wes", command, "--help", "--config", clientConfig };
+                commandStatement = new String[]{ WORKFLOW, "wes", command, HELP, "--config", clientConfig };
             }
 
             Client.main(commandStatement);
@@ -65,9 +67,9 @@ class AbstractEntryClientTestIT {
             String[] commandStatement;
 
             if (command.length() == 0) {
-                commandStatement = new String[]{ "workflow", "wes", "--help", "--config", CONFIG_NO_CONTENT_RESOURCE};
+                commandStatement = new String[]{ WORKFLOW, "wes", HELP, "--config", CONFIG_NO_CONTENT_RESOURCE};
             } else {
-                commandStatement = new String[]{ "workflow", "wes", command, "--help", "--config", CONFIG_NO_CONTENT_RESOURCE};
+                commandStatement = new String[]{ WORKFLOW, "wes", command, HELP, "--config", CONFIG_NO_CONTENT_RESOURCE};
             }
 
             Client.main(commandStatement);

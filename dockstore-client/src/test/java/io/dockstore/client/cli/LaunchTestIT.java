@@ -42,6 +42,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -211,7 +212,7 @@ class LaunchTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("smcFusionQuant-INTEGRATE-workflow.cwl"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("convert");
         args.add("cwl2json");
         args.add("--cwl");
@@ -703,7 +704,7 @@ class LaunchTestIT {
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("dir6.cwl.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--local-entry");
         args.add(cwlFile.getAbsolutePath());
@@ -889,7 +890,7 @@ class LaunchTestIT {
         File helloWdl = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("testInvalidJSON.json"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--local-entry");
         args.add(helloWdl.getAbsolutePath());
@@ -929,7 +930,7 @@ class LaunchTestIT {
         File helloJSON = new File(ResourceHelpers.resourceFilePath("helloSpaces.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--local-entry");
         args.add(helloWDL.getAbsolutePath());
@@ -949,7 +950,7 @@ class LaunchTestIT {
         // Cromwell workflow engine.
         File file = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
@@ -967,7 +968,7 @@ class LaunchTestIT {
         // Cromwell workflow engine.
         File file = new File(ResourceHelpers.resourceFilePath("no-input-echo.wdl"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
@@ -984,7 +985,7 @@ class LaunchTestIT {
         // test parameter files.
         File file = new File(ResourceHelpers.resourceFilePath("no-input-echo.cwl"));
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--local-entry");
         args.add(file.getAbsolutePath());

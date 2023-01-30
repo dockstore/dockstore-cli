@@ -5,6 +5,7 @@ import com.beust.jcommander.ParameterException;
 import io.dockstore.client.cli.nested.WesCommandParser;
 import org.junit.jupiter.api.Test;
 
+import static io.dockstore.client.cli.Client.HELP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -16,7 +17,7 @@ class WesCommandParserTest {
     @Test
     void testWesMainHelp() {
         final String[] args = {
-            "--help"
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -58,7 +59,7 @@ class WesCommandParserTest {
     void testCommandLaunchHelp() {
         final String[] args = {
             "launch",
-            "--help"
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -175,7 +176,7 @@ class WesCommandParserTest {
     void testCommandCancelHelp() {
         final String[] args = {
             "cancel",
-            "--help"
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -236,7 +237,7 @@ class WesCommandParserTest {
     void testCommandStatusHelp() {
         final String[] args = {
             "status",
-            "--help"
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -260,7 +261,7 @@ class WesCommandParserTest {
     void testCommandServiceInfoHelp() {
         final String[] args = {
             "service-info",
-            "--help"
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -273,7 +274,7 @@ class WesCommandParserTest {
     void testCommandRunListHelp() {
         final String[] args = {
             "list",
-            "--help"
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -306,7 +307,7 @@ class WesCommandParserTest {
     void testCommandRunLogsHelp() {
         final String[] args = {
             "logs",
-            "--help"
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();

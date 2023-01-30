@@ -29,6 +29,7 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -60,7 +61,7 @@ public class WorkflowInDirectoryTestIT {
     public void testWorkflowRunInDirectory() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow-job.yml"));
-        this.baseWorkflowTest(cwlFile, cwlJSON, false, "workflow");
+        this.baseWorkflowTest(cwlFile, cwlJSON, false, WORKFLOW);
     }
 
     /**
@@ -71,7 +72,7 @@ public class WorkflowInDirectoryTestIT {
     public void testWorkflowWithEmptyHints() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow-empty-hints.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow-job.yml"));
-        this.baseWorkflowTest(cwlFile, cwlJSON, true, "workflow");
+        this.baseWorkflowTest(cwlFile, cwlJSON, true, WORKFLOW);
     }
 
     /**
@@ -81,7 +82,7 @@ public class WorkflowInDirectoryTestIT {
     public void testWorkflowRunInDirectorySecondaryFileExtensions() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflowArrayedOutput.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow-jobArrayedOutput.json"));
-        this.baseWorkflowTest(cwlFile, cwlJSON, false, "workflow");
+        this.baseWorkflowTest(cwlFile, cwlJSON, false, WORKFLOW);
     }
 
     /**
@@ -91,7 +92,7 @@ public class WorkflowInDirectoryTestIT {
     public void testWorkflowRunInDirectorySecondaryFileByPaths() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflowArrayedOutput.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("testDirectory2/1st-workflow-jobArrayedOutput2.json"));
-        this.baseWorkflowTest(cwlFile, cwlJSON, false, "workflow");
+        this.baseWorkflowTest(cwlFile, cwlJSON, false, WORKFLOW);
     }
 
     /**
@@ -108,7 +109,7 @@ public class WorkflowInDirectoryTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow-job.json"));
         exit.expectSystemExitWithStatus(Client.IO_ERROR);
-        this.baseWorkflowTest(cwlFile, cwlJSON, true, "workflow");
+        this.baseWorkflowTest(cwlFile, cwlJSON, true, WORKFLOW);
         assertTrue(systemErrRule.getLog().contains("Missing required secondary file"));
     }
 
@@ -120,7 +121,7 @@ public class WorkflowInDirectoryTestIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow-no-secondary-in-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("directory/1st-workflow-job.json"));
         exit.expectSystemExitWithStatus(3);
-        this.baseWorkflowTest(cwlFile, cwlJSON, true, "workflow");
+        this.baseWorkflowTest(cwlFile, cwlJSON, true, WORKFLOW);
         assertTrue(systemErrRule.getLog().contains("Missing required secondary file"));
     }
 
@@ -128,7 +129,7 @@ public class WorkflowInDirectoryTestIT {
     public void testJeltjeWorkflow() {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("testDirectory3/workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("testDirectory3/workflow.json"));
-        this.baseWorkflowTest(cwlFile, cwlJSON, false, "workflow");
+        this.baseWorkflowTest(cwlFile, cwlJSON, false, WORKFLOW);
     }
 
     /**

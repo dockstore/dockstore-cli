@@ -20,6 +20,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.Assert.assertTrue;
 
 public class LaunchTestYamlIT {
@@ -45,7 +46,7 @@ public class LaunchTestYamlIT {
 
     @Test
     public void yamlAndJsonWorkflowCorrect() {
-        yamlAndJsonEntryCorrect("workflow");
+        yamlAndJsonEntryCorrect(WORKFLOW);
     }
 
     @Test
@@ -71,7 +72,7 @@ public class LaunchTestYamlIT {
     public void testMaliciousParameterYaml() {
         File yamlTestParameterFile = new File(ResourceHelpers.resourceFilePath("malicious.input.yaml"));
 
-        List<String> args = getLaunchStringList("workflow");
+        List<String> args = getLaunchStringList(WORKFLOW);
         args.add("--yaml");
         args.add(yamlTestParameterFile.getAbsolutePath());
         exit.expectSystemExit();
@@ -88,7 +89,7 @@ public class LaunchTestYamlIT {
         File helloYAML = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--entry");
         args.add(file.getAbsolutePath());
@@ -109,7 +110,7 @@ public class LaunchTestYamlIT {
 
     @Test
     public void wdlWorkflowCorrectFlags() {
-        wdlEntryCorrectFlags("workflow");
+        wdlEntryCorrectFlags(WORKFLOW);
     }
 
     @Test

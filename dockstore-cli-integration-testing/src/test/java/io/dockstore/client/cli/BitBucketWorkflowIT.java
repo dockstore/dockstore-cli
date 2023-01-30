@@ -16,6 +16,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -50,17 +51,17 @@ class BitBucketWorkflowIT extends BaseIT {
     void testRefreshAndConvertWithImportsWDL() {
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "update_workflow", "--entry",
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--descriptor-type", "wdl",
                 "--workflow-path", "/Dockstore.wdl", "--default-test-parameter-path", "/foo.json", "--script" });
 
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--script" });
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
             SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--script" });
 
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "convert", "entry2json", "--entry",
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "convert", "entry2json", "--entry",
                 SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow:wdl_import", "--script" });
         assertTrue(systemOutRule.getText().contains("\"three_step.cgrep.pattern\": \"String\""));
     }
@@ -72,7 +73,7 @@ class BitBucketWorkflowIT extends BaseIT {
     void testManualPublishBitbucket() {
         // manual publish
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "manual_publish", "--repository",
                 "dockstore-workflow", "--organization", "dockstore_testuser2", "--git-version-control", "bitbucket", "--workflow-name",
                 "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
 
@@ -87,7 +88,7 @@ class BitBucketWorkflowIT extends BaseIT {
         assertEquals(0, count2, "All Bitbucket workflow versions should have last modified populated when manual published");
 
         // grab wdl file
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "wdl", "--entry",
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "wdl", "--entry",
             SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow/testname:wdl_import", "--script" });
     }
 

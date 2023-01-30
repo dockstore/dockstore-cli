@@ -11,6 +11,8 @@ import io.swagger.client.Configuration;
 import io.swagger.client.api.MetadataApi;
 
 import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.Client.DEPS;
+import static io.dockstore.client.cli.Client.HELP;
 
 /**
  * @author gluu
@@ -28,10 +30,10 @@ public final class DepCommand {
     public static boolean handleDepCommand(String[] args) {
         CommandDep commandDep = new CommandDep();
         JCommander jCommanderMain = new JCommander();
-        JCommanderUtility.addCommand(jCommanderMain, "deps", commandDep);
+        JCommanderUtility.addCommand(jCommanderMain, DEPS, commandDep);
         jCommanderMain.parse(args);
         if (commandDep.help) {
-            JCommanderUtility.printJCommanderHelp(jCommanderMain, "dockstore", "deps");
+            JCommanderUtility.printJCommanderHelp(jCommanderMain, "dockstore", DEPS);
         } else {
             ApiClient defaultApiClient;
             defaultApiClient = Configuration.getDefaultApiClient();
@@ -56,7 +58,7 @@ public final class DepCommand {
         private String pythonVersion = "3";
         // @Parameter(names = "--runner", description = "tool/workflow runner. Available options: 'cwltool'")
         private String runner = "cwltool";
-        @Parameter(names = "--help", description = "Prints help for deps", help = true)
+        @Parameter(names = HELP, description = "Prints help for deps", help = true)
         private boolean help = false;
     }
 }

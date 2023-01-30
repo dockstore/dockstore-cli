@@ -16,9 +16,8 @@
 
 package io.dockstore.client.cli;
 
-import io.dockstore.common.FlushingSystemErr;
-import io.dockstore.common.FlushingSystemOut;
-import org.apache.commons.text.similarity.LevenshteinDistance;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,10 +27,9 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.DEPS;
+import static io.dockstore.client.cli.Client.PLUGIN;
 import static org.junit.Assert.assertTrue;
 
 @ExtendWith(SystemStubsExtension.class)
@@ -49,14 +47,14 @@ public class SuggestClosestMatchTest {
 
         acceptedCommands.add("orange");
         acceptedCommands.add("juice");
-        List<String> result = ArgumentUtility.minDistance("oran",acceptedCommands);
+        List<String> result = ArgumentUtility.minDistance("oran", acceptedCommands);
         Assertions.assertEquals(1, result.size());
         assertTrue(result.contains("orange"));
 
         acceptedCommands.add("test1");
         acceptedCommands.add("test2");
         acceptedCommands.add("test3");
-        result = ArgumentUtility.minDistance("test7",acceptedCommands);
+        result = ArgumentUtility.minDistance("test7", acceptedCommands);
         Assertions.assertEquals(3, result.size());
         assertTrue(result.contains("test1"));
         assertTrue(result.contains("test2"));
@@ -71,12 +69,11 @@ public class SuggestClosestMatchTest {
         // The threshold could change, but these should never return a result
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add("abcdefgh");
-        assertTrue(ArgumentUtility.minDistance("b",acceptedCommands).isEmpty());
-        assertTrue(ArgumentUtility.minDistance("zzzzzzzzzzzz",acceptedCommands).isEmpty());
+        assertTrue(ArgumentUtility.minDistance("zzzzzzzzzzzz", acceptedCommands).isEmpty());
         acceptedCommands.add("bbbbbbbb");
-        assertTrue(ArgumentUtility.minDistance("cccccc",acceptedCommands).isEmpty());
+        assertTrue(ArgumentUtility.minDistance("qqqqqqq", acceptedCommands).isEmpty());
         acceptedCommands.add("fffffffff");
-        assertTrue(ArgumentUtility.minDistance("pppppppp",acceptedCommands).isEmpty());
+        assertTrue(ArgumentUtility.minDistance("pppppppp", acceptedCommands).isEmpty());
     }
 
     @Test
@@ -85,29 +82,29 @@ public class SuggestClosestMatchTest {
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add("tool");
         acceptedCommands.add("workflow");
-        acceptedCommands.add("checker");
-        acceptedCommands.add("plugin");
-        acceptedCommands.add("deps");
+        acceptedCommands.add(CHECKER);
+        acceptedCommands.add(PLUGIN);
+        acceptedCommands.add(DEPS);
         acceptedCommands.add("yaml");
         ArgumentUtility.invalid("", "z", acceptedCommands);
         Assertions.assertEquals("dockstore: 'z' is not a dockstore command. See 'dockstore --help'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        ArgumentUtility.invalid("", "ffzz", acceptedCommands);
-        Assertions.assertEquals("dockstore: 'ffzz' is not a dockstore command. See 'dockstore --help'.\n",
+        ArgumentUtility.invalid("", "xxzz", acceptedCommands);
+        Assertions.assertEquals("dockstore: 'xxzz' is not a dockstore command. See 'dockstore --help'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        ArgumentUtility.invalid("random_command_1", "ffzz", acceptedCommands);
-        Assertions.assertEquals("dockstore random_command_1: 'ffzz' is not a dockstore command. " +
-                        "See 'dockstore random_command_1 --help'.\n",
+        ArgumentUtility.invalid("random_command_1", "xxzz", acceptedCommands);
+        Assertions.assertEquals("dockstore random_command_1: 'xxzz' is not a dockstore command. "
+                        + "See 'dockstore random_command_1 --help'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        ArgumentUtility.invalid("random_command_1 random_command_2", "ffzz", acceptedCommands);
-        Assertions.assertEquals("dockstore random_command_1 random_command_2: 'ffzz' is not a dockstore command. " +
-                        "See 'dockstore random_command_1 random_command_2 --help'.\n",
+        ArgumentUtility.invalid("random_command_1 random_command_2", "xxzz", acceptedCommands);
+        Assertions.assertEquals("dockstore random_command_1 random_command_2: 'xxzz' is not a dockstore command. "
+                        + "See 'dockstore random_command_1 random_command_2 --help'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
     }
@@ -121,9 +118,9 @@ public class SuggestClosestMatchTest {
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add("tool");
         acceptedCommands.add("workflow");
-        acceptedCommands.add("checker");
-        acceptedCommands.add("plugin");
-        acceptedCommands.add("deps");
+        acceptedCommands.add(CHECKER);
+        acceptedCommands.add(PLUGIN);
+        acceptedCommands.add(DEPS);
         acceptedCommands.add("yaml");
 
         ArgumentUtility.invalid("", "CHECKER", acceptedCommands);
@@ -175,9 +172,9 @@ public class SuggestClosestMatchTest {
         systemOutRule.clear();
 
         acceptedCommands.add("workflow");
-        acceptedCommands.add("checker");
-        acceptedCommands.add("plugin");
-        acceptedCommands.add("deps");
+        acceptedCommands.add(CHECKER);
+        acceptedCommands.add(PLUGIN);
+        acceptedCommands.add(DEPS);
         acceptedCommands.add("yaml");
 
         ArgumentUtility.invalid("", "pluggn", acceptedCommands);
@@ -207,10 +204,10 @@ public class SuggestClosestMatchTest {
         systemOutRule.clear();
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add("workflow");
-        acceptedCommands.add("checker");
+        acceptedCommands.add(CHECKER);
         acceptedCommands.add("test1");
-        acceptedCommands.add("plugin");
-        acceptedCommands.add("deps");
+        acceptedCommands.add(PLUGIN);
+        acceptedCommands.add(DEPS);
         acceptedCommands.add("test2");
         acceptedCommands.add("yaml");
 

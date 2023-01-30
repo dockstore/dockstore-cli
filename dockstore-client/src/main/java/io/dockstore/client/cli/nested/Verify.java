@@ -14,6 +14,7 @@ import io.swagger.client.Configuration;
 import io.swagger.client.api.ExtendedGa4GhApi;
 
 import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.Client.HELP;
 
 /**
  * @author gluu
@@ -70,7 +71,7 @@ final class Verify {
         private boolean unverify;
         @Parameter(names = "--metadata", description = "Additional information on the verification (notes, explanation)", required = true)
         private String metadata;
-        @Parameter(names = "--help", description = "Prints help for verify", help = true)
+        @Parameter(names = HELP, description = "Prints help for verify", help = true)
         private boolean help = false;
     }
 }

@@ -22,6 +22,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -226,7 +227,7 @@ class LaunchNoInternetTestIT {
             fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());
@@ -253,7 +254,7 @@ class LaunchNoInternetTestIT {
             fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
+        args.add(WORKFLOW);
         args.add("launch");
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());

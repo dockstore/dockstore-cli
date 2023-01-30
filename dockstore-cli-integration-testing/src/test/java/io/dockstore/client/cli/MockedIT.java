@@ -49,6 +49,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static io.dockstore.client.cli.Client.TOOL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -138,7 +139,7 @@ public class MockedIT {
 
     @Test
     public void runLaunchOneJson() throws IOException, ApiException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry",
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry",
             "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testOneRun.json"), "--script", "--ignore-checksums" });
 
         assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
@@ -147,7 +148,7 @@ public class MockedIT {
     // TODO: This is returning false positives, disabling for now until we add array support
     @Ignore
     public void runLaunchNJson() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry",
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry",
             "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testMultipleRun.json"),
             "--script" });
     }
@@ -161,7 +162,7 @@ public class MockedIT {
     @Test
     public void runLaunchOneLocalArrayedJson() throws IOException, ApiException {
         Client.main(
-            new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry", "quay.io/collaboratory/arrays",
+            new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry", "quay.io/collaboratory/arrays",
                 "--json", ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
 
         assertTrue(new File("/tmp/example.bedGraph").exists());
@@ -181,7 +182,7 @@ public class MockedIT {
 
         Client.main(new String[] { "--clean-cache", "--config", configFileLocation, "--script" });
         // this is kind of redundant, it looks like we take the mocked config file no matter what
-        Client.main(new String[] { "--config", configFileLocation, "tool", "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
+        Client.main(new String[] { "--config", configFileLocation, TOOL, "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
             ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
 
         assertTrue(new File("/tmp/example.bedGraph").exists());
@@ -189,7 +190,7 @@ public class MockedIT {
         systemOutRule.clearLog();
 
         // try again, things should be cached now
-        Client.main(new String[] { "--config", configFileLocation, "tool", "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
+        Client.main(new String[] { "--config", configFileLocation, TOOL, "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
             ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
         assertEquals("output should contain only hard linking", 6, StringUtils.countMatches(systemOutRule.getLog(), "hard-linking"));
         assertTrue("output should not contain warnings about skipping files", !systemOutRule.getLog().contains("skipping"));
@@ -204,7 +205,7 @@ public class MockedIT {
     @Test
     public void runLaunchOneHTTPArrayedJson() throws IOException, ApiException {
         Client.main(
-            new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry", "quay.io/collaboratory/arrays",
+            new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry", "quay.io/collaboratory/arrays",
                 "--json", ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), "--script", "--ignore-checksums" });
 
         assertTrue(new File("/tmp/wc1.out").exists());

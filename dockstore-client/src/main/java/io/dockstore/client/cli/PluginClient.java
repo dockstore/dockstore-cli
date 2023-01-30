@@ -34,6 +34,8 @@ import ro.fortsoft.pf4j.PluginManager;
 import ro.fortsoft.pf4j.PluginWrapper;
 
 import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 
 /**
@@ -57,7 +59,7 @@ public final class PluginClient {
         JCommander jc = new JCommander();
 
         CommandPlugin commandPlugin = new CommandPlugin();
-        JCommander jcPlugin = JCommanderUtility.addCommand(jc, "plugin", commandPlugin);
+        JCommander jcPlugin = JCommanderUtility.addCommand(jc, PLUGIN, commandPlugin);
 
         CommandPluginList commandPluginList = new CommandPluginList();
         JCommanderUtility.addCommand(jcPlugin, "list", commandPluginList);
@@ -68,19 +70,19 @@ public final class PluginClient {
         jcPlugin.parse(argv);
         try {
             if (args.isEmpty() || commandPlugin.help) {
-                printJCommanderHelp(jc, "dockstore", "plugin");
+                printJCommanderHelp(jc, "dockstore", PLUGIN);
             } else {
                 switch (jcPlugin.getParsedCommand()) {
                 case "list":
                     if (commandPluginList.help) {
-                        printJCommanderHelp(jc, "dockstore", "plugin");
+                        printJCommanderHelp(jc, "dockstore", PLUGIN);
                     } else {
                         return handleList(configFile);
                     }
                     break;
                 case "download":
                     if (commandPluginDownload.help) {
-                        printJCommanderHelp(jc, "dockstore", "plugin");
+                        printJCommanderHelp(jc, "dockstore", PLUGIN);
                     } else {
                         return handleDownload(configFile);
                     }
@@ -90,7 +92,7 @@ public final class PluginClient {
                 }
             }
         } catch (ParameterException e) {
-            printJCommanderHelp(jc, "dockstore", "plugin");
+            printJCommanderHelp(jc, "dockstore", PLUGIN);
         }
         return true;
 
@@ -129,19 +131,19 @@ public final class PluginClient {
 
     @Parameters(separators = "=", commandDescription = "Configure and debug plugins")
     private static class CommandPlugin {
-        @Parameter(names = "--help", description = "Prints help for plugin command", help = true)
+        @Parameter(names = HELP, description = "Prints help for plugin command", help = true)
         private boolean help = false;
     }
 
     @Parameters(separators = "=", commandDescription = "List currently activated file provision plugins")
     private static class CommandPluginList {
-        @Parameter(names = "--help", description = "Prints help for list command", help = true)
+        @Parameter(names = HELP, description = "Prints help for list command", help = true)
         private boolean help = false;
     }
 
     @Parameters(separators = "=", commandDescription = "Download default file provisioning plugins")
     private static class CommandPluginDownload {
-        @Parameter(names = "--help", description = "Prints help for download command", help = true)
+        @Parameter(names = HELP, description = "Prints help for download command", help = true)
         private boolean help = false;
     }
 

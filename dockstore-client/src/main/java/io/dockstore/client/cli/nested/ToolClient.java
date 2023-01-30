@@ -73,6 +73,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+import static io.dockstore.client.cli.Client.TOOL;
 import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
 
 /**
@@ -104,7 +105,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     @Override
     public String getEntryType() {
-        return "Tool";
+        return TOOL;
     }
 
     @Override

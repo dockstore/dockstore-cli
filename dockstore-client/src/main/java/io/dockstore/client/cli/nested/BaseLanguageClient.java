@@ -37,6 +37,7 @@ import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_MISMATCH_MESSAGE;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
@@ -175,7 +176,7 @@ public abstract class BaseLanguageClient {
                 try {
                     provisionedParameterFile = provisionInputFiles();
                 } catch (ApiException ex) {
-                    if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool")) {
+                    if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL)) {
                         exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
                                 ENTRY_NOT_FOUND);
                     } else {
@@ -314,7 +315,7 @@ public abstract class BaseLanguageClient {
                 zipFile = new File(workingDir, convertedName);
                 out("Successfully downloaded files for entry '" + path + "'");
             } catch (ApiException ex) {
-                if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool")) {
+                if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL)) {
                     exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
                             ENTRY_NOT_FOUND);
                 } else {

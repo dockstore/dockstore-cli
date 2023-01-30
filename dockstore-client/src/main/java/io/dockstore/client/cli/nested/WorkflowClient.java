@@ -83,6 +83,7 @@ import static io.dockstore.client.cli.ArgumentUtility.reqVal;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
+import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 
@@ -1125,7 +1126,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     }
 
     private void restub(List<String> args) {
-        if (args.isEmpty() || args.contains("--help") || args.contains("-h")) {
+        if (args.isEmpty() || args.contains(HELP) || args.contains("-h")) {
             restubHelp();
         } else {
             try {
@@ -1206,7 +1207,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
         @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
-        @Parameter(names = "--help", description = "Prints help for entry2json command", help = true)
+        @Parameter(names = HELP, description = "Prints help for entry2json command", help = true)
         private boolean help = false;
     }
 
@@ -1225,7 +1226,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         private String wdlOutputTarget;
         @Parameter(names = "--ignore-checksums", description = "Allows you to ignore validating checksums of each downloaded descriptor")
         private boolean ignoreChecksums;
-        @Parameter(names = "--help", description = "Prints help for launch command", help = true)
+        @Parameter(names = HELP, description = "Prints help for launch command", help = true)
         private boolean help = false;
         @Parameter(names = "--uuid", description = "Allows you to specify a uuid for 3rd party notifications")
         private String uuid;

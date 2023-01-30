@@ -29,6 +29,7 @@ import com.beust.jcommander.WrappedParameter;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.outFormatted;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
+import static io.dockstore.client.cli.Client.HELP;
 
 /**
  * @author gluu
@@ -116,7 +117,7 @@ public final class JCommanderUtility {
         boolean first = true;
         for (ParameterDescription pd : sorted) {
             WrappedParameter parameter = pd.getParameter();
-            if (parameter.required() && !Objects.equals(pd.getNames(), "--help")) {
+            if (parameter.required() && !Objects.equals(pd.getNames(), HELP)) {
                 if (first) {
                     out("Required parameters:");
                     first = false;
@@ -140,7 +141,7 @@ public final class JCommanderUtility {
         boolean first = true;
         for (ParameterDescription pd : sorted) {
             WrappedParameter parameter = pd.getParameter();
-            if (!parameter.required() && !pd.getNames().equals("--help")) {
+            if (!parameter.required() && !pd.getNames().equals(HELP)) {
                 if (first) {
                     out("Optional parameters:");
                     first = false;
