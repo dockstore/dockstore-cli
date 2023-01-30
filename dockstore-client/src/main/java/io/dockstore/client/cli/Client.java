@@ -552,7 +552,7 @@ public class Client {
         } else {
             //current version is older than latest stable
             out("Please upgrade with the following command:");
-            out("   dockstore --upgrade");  // takes you to the newest stable version, unless you're already "past it"
+            out("   dockstore " + UPGRADE);  // takes you to the newest stable version, unless you're already "past it"
         }
     }
 
