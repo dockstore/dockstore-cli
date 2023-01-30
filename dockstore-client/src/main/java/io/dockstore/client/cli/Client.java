@@ -120,6 +120,7 @@ public class Client {
     public static final String VERSION = "--version";
     public static final String SERVER_METADATA = "--server-metadata";
     public static final String UPGRADE = "--upgrade";
+    public static final String UPGRADE_STABLE = "--upgrade-stable";
     private static ObjectMapper objectMapper;
 
     private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
@@ -451,7 +452,7 @@ public class Client {
                         if (Objects.equals(currentVersion, latestUnstable)) {
                             // current version is the latest unstable version
                             out("You are currently on the latest unstable version. If you wish to upgrade to the latest stable version, please use the following command:");
-                            out("   dockstore --upgrade-stable");
+                            out("   dockstore " + UPGRADE_STABLE);
                         } else {
                             //user wants to upgrade to newest unstable version
                             upgradeURL = getUnstableURL(latestUnstable, mapRel);
@@ -543,7 +544,7 @@ public class Client {
         if (compareVersion(currentVersion)) {
             //current version is latest than latest stable
             out("You are currently on the latest unstable version. If you wish to upgrade to the latest stable version, please use the following command:");
-            out("   dockstore --upgrade-stable"); //takes you to the newest stable version no matter what
+            out("   dockstore " + UPGRADE_STABLE); //takes you to the newest stable version no matter what
         } else {
             //current version is older than latest stable
             out("Please upgrade with the following command:");
@@ -619,7 +620,7 @@ public class Client {
         out("                       Default: false");
         out("  " + UPGRADE + "            Upgrades to the latest stable release of Dockstore");
         out("                       Default: false");
-        out("  --upgrade-stable     Force upgrade to the latest stable release of Dockstore");
+        out("  " + UPGRADE_STABLE + "     Force upgrade to the latest stable release of Dockstore");
         out("                       Default: false");
         out("  --upgrade-unstable   Force upgrade to the latest unstable release of Dockstore");
         out("                       Default: false");
@@ -773,7 +774,7 @@ public class Client {
                         case UPGRADE:
                             upgrade("none");
                             break;
-                        case "--upgrade-stable":
+                        case UPGRADE_STABLE:
                             upgrade("stable");
                             break;
                         case "--upgrade-unstable":
@@ -786,7 +787,7 @@ public class Client {
                             List<String> possibleCommands = new ArrayList<String>();
                             possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML,
                                     HELP, DEBUG_FLAG, VERSION, SERVER_METADATA, UPGRADE,
-                                    "--upgrade-stable", "--upgrade-unstable", "--config", "--script", "--clean-cache"));
+                                    UPGRADE_STABLE, "--upgrade-unstable", "--config", "--script", "--clean-cache"));
                             invalid("", cmd, possibleCommands);
                             break;
                         }
