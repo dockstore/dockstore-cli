@@ -121,6 +121,7 @@ public class Client {
     public static final String SERVER_METADATA = "--server-metadata";
     public static final String UPGRADE = "--upgrade";
     public static final String UPGRADE_STABLE = "--upgrade-stable";
+    public static final String UPGRADE_UNSTABLE = "--upgrade-unstable";
     private static ObjectMapper objectMapper;
 
     private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
@@ -520,7 +521,7 @@ public class Client {
                                 out("Current version : " + currentVersion);
                                 out("You have the most recent stable release.");
                                 out("If you wish to upgrade to the latest unstable version, please use the following command:");
-                                out("   dockstore --upgrade-unstable"); // takes you to the newest unstable version
+                                out("   dockstore " + UPGRADE_UNSTABLE); // takes you to the newest unstable version
                             } else {
                                 err("Current version : " + currentVersion);
                                 //not the latest stable version, could be on the newest unstable or older unstable/stable version
@@ -622,7 +623,7 @@ public class Client {
         out("                       Default: false");
         out("  " + UPGRADE_STABLE + "     Force upgrade to the latest stable release of Dockstore");
         out("                       Default: false");
-        out("  --upgrade-unstable   Force upgrade to the latest unstable release of Dockstore");
+        out("  " + UPGRADE_UNSTABLE + "   Force upgrade to the latest unstable release of Dockstore");
         out("                       Default: false");
         out("  --config <file>      Override config file");
         out("                       Default: ~/.dockstore/config");
@@ -777,7 +778,7 @@ public class Client {
                         case UPGRADE_STABLE:
                             upgrade("stable");
                             break;
-                        case "--upgrade-unstable":
+                        case UPGRADE_UNSTABLE:
                             upgrade("unstable");
                             break;
                         case "--clean-cache":
@@ -787,7 +788,7 @@ public class Client {
                             List<String> possibleCommands = new ArrayList<String>();
                             possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML,
                                     HELP, DEBUG_FLAG, VERSION, SERVER_METADATA, UPGRADE,
-                                    UPGRADE_STABLE, "--upgrade-unstable", "--config", "--script", "--clean-cache"));
+                                    UPGRADE_STABLE, UPGRADE_UNSTABLE, "--config", "--script", "--clean-cache"));
                             invalid("", cmd, possibleCommands);
                             break;
                         }

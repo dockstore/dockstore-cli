@@ -121,7 +121,7 @@ class UpgradeTestIT {
     @Test
     void upTestUnstableOption() {
         //else if current is the latest stable version, output "you are currently running the most stable version"
-        //         and option to "--upgrade-unstable"
+        //         and option to UPGRADE_UNSTABLE"
         String detectedVersion = "0.4-beta.1";
         String currentVersion = "0.4-beta.1";
         String unstable = "0.4-beta.0";
@@ -143,7 +143,7 @@ class UpgradeTestIT {
 
     @Test
     void upgradeStableOption() {
-        //if the current is latest stable, output option to "--upgrade-unstable"
+        //if the current is latest stable, output option to UPGRADE_UNSTABLE"
         String detectedVersion = "0.4-beta.1";
         String currentVersion = "0.4-beta.1";
         String unstable = "0.4-beta.0";
