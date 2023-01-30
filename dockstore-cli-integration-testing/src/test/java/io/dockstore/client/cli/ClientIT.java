@@ -46,6 +46,7 @@ import static io.dockstore.client.cli.Client.DEBUG_FLAG;
 import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
+import static io.dockstore.client.cli.Client.SERVER_METADATA;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
@@ -227,7 +228,7 @@ class ClientIT extends BaseIT {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), VERSION });
         assertTrue(systemOutRule.getText().contains("Dockstore version"));
         systemOutRule.clear();
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "--server-metadata" });
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), SERVER_METADATA });
         assertTrue(systemOutRule.getText().contains("version"));
         systemOutRule.clear();
     }
