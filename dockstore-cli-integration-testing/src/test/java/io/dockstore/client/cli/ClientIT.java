@@ -109,7 +109,7 @@ class ClientIT extends BaseIT {
     //
     @Disabled("Won't work as entry must be valid")
     void quickRegisterValidEntry() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test6" });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test6" });
 
         // verify DB
         final long count = testingPostgres.runSelectStatement("select count(*) from tool where name = 'test6'", long.class);
@@ -118,9 +118,9 @@ class ClientIT extends BaseIT {
 
     @Test
     void testPluginEnable() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), PLUGIN, "download" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), PLUGIN, "download" });
         systemOutRule.clear();
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), PLUGIN, "list" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), PLUGIN, "list" });
         assertTrue(systemOutRule.getText().contains("dockstore-file-synapse-plugin"));
         assertTrue(systemOutRule.getText().contains("dockstore-file-s3-plugin"));
         assertFalse(systemOutRule.getText().contains("dockstore-icgc-storage-client-plugin"));
@@ -128,9 +128,9 @@ class ClientIT extends BaseIT {
 
     @Test
     void testPluginDisable() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), PLUGIN, "download" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), PLUGIN, "download" });
         systemOutRule.clear();
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), PLUGIN, "list" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), PLUGIN, "list" });
         assertFalse(systemOutRule.getText().contains("dockstore-file-synapse-plugin"));
         assertFalse(systemOutRule.getText().contains("dockstore-file-s3-plugin"));
         assertTrue(systemOutRule.getText().contains("dockstore-file-icgc-storage-client-plugin"));

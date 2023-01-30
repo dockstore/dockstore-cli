@@ -103,7 +103,7 @@ class QuayGitlabBasicIT extends BaseIT {
         assertEquals(1, count, "there should be 1 entries, there are " + count);
 
         // Unpublish
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
             "quay.io/dockstoretestuser/quayandgitlabalternate/alternate", SCRIPT_FLAG });
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
@@ -117,7 +117,7 @@ class QuayGitlabBasicIT extends BaseIT {
      */
     @Test
     void testQuayGitlabManuallyRegisterDuplicate() throws Exception {
-        int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+        int exitCode = catchSystemExit(() ->  Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgitlab",
                 "--git-url", "git@gitlab.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--script" }));
         assertEquals(Client.API_ERROR, exitCode);

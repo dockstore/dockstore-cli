@@ -103,12 +103,12 @@ class WorkflowIT extends BaseIT {
         // should be able to launch properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--entry", toolpath,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--entry", toolpath,
                 "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
 
         // should not be able to launch properly with incorrect credentials
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "launch", "--entry", toolpath,
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "launch", "--entry", toolpath,
                         "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -154,7 +154,7 @@ class WorkflowIT extends BaseIT {
 
         // Download published workflow version
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry", toolpath,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry", toolpath,
                 SCRIPT_FLAG });
         arbitraryURL = SwaggerUtility.getArbitraryURL("/workflows/" + workflowId + "/zip/" + versionId, new GenericType<byte[]>() {
         }, CLICommonTestUtilities.getWebClient(false, null, testingPostgres));
@@ -167,7 +167,7 @@ class WorkflowIT extends BaseIT {
         tempZip2.deleteOnExit();
 
         // download and unzip via CLI
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "download", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "download", "--entry",
             toolpath + ":" + workflowVersion.getName(), "--script" });
         zipFile.stream().forEach((ZipEntry entry) -> {
             if (!(entry).isDirectory()) {
@@ -178,7 +178,7 @@ class WorkflowIT extends BaseIT {
         });
 
         // download zip via CLI
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "download", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "download", "--entry",
             toolpath + ":" + workflowVersion.getName(), "--zip", "--script" });
         File downloadedZip = new File(new WorkflowClient(null, null, null, false).zipFilename(workflow));
         assert (downloadedZip.exists());

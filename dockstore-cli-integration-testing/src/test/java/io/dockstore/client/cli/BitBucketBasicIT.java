@@ -55,7 +55,7 @@ class BitBucketBasicIT extends BaseIT {
     @Test
     void testQuayAndBitbucketPublishAndUnpublishAentry() {
         // Publish
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
             "quay.io/dockstoretestuser/quayandbitbucket", "--script" });
 
         final long count = testingPostgres
@@ -63,7 +63,7 @@ class BitBucketBasicIT extends BaseIT {
         assertEquals(1, count, "there should be 1 registered");
 
         // Unpublish
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
             "quay.io/dockstoretestuser/quayandbitbucket", "--script" });
 
         final long count2 = testingPostgres

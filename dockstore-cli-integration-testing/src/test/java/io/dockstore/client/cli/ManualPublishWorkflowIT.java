@@ -197,23 +197,23 @@ class ManualPublishWorkflowIT extends BaseIT {
         assertEquals(0, count, "there should be no verified workflowversions, there are " + count);
 
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "parameter_test_workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-path",
                 "/Dockstore.cwl", "--descriptor-type", "cwl", "--script" });
 
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--add",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--add",
             "/test.wdl.json", "--entry", SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION,
             "wdltest", "--script" });
 
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--add",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--add",
             "/test.cwl.json", "--entry", SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION,
             "master", "--script" });
 
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", "--script" });
 
         // Verify workflowversion
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
             "#workflow/github.com/DockstoreTestUser2/parameter_test_workflow", "--version-id", "wdltest", "--file-path", "test.wdl.json",
             "--descriptor-type", "cwl", "--platform", "Cromwell", "--platform-version", "thing", "--metadata", "Docker testing group",
             "--script" });
@@ -225,7 +225,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         assertEquals(1, count2, "there should be one verified workflowversion, there are " + count2);
 
         // Update workflowversion to have another verified source
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
             "#workflow/github.com/DockstoreTestUser2/parameter_test_workflow", "--version-id", "wdltest", "--file-path", "test.wdl.json",
             "--descriptor-type", "cwl", "--platform", "Cromwell", "--platform-version", "thing", "--metadata", "Docker testing group2",
             "--script" });
@@ -237,7 +237,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         assertEquals(1, count3, "there should be one verified workflowversion, there are " + count3);
 
         // Verify another version
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
             "#workflow/github.com/DockstoreTestUser2/parameter_test_workflow", "--version-id", "master", "--file-path", "test.cwl.json",
             "--descriptor-type", "cwl", "--platform", "Cromwell", "--platform-version", "thing", "--metadata", "Docker testing group",
             "--script" });
@@ -249,7 +249,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         assertEquals(2, count4, "there should be two verified workflowversions, there are " + count4);
 
         // Unverify workflowversion
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "verify", "--trs-id",
             "#workflow/github.com/DockstoreTestUser2/parameter_test_workflow", "--version-id", "master", "--file-path", "test.cwl.json",
             "--descriptor-type", "cwl", "--platform", "Cromwell", "--platform-version", "thing", "--unverify", "--metadata",
             "Docker testing group", "--script" });
@@ -268,20 +268,20 @@ class ManualPublishWorkflowIT extends BaseIT {
     void testInfo() throws Exception {
         // manual publish
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
                 "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
 
         // info (no version)
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--script" });
 
         // info (with version)
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname:master", "--script" });
 
         // unpublish
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--unpub", "--script" });
 
         // info

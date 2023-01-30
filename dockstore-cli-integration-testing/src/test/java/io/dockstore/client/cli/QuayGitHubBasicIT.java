@@ -152,7 +152,7 @@ class QuayGitHubBasicIT extends BaseIT {
     void testAddQuayRepoOfNonOwnedOrg() throws Exception {
         // Repo user isn't part of org
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                         Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstore2", "--name", "testrepo2",
                         "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname",
                         "testOrg", "--cwl-path", "/Dockstore.cwl", "--dockerfile-path", "/Dockerfile", SCRIPT_FLAG }));
@@ -170,7 +170,7 @@ class QuayGitHubBasicIT extends BaseIT {
         assertTrue(secondWorkflowCount > 0, "should find non-zero number of workflows");
 
         // refresh a specific workflow
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" });
 
         // artificially create an invalid version
@@ -178,7 +178,7 @@ class QuayGitHubBasicIT extends BaseIT {
         testingPostgres.runUpdateStatement("update workflowversion set reference = 'test'");
 
         // refresh
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "refresh", "--entry",
             SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" });
 
         // check that the version was deleted
@@ -196,7 +196,7 @@ class QuayGitHubBasicIT extends BaseIT {
         assertTrue(nfWorkflowCount > 0, "should find non-zero number of next flow workflows");
 
         // refresh
-        catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "refresh", "--entry",
+        catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "refresh", "--entry",
                 SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" }));
         final long thirdWorkflowCount = testingPostgres.runSelectStatement("select count(*) from workflow", long.class);
         assertEquals(secondWorkflowCount, thirdWorkflowCount, "there should be no change in count of workflows");
@@ -208,7 +208,7 @@ class QuayGitHubBasicIT extends BaseIT {
      */
     @Test
     void testManualQuayManualBuild() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "noautobuild", "--git-url",
                 "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
                 "--script" }));
@@ -220,7 +220,7 @@ class QuayGitHubBasicIT extends BaseIT {
      */
     @Test
     void testManualQuayNoTags() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
                 Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "nobuildsatall",
                 "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "alternate",
                 "--script" }));
@@ -233,7 +233,7 @@ class QuayGitHubBasicIT extends BaseIT {
     @Test
     void testQuayNoAutobuild() {
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
                 "quay.io/dockstoretestuser/noautobuild", "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git",
                 "--script" });
 
@@ -243,7 +243,7 @@ class QuayGitHubBasicIT extends BaseIT {
         assertEquals(1, count, "the tool should now have an associated git repo");
 
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", ToolClient.UPDATE_TOOL, "--entry",
                 "quay.io/dockstoretestuser/nobuildsatall", "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git",
                 "--script" });
 

@@ -38,6 +38,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
@@ -82,13 +83,13 @@ class BasicIT extends BaseIT {
      */
     @Test
     void testVersionTagDockerhub() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
             SCRIPT_FLAG });
 
         // Add a tag
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "version_tag", "add", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "version_tag", "add", "--entry",
             "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular", "--name", "masterTest", "--image-id",
             "4728f8f5ce1709ec8b8a5282e274e63de3c67b95f03a519191e6ea675c5d34e8", "--git-reference", "master", SCRIPT_FLAG });
 
@@ -97,7 +98,7 @@ class BasicIT extends BaseIT {
 
         // Update tag
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "version_tag", "update", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "version_tag", "update", "--entry",
                 "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular", "--name", "masterTest", "--hidden", "true",
                 SCRIPT_FLAG });
 
@@ -107,7 +108,7 @@ class BasicIT extends BaseIT {
 
         // Remove tag
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "version_tag", "remove", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "version_tag", "remove", "--entry",
                 "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular", "--name", "masterTest", SCRIPT_FLAG });
 
         final long count3 = testingPostgres.runSelectStatement("select count(*) from tag where name = 'masterTest'", long.class);
@@ -139,7 +140,7 @@ class BasicIT extends BaseIT {
      */
     @Test
     void testDockerhubGithubManualRegistration() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
             SCRIPT_FLAG });
@@ -150,7 +151,7 @@ class BasicIT extends BaseIT {
         assertEquals(1, count, "there should be 1 entries");
 
         // Unpublish
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "publish", "--unpub", "--entry",
             "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular", SCRIPT_FLAG });
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'regular' and ispublished='t'", long.class);
@@ -164,7 +165,7 @@ class BasicIT extends BaseIT {
      */
     @Test
     void testDockerhubGithubAlternateStructure() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:DockstoreTestUser/dockstore-whalesay-alternate.git", "--git-reference", "master", "--toolname",
             "alternate", "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", SCRIPT_FLAG });

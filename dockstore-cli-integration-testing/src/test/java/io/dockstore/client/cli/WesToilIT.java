@@ -242,7 +242,7 @@ public class WesToilIT {
     public void testComplexNestedDirectoryAttachments() throws InterruptedException {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
         String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
+            CONFIG, TOIL_CONFIG,
             "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-complex-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w5_1_test.json"),
             "--attach", ResourceHelpers.resourceFilePath("wesIt/w5_nested"),

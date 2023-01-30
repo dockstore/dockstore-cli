@@ -141,7 +141,7 @@ public class MockedIT {
 
     @Test
     public void runLaunchOneJson() throws IOException, ApiException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry",
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry",
             "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testOneRun.json"), SCRIPT_FLAG, "--ignore-checksums" });
 
         assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
@@ -150,7 +150,7 @@ public class MockedIT {
     // TODO: This is returning false positives, disabling for now until we add array support
     @Ignore
     public void runLaunchNJson() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry",
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry",
             "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testMultipleRun.json"),
             SCRIPT_FLAG });
     }
