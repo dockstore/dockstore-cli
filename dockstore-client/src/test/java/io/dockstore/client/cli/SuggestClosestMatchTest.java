@@ -19,22 +19,48 @@ package io.dockstore.client.cli;
 import io.dockstore.common.FlushingSystemErr;
 import io.dockstore.common.FlushingSystemOut;
 import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.junit.Test;
+
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-
+@ExtendWith(SystemStubsExtension.class)
 public class SuggestClosestMatchTest {
+
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
+
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
     @Test
     public void onlyOneCorrectSolution() {
         List<String> acceptedCommands = new ArrayList<String>();
-        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
-        System.out.println(levenshteinDistance.apply("oran", "orange"));
+
+        acceptedCommands.add("orange");
+        acceptedCommands.add("juice");
+        List<String> result = ArgumentUtility.minDistance("oran",acceptedCommands);
+        Assertions.assertEquals(1, result.size());
+        assertTrue(result.contains("orange"));
+
+        acceptedCommands.add("test1");
+        acceptedCommands.add("test2");
+        acceptedCommands.add("test3");
+        result = ArgumentUtility.minDistance("test7",acceptedCommands);
+        Assertions.assertEquals(3, result.size());
+        assertTrue(result.contains("test1"));
+        assertTrue(result.contains("test2"));
+        assertTrue(result.contains("test3"));
     }
 
     /**
@@ -53,4 +79,163 @@ public class SuggestClosestMatchTest {
         assertTrue(ArgumentUtility.minDistance("pppppppp",acceptedCommands).isEmpty());
     }
 
+    @Test
+    public void noSuggestions() {
+        systemOutRule.clear();
+        List<String> acceptedCommands = new ArrayList<String>();
+        acceptedCommands.add("tool");
+        acceptedCommands.add("workflow");
+        acceptedCommands.add("checker");
+        acceptedCommands.add("plugin");
+        acceptedCommands.add("deps");
+        acceptedCommands.add("yaml");
+        ArgumentUtility.invalid("", "z", acceptedCommands);
+        Assertions.assertEquals("dockstore: 'z' is not a dockstore command. See 'dockstore --help'.\n",
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+        ArgumentUtility.invalid("", "ffzz", acceptedCommands);
+        Assertions.assertEquals("dockstore: 'ffzz' is not a dockstore command. See 'dockstore --help'.\n",
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+        ArgumentUtility.invalid("random_command_1", "ffzz", acceptedCommands);
+        Assertions.assertEquals("dockstore random_command_1: 'ffzz' is not a dockstore command. " +
+                        "See 'dockstore random_command_1 --help'.\n",
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+        ArgumentUtility.invalid("random_command_1 random_command_2", "ffzz", acceptedCommands);
+        Assertions.assertEquals("dockstore random_command_1 random_command_2: 'ffzz' is not a dockstore command. " +
+                        "See 'dockstore random_command_1 random_command_2 --help'.\n",
+                systemOutRule.getText());
+        systemOutRule.clear();
+    }
+
+    /**
+     * Ensures that if a user accidentally uses upper-case, they are shown the correct lower-case command
+     */
+    @Test
+    public void usedUpperCase() {
+        systemOutRule.clear();
+        List<String> acceptedCommands = new ArrayList<String>();
+        acceptedCommands.add("tool");
+        acceptedCommands.add("workflow");
+        acceptedCommands.add("checker");
+        acceptedCommands.add("plugin");
+        acceptedCommands.add("deps");
+        acceptedCommands.add("yaml");
+
+        ArgumentUtility.invalid("", "CHECKER", acceptedCommands);
+        Assertions.assertEquals("""
+                        dockstore: 'CHECKER' is not a dockstore command. See 'dockstore --help'.
+                                                
+                        The most similar command is:
+                            checker
+                        """,
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+        ArgumentUtility.invalid("", "Checker", acceptedCommands);
+        Assertions.assertEquals("""
+                        dockstore: 'Checker' is not a dockstore command. See 'dockstore --help'.
+                                                
+                        The most similar command is:
+                            checker
+                        """,
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+        ArgumentUtility.invalid("", "cheCKer", acceptedCommands);
+        Assertions.assertEquals("""
+                        dockstore: 'cheCKer' is not a dockstore command. See 'dockstore --help'.
+                                                
+                        The most similar command is:
+                            checker
+                        """,
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+    }
+
+    @Test
+    public void onlyOneCloseMatch() {
+        systemOutRule.clear();
+        List<String> acceptedCommands = new ArrayList<String>();
+        acceptedCommands.add("tool");
+
+        ArgumentUtility.invalid("", "too", acceptedCommands);
+        Assertions.assertEquals("""
+                        dockstore: 'too' is not a dockstore command. See 'dockstore --help'.
+                        
+                        The most similar command is:
+                            tool
+                        """,
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+        acceptedCommands.add("workflow");
+        acceptedCommands.add("checker");
+        acceptedCommands.add("plugin");
+        acceptedCommands.add("deps");
+        acceptedCommands.add("yaml");
+
+        ArgumentUtility.invalid("", "pluggn", acceptedCommands);
+        Assertions.assertEquals("""
+                        dockstore: 'pluggn' is not a dockstore command. See 'dockstore --help'.
+                        
+                        The most similar command is:
+                            plugin
+                        """,
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+        ArgumentUtility.invalid("random_1 random_2", "y", acceptedCommands);
+        Assertions.assertEquals("""
+                        dockstore random_1 random_2: 'y' is not a dockstore command. See 'dockstore random_1 random_2 --help'.
+                        
+                        The most similar command is:
+                            yaml
+                        """,
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+    }
+
+    @Test
+    public void severalCloseMatches() {
+        systemOutRule.clear();
+        List<String> acceptedCommands = new ArrayList<String>();
+        acceptedCommands.add("workflow");
+        acceptedCommands.add("checker");
+        acceptedCommands.add("test1");
+        acceptedCommands.add("plugin");
+        acceptedCommands.add("deps");
+        acceptedCommands.add("test2");
+        acceptedCommands.add("yaml");
+
+        ArgumentUtility.invalid("", "test0", acceptedCommands);
+        Assertions.assertEquals("""
+                        dockstore: 'test0' is not a dockstore command. See 'dockstore --help'.
+                        
+                        The most similar commands are:
+                            test1
+                            test2
+                        """,
+                systemOutRule.getText());
+        systemOutRule.clear();
+
+        acceptedCommands.add("test8");
+        ArgumentUtility.invalid("random_1 random_2", "test0", acceptedCommands);
+        Assertions.assertEquals("""
+                        dockstore random_1 random_2: 'test0' is not a dockstore command. See 'dockstore random_1 random_2 --help'.
+                        
+                        The most similar commands are:
+                            test1
+                            test2
+                            test8
+                        """,
+                systemOutRule.getText());
+        systemOutRule.clear();
+    }
 }
