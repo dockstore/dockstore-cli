@@ -49,6 +49,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static io.dockstore.client.cli.Client.CLEAN_CACHE;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static org.junit.Assert.assertEquals;
@@ -181,7 +182,7 @@ public class MockedIT {
         String configFileLocation = TestUtility.getConfigFileLocation(true, true, true);
         when(client.getConfigFile()).thenReturn(configFileLocation);
 
-        Client.main(new String[] { "--clean-cache", "--config", configFileLocation, "--script" });
+        Client.main(new String[] { CLEAN_CACHE, "--config", configFileLocation, "--script" });
         // this is kind of redundant, it looks like we take the mocked config file no matter what
         Client.main(new String[] { "--config", configFileLocation, TOOL, "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
             ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });

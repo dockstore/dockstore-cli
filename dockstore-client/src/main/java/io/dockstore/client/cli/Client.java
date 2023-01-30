@@ -124,6 +124,7 @@ public class Client {
     public static final String UPGRADE_UNSTABLE = "--upgrade-unstable";
     public static final String CONFIG = "--config";
     public static final String SCRIPT_FLAG = "--script";
+    public static final String CLEAN_CACHE = "--clean-cache";
     private static ObjectMapper objectMapper;
 
     private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
@@ -631,7 +632,7 @@ public class Client {
         out("                       Default: ~/.dockstore/config");
         out("  " + SCRIPT_FLAG + "             Will not check Github for newer versions of Dockstore, or ask for user input");
         out("                       Default: false");
-        out("  --clean-cache        Delete the Dockstore launcher cache to save space");
+        out("  " + CLEAN_CACHE + "        Delete the Dockstore launcher cache to save space");
         printHelpFooter();
     }
 
@@ -783,14 +784,14 @@ public class Client {
                         case UPGRADE_UNSTABLE:
                             upgrade("unstable");
                             break;
-                        case "--clean-cache":
+                        case CLEAN_CACHE:
                             clean();
                             break;
                         default:
                             List<String> possibleCommands = new ArrayList<String>();
                             possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML,
                                     HELP, DEBUG_FLAG, VERSION, SERVER_METADATA, UPGRADE,
-                                    UPGRADE_STABLE, UPGRADE_UNSTABLE, CONFIG, SCRIPT_FLAG, "--clean-cache"));
+                                    UPGRADE_STABLE, UPGRADE_UNSTABLE, CONFIG, SCRIPT_FLAG, CLEAN_CACHE));
                             invalid("", cmd, possibleCommands);
                             break;
                         }

@@ -42,6 +42,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.CLEAN_CACHE;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.DEBUG_FLAG;
 import static io.dockstore.client.cli.Client.DEPS;
@@ -236,7 +237,7 @@ class ClientIT extends BaseIT {
 
     @Test
     void testCacheCleaning() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "--clean-cache" });
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), CLEAN_CACHE });
         systemOutRule.clear();
     }
 
