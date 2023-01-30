@@ -285,7 +285,7 @@ class ManualPublishWorkflowIT extends BaseIT {
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--unpub", "--script" });
 
         // info
-        int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
+        int exitCode = catchSystemExit(() ->  Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "info", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--script" }));
         assertEquals(Client.COMMAND_ERROR, exitCode);
     }
@@ -296,10 +296,10 @@ class ManualPublishWorkflowIT extends BaseIT {
     @Test
     void testManualPublishAndGrabWDL() {
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
                 "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "wdl", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "wdl", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname:testBoth", "--script" });
     }
 
@@ -309,7 +309,7 @@ class ManualPublishWorkflowIT extends BaseIT {
     @Test
     void testManualPublishInvalid() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                         "dockstore_empty_repo", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
                         "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" }));
         assertEquals(Client.API_ERROR, exitCode);
@@ -322,12 +322,12 @@ class ManualPublishWorkflowIT extends BaseIT {
     void testLabelEditing() {
         // Set up workflow
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-path",
                 "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
 
         // add labels
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "label", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "label", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--add", "test1", "--add", "test2",
             "--script" });
 
@@ -335,7 +335,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         assertEquals(2, count, "there should be 2 labels, there are " + count);
 
         // remove labels
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "label", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "label", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--remove", "test1", "--add", "test3",
             "--script" });
 
@@ -349,11 +349,11 @@ class ManualPublishWorkflowIT extends BaseIT {
     @Test
     void testGetInvalidDescriptor() throws Exception {
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
                 "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
 
-        int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "cwl", "--entry",
+        int exitCode = catchSystemExit(() ->  Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "cwl", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname:testBoth", "--script" }));
         assertEquals(Client.API_ERROR, exitCode);
     }
@@ -367,7 +367,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         final String publishNameParameter = "--new-entry-name";
 
         // register workflow
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
             "parameter_test_workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--script"});
 
         // count number of workflows for this user with the workflowname 'test_entryname'
@@ -378,13 +378,13 @@ class ManualPublishWorkflowIT extends BaseIT {
 
         // publish workflow with name 'test_entryname'
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
                 "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
 
         // publish workflow with name 'test_entryname' a second time, shouldn't work
         systemOutRule.clear();
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
                 "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
         assertTrue(
                 systemOutRule.getText().contains("The following workflow is already registered: github.com/DockstoreTestUser2/parameter_test_workflow"),
@@ -404,12 +404,12 @@ class ManualPublishWorkflowIT extends BaseIT {
                 "Ensure there is a published workflow with the expected workflow name");
 
         // Try unpublishing with both --unpub and --entryname specified, should fail
-        int exitCode = catchSystemExit(() ->   Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+        int exitCode = catchSystemExit(() ->   Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
                 "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
 
         // unpublish workflow with name 'test_entryname'
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
             "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", "--script"});
 
         // verify count of number of unpublish workflows with the desired name is 1
@@ -418,7 +418,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         assertEquals(1, countUnpublishedWorkflowWithCustomName, "The workflow should exist and be unpublished");
 
         systemOutRule.clear();
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
             "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", "--script"});
         assertTrue(
                 systemOutRule.getText().contains("The following workflow is already unpublished: github.com/DockstoreTestUser2/parameter_test_workflow"),
@@ -434,7 +434,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         final String publishNameParameter = "--entryname";
 
         // register workflow
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
             "parameter_test_workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--script"});
 
         // count number of workflows for this user with the workflowname 'test_entryname'
@@ -445,13 +445,13 @@ class ManualPublishWorkflowIT extends BaseIT {
 
         // publish workflow with name 'test_entryname'
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
                 "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
 
         // publish workflow with name 'test_entryname' a second time, shouldn't work
         systemOutRule.clear();
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
                 "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"});
         assertTrue(
                 systemOutRule.getText().contains("The following workflow is already registered: github.com/DockstoreTestUser2/parameter_test_workflow"),
@@ -471,15 +471,15 @@ class ManualPublishWorkflowIT extends BaseIT {
                 "Ensure there is a published workflow with the expected workflow name");
 
         // Try unpublishing with both --unpub and --entryname specified, should fail
-        int exitCode = catchSystemExit(() ->   Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+        int exitCode = catchSystemExit(() ->   Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
                 "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
 
-        catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+        catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
             "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", "--script"}));
 
         // unpublish workflow with name 'test_entryname'
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
             "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", "--script"});
 
         // verify count of number of unpublish workflows with the desired name is 1
@@ -488,7 +488,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         assertEquals(1, countUnpublishedWorkflowWithCustomName, "The workflow should exist and be unpublished");
 
         systemOutRule.clear();
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub",
             "--entry", "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", "--script"});
         assertTrue(
                 systemOutRule.getText().contains("The following workflow is already unpublished: github.com/DockstoreTestUser2/parameter_test_workflow"),

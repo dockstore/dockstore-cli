@@ -51,6 +51,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
@@ -208,24 +209,24 @@ class WorkflowIT extends BaseIT {
         // should be able to download properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
-            new String[] { "--config", fileWithCorrectCredentials, CHECKER, "download", "--entry", toolpath, VERSION, "master",
+            new String[] { CONFIG, fileWithCorrectCredentials, CHECKER, "download", "--entry", toolpath, VERSION, "master",
                 "--script" });
 
         // Publish the workflow
-        Client.main(new String[] { "--config", fileWithCorrectCredentials, "workflow", "publish", "--entry", toolpath, "--script" });
+        Client.main(new String[] { CONFIG, fileWithCorrectCredentials, "workflow", "publish", "--entry", toolpath, "--script" });
 
         // should be able to download properly with incorrect credentials because the entry is published
         Client.main(
-            new String[] { "--config", fileWithIncorrectCredentials, CHECKER, "download", "--entry", toolpath, VERSION, "master",
+            new String[] { CONFIG, fileWithIncorrectCredentials, CHECKER, "download", "--entry", toolpath, VERSION, "master",
                 "--script" });
 
         // Unpublish the workflow
         Client.main(
-            new String[] { "--config", fileWithCorrectCredentials, "workflow", "publish", "--entry", toolpath, "--unpub", "--script" });
+            new String[] { CONFIG, fileWithCorrectCredentials, "workflow", "publish", "--entry", toolpath, "--unpub", "--script" });
 
         // should not be able to download properly with incorrect credentials because the entry is not published
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { "--config", fileWithIncorrectCredentials, CHECKER, "download", "--entry", toolpath, VERSION, "master",
+                new String[] { CONFIG, fileWithIncorrectCredentials, CHECKER, "download", "--entry", toolpath, VERSION, "master",
                         "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -250,23 +251,23 @@ class WorkflowIT extends BaseIT {
         // should be able to launch properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), CHECKER, "launch", "--entry", toolpath,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), CHECKER, "launch", "--entry", toolpath,
                 "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
 
         // should be able to launch properly with incorrect credentials but the entry is published
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
                 "--script" });
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, "launch", "--entry", toolpath,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, "launch", "--entry", toolpath,
                 "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
 
         // should not be able to launch properly with incorrect credentials
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
                 "--unpub", "--script" });
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, "launch", "--entry", toolpath,
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, "launch", "--entry", toolpath,
                         "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -317,13 +318,13 @@ class WorkflowIT extends BaseIT {
         assertFalse(workflow.getOutputFileFormats().isEmpty());
 
         // launch the workflow, note that the latest version of the workflow should launch (i.e. the working one)
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
             workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), "--script" });
 
         WorkflowsApi workflowsApi = new WorkflowsApi(webClient);
         workflowsApi.publish(workflow.getId(), SwaggerUtility.createPublishRequest(true));
         // should also launch successfully with the wrong credentials when published
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry",
             workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), "--script" });
     }
 
@@ -387,7 +388,7 @@ class WorkflowIT extends BaseIT {
         args.add("github.com/dockstore-testing/Workflows-For-CI/count-lines1-wf");
         args.add("--yaml");
         args.add(jsonFilePath);
-        args.add("--config");
+        args.add(CONFIG);
         args.add(clientConfig);
         args.add("--script");
 

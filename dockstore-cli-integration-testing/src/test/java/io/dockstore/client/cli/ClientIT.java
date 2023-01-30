@@ -138,11 +138,11 @@ class ClientIT extends BaseIT {
 
     @Disabled("seems to have been disabled for ages")
     void quickRegisterDuplicateEntry() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test6" });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test6" });
         Client.main(
-            new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test6", "view1" });
+            new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test6", "view1" });
         Client.main(
-            new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test6", "view2" });
+            new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test6", "view2" });
 
         // verify DB
         final long count = testingPostgres.runSelectStatement("select count(*) from container where name = 'test6'", long.class);
@@ -151,14 +151,14 @@ class ClientIT extends BaseIT {
 
     @Test
     void quickRegisterInValidEntry() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test1" }));
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "publish", "quay.io/test_org/test1" }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
     @Test
     void quickRegisterUnknownEntry() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "publish",
+                new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "publish",
                         "quay.io/funky_container_that_does_not_exist" }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
@@ -169,19 +169,19 @@ class ClientIT extends BaseIT {
      */
     @Disabled("Since dockstore now checks for associated tags for Quay container, manual publishing of nonexistant images won't work")
     void manualRegisterABunchOfValidEntries() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
             Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
             "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master" });
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
             Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
             "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test1" });
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
             Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
             "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test2" });
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
             "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master" });
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
             Registry.DOCKER_HUB.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
             "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test1" });
 
@@ -194,13 +194,13 @@ class ClientIT extends BaseIT {
     void manualRegisterADuplicate() throws Exception {
         //TODO: this test is actually dying on the first command, I suspect that this has been broken for a while before migration to junit5
         int exitCode = catchSystemExit(() -> {
-            Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
+            Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
                     Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
                     "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master" });
-            Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
+            Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
                     Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
                     "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test1" });
-            Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
+            Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "manual_publish", "--registry",
                     Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
                     "git@github.com:funky-user/test2.git", "--git-reference", "refs/head/master", "--toolname", "test1" });
         });
@@ -212,7 +212,7 @@ class ClientIT extends BaseIT {
     void launchingCWLWorkflow() throws IOException {
         final String firstWorkflowCWL = ResourceHelpers.resourceFilePath("1st-workflow.cwl");
         final String firstWorkflowJSON = ResourceHelpers.resourceFilePath("1st-workflow-job.json");
-        Client.main(new String[] { "--script", "--config", TestUtility.getConfigFileLocation(true), WORKFLOW, "launch", "--local-entry",
+        Client.main(new String[] { "--script", CONFIG, TestUtility.getConfigFileLocation(true), WORKFLOW, "launch", "--local-entry",
             firstWorkflowCWL, "--json", firstWorkflowJSON });
     }
 
@@ -220,30 +220,30 @@ class ClientIT extends BaseIT {
     @Category(ToilCompatibleTest.class)
     void launchingCWLToolWithRemoteParameters() throws IOException {
         Client.main(
-            new String[] { "--script", "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--local-entry", FIRST_TOOL,
+            new String[] { "--script", CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "launch", "--local-entry", FIRST_TOOL,
                 "--json",
                 "https://raw.githubusercontent.com/dockstore/dockstore/f343bcd6e4465a8ef790208f87740bd4d5a9a4da/dockstore-client/src/test/resources/test.cwl.json" });
     }
 
     @Test
     void testMetadataMethods() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), VERSION });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), VERSION });
         assertTrue(systemOutRule.getText().contains("Dockstore version"));
         systemOutRule.clear();
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), SERVER_METADATA });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), SERVER_METADATA });
         assertTrue(systemOutRule.getText().contains("version"));
         systemOutRule.clear();
     }
 
     @Test
     void testCacheCleaning() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), CLEAN_CACHE });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), CLEAN_CACHE });
         systemOutRule.clear();
     }
 
     @Test
     void pluginDownload() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), PLUGIN, "download" });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), PLUGIN, "download" });
     }
 
     /**
@@ -255,7 +255,7 @@ class ClientIT extends BaseIT {
     @Test
     void testDepsCommandWithVersionAndPython3() throws IOException {
         Client.main(
-            new String[] { "--config", TestUtility.getConfigFileLocation(true), DEPS, "--client-version", "1.7.0", "--python-version",
+            new String[] { CONFIG, TestUtility.getConfigFileLocation(true), DEPS, "--client-version", "1.7.0", "--python-version",
                 "3" });
         assertFalse(systemOutRule.getText().contains("monotonic=="));
         assertDepsCommandOutput();
@@ -270,10 +270,10 @@ class ClientIT extends BaseIT {
     @Test
     @Disabled("Ignored until there are more than one runner.")
     void testDepsCommandWithUnknownRunners() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), DEPS, "--runner", "cromwell" }));
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), DEPS, "--runner", "cromwell" }));
         assertEquals(Client.API_ERROR, exitCode);
         assertTrue(systemOutRule.getText().contains("Could not get runner dependencies"));
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), DEPS, "--runner", "cromwell" });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), DEPS, "--runner", "cromwell" });
     }
 
     /**
@@ -284,7 +284,7 @@ class ClientIT extends BaseIT {
      */
     @Test
     void testDepsCommand() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), DEPS });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), DEPS });
         assertFalse(systemOutRule.getText().contains("monotonic=="), "Python 3 does not have monotonic as a dependency");
         assertDepsCommandOutput();
     }
@@ -297,7 +297,7 @@ class ClientIT extends BaseIT {
      */
     @Test
     void testDepsCommandHelp() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), DEPS, "HELP" });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), DEPS, "HELP" });
         assertTrue(systemOutRule.getText().contains("Print cwltool runner dependencies"));
     }
 
@@ -413,7 +413,7 @@ class ClientIT extends BaseIT {
 
     private void checkCommandForHelp(String[] argv) throws IOException {
         final ArrayList<String> strings = Lists.newArrayList(argv);
-        strings.add("--config");
+        strings.add(CONFIG);
         strings.add(TestUtility.getConfigFileLocation(true));
 
         Client.main(strings.toArray(new String[0]));

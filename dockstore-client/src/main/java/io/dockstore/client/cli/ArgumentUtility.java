@@ -27,6 +27,7 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.DEBUG_FLAG;
 import static io.dockstore.client.cli.Client.HELP;
 import static java.lang.Math.max;
@@ -249,7 +250,7 @@ public final class ArgumentUtility {
         out("                       Default: false");
         out("  " + DEBUG_FLAG + "              Print debugging information");
         out("                       Default: false");
-        out("  --config <file>      Override config file");
+        out("  " + CONFIG + " <file>      Override config file");
         out("                       Default: ~/.dockstore/config");
         out("  --script             For usage with scripts. Will not check for updates to Dockstore CLI.");
         out("                       Default: false");

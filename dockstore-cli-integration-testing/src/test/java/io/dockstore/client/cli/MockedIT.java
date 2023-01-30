@@ -50,6 +50,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import static io.dockstore.client.cli.Client.CLEAN_CACHE;
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static org.junit.Assert.assertEquals;
@@ -164,7 +165,7 @@ public class MockedIT {
     @Test
     public void runLaunchOneLocalArrayedJson() throws IOException, ApiException {
         Client.main(
-            new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry", "quay.io/collaboratory/arrays",
+            new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry", "quay.io/collaboratory/arrays",
                 "--json", ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), SCRIPT_FLAG, "--ignore-checksums" });
 
         assertTrue(new File("/tmp/example.bedGraph").exists());
@@ -182,9 +183,9 @@ public class MockedIT {
         String configFileLocation = TestUtility.getConfigFileLocation(true, true, true);
         when(client.getConfigFile()).thenReturn(configFileLocation);
 
-        Client.main(new String[] { CLEAN_CACHE, "--config", configFileLocation, "--script" });
+        Client.main(new String[] { CLEAN_CACHE, CONFIG, configFileLocation, "--script" });
         // this is kind of redundant, it looks like we take the mocked config file no matter what
-        Client.main(new String[] { "--config", configFileLocation, TOOL, "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
+        Client.main(new String[] { CONFIG, configFileLocation, TOOL, "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
             ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
 
         assertTrue(new File("/tmp/example.bedGraph").exists());
@@ -192,7 +193,7 @@ public class MockedIT {
         systemOutRule.clearLog();
 
         // try again, things should be cached now
-        Client.main(new String[] { "--config", configFileLocation, TOOL, "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
+        Client.main(new String[] { CONFIG, configFileLocation, TOOL, "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
             ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
         assertEquals("output should contain only hard linking", 6, StringUtils.countMatches(systemOutRule.getLog(), "hard-linking"));
         assertTrue("output should not contain warnings about skipping files", !systemOutRule.getLog().contains("skipping"));
@@ -207,7 +208,7 @@ public class MockedIT {
     @Test
     public void runLaunchOneHTTPArrayedJson() throws IOException, ApiException {
         Client.main(
-            new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry", "quay.io/collaboratory/arrays",
+            new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry", "quay.io/collaboratory/arrays",
                 "--json", ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), "--script", "--ignore-checksums" });
 
         assertTrue(new File("/tmp/wc1.out").exists());
