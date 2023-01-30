@@ -26,6 +26,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
 import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
@@ -152,7 +153,7 @@ public class CheckerClient extends WorkflowClient {
 
     private void addCheckerHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " add --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " add " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " add [parameters]");
         out("");
         out("Description:");
@@ -219,7 +220,7 @@ public class CheckerClient extends WorkflowClient {
 
     private void updateCheckerHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " update --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " update " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " update [parameters]");
         out("");
         out("Description:");
@@ -269,7 +270,7 @@ public class CheckerClient extends WorkflowClient {
 
     private void downloadCheckerHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " download --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " download " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " download [parameters]");
         out("");
         out("Description:");

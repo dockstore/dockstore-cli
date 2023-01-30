@@ -120,6 +120,7 @@ import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
+import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
@@ -1372,7 +1373,7 @@ public abstract class AbstractEntryClient<T> {
             launchHelp();
         } else {
             if (args.contains("--local-entry") && args.contains("--entry")) {
-                errorMessage("You can only use one of --local-entry and --entry at a time. Please use --help for more information.",
+                errorMessage("You can only use one of --local-entry and --entry at a time. Please use " + HELP + " for more information.",
                         CLIENT_ERROR);
             } else if (args.contains("--local-entry")) {
                 final String descriptor = optVal(args, "--descriptor", null);
@@ -1537,7 +1538,7 @@ public abstract class AbstractEntryClient<T> {
         printHelpHeader();
         out("Commands:");
         out("");
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
@@ -1568,7 +1569,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesLaunchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes launch --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes launch " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
         printWesLaunchHelpBody();
         printWesHelpFooter();
@@ -1577,7 +1578,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesStatusHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes status --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes status " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
         out("");
         out("Description:");
@@ -1591,7 +1592,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesRunLogsHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes logs --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes logs " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
         out("");
         out("Description:");
@@ -1605,7 +1606,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesCancelHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes cancel --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes cancel " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
         out("");
         out("Description:");
@@ -1619,7 +1620,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesServiceInfoHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes service-info --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes service-info " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " wes service-info");
         out("");
         out("Description:");
@@ -1630,7 +1631,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesRunListHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes list --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes list " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " wes list");
         out("");
         out("Description:");
@@ -1654,7 +1655,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void starHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " star --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " star " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " star");
         out("       dockstore " + getEntryType().toLowerCase() + " star [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " star --unstar [parameters]");
@@ -1670,7 +1671,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void listHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " list --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " list " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " list");
         out("");
         out("Description:");
@@ -1680,7 +1681,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void labelHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " label --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " label " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " label [parameters]");
         out("");
         out("Description:");
@@ -1697,7 +1698,7 @@ public abstract class AbstractEntryClient<T> {
 
     protected void testParameterHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " test_parameter --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " test_parameter " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " test_parameter [parameters]");
         out("");
         out("Description:");
@@ -1719,7 +1720,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void infoHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " info --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " info " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " info [parameters]");
         out("");
         out("Description:");
@@ -1733,7 +1734,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void descriptorHelp(DescriptorLanguage descriptorType) {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + descriptorType + " --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + descriptorType + " " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " " + descriptorType + " [parameters]");
         out("");
         out("Description:");
@@ -1747,7 +1748,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void refreshHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " refresh --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " refresh " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " refresh");
         out("       dockstore " + getEntryType().toLowerCase() + " refresh [parameters]");
         out("");
@@ -1761,7 +1762,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void searchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " search --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " search " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " search [parameters]");
         out("");
         out("Description:");
@@ -1774,7 +1775,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void cwl2yamlHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2yaml [parameters]");
         out("");
         out("Description:");
@@ -1787,7 +1788,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void cwl2jsonHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2json [parameters]");
         out("");
         out("Description:");
@@ -1800,7 +1801,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void wdl2jsonHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " wdl2json [parameters]");
         out("");
         out("Description:");
@@ -1813,7 +1814,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void convertHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2json [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2yaml [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " wdl2json [parameters]");
@@ -1826,7 +1827,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void entry2jsonHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
         out("");
         out("Description:");
@@ -1841,7 +1842,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void downloadHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " download --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " download " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " download [parameters]");
         out("");
         out("Description:");
@@ -1882,7 +1883,7 @@ public abstract class AbstractEntryClient<T> {
 
     protected void launchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " launch --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " launch " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " launch [parameters]");
         printLaunchHelpBody();
         printHelpFooter();
@@ -1890,7 +1891,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void verifyHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " verify --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " verify " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " verify [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " verify --unverify [parameters]");
         out("");

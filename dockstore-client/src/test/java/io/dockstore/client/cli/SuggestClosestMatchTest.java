@@ -29,6 +29,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CHECKER;
 import static io.dockstore.client.cli.Client.DEPS;
+import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static org.junit.Assert.assertTrue;
 
@@ -87,24 +88,24 @@ public class SuggestClosestMatchTest {
         acceptedCommands.add(DEPS);
         acceptedCommands.add("yaml");
         ArgumentUtility.invalid("", "z", acceptedCommands);
-        Assertions.assertEquals("dockstore: 'z' is not a dockstore command. See 'dockstore --help'.\n",
+        Assertions.assertEquals("dockstore: 'z' is not a dockstore command. See 'dockstore " + HELP + "'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
 
         ArgumentUtility.invalid("", "xxzz", acceptedCommands);
-        Assertions.assertEquals("dockstore: 'xxzz' is not a dockstore command. See 'dockstore --help'.\n",
+        Assertions.assertEquals("dockstore: 'xxzz' is not a dockstore command. See 'dockstore " + HELP + "'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
 
         ArgumentUtility.invalid("random_command_1", "xxzz", acceptedCommands);
         Assertions.assertEquals("dockstore random_command_1: 'xxzz' is not a dockstore command. "
-                        + "See 'dockstore random_command_1 --help'.\n",
+                        + "See 'dockstore random_command_1 " + HELP + "'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
 
         ArgumentUtility.invalid("random_command_1 random_command_2", "xxzz", acceptedCommands);
         Assertions.assertEquals("dockstore random_command_1 random_command_2: 'xxzz' is not a dockstore command. "
-                        + "See 'dockstore random_command_1 random_command_2 --help'.\n",
+                        + "See 'dockstore random_command_1 random_command_2 " + HELP + "'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
     }

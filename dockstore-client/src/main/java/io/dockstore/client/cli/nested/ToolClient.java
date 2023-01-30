@@ -73,6 +73,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
 
@@ -285,7 +286,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     @Override
     protected void publishHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " publish --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " publish " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " publish");
         out("       dockstore " + getEntryType().toLowerCase() + " publish [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " publish --unpub [parameters]");
@@ -1174,7 +1175,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void updateToolHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool " + UPDATE_TOOL + " --help");
+        out("Usage: dockstore tool " + UPDATE_TOOL + " " + HELP);
         out("       dockstore tool " + UPDATE_TOOL + " [parameters]");
         out("");
         out("Description:");
@@ -1198,8 +1199,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void versionTagHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool version_tag --help");
-        out("       dockstore tool version_tag [command] --help");
+        out("Usage: dockstore tool version_tag " + HELP);
+        out("       dockstore tool version_tag [command] " + HELP);
         out("       dockstore tool version_tag [command] [parameters]");
         out("");
         out("Description:");
@@ -1216,7 +1217,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void versionTagRemoveHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool version_tag remove --help");
+        out("Usage: dockstore tool version_tag remove " + HELP);
         out("       dockstore tool version_tag remove [parameters]");
         out("");
         out("Description:");
@@ -1230,7 +1231,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void versionTagUpdateHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool version_tag update --help");
+        out("Usage: dockstore tool version_tag update " + HELP);
         out("       dockstore tool version_tag update [parameters]");
         out("");
         out("Description:");
@@ -1251,7 +1252,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void versionTagAddHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool version_tag add --help");
+        out("Usage: dockstore tool version_tag add " + HELP);
         out("       dockstore tool version_tag add [parameters]");
         out("");
         out("Description:");
@@ -1273,7 +1274,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void manualPublishHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool manual_publish --help");
+        out("Usage: dockstore tool manual_publish " + HELP);
         out("       dockstore tool manual_publish [parameters]");
         out("");
         out("Description:");

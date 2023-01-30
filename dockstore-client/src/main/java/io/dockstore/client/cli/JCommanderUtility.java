@@ -81,7 +81,7 @@ public final class JCommanderUtility {
     }
 
     private static void printJCommanderHelpUsage(String programName, String commandName, JCommander jc) {
-        out("Usage: " + programName + " " + commandName + " --help");
+        out("Usage: " + programName + " " + commandName + " " + HELP);
         if (jc.getCommands().isEmpty()) {
             out("       " + programName + " " + commandName + " [parameters]");
         } else {

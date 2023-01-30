@@ -41,8 +41,8 @@ class YamlClientIT extends BaseIT {
     @SystemStub
     public final SystemErr systemErrRule = new SystemErr();
 
-    public final String yamlHelpMsg = "dockstore yaml --help";
-    public final String validateHelpMsg = "dockstore yaml validate --help";
+    public final String yamlHelpMsg = "dockstore yaml " + HELP;
+    public final String validateHelpMsg = "dockstore yaml validate " + HELP;
 
     @BeforeEach
     @Override

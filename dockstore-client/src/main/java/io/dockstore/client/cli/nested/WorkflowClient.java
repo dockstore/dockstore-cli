@@ -145,7 +145,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     private void manualPublishHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " manual_publish --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " manual_publish " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " manual_publish [parameters]");
         out("");
         out("Description:");
@@ -167,7 +167,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     private void updateWorkflowHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + UPDATE_WORKFLOW + " --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + UPDATE_WORKFLOW + " " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " " + UPDATE_WORKFLOW + " [parameters]");
         out("");
         out("Description:");
@@ -186,7 +186,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     protected void versionTagHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " version_tag --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " version_tag " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " version_tag [parameters]");
         out("");
         out("Description:");
@@ -757,7 +757,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     @Override
     protected void publishHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " publish --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " publish " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " publish");
         out("       dockstore " + getEntryType().toLowerCase() + " publish [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " publish --unpub [parameters]");
@@ -1154,7 +1154,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     private void restubHelp() {
         printHelpHeader();
-        out("Usage: dockstore workflow restub --help");
+        out("Usage: dockstore workflow restub " + HELP);
         out("       dockstore workflow restub [parameters]");
         out("");
         out("Description:");

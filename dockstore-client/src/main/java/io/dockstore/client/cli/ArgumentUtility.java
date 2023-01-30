@@ -244,7 +244,7 @@ public final class ArgumentUtility {
     public static void printFlagHelp() {
         out("");
         out("Flags:");
-        out("  --help               Print help information");
+        out("  " + HELP + "               Print help information");
         out("                       Default: false");
         out("  --debug              Print debugging information");
         out("                       Default: false");
@@ -295,7 +295,7 @@ public final class ArgumentUtility {
         }
 
         out("dockstore" + formattedCorrectCommand + ": \'" + invalidCommand + "\'" + " is not a dockstore command. "
-                + "See 'dockstore" + formattedCorrectCommand + " --help'.");
+                + "See 'dockstore" + formattedCorrectCommand + " " + HELP + "'.");
 
         if (mostSimilarCommands.isEmpty()) {
             return;
