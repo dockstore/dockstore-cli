@@ -608,7 +608,7 @@ public class Client {
         out("   " + WORKFLOW + "            Puts dockstore into " + WORKFLOW + " mode.");
         out("   " + CHECKER + "             Puts dockstore into " + CHECKER + " mode.");
         out("   " + PLUGIN + "              Configure and debug plugins.");
-        out("   " + DEPS + "                Print tool/workflow runner dependencies.");
+        out("   " + DEPS + "                Print " + TOOL + "/" + WORKFLOW + " runner dependencies.");
         out("   " + YAML + "                Puts dockstore into " + YAML + " mode.");
         out("");
         printLineBreak();

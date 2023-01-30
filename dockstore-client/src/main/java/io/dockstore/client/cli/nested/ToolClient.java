@@ -230,12 +230,12 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             if (isPublished) {
                 publish(false, entryPath);
             } else {
-                out("The following tool is already unpublished: " + entryPath);
+                out("The following " + TOOL + " is already unpublished: " + entryPath);
             }
         } else {
             if (newName == null) {
                 if (isPublished) {
-                    out("The following tool is already published: " + entryPath);
+                    out("The following " + TOOL + " is already published: " + entryPath);
                 } else {
                     publish(true, entryPath);
                 }
@@ -318,7 +318,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
             if (adds.size() > 0 || removes.size() > 0) {
                 containersApi.refresh(container.getId());
-                out("The test parameter files for tag " + versionName + " of tool " + parentEntry + " have been updated.");
+                out("The test parameter files for tag " + versionName + " of " + TOOL + " " + parentEntry + " have been updated.");
             } else {
                 out("Please provide at least one test parameter file to add or remove.");
             }

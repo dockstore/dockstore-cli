@@ -43,6 +43,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.common.DescriptorLanguage.CWL;
@@ -176,7 +177,7 @@ class LaunchTestIT {
 
         assertTrue(systemOutRule.getText().contains("Cromwell exit code: 0"), "output should include a successful cromwell run");
         assertTrue(systemOutRule.getText().contains("really cool metadata"),
-                "output should include a noop plugin run with metadata");
+                "output should include a noop " + PLUGIN + " run with metadata");
     }
 
     @Test
@@ -204,7 +205,7 @@ class LaunchTestIT {
         assertTrue(systemOutRule.getText().contains("Final process status is success"),
                 "output should include a successful cwltool run");
         assertTrue(systemOutRule.getText().contains("really cool metadata"),
-                "output should include a noop plugin run with metadata");
+                "output should include a noop " + PLUGIN + " run with metadata");
     }
 
 

@@ -15,6 +15,7 @@ import io.swagger.client.api.ExtendedGa4GhApi;
 
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.TOOL;
 
 /**
  * @author gluu
@@ -45,7 +46,7 @@ final class Verify {
                             verifyCommand.filePath, verifyCommand.platform, verifyCommand.platformVersion, verifyCommand.metadata,
                             !verifyCommand.unverify);
             if (stringObjectMap == null) {
-                ArgumentUtility.errorMessage("Could not verify tool", API_ERROR);
+                ArgumentUtility.errorMessage("Could not verify " + TOOL, API_ERROR);
             } else {
                 Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
                 ArgumentUtility.out(gson.toJson(stringObjectMap));

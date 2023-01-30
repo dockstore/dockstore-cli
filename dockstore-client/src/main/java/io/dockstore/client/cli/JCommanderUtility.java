@@ -30,6 +30,7 @@ import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.outFormatted;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 
 /**
  * @author gluu
@@ -49,7 +50,7 @@ public final class JCommanderUtility {
         printJCommanderHelpUsage(programName, commandName, jc);
         printJCommanderHelpDescription(description);
         out("Required parameters:\n"
-                + "  --entry <entry>                     Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)\n"
+                + "  --entry <entry>                     Complete " + WORKFLOW + " path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)\n"
                 + "   OR\n"
                 + "  --local-entry <local-entry>         Allows you to specify a full path to a local descriptor instead of an entry path\n");
         out("");

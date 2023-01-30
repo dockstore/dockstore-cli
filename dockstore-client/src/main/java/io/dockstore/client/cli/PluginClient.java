@@ -131,7 +131,7 @@ public final class PluginClient {
 
     @Parameters(separators = "=", commandDescription = "Configure and debug plugins")
     private static class CommandPlugin {
-        @Parameter(names = HELP, description = "Prints help for plugin command", help = true)
+        @Parameter(names = HELP, description = "Prints help for " + PLUGIN + " command", help = true)
         private boolean help = false;
     }
 

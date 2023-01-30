@@ -346,10 +346,10 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                     } else if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL) && matchTool.find()) {
                         classToolFound = true;
                     } else if ((abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL) && matchWf.find())) {
-                        errorMessage("Expected a tool but the CWL file specified a workflow. Use 'dockstore workflow launch ...' instead.",
+                        errorMessage("Expected a " + TOOL + " but the CWL file specified a " + WORKFLOW + ". Use 'dockstore " + WORKFLOW + " launch ...' instead.",
                             CLIENT_ERROR);
                     } else if (abstractEntryClient.getEntryType().equalsIgnoreCase(WORKFLOW) && matchTool.find()) {
-                        errorMessage("Expected a workflow but the CWL file specified a tool. Use 'dockstore tool launch ...' instead.",
+                        errorMessage("Expected a workflow but the CWL file specified a " + TOOL + ". Use 'dockstore " + TOOL + " launch ...' instead.",
                             CLIENT_ERROR);
                     }
                 }

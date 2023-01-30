@@ -29,6 +29,7 @@ import io.dockstore.client.cli.SearchClient;
 import io.swagger.client.model.ToolV1;
 import io.swagger.client.model.Workflow;
 
+import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 
 /**
@@ -51,7 +52,7 @@ public class ToolWorkflowDeserializer implements JsonDeserializer<SearchClient.E
 
         if (WORKFLOW.equals(type)) {
             internalHit.source = gson.fromJson(sourceString, Workflow.class);
-        } else if ("tool".equals(type)) {
+        } else if (TOOL.equals(type)) {
             internalHit.source = gson.fromJson(sourceString, ToolV1.class);
         }
 

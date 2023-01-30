@@ -7,6 +7,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
 import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 
 public class WesCommandParser {
 
@@ -67,11 +68,11 @@ public class WesCommandParser {
         }
     }
 
-    @Parameters(commandDescription = "Launch a workflow using WES")
+    @Parameters(commandDescription = "Launch a " + WORKFLOW + " using WES")
     public static class CommandLaunch extends WesMain {
-        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
+        @Parameter(names = "--entry", description = "Complete " + WORKFLOW + " path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
-        @Parameter(names = "--inline-workflow", description = "Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.")
+        @Parameter(names = "--inline-workflow", description = "Inlines " + WORKFLOW + " files contents directly into the WES HTTP request. This is required for some WES server implementations.")
         private boolean inlineWorkflow = false;
         @Parameter(names = "--json", description = "JSON file describing which attached file contains input parameters.")
         private String json;
@@ -97,7 +98,7 @@ public class WesCommandParser {
 
     @Parameters(commandDescription = "Cancel a remote WES entry")
     public static class CommandCancel extends WesMain {
-        @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
+        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to cancel", required = true)
         private String id;
 
         public String getId() {
@@ -105,9 +106,9 @@ public class WesCommandParser {
         }
     }
 
-    @Parameters(commandDescription = "Retrieve the status of a workflow")
+    @Parameters(commandDescription = "Retrieve the status of a " + WORKFLOW)
     public static class CommandStatus extends WesMain {
-        @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
+        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to cancel", required = true)
         private String id;
 
         public String getId() {
@@ -116,9 +117,9 @@ public class WesCommandParser {
 
     }
 
-    @Parameters(commandDescription = "Retrieve the status of a workflow")
+    @Parameters(commandDescription = "Retrieve the status of a " + WORKFLOW)
     public static class CommandRunLogs extends WesMain {
-        @Parameter(names = "--id", description = "The ID of the workflow to cancel", required = true)
+        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to cancel", required = true)
         private String id;
 
         public String getId() {

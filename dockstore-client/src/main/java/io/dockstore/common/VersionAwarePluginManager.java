@@ -35,6 +35,8 @@ import ro.fortsoft.pf4j.util.AndFileFilter;
 import ro.fortsoft.pf4j.util.DirectoryFileFilter;
 import ro.fortsoft.pf4j.util.NotFileFilter;
 
+import static io.dockstore.client.cli.Client.PLUGIN;
+
 /**
  * This extends the default plugin manager to be version-aware (take the latest version of a plugin)
  */
@@ -80,7 +82,7 @@ public class VersionAwarePluginManager extends DefaultPluginManager {
         Set<File> fileSet = pluginVersionMap.values().stream().map(Pair::getRight).collect(Collectors.toSet());
         for (File directory : directories) {
             if (!fileSet.contains(directory)) {
-                LOG.debug("Deleting old version of plugin in {}", directory.getAbsoluteFile());
+                LOG.debug("Deleting old version of " + PLUGIN + " in {}", directory.getAbsoluteFile());
                 try {
                     FileUtils.deleteDirectory(directory);
                     FileUtils.deleteQuietly(new File(directory.getAbsoluteFile() + ".zip"));

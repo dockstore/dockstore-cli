@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 
 /**
@@ -119,9 +121,9 @@ public final class SearchClient {
             ElasticSearchObject elasticSearchObject = gson.fromJson(s, ElasticSearchObject.class);
             for (ElasticSearchObject.HitsInternal hit : elasticSearchObject.hits.hits) {
                 if (hit.source instanceof ToolV1) {
-                    System.out.println("Found deserialized tool");
+                    System.out.println("Found deserialized " + TOOL);
                 } else {
-                    System.out.println("Found deserialized workflow");
+                    System.out.println("Found deserialized " + WORKFLOW);
                 }
             }
             System.out.println(s);
