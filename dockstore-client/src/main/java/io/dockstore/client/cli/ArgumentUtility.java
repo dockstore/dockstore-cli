@@ -27,6 +27,7 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.Client.DEBUG_FLAG;
 import static io.dockstore.client.cli.Client.HELP;
 import static java.lang.Math.max;
 
@@ -246,7 +247,7 @@ public final class ArgumentUtility {
         out("Flags:");
         out("  " + HELP + "               Print help information");
         out("                       Default: false");
-        out("  --debug              Print debugging information");
+        out("  " + DEBUG_FLAG + "              Print debugging information");
         out("                       Default: false");
         out("  --config <file>      Override config file");
         out("                       Default: ~/.dockstore/config");
