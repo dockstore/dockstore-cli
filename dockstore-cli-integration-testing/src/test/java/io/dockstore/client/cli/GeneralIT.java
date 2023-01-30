@@ -44,6 +44,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.UPGRADE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -79,7 +80,7 @@ class GeneralIT extends BaseIT {
         String installLocation = Client.getInstallLocation();
         String latestVersion = Client.getLatestVersion();
 
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "--upgrade", "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), UPGRADE, "--script" });
         String currentVersion = Client.getCurrentVersion();
 
         if (installLocation != null && latestVersion != null && currentVersion != null) {

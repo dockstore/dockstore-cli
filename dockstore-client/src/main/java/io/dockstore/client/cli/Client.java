@@ -119,6 +119,7 @@ public class Client {
     public static final String HELP = "--help";
     public static final String VERSION = "--version";
     public static final String SERVER_METADATA = "--server-metadata";
+    public static final String UPGRADE = "--upgrade";
     private static ObjectMapper objectMapper;
 
     private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
@@ -616,7 +617,7 @@ public class Client {
         out("                       Default: false");
         out("  " + SERVER_METADATA + "    Print metadata describing the dockstore webservice");
         out("                       Default: false");
-        out("  --upgrade            Upgrades to the latest stable release of Dockstore");
+        out("  " + UPGRADE + "            Upgrades to the latest stable release of Dockstore");
         out("                       Default: false");
         out("  --upgrade-stable     Force upgrade to the latest stable release of Dockstore");
         out("                       Default: false");
@@ -769,7 +770,7 @@ public class Client {
                         case SERVER_METADATA:
                             serverMetadata();
                             break;
-                        case "--upgrade":
+                        case UPGRADE:
                             upgrade("none");
                             break;
                         case "--upgrade-stable":
@@ -784,7 +785,7 @@ public class Client {
                         default:
                             List<String> possibleCommands = new ArrayList<String>();
                             possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML,
-                                    HELP, DEBUG_FLAG, VERSION, SERVER_METADATA, "--upgrade",
+                                    HELP, DEBUG_FLAG, VERSION, SERVER_METADATA, UPGRADE,
                                     "--upgrade-stable", "--upgrade-unstable", "--config", "--script", "--clean-cache"));
                             invalid("", cmd, possibleCommands);
                             break;
