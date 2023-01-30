@@ -1707,7 +1707,7 @@ public abstract class AbstractEntryClient<T> {
         out("Required Parameters:");
         out("  --entry <entry>                                                          Complete " + getEntryType()
                 + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("  --version <version>                                                      " + getEntryType() + " version name");
+        out("  " + VERSION + " <version>                                                      " + getEntryType() + " version name");
         if (getEntryType().equalsIgnoreCase(TOOL)) {
             out("  --descriptor-type <descriptor-type>                                      " + DescriptorLanguage.CWL.toString() + "/" + DescriptorLanguage.WDL.toString());
         }
@@ -1900,7 +1900,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Required parameters:");
         out("  --entry <entry>                              Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("  --version <version>                          Version name");
+        out("  " + VERSION + " <version>                          Version name");
         out("");
         out("Optional Parameters:");
         out("  --verified-source <verified-source>          Source of verification (Required to verify).");

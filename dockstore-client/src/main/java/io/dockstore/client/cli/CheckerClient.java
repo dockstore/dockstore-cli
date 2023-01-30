@@ -278,7 +278,7 @@ public class CheckerClient extends WorkflowClient {
         out("");
         out("Required Parameters:");
         out("  --entry <entry>          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("  --version <version>      Checker version");
+        out("  " + VERSION + " <version>      Checker version");
         out("  --zip                    Keep the zip file rather than uncompress the files within");
         out("");
         printHelpFooter();
