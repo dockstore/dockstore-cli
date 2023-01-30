@@ -15,6 +15,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
@@ -58,7 +59,7 @@ class QuayGitlabBasicIT extends BaseIT {
     @Test
     void testQuayGitlabPublishAlternateStructure() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
-                "quay.io/dockstoretestuser/quayandgitlabalternate", "--script" }));
+                "quay.io/dockstoretestuser/quayandgitlabalternate", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
@@ -69,7 +70,7 @@ class QuayGitlabBasicIT extends BaseIT {
     void testQuayAndGitlabPublishAndUnpublishAnentry() {
         // Publish
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
-            "quay.io/dockstoretestuser/quayandgitlab", "--script" });
+            "quay.io/dockstoretestuser/quayandgitlab", SCRIPT_FLAG });
 
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where name = 'quayandgitlab' and ispublished='t'", long.class);
@@ -77,7 +78,7 @@ class QuayGitlabBasicIT extends BaseIT {
 
         // Unpublish
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "quay.io/dockstoretestuser/quayandgitlab", "--script" });
+            "quay.io/dockstoretestuser/quayandgitlab", SCRIPT_FLAG });
 
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where name = 'quayandgitlab' and ispublished='t'", long.class);
@@ -94,7 +95,7 @@ class QuayGitlabBasicIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "manual_publish", "--registry",
             Registry.QUAY_IO.name(), Registry.QUAY_IO.toString(), "--namespace", "dockstoretestuser", "--name", "quayandgitlabalternate",
             "--git-url", "git@gitlab.com:dockstore.test.user/quayandgitlabalternate.git", "--git-reference", "master", "--toolname",
-            "alternate", "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", "--script" });
+            "alternate", "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", SCRIPT_FLAG });
 
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
@@ -103,7 +104,7 @@ class QuayGitlabBasicIT extends BaseIT {
 
         // Unpublish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--unpub", "--entry",
-            "quay.io/dockstoretestuser/quayandgitlabalternate/alternate", "--script" });
+            "quay.io/dockstoretestuser/quayandgitlabalternate/alternate", SCRIPT_FLAG });
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
 

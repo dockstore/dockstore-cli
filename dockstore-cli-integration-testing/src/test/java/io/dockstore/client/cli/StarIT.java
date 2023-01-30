@@ -9,6 +9,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,14 +36,14 @@ class StarIT extends BaseIT {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
-                "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
+                "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", SCRIPT_FLAG });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--pub", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--pub", SCRIPT_FLAG });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "star", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", SCRIPT_FLAG });
         assertTrue(systemOutRule.getText().contains("Successfully starred"));
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "star", "--unstar", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", SCRIPT_FLAG });
         assertTrue(systemOutRule.getText().contains("Successfully unstarred"));
     }
 }

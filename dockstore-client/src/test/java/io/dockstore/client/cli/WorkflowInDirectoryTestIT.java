@@ -30,6 +30,7 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
 import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -174,7 +175,7 @@ public class WorkflowInDirectoryTestIT {
         args.add("--yaml");
         args.add(testParameter.getPath());
         if (script) {
-            args.add("--script");
+            args.add(SCRIPT_FLAG);
         }
 
         Client.main(args.toArray(new String[0]));

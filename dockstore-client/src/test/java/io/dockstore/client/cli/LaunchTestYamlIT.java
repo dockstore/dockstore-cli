@@ -21,6 +21,7 @@ import org.junit.runner.Description;
 
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.Assert.assertTrue;
 
@@ -105,7 +106,7 @@ public class LaunchTestYamlIT {
             systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
         args.add(0, config.getPath());
         args.add(0, CONFIG);
-        args.add(0, "--script");
+        args.add(0, SCRIPT_FLAG);
         Client.main(args.toArray(new String[0]));
     }
 
@@ -148,7 +149,7 @@ public class LaunchTestYamlIT {
     private List<String> getLaunchStringList(String entryType) {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         final List<String> strings = new ArrayList<>();
-        strings.add("--script");
+        strings.add(SCRIPT_FLAG);
         strings.add(CONFIG);
         strings.add(ResourceHelpers.resourceFilePath("config"));
         strings.add(entryType);

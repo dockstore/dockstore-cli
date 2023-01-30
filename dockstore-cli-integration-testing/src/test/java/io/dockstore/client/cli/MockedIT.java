@@ -49,6 +49,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -140,7 +141,7 @@ public class MockedIT {
     @Test
     public void runLaunchOneJson() throws IOException, ApiException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry",
-            "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testOneRun.json"), "--script", "--ignore-checksums" });
+            "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testOneRun.json"), SCRIPT_FLAG, "--ignore-checksums" });
 
         assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
     }
@@ -150,7 +151,7 @@ public class MockedIT {
     public void runLaunchNJson() throws IOException {
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry",
             "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testMultipleRun.json"),
-            "--script" });
+            SCRIPT_FLAG });
     }
 
     /**
@@ -163,7 +164,7 @@ public class MockedIT {
     public void runLaunchOneLocalArrayedJson() throws IOException, ApiException {
         Client.main(
             new String[] { "--config", TestUtility.getConfigFileLocation(true), TOOL, "launch", "--entry", "quay.io/collaboratory/arrays",
-                "--json", ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
+                "--json", ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), SCRIPT_FLAG, "--ignore-checksums" });
 
         assertTrue(new File("/tmp/example.bedGraph").exists());
         assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));

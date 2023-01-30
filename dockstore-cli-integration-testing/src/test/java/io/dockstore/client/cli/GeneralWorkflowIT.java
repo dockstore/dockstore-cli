@@ -40,6 +40,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.webservice.resources.WorkflowResource.FROZEN_VERSION_REQUIRED;
@@ -103,7 +104,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // refresh individual that is valid
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         // check that valid is valid and full
         final long count = testingPostgres.runSelectStatement("select count(*) from workflow where ispublished='t'", long.class);
@@ -117,14 +118,14 @@ class GeneralWorkflowIT extends BaseIT {
 
         // attempt to publish it
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         final long count5 = testingPostgres.runSelectStatement("select count(*) from workflow where ispublished='t'", long.class);
         assertEquals(1, count5, "there should be 1 published entry, there are " + count5);
 
         // unpublish
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--unpub", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--unpub", SCRIPT_FLAG });
 
         final long count6 = testingPostgres.runSelectStatement("select count(*) from workflow where ispublished='t'", long.class);
         assertEquals(0, count6, "there should be 0 published entries, there are " + count6);
@@ -137,7 +138,7 @@ class GeneralWorkflowIT extends BaseIT {
      */
     private void testPublishList() {
         systemOutRule.clear();
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", SCRIPT_FLAG });
         assertTrue(systemOutRule.getText().contains("github.com/DockstoreTestUser2/hello-dockstore-workflow"),
                 "Should contain a FULL workflow belonging to the user");
         assertFalse(systemOutRule.getText().contains("gitlab.com/dockstore.test.user2/dockstore-workflow-md5sum-unified "),
@@ -155,7 +156,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // refresh individual
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/dockstore_empty_repo", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/dockstore_empty_repo", SCRIPT_FLAG });
 
         // check that no valid versions
         final long count = testingPostgres.runSelectStatement("select count(*) from workflowversion where valid='t'", long.class);
@@ -163,7 +164,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // try and publish
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
-                SourceControl.GITHUB + "/DockstoreTestUser2/dockstore_empty_repo", "--script" }));
+                SourceControl.GITHUB + "/DockstoreTestUser2/dockstore_empty_repo", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
@@ -179,9 +180,9 @@ class GeneralWorkflowIT extends BaseIT {
         // Refresh and then restub
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "restub", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement("select count(*) from workflowversion", long.class);
         assertEquals(0, count, "there should be 0 workflow versions, there are " + count);
@@ -195,7 +196,7 @@ class GeneralWorkflowIT extends BaseIT {
         // Refresh and then restub
         refreshByOrganizationReplacement(USER_2_USERNAME);
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "refresh", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
 

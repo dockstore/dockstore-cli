@@ -16,6 +16,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,12 +48,12 @@ class ManualPublishWorkflowIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
-                "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
+                "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", SCRIPT_FLAG });
 
         int exitCode = catchSystemExit(() ->   Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "manual_publish", "--repository",
                         "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
-                        "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" }));
+                        "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
@@ -66,10 +67,10 @@ class ManualPublishWorkflowIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "manual_publish", "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
-                "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
+                "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "version_tag", "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--name", "master",
-            "--workflow-path", "/Dockstore2.wdl", "--script" });
+            "--workflow-path", "/Dockstore2.wdl", SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from workflowversion wv, version_metadata vm where wv.name = 'master' and wv.workflowpath = '/Dockstore2.wdl' and wv.id = vm.id",
@@ -86,16 +87,16 @@ class ManualPublishWorkflowIT extends BaseIT {
         // Setup workflow
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "manual_publish", "--repository",
-                "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--script" });
+                "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", SCRIPT_FLAG });
 
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "refresh", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
         // Update workflow with version with no metadata
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--default-version", "testWDL",
-                "--script" });
+                SCRIPT_FLAG });
 
         // Assert default version is updated and no author or email is found
         final long count = testingPostgres.runSelectStatement("select count(*) from workflow w, workflowversion wv where wv.name = 'testWDL' and wv.id = w.actualdefaultversion", long.class);
@@ -110,7 +111,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "update_workflow", "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--default-version", "testBoth",
-                "--script" });
+                SCRIPT_FLAG });
 
         // Assert default version is updated and author and email are set
         final long count3 = testingPostgres
@@ -124,14 +125,14 @@ class ManualPublishWorkflowIT extends BaseIT {
 
         // Unpublish
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
-            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--unpub", "--script" });
+            SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--unpub", SCRIPT_FLAG });
 
         // Alter workflow so that it has no valid tags
         testingPostgres.runUpdateStatement("UPDATE workflowversion SET valid='f'");
 
         // Now you shouldn't be able to publish the workflow
         int exitCode = catchSystemExit(() ->  Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry",
-                SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--script" }));
+                SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
@@ -145,7 +146,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "manual_publish", "--repository",
                 "dockstore-workflow-example", "--organization", "dockstore.test.user2", "--git-version-control", "gitlab",
-                "--workflow-name", "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", "--script" });
+                "--workflow-name", "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", SCRIPT_FLAG });
 
         // Check for one valid version
         final long count = testingPostgres.runSelectStatement("select count(*) from workflowversion where valid='t'", long.class);
@@ -157,7 +158,7 @@ class ManualPublishWorkflowIT extends BaseIT {
 
         // grab wdl file
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "wdl", "--entry",
-            SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example/testname:master", "--script" });
+            SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example/testname:master", SCRIPT_FLAG });
     }
 
     /**
@@ -171,7 +172,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
                 "dockstore-workflow-md5sum-unified", "--organization", "dockstore.test.user2", "--git-version-control", "gitlab",
-                "--workflow-name", "testname", "--workflow-path", "/checker.wdl", "--descriptor-type", "wdl", "--script" });
+                "--workflow-name", "testname", "--workflow-path", "/checker.wdl", "--descriptor-type", "wdl", SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement("select count(*) from workflowversion", long.class);
         assertTrue(count >= 5, "there should be at least 5 versions, there are " + count);

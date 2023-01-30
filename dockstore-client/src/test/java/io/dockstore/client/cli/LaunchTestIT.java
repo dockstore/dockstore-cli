@@ -43,6 +43,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
@@ -250,7 +251,7 @@ class LaunchTestIT {
     private void runClientCommand(ArrayList<String> args) {
         args.add(0, ResourceHelpers.resourceFilePath("config"));
         args.add(0, CONFIG);
-        args.add(0, "--script");
+        args.add(0, SCRIPT_FLAG);
         Client.main(args.toArray(new String[0]));
     }
 
@@ -258,7 +259,7 @@ class LaunchTestIT {
         //used to run client with a specified config file
         args.add(0, config.getPath());
         args.add(0, CONFIG);
-        args.add(0, "--script");
+        args.add(0, SCRIPT_FLAG);
         Client.main(args.toArray(new String[0]));
     }
 

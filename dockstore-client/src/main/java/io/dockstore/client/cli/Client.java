@@ -123,6 +123,7 @@ public class Client {
     public static final String UPGRADE_STABLE = "--upgrade-stable";
     public static final String UPGRADE_UNSTABLE = "--upgrade-unstable";
     public static final String CONFIG = "--config";
+    public static final String SCRIPT_FLAG = "--script";
     private static ObjectMapper objectMapper;
 
     private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
@@ -628,7 +629,7 @@ public class Client {
         out("                       Default: false");
         out("  " + CONFIG + " <file>      Override config file");
         out("                       Default: ~/.dockstore/config");
-        out("  --script             Will not check Github for newer versions of Dockstore, or ask for user input");
+        out("  " + SCRIPT_FLAG + "             Will not check Github for newer versions of Dockstore, or ask for user input");
         out("                       Default: false");
         out("  --clean-cache        Delete the Dockstore launcher cache to save space");
         printHelpFooter();
@@ -697,7 +698,7 @@ public class Client {
         } else {
             root.setLevel(Level.ERROR);
         }
-        if (flag(args, "--script") || flag(args, "--s")) {
+        if (flag(args, SCRIPT_FLAG) || flag(args, "--s")) {
             SCRIPT.set(true);
         } else {
             SCRIPT.set(false);
@@ -789,7 +790,7 @@ public class Client {
                             List<String> possibleCommands = new ArrayList<String>();
                             possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML,
                                     HELP, DEBUG_FLAG, VERSION, SERVER_METADATA, UPGRADE,
-                                    UPGRADE_STABLE, UPGRADE_UNSTABLE, CONFIG, "--script", "--clean-cache"));
+                                    UPGRADE_STABLE, UPGRADE_UNSTABLE, CONFIG, SCRIPT_FLAG, "--clean-cache"));
                             invalid("", cmd, possibleCommands);
                             break;
                         }

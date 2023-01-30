@@ -44,6 +44,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.UPGRADE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,7 +82,7 @@ class GeneralIT extends BaseIT {
         String installLocation = Client.getInstallLocation();
         String latestVersion = Client.getLatestVersion();
 
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), UPGRADE, "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), UPGRADE, SCRIPT_FLAG });
         String currentVersion = Client.getCurrentVersion();
 
         if (installLocation != null && latestVersion != null && currentVersion != null) {
@@ -97,7 +98,7 @@ class GeneralIT extends BaseIT {
     void testLocalLaunchCWL() {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("arrays.cwl"), "--json",
-            ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), "--script" });
+            ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), SCRIPT_FLAG });
     }
 
     /**
@@ -107,7 +108,7 @@ class GeneralIT extends BaseIT {
     void testLocalLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
-                        "imnotreal.cwl", "--json", "filtercount-job.json", "--script" }));
+                        "imnotreal.cwl", "--json", "filtercount-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -118,7 +119,7 @@ class GeneralIT extends BaseIT {
     void testLocalLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
-                        "imnotreal.wdl", "--json", "imnotreal-job.json", "--descriptor", "wdl", "--script" }));
+                        "imnotreal.wdl", "--json", "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -129,7 +130,7 @@ class GeneralIT extends BaseIT {
     void testRemoteLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--entry",
-                        "imnotreal.cwl", "--json", "imnotreal-job.json", "--script" }));
+                        "imnotreal.cwl", "--json", "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.IO_ERROR, exitCode);
     }
 
@@ -140,7 +141,7 @@ class GeneralIT extends BaseIT {
     void testRemoteLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--entry", "imnotreal.wdl",
-                        "--json", "imnotreal-job.json", "--descriptor", "wdl", "--script" }));
+                        "--json", "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -151,7 +152,7 @@ class GeneralIT extends BaseIT {
     void testLabelIncorrectInput() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
-                        "quay.io/dockstoretestuser2/quayandgithub", "--add", "docker-hub", "--add", "quay.io", "--script" }));
+                        "quay.io/dockstoretestuser2/quayandgithub", "--add", "docker-hub", "--add", "quay.io", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
@@ -162,14 +163,14 @@ class GeneralIT extends BaseIT {
     void testAddEditRemoveLabel() {
         // Test adding/removing labels for different containers
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
-            "quay.io/dockstoretestuser2/quayandgithub", "--add", "quay", "--add", "github", "--remove", "dockerhub", "--script" });
+            "quay.io/dockstoretestuser2/quayandgithub", "--add", "quay", "--add", "github", "--remove", "dockerhub", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
-            "quay.io/dockstoretestuser2/quayandgithub", "--add", "github", "--add", "dockerhub", "--remove", "quay", "--script" });
+            "quay.io/dockstoretestuser2/quayandgithub", "--add", "github", "--add", "dockerhub", "--remove", "quay", SCRIPT_FLAG });
 
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
-            "quay.io/dockstoretestuser2/quayandgithubalternate", "--add", "alternate", "--add", "github", "--script" });
+            "quay.io/dockstoretestuser2/quayandgithubalternate", "--add", "alternate", "--add", "github", SCRIPT_FLAG });
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
-            "quay.io/dockstoretestuser2/quayandgithubalternate", "--remove", "github", "--script" });
+            "quay.io/dockstoretestuser2/quayandgithubalternate", "--remove", "github", SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement("select count(*) from entry_label where entryid = '2'", long.class);
         assertEquals(2, count, "there should be 2 labels for the given container, there are " + count);
@@ -188,7 +189,7 @@ class GeneralIT extends BaseIT {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "update", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--cwl-path", "/testDir/Dockstore.cwl", "--wdl-path",
-                "/testDir/Dockstore.wdl", "--dockerfile-path", "/testDir/Dockerfile", "--script" });
+                "/testDir/Dockstore.wdl", "--dockerfile-path", "/testDir/Dockerfile", SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement(
             "select count(*) from tag,tool where tool.registry = '" + Registry.QUAY_IO.getDockerPath()
@@ -199,7 +200,7 @@ class GeneralIT extends BaseIT {
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "update", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--cwl-path", "/Dockstore.cwl", "--wdl-path",
-                "/Dockstore.wdl", "--dockerfile-path", "/Dockerfile", "--script" });
+                "/Dockstore.wdl", "--dockerfile-path", "/Dockerfile", SCRIPT_FLAG });
 
         final long count2 = testingPostgres.runSelectStatement(
             "select count(*) from tag,tool where tool.registry = '" + Registry.QUAY_IO.getDockerPath()
@@ -215,7 +216,7 @@ class GeneralIT extends BaseIT {
     void testVersionTagRemoveAutoContainer() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "remove", "--entry",
-                        "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--script" }));
+                        "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 

@@ -22,6 +22,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -146,7 +147,7 @@ class GitHubAppToolIT extends BaseIT {
 
     @Test
     void launch() throws ApiException {
-        Client.main(new String[]{"workflow", "launch", "--entry", ENTRY_PATH_WITH_VERSION, "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script", "--config",
+        Client.main(new String[]{"workflow", "launch", "--entry", ENTRY_PATH_WITH_VERSION, "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG, "--config",
             ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("Final process status is success"));
     }

@@ -15,6 +15,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
@@ -49,7 +50,7 @@ class LaunchWorkflowIT extends BaseIT {
     void testLocalLaunchCWL() {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("filtercount.cwl.yaml"), "--json", ResourceHelpers.resourceFilePath("filtercount-job.json"),
-            "--script" });
+            SCRIPT_FLAG });
     }
 
     /**
@@ -58,7 +59,7 @@ class LaunchWorkflowIT extends BaseIT {
     @Test
     void testLocalLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--local-entry",
-                "imnotreal.cwl", "--json", "imnotreal-job.json", "--script" }));
+                "imnotreal.cwl", "--json", "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -69,7 +70,7 @@ class LaunchWorkflowIT extends BaseIT {
     @Test
     void testLocalLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--local-entry",
-                "imnotreal.wdl", "--json", "imnotreal-job.json", "--script" }));
+                "imnotreal.wdl", "--json", "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -80,7 +81,7 @@ class LaunchWorkflowIT extends BaseIT {
     @Category(ToilCompatibleTest.class)
     void testRemoteLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--entry",
-                "imnotreal.cwl", "--json", "imnotreal-job.json", "--script" }));
+                "imnotreal.cwl", "--json", "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -90,7 +91,7 @@ class LaunchWorkflowIT extends BaseIT {
     @Test
     void testRemoteLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--entry",
-                "imnotreal.wdl", "--json", "imnotreal-job.json", "--script" }));
+                "imnotreal.wdl", "--json", "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -100,7 +101,7 @@ class LaunchWorkflowIT extends BaseIT {
     @Test
     void testLocalLaunchWDL() {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--local-entry",
-            ResourceHelpers.resourceFilePath("wdl.wdl"), "--json", ResourceHelpers.resourceFilePath("wdl.json"), "--script" });
+            ResourceHelpers.resourceFilePath("wdl.wdl"), "--json", ResourceHelpers.resourceFilePath("wdl.json"), SCRIPT_FLAG });
     }
 
 
@@ -111,7 +112,7 @@ class LaunchWorkflowIT extends BaseIT {
     void testLocalLaunchWDLWithDir() {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("directorytest.wdl"), "--json", ResourceHelpers.resourceFilePath("directorytest.json"),
-            "--script" });
+            SCRIPT_FLAG });
     }
 
 
@@ -124,7 +125,7 @@ class LaunchWorkflowIT extends BaseIT {
     void testLocalLaunchWDLImportHTTP() {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--local-entry",
             ResourceHelpers.resourceFilePath("wdlhttpimport.wdl"), "--json", ResourceHelpers.resourceFilePath("wdlhttp.json"),
-            "--script" });
+            SCRIPT_FLAG });
     }
 
     /**
@@ -137,7 +138,7 @@ class LaunchWorkflowIT extends BaseIT {
         //        systemExit.checkAssertionAfterwards(
         //            () -> assertTrue("Output should indicate issues with WDL imports and exit", systemOutRule.getLog().contains("Could not get WDL imports")));
         int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
-                ResourceHelpers.resourceFilePath("wdlincorrecthttp.wdl"), "--json", ResourceHelpers.resourceFilePath("wdl.json"), "--script" }));
+                ResourceHelpers.resourceFilePath("wdlincorrecthttp.wdl"), "--json", ResourceHelpers.resourceFilePath("wdl.json"), SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 

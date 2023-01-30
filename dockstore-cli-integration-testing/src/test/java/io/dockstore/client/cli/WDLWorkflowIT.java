@@ -44,6 +44,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -149,7 +150,7 @@ class WDLWorkflowIT extends BaseIT {
     private void checkOnConvert(String skylabWorkflowChecker, String branch, String prefix) {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "convert", "entry2json", "--entry",
-                skylabWorkflowChecker + ":" + branch, "--script" });
+                skylabWorkflowChecker + ":" + branch, SCRIPT_FLAG });
         List<String> stringList = new ArrayList<>();
         stringList.add("\"" + prefix + ".gtf_file\": \"File\"");
         stringList.add("\"" + prefix + ".genome_ref_fasta\": \"File\"");

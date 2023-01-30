@@ -51,6 +51,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.swagger.client.model.ToolDescriptor.TypeEnum.CWL;
@@ -103,12 +104,12 @@ class WorkflowIT extends BaseIT {
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
 
         // should not be able to launch properly with incorrect credentials
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, "launch", "--entry", toolpath,
-                        "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" }));
+                        "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -154,7 +155,7 @@ class WorkflowIT extends BaseIT {
         // Download published workflow version
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "publish", "--entry", toolpath,
-                "--script" });
+                SCRIPT_FLAG });
         arbitraryURL = SwaggerUtility.getArbitraryURL("/workflows/" + workflowId + "/zip/" + versionId, new GenericType<byte[]>() {
         }, CLICommonTestUtilities.getWebClient(false, null, testingPostgres));
         File tempZip2 = File.createTempFile("temp", "zip");
