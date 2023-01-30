@@ -117,6 +117,7 @@ public class Client {
     public static final String DEBUG_FLAG = "--debug";
 
     public static final String HELP = "--help";
+    public static final String VERSION = "--version";
     private static ObjectMapper objectMapper;
 
     private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
@@ -610,7 +611,7 @@ public class Client {
         out("                       Default: false");
         out("  " + DEBUG_FLAG + "              Print debugging information");
         out("                       Default: false");
-        out("  --version            Print dockstore's version");
+        out("  " + VERSION + "            Print dockstore's version");
         out("                       Default: false");
         out("  --server-metadata    Print metadata describing the dockstore webservice");
         out("                       Default: false");
@@ -761,7 +762,7 @@ public class Client {
                     if (null != cmd) {
                         switch (cmd) {
                         case "-v":
-                        case "--version":
+                        case VERSION:
                             version();
                             break;
                         case "--server-metadata":
@@ -782,7 +783,7 @@ public class Client {
                         default:
                             List<String> possibleCommands = new ArrayList<String>();
                             possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML,
-                                    HELP, DEBUG_FLAG, "--version", "--server-metadata", "--upgrade",
+                                    HELP, DEBUG_FLAG, VERSION, "--server-metadata", "--upgrade",
                                     "--upgrade-stable", "--upgrade-unstable", "--config", "--script", "--clean-cache"));
                             invalid("", cmd, possibleCommands);
                             break;

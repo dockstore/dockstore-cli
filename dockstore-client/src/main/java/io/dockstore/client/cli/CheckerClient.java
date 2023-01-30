@@ -25,6 +25,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+import static io.dockstore.client.cli.Client.VERSION;
 
 /**
  * This implements all operations on the CLI that are specific to checkers
@@ -239,7 +240,7 @@ public class CheckerClient extends WorkflowClient {
 
             // Retrieve arguments
             String entryPath = reqVal(args, "--entry");
-            String version = reqVal(args, "--version");
+            String version = reqVal(args, VERSION);
             final boolean unzip = !args.contains("--zip");
 
             // Get entry from path

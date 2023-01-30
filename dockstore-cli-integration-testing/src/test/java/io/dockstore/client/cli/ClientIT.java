@@ -47,6 +47,7 @@ import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.common.CLICommonTestUtilities.checkToolList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -223,7 +224,7 @@ class ClientIT extends BaseIT {
 
     @Test
     void testMetadataMethods() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "--version" });
+        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), VERSION });
         assertTrue(systemOutRule.getText().contains("Dockstore version"));
         systemOutRule.clear();
         Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "--server-metadata" });

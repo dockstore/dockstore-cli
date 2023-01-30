@@ -51,6 +51,7 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.swagger.client.model.ToolDescriptor.TypeEnum.CWL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -206,7 +207,7 @@ class WorkflowIT extends BaseIT {
         // should be able to download properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
-            new String[] { "--config", fileWithCorrectCredentials, CHECKER, "download", "--entry", toolpath, "--version", "master",
+            new String[] { "--config", fileWithCorrectCredentials, CHECKER, "download", "--entry", toolpath, VERSION, "master",
                 "--script" });
 
         // Publish the workflow
@@ -214,7 +215,7 @@ class WorkflowIT extends BaseIT {
 
         // should be able to download properly with incorrect credentials because the entry is published
         Client.main(
-            new String[] { "--config", fileWithIncorrectCredentials, CHECKER, "download", "--entry", toolpath, "--version", "master",
+            new String[] { "--config", fileWithIncorrectCredentials, CHECKER, "download", "--entry", toolpath, VERSION, "master",
                 "--script" });
 
         // Unpublish the workflow
@@ -223,7 +224,7 @@ class WorkflowIT extends BaseIT {
 
         // should not be able to download properly with incorrect credentials because the entry is not published
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { "--config", fileWithIncorrectCredentials, CHECKER, "download", "--entry", toolpath, "--version", "master",
+                new String[] { "--config", fileWithIncorrectCredentials, CHECKER, "download", "--entry", toolpath, VERSION, "master",
                         "--script" }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }

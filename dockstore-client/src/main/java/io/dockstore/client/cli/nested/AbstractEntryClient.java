@@ -122,6 +122,7 @@ import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
@@ -753,7 +754,7 @@ public abstract class AbstractEntryClient<T> {
             testParameterHelp();
         } else {
             String entry = reqVal(args, "--entry");
-            String version = reqVal(args, "--version");
+            String version = reqVal(args, VERSION);
             String descriptorType = null;
             final List<String> adds = optVals(args, "--add");
             final List<String> removes = optVals(args, "--remove");

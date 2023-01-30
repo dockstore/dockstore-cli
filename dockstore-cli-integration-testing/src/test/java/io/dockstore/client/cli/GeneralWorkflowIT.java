@@ -39,6 +39,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.webservice.resources.WorkflowResource.FROZEN_VERSION_REQUIRED;
 import static io.dockstore.webservice.resources.WorkflowResource.NO_ZENDO_USER_TOKEN;
@@ -505,7 +506,7 @@ class GeneralWorkflowIT extends BaseIT {
         // Update version master with test parameters
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
-                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", "--version", "master", "--add",
+                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION, "master", "--add",
                 // Trying to remove a non-existent test parameter file now causes an error. It didn't use to and test was relying
                 // on that behavior.
                 "test.cwl.json", "--add", "test2.cwl.json", "--add", "fake.cwl.json", /*"--remove", "notreal.cwl.json",*/ "--script" });
@@ -515,7 +516,7 @@ class GeneralWorkflowIT extends BaseIT {
         // Update version with test parameters
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
-                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", "--version", "master", "--add",
+                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION, "master", "--add",
                 "test.cwl.json", "--remove", "test2.cwl.json", "--script" });
         final long count3 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals(1, count3, "there should be one sourcefile that is a test parameter file, there are " + count3);
@@ -523,7 +524,7 @@ class GeneralWorkflowIT extends BaseIT {
         // Update other version with test parameters
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
-                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", "--version", "wdltest", "--add",
+                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION, "wdltest", "--add",
                 "test.wdl.json", "--script" });
         final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='CWL_TEST_JSON'", long.class);
         assertEquals(2, count4, "there should be two sourcefiles that are cwl test parameter files, there are " + count4);
@@ -545,7 +546,7 @@ class GeneralWorkflowIT extends BaseIT {
         // Update version wdltest with test parameters
         Client.main(
             new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "test_parameter", "--entry",
-                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", "--version", "wdltest", "--add",
+                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", VERSION, "wdltest", "--add",
                 "test.wdl.json", "--script" });
         final long count6 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='WDL_TEST_JSON'", long.class);
         assertEquals(1, count6, "there should be one sourcefile that is a wdl test parameter file, there are " + count6);
