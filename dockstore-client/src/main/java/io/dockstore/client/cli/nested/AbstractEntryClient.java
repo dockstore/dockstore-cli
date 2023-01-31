@@ -129,6 +129,7 @@ import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
 import static io.dockstore.common.DescriptorLanguage.WDL;
+import static io.github.collaboratory.cwl.CWLClient.WES;
 
 /**
  * Handles the commands for a particular type of entry. (e.g. Workflows, Tools) Not a great abstraction, but enforces some structure for
@@ -149,9 +150,18 @@ public abstract class AbstractEntryClient<T> {
     public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
     public static final String MULTIPLE_TEST_FILE_ERROR_MESSAGE = "If specifying a test parameter file, use either --json or --yaml, but not both.";
 
-
+    public static final String INFO = "info";
+    public static final String LIST = "list";
+    public static final String SEARCH = "search";
+    public static final String PUBLISH = "publish";
+    public static final String STAR = "star";
+    public static final String REFRESH = "refresh";
+    public static final String LABEL = "label";
+    public static final String MANUAL_PUBLISH = "manual_publish";
+    public static final String VERIFY = "verify";
+    public static final String TEST_PARAMETER = "test_parameter";
+    public static final String NFL = "nfl";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
-
     protected boolean isAdmin = false;
 
     boolean isLocalEntry = false;
@@ -206,39 +216,39 @@ public abstract class AbstractEntryClient<T> {
         printUsageHelp(getEntryType().toLowerCase());
         out("Commands:");
         out("");
-        out("  " + CONVERT + "          :  utilities that allow you to convert file types");
+        out("  " + CONVERT + "          :  utilities that allow you to " + CONVERT + " file types");
         out("");
         out("  " + CWL.toString() + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
         out("                      which enables integration with Global Alliance compliant systems");
         out("");
-        out("  " + DOWNLOAD + "         :  download " + getEntryType() + "s to the local directory");
+        out("  " + DOWNLOAD + "         :  " + DOWNLOAD + " " + getEntryType() + "s to the local directory");
         out("");
-        out("  info             :  print detailed information about a particular published " + getEntryType());
+        out("  " + INFO + "             :  print detailed information about a particular published " + getEntryType());
         out("");
-        out("  label            :  updates labels for an individual " + getEntryType() + "");
+        out("  " + LABEL + "            :  updates labels for an individual " + getEntryType() + "");
         out("");
         out("  " + LAUNCH + "           :  launch " + getEntryType() + "s (locally)");
         out("");
-        out("  list             :  lists all the " + getEntryType() + "s published by the user");
+        out("  " + LIST + "             :  lists all the " + getEntryType() + "s published by the user");
         out("");
         if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
-            out("  nfl              :  returns the Nextflow " + getEntryType() + " defintion for this entry");
+            out("  " + NFL + "              :  returns the Nextflow " + getEntryType() + " defintion for this entry");
             out("");
         }
-        out("  publish          :  publish/unpublish a " + getEntryType() + " in Dockstore");
+        out("  " + PUBLISH + "          :  publish/unpublish a " + getEntryType() + " in Dockstore");
         out("");
-        out("  refresh          :  updates your list of " + getEntryType() + "s stored on Dockstore or an individual " + getEntryType());
+        out("  " + REFRESH + "          :  updates your list of " + getEntryType() + "s stored on Dockstore or an individual " + getEntryType());
         out("");
-        out("  search           :  allows a user to search for all published " + getEntryType() + "s that match the criteria");
+        out("  " + SEARCH + "           :  allows a user to search for all published " + getEntryType() + "s that match the criteria");
         out("");
-        out("  star             :  star/unstar a " + getEntryType() + " in Dockstore");
+        out("  " + STAR + "             :  " + STAR + "/unstar a " + getEntryType() + " in Dockstore");
         out("");
-        out("  test_parameter   :  updates test parameter files for a version of a " + getEntryType() + "");
+        out("  " + TEST_PARAMETER + "   :  updates test parameter files for a version of a " + getEntryType() + "");
         out("");
         out("  " + WDL.toString() + "              :  returns the Workflow Descriptor Language definition for this entry");
         if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
             out("");
-            out("  wes              :  calls a Workflow Execution Schema API (WES) for a version of a " + getEntryType() + "");
+            out("  " + WES + "              :  calls a Workflow Execution Schema API (WES) for a version of a " + getEntryType() + "");
         }
 
         printClientSpecificHelp();
@@ -254,6 +264,8 @@ public abstract class AbstractEntryClient<T> {
      * Print help for commands specific to this client type.
      */
     protected abstract void printClientSpecificHelp();
+
+    protected abstract List<String> getClientSpecificCommands();
 
     /**
      * A friendly description for the type of entry that this handles. Damn you type erasure.
@@ -286,31 +298,31 @@ public abstract class AbstractEntryClient<T> {
             }
 
             switch (activeCommand) {
-            case "info":
+            case INFO:
                 info(args);
                 break;
-            case "list":
+            case LIST:
                 list(args);
                 break;
-            case "search":
+            case SEARCH:
                 search(args);
                 break;
-            case "publish":
+            case PUBLISH:
                 publish(args);
                 break;
-            case "star":
+            case STAR:
                 star(args);
                 break;
-            case "refresh":
+            case REFRESH:
                 refresh(args);
                 break;
-            case "label":
+            case LABEL:
                 label(args);
                 break;
-            case "manual_publish":
+            case MANUAL_PUBLISH:
                 manualPublish(args);
                 break;
-            case "convert":
+            case CONVERT:
                 convert(args);
                 break;
             case LAUNCH:
@@ -319,13 +331,13 @@ public abstract class AbstractEntryClient<T> {
             case DOWNLOAD:
                 download(args);
                 break;
-            case "verify":
+            case VERIFY:
                 verify(args);
                 break;
-            case "test_parameter":
+            case TEST_PARAMETER:
                 testParameter(args);
                 break;
-            case "wes":
+            case WES:
                 isWesCommand = true;
                 if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
                     processWesCommands(args);
@@ -334,7 +346,17 @@ public abstract class AbstractEntryClient<T> {
                 }
                 break;
             default:
-                return false;
+                List<String> possibleCommands = new ArrayList<String>();
+                possibleCommands.addAll(Arrays.asList(INFO, LIST, SEARCH, PUBLISH, STAR, REFRESH, LABEL, MANUAL_PUBLISH,
+                        CONVERT, LAUNCH, DOWNLOAD, VERIFY, TEST_PARAMETER, WDL.toString(), CWL.toString()));
+
+                if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
+                    possibleCommands.addAll(Arrays.asList(WES, NFL));
+                }
+                possibleCommands.addAll(getClientSpecificCommands());
+                possibleCommands.addAll(Client.getGeneralFlags());
+                invalid(getEntryType().toLowerCase(), activeCommand, possibleCommands);
+                return true;
             }
             return true;
         }
@@ -579,15 +601,15 @@ public abstract class AbstractEntryClient<T> {
 
             for (String add : addsSet) {
                 if (!add.matches(labelStringPattern)) {
-                    errorMessage("The following label does not match the proper label format : " + add, CLIENT_ERROR);
+                    errorMessage("The following " + LABEL + " does not match the proper " + LABEL + " format : " + add, CLIENT_ERROR);
                 } else if (removesSet.contains(add)) {
-                    errorMessage("The following label is present in both add and remove : " + add, CLIENT_ERROR);
+                    errorMessage("The following " + LABEL + " is present in both add and remove : " + add, CLIENT_ERROR);
                 }
             }
 
             for (String remove : removesSet) {
                 if (!remove.matches(labelStringPattern)) {
-                    errorMessage("The following label does not match the proper label format : " + remove, CLIENT_ERROR);
+                    errorMessage("The following " + LABEL + " does not match the proper " + LABEL + " format : " + remove, CLIENT_ERROR);
                 }
             }
             handleLabels(toolpath, addsSet, removesSet);
@@ -742,7 +764,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void verify(List<String> args) {
         if (isAdmin) {
-            args.add(0, "verify");
+            args.add(0, VERIFY);
             String[] argsArray = new String[args.size()];
             argsArray = args.toArray(argsArray);
             Verify.handleVerifyCommand(argsArray);
@@ -868,10 +890,10 @@ public abstract class AbstractEntryClient<T> {
 
         if (!file.exists() || file.isDirectory()) {
             if (getEntryType().equalsIgnoreCase(TOOL)) {
-                errorMessage("The tool file " + file.getPath() + " does not exist. Did you mean to launch a remote tool or a workflow?",
+                errorMessage("The tool file " + file.getPath() + " does not exist. Did you mean to " + LAUNCH + " a remote " + TOOL + " or a " + WORKFLOW + "?",
                     ENTRY_NOT_FOUND);
             } else {
-                errorMessage("The workflow file " + file.getPath() + " does not exist. Did you mean to launch a remote workflow or a tool?",
+                errorMessage("The workflow file " + file.getPath() + " does not exist. Did you mean to " + LAUNCH + " a remote " + WORKFLOW + " or a " + TOOL + "?",
                     ENTRY_NOT_FOUND);
             }
         }
@@ -1112,7 +1134,7 @@ public abstract class AbstractEntryClient<T> {
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting brief WES run status", e);
         } catch (JsonProcessingException e) {
-            LOG.error("Unable to convert WES response object to JSON", e);
+            LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
     }
 
@@ -1129,7 +1151,7 @@ public abstract class AbstractEntryClient<T> {
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES run logs", e);
         } catch (JsonProcessingException e) {
-            LOG.error("Unable to convert WES response object to JSON", e);
+            LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
     }
 
@@ -1159,7 +1181,7 @@ public abstract class AbstractEntryClient<T> {
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES server info", e);
         } catch (JsonProcessingException e) {
-            LOG.error("Unable to convert WES response object to JSON", e);
+            LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
     }
 
@@ -1180,7 +1202,7 @@ public abstract class AbstractEntryClient<T> {
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES Run List", e);
         } catch (JsonProcessingException e) {
-            LOG.error("Unable to convert WES response object to JSON", e);
+            LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
     }
 
@@ -1254,7 +1276,7 @@ public abstract class AbstractEntryClient<T> {
 
             // Depending on the desired WES request, parse input parameters from the command line
             switch (wesCommandParser.jCommander.getParsedCommand()) {
-            case "launch":
+            case LAUNCH:
                 wesLaunch(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandLaunch.getEntry(),
                     wesCommandParser.commandLaunch.getInlineWorkflow(),
@@ -1278,7 +1300,7 @@ public abstract class AbstractEntryClient<T> {
             case "service-info":
                 wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
-            case "list":
+            case LIST:
                 wesListRuns(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandRunList.getPageSize(),
                     wesCommandParser.commandRunList.getPageToken(),
@@ -1539,13 +1561,13 @@ public abstract class AbstractEntryClient<T> {
         printHelpHeader();
         out("Commands:");
         out("");
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes service-info [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes list [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LAUNCH + " [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " status [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " logs [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " cancel [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " service-info [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " list [parameters]");
         out("");
         out("Description:");
         out(" Sends a request to a Workflow Execution Service (WES) endpoint.");
@@ -1570,8 +1592,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesLaunchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes launch " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LAUNCH + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LAUNCH + " [parameters]");
         printWesLaunchHelpBody();
         printWesHelpFooter();
         printHelpFooter();
@@ -1579,13 +1601,13 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesStatusHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes status " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " status " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " status [parameters]");
         out("");
         out("Description:");
         out("  Status, gets the status of a " + getEntryType() + ".");
         out("Required Parameters:");
-        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
+        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1593,13 +1615,13 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesRunLogsHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes logs " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " logs " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " logs [parameters]");
         out("");
         out("Description:");
         out("  Logs, gets the verbose run logs of a " + getEntryType() + ".");
         out("Required Parameters:");
-        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
+        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1607,13 +1629,13 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesCancelHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes cancel " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " cancel " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " cancel [parameters]");
         out("");
         out("Description:");
         out("  Cancels a " + getEntryType() + ".");
         out("Required Parameters:");
-        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
+        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1621,8 +1643,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesServiceInfoHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes service-info " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " wes service-info");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " service-info " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " service-info");
         out("");
         out("Description:");
         out("  Returns descriptive information of the provided WES server. ");
@@ -1632,8 +1654,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesRunListHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes list " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " wes list");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " list " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " list");
         out("");
         out("Description:");
         out("  Returns information about past runs. ");
@@ -1656,10 +1678,10 @@ public abstract class AbstractEntryClient<T> {
 
     private void starHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " star " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " star");
-        out("       dockstore " + getEntryType().toLowerCase() + " star [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " star --unstar [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + STAR + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + STAR);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + STAR + " [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + STAR + " --unstar [parameters]");
         out("");
         out("Description:");
         out("  Star/unstar a registered " + getEntryType() + ".");
@@ -1682,8 +1704,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void labelHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " label " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " label [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + LABEL + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + LABEL + " [parameters]");
         out("");
         out("Description:");
         out("  Add or remove labels from a given Dockstore " + getEntryType());
@@ -1699,8 +1721,8 @@ public abstract class AbstractEntryClient<T> {
 
     protected void testParameterHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " test_parameter " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " test_parameter [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + TEST_PARAMETER + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + TEST_PARAMETER + " [parameters]");
         out("");
         out("Description:");
         out("  Add or remove test parameter files from a given Dockstore " + getEntryType() + " version");
@@ -1749,9 +1771,9 @@ public abstract class AbstractEntryClient<T> {
 
     private void refreshHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " refresh " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " refresh");
-        out("       dockstore " + getEntryType().toLowerCase() + " refresh [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + REFRESH + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + REFRESH);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + REFRESH + " [parameters]");
         out("");
         out("Description:");
         out("  Refresh an individual " + getEntryType() + " or all your " + getEntryType() + ".");
@@ -1763,14 +1785,14 @@ public abstract class AbstractEntryClient<T> {
 
     private void searchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " search " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " search [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + SEARCH + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + SEARCH + " [parameters]");
         out("");
         out("Description:");
         out("  Search for published " + getEntryType() + " on Dockstore.");
         out("");
         out("Required Parameters:");
-        out("  --pattern <pattern>         Pattern to search Dockstore with");
+        out("  --pattern <pattern>         Pattern to " + SEARCH + " Dockstore with");
         printHelpFooter();
     }
 
@@ -1822,7 +1844,7 @@ public abstract class AbstractEntryClient<T> {
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
         out("");
         out("Description:");
-        out("  They allow you to convert between file representations.");
+        out("  They allow you to " + CONVERT + " between file representations.");
         printHelpFooter();
     }
 
@@ -1843,8 +1865,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void downloadHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " download " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " download [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + DOWNLOAD + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + DOWNLOAD + " [parameters]");
         out("");
         out("Description:");
         out("  Download an entry to the working directory.");
@@ -1872,7 +1894,7 @@ public abstract class AbstractEntryClient<T> {
         out("Optional parameters:");
         out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.toString());
+        out("  --descriptor <descriptor type>      Descriptor type used to " + LAUNCH + " " + WORKFLOW + ". Defaults to " + CWL.toString());
         if (!(this instanceof CheckerClient)) {
             out("  --local-entry                       Allows you to specify a full path to a local descriptor for --entry instead of an entry path");
         }
@@ -1892,9 +1914,9 @@ public abstract class AbstractEntryClient<T> {
 
     private void verifyHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " verify " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " verify [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " verify --unverify [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + VERIFY + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + VERIFY + " [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + VERIFY + " --unverify [parameters]");
         out("");
         out("Description:");
         out("  Verify/unverify a version.");
@@ -1904,14 +1926,14 @@ public abstract class AbstractEntryClient<T> {
         out("  " + VERSION + " <version>                          Version name");
         out("");
         out("Optional Parameters:");
-        out("  --verified-source <verified-source>          Source of verification (Required to verify).");
+        out("  --verified-source <verified-source>          Source of verification (Required to " + VERIFY + ").");
         printHelpFooter();
     }
 
     protected void printAdminHelp() {
         out("Admin Only Commands:");
         out("");
-        out("  verify           :  Verify/unverify a version");
+        out("  " + VERIFY + "           :  " + VERIFY + "/unverify a version");
         out("");
     }
 

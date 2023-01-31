@@ -41,6 +41,9 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.PLUGIN;
@@ -198,7 +201,7 @@ class LaunchTestIT {
         Client.SCRIPT.set(true);
         client.setConfigFile(ResourceHelpers.resourceFilePath("config.withTestPlugin"));
 
-        PluginClient.handleCommand(Lists.newArrayList("download"), Utilities.parseConfig(client.getConfigFile()));
+        PluginClient.handleCommand(Lists.newArrayList(DOWNLOAD), Utilities.parseConfig(client.getConfigFile()));
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         workflowClient.checkEntryFile(cwlFile.getAbsolutePath(), args, null);
@@ -217,7 +220,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("convert");
+        args.add(CONVERT);
         args.add("cwl2json");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
@@ -709,7 +712,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(cwlFile.getAbsolutePath());
         args.add("--json");
@@ -726,7 +729,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
         args.add("--json");
@@ -742,7 +745,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
         args.add("--json");
@@ -759,7 +762,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
         args.add("--json");
@@ -776,7 +779,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
         args.add("--json");
@@ -793,7 +796,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
         args.add("--json");
@@ -877,7 +880,7 @@ class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("noOutput.cwl"));
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("convert");
+        args.add(CONVERT);
         args.add("cwl2json");
         args.add("--cwl");
         args.add(file.getAbsolutePath());
@@ -895,7 +898,7 @@ class LaunchTestIT {
         File jsonFile = new File(ResourceHelpers.resourceFilePath("testInvalidJSON.json"));
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(helloWdl.getAbsolutePath());
         args.add("--json");
@@ -915,7 +918,7 @@ class LaunchTestIT {
         File jsonFile = new File(ResourceHelpers.resourceFilePath("testInvalidJSON.json"));
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(helloWdl.getAbsolutePath());
         args.add("--json");
@@ -935,7 +938,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(helloWDL.getAbsolutePath());
         args.add("--json");
@@ -955,7 +958,7 @@ class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
 
@@ -973,7 +976,7 @@ class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("no-input-echo.wdl"));
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
 
@@ -990,7 +993,7 @@ class LaunchTestIT {
         File file = new File(ResourceHelpers.resourceFilePath("no-input-echo.cwl"));
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
 

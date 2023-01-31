@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -59,6 +60,7 @@ import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.DESCRIPTION_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.GIT_HEADER;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.MAX_DESCRIPTION;
 import static io.dockstore.client.cli.ArgumentUtility.NAME_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.boolWord;
@@ -84,6 +86,7 @@ import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
  */
 public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     public static final String UPDATE_TOOL = "update_tool";
+    public static final String VERSION_TAG = "version_tag";
     private static final Logger LOG = LoggerFactory.getLogger(ToolClient.class);
     private final Client client;
     private ContainersApi containersApi;
@@ -109,14 +112,21 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         return TOOL;
     }
 
+    protected List<String> getClientSpecificCommands() {
+        List<String> possibleCommands = new ArrayList<String>();
+        possibleCommands.addAll(Arrays.asList(VERSION_TAG, UPDATE_TOOL));
+        return possibleCommands;
+    }
+
+    // If additional command is added, please add it to getClientSpecificCommands
     @Override
     public boolean processEntrySpecificCommands(List<String> args, String activeCommand) {
         if (null != activeCommand) {
             switch (activeCommand) {
-            case "version_tag":
+            case VERSION_TAG:
                 versionTag(args);
                 break;
-            case ToolClient.UPDATE_TOOL:
+            case UPDATE_TOOL:
                 updateTool(args);
                 break;
             default:
@@ -224,7 +234,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             existingTool = containersApi.getContainerByToolPath(entryPath, null);
             isPublished = existingTool.isIsPublished();
         } catch (ApiException ex) {
-            exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : "publish ") + entryPath, Client.API_ERROR);
+            exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : PUBLISH + " ") + entryPath, Client.API_ERROR);
         }
 
         if (unpublishRequest) {
@@ -266,7 +276,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                     containersApi.refresh(newContainer.getId());
                     publish(true, newContainer.getToolPath());
                 } catch (ApiException ex) {
-                    exceptionMessage(ex, "Unable to publish " + newName, Client.API_ERROR);
+                    exceptionMessage(ex, "Unable to " + PUBLISH + " " + newName, Client.API_ERROR);
                 }
             } else {
                 out("The following tool is already registered: " + entryPath + "/" + newName);
@@ -286,10 +296,10 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     @Override
     protected void publishHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " publish " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " publish");
-        out("       dockstore " + getEntryType().toLowerCase() + " publish [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " publish --unpub [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + PUBLISH + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + PUBLISH);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + PUBLISH + " [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + PUBLISH + " --unpub [parameters]");
         out("");
         out("Description:");
         out("  Publish/unpublish a registered " + getEntryType() + ".");
@@ -299,7 +309,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("Optional Parameter(s):");
         out("  --new-entry-name <new-tool-name>      " + "New name to give the tool specified by --entry. "
-                + "This will register and publish a new copy of the " + TOOL + " with the given name.");
+                + "This will register and " + PUBLISH + " a new copy of the " + TOOL + " with the given name.");
         printHelpFooter();
     }
 
@@ -360,7 +370,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     private void publish(boolean publish, String entry) {
-        String action = "publish";
+        String action = PUBLISH;
         if (!publish) {
             action = "unpublish";
         }
@@ -388,7 +398,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
      */
     @Override
     protected void handleStarUnstar(String entry, boolean star) {
-        String action = star ? "star" : "unstar";
+        String action = star ? STAR : "unstar";
         try {
             DockstoreTool container = containersApi.getPublishedContainerByToolPath(entry, null);
             StarRequest request = new StarRequest();
@@ -489,7 +499,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             Optional<Registry> regEnum = getRegistryEnum(registry);
 
             if (regEnum.isEmpty()) {
-                errorMessage("The registry that you entered does not exist. Run \'dockstore tool manual_publish\' to see valid registries.",
+                errorMessage("The registry that you entered does not exist. Run \'dockstore " + TOOL + " " + MANUAL_PUBLISH + "\' to see valid registries.",
                         Client.CLIENT_ERROR);
             }
 
@@ -1149,7 +1159,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     void wesLaunch(WorkflowExecutionServiceApi clientWorkflowExecutionServiceApi, String entry, boolean inlineWorkflow, String paramsPath,
         List<String> filePaths, boolean verbose) {
         // Only supports workflows for the moment
-        throw new UnsupportedOperationException("WES launch does not currently support tools. Please launch a workflow instead.");
+        throw new UnsupportedOperationException("WES " + LAUNCH + " does not currently support tools. Please " + LAUNCH + " a workflow instead.");
     }
 
     @Override
@@ -1165,11 +1175,11 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     // Help Commands
     protected void printClientSpecificHelp() {
         out("");
-        out("  version_tag      :  updates version tags for an individual tool");
+        out("  " + VERSION_TAG + "      :  updates version tags for an individual tool");
         out("");
-        out("  " + ToolClient.UPDATE_TOOL + "      :  updates certain fields of a tool");
+        out("  " + UPDATE_TOOL + "      :  updates certain fields of a tool");
         out("");
-        out("  manual_publish   :  registers a manual tool in the dockstore and then attempt to publish");
+        out("  " + MANUAL_PUBLISH + "   :  registers a manual tool in the dockstore and then attempt to " + PUBLISH);
         out("");
     }
 
@@ -1199,9 +1209,9 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void versionTagHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool version_tag " + HELP);
-        out("       dockstore tool version_tag [command] " + HELP);
-        out("       dockstore tool version_tag [command] [parameters]");
+        out("Usage: dockstore tool " + VERSION_TAG + " " + HELP);
+        out("       dockstore tool " + VERSION_TAG + " [command] " + HELP);
+        out("       dockstore tool " + VERSION_TAG + " [command] [parameters]");
         out("");
         out("Description:");
         out("  Add, update or remove version tags. For auto tools you can only update.");
@@ -1217,8 +1227,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void versionTagRemoveHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool version_tag remove " + HELP);
-        out("       dockstore tool version_tag remove [parameters]");
+        out("Usage: dockstore tool " + VERSION_TAG + " remove " + HELP);
+        out("       dockstore tool " + VERSION_TAG + " remove [parameters]");
         out("");
         out("Description:");
         out("  Remove an existing version tag of a tool.");
@@ -1231,8 +1241,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void versionTagUpdateHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool version_tag update " + HELP);
-        out("       dockstore tool version_tag update [parameters]");
+        out("Usage: dockstore tool " + VERSION_TAG + " update " + HELP);
+        out("       dockstore tool " + VERSION_TAG + " update [parameters]");
         out("");
         out("Description:");
         out("  Update an existing version tag of a tool.");
@@ -1252,8 +1262,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void versionTagAddHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool version_tag add " + HELP);
-        out("       dockstore tool version_tag add [parameters]");
+        out("Usage: dockstore tool " + VERSION_TAG + " add " + HELP);
+        out("       dockstore tool " + VERSION_TAG + " add [parameters]");
         out("");
         out("Description:");
         out("  Add a new version tag to a manually added tool.");
@@ -1274,8 +1284,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void manualPublishHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool manual_publish " + HELP);
-        out("       dockstore tool manual_publish [parameters]");
+        out("Usage: dockstore tool " + MANUAL_PUBLISH + " " + HELP);
+        out("       dockstore tool " + MANUAL_PUBLISH + " [parameters]");
         out("");
         out("Description:");
         out("  Manually register an tool in the dockstore.");

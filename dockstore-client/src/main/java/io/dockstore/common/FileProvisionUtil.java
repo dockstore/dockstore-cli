@@ -61,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.PluginManager;
 
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.Client.PLUGIN;
 
 /**
@@ -301,7 +302,7 @@ public final class FileProvisionUtil {
             downloadPlugin(filePluginLocation, version, name, sourceLocation);
             return true;
         } catch (MalformedURLException | URISyntaxException e) {
-            LOG.error("Could not download plugin: " + e.getMessage());
+            LOG.error("Could not " + DOWNLOAD + " plugin: " + e.getMessage());
             return false;
         }
     }

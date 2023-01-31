@@ -14,6 +14,8 @@ import io.swagger.client.model.Workflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
@@ -51,9 +53,9 @@ public class CheckerClient extends WorkflowClient {
         // Checker client help
         out("Commands:");
         out("");
-        out("  download             :  Downloads all files associated with a " + CHECKER + " " + WORKFLOW + ".");
+        out("  " + DOWNLOAD + "             :  Downloads all files associated with a " + CHECKER + " " + WORKFLOW + ".");
         out("");
-        out("  launch               :  Launch a " + CHECKER + " " + WORKFLOW + " locally.");
+        out("  " + LAUNCH + "               :  Launch a " + CHECKER + " " + WORKFLOW + " locally.");
         out("");
         out("  add                  :  Adds a " + CHECKER + " " + WORKFLOW + " to and existing " + TOOL + "/" + WORKFLOW + ".");
         out("");
@@ -61,7 +63,7 @@ public class CheckerClient extends WorkflowClient {
         out("");
         out("  update_version       :  Updates a specific version of an existing " + CHECKER + " " + WORKFLOW + ".");
         out("");
-        out("  test_parameter       :  Add/Remove test parameter files for a " + CHECKER + " " + WORKFLOW + " version.");
+        out("  " + TEST_PARAMETER + "       :  Add/Remove test parameter files for a " + CHECKER + " " + WORKFLOW + " version.");
         out("");
 
         if (isAdmin) {
@@ -88,13 +90,13 @@ public class CheckerClient extends WorkflowClient {
             case "update":
                 updateChecker(args);
                 break;
-            case "download":
+            case DOWNLOAD:
                 downloadChecker(args);
                 break;
-            case "launch":
+            case LAUNCH:
                 launchChecker(args);
                 break;
-            case "test_parameter":
+            case TEST_PARAMETER:
                 testParameterChecker(args);
                 break;
             case "update_version":
@@ -270,8 +272,8 @@ public class CheckerClient extends WorkflowClient {
 
     private void downloadCheckerHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " download " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " download [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + DOWNLOAD + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + DOWNLOAD + " [parameters]");
         out("");
         out("Description:");
         out("  Downloads all " + CHECKER + " " + WORKFLOW + " files for the given entry and stores them in the current directory.");

@@ -33,10 +33,12 @@ import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.PluginManager;
 import ro.fortsoft.pf4j.PluginWrapper;
 
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
 
 /**
  *
@@ -62,10 +64,10 @@ public final class PluginClient {
         JCommander jcPlugin = JCommanderUtility.addCommand(jc, PLUGIN, commandPlugin);
 
         CommandPluginList commandPluginList = new CommandPluginList();
-        JCommanderUtility.addCommand(jcPlugin, "list", commandPluginList);
+        JCommanderUtility.addCommand(jcPlugin, LIST, commandPluginList);
 
         CommandPluginDownload commandPluginDownload = new CommandPluginDownload();
-        JCommanderUtility.addCommand(jcPlugin, "download", commandPluginDownload);
+        JCommanderUtility.addCommand(jcPlugin, DOWNLOAD, commandPluginDownload);
         // Not parsing with jc because we know the first command was plugin.  jc's purpose is to display help
         jcPlugin.parse(argv);
         try {
@@ -73,14 +75,14 @@ public final class PluginClient {
                 printJCommanderHelp(jc, "dockstore", PLUGIN);
             } else {
                 switch (jcPlugin.getParsedCommand()) {
-                case "list":
+                case LIST:
                     if (commandPluginList.help) {
                         printJCommanderHelp(jc, "dockstore", PLUGIN);
                     } else {
                         return handleList(configFile);
                     }
                     break;
-                case "download":
+                case DOWNLOAD:
                     if (commandPluginDownload.help) {
                         printJCommanderHelp(jc, "dockstore", PLUGIN);
                     } else {
@@ -143,7 +145,7 @@ public final class PluginClient {
 
     @Parameters(separators = "=", commandDescription = "Download default file provisioning plugins")
     private static class CommandPluginDownload {
-        @Parameter(names = HELP, description = "Prints help for download command", help = true)
+        @Parameter(names = HELP, description = "Prints help for " + DOWNLOAD + " command", help = true)
         private boolean help = false;
     }
 

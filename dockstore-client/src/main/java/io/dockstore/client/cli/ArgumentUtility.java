@@ -273,7 +273,7 @@ public final class ArgumentUtility {
         LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
         int minDistance = -1;
         for (String str: possibleCommands) {
-            int distance = levenshteinDistance.apply(str, invalidCommand);
+            int distance = levenshteinDistance.apply(str.toLowerCase(), invalidCommand);
             if (distance >= max(str.length(), invalidCommand.length())) {
                 continue;
             } else if (distance < minDistance || minDistance == -1) {

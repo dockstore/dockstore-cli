@@ -6,8 +6,10 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
 
 public class WesCommandParser {
 
@@ -37,12 +39,12 @@ public class WesCommandParser {
         // Build JCommander
         return JCommander.newBuilder()
             .addObject(this.wesMain)
-            .addCommand("launch", this.commandLaunch)
+            .addCommand(LAUNCH, this.commandLaunch)
             .addCommand("cancel", this.commandCancel)
             .addCommand("status", this.commandStatus)
             .addCommand("logs", this.commandRunLogs)
             .addCommand("service-info", this.commandServiceInfo)
-            .addCommand("list", this.commandRunList)
+            .addCommand(LIST, this.commandRunList)
             .build();
     }
 

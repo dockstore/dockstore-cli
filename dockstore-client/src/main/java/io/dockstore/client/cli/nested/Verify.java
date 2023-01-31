@@ -16,6 +16,7 @@ import io.swagger.client.api.ExtendedGa4GhApi;
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.VERIFY;
 
 /**
  * @author gluu
@@ -33,10 +34,10 @@ final class Verify {
     static void handleVerifyCommand(String[] args) {
         VerifyCommand verifyCommand = new VerifyCommand();
         JCommander jCommanderMain = new JCommander();
-        JCommanderUtility.addCommand(jCommanderMain, "verify", verifyCommand);
+        JCommanderUtility.addCommand(jCommanderMain, VERIFY, verifyCommand);
         jCommanderMain.parse(args);
         if (verifyCommand.help) {
-            JCommanderUtility.printJCommanderHelp(jCommanderMain, "dockstore", "verify");
+            JCommanderUtility.printJCommanderHelp(jCommanderMain, "dockstore", VERIFY);
         } else {
             ApiClient defaultApiClient;
             defaultApiClient = Configuration.getDefaultApiClient();
@@ -46,7 +47,7 @@ final class Verify {
                             verifyCommand.filePath, verifyCommand.platform, verifyCommand.platformVersion, verifyCommand.metadata,
                             !verifyCommand.unverify);
             if (stringObjectMap == null) {
-                ArgumentUtility.errorMessage("Could not verify " + TOOL, API_ERROR);
+                ArgumentUtility.errorMessage("Could not " + VERIFY + " " + TOOL, API_ERROR);
             } else {
                 Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
                 ArgumentUtility.out(gson.toJson(stringObjectMap));
@@ -72,7 +73,7 @@ final class Verify {
         private boolean unverify;
         @Parameter(names = "--metadata", description = "Additional information on the verification (notes, explanation)", required = true)
         private String metadata;
-        @Parameter(names = HELP, description = "Prints help for verify", help = true)
+        @Parameter(names = HELP, description = "Prints help for " + VERIFY, help = true)
         private boolean help = false;
     }
 }

@@ -15,9 +15,12 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
+import static io.github.collaboratory.cwl.CWLClient.WES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -47,16 +50,16 @@ class AbstractEntryClientTestIT {
     @Test
     void testWESHelpMessages() {
         final String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
-        final String[] commandNames = {"", "launch", "status", "cancel", "service-info", "logs", "list"};
+        final String[] commandNames = {"", LAUNCH, "status", "cancel", "service-info", "logs", LIST};
 
         // has config file
         for (String command : commandNames) {
             String[] commandStatement;
 
             if (command.length() == 0) {
-                commandStatement = new String[]{ WORKFLOW, "wes", HELP, CONFIG, clientConfig };
+                commandStatement = new String[]{ WORKFLOW, WES, HELP, CONFIG, clientConfig };
             } else {
-                commandStatement = new String[]{ WORKFLOW, "wes", command, HELP, CONFIG, clientConfig };
+                commandStatement = new String[]{ WORKFLOW, WES, command, HELP, CONFIG, clientConfig };
             }
 
             Client.main(commandStatement);
@@ -68,9 +71,9 @@ class AbstractEntryClientTestIT {
             String[] commandStatement;
 
             if (command.length() == 0) {
-                commandStatement = new String[]{ WORKFLOW, "wes", HELP, CONFIG, CONFIG_NO_CONTENT_RESOURCE};
+                commandStatement = new String[]{ WORKFLOW, WES, HELP, CONFIG, CONFIG_NO_CONTENT_RESOURCE};
             } else {
-                commandStatement = new String[]{ WORKFLOW, "wes", command, HELP, CONFIG, CONFIG_NO_CONTENT_RESOURCE};
+                commandStatement = new String[]{ WORKFLOW, WES, command, HELP, CONFIG, CONFIG_NO_CONTENT_RESOURCE};
             }
 
             Client.main(commandStatement);

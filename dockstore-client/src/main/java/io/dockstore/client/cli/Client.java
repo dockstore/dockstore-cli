@@ -85,6 +85,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.SEARCH;
 import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 
 /**
@@ -599,6 +600,7 @@ public class Client {
         }
     }
 
+    // If you add a command, please update the list of commands given to the invalid function in the run method
     private static void printGeneralHelp() {
         printHelpHeader();
         out("Usage: dockstore [mode] [flags] [command] [command parameters]");
@@ -729,7 +731,7 @@ public class Client {
                         targetClient = getWorkflowClient();
                     } else if (PLUGIN.equals(mode)) {
                         handled = PluginClient.handleCommand(args, Utilities.parseConfig(configFile));
-                    } else if ("search".equals(mode)) {
+                    } else if (SEARCH.equals(mode)) {
                         handled = SearchClient.handleCommand(args, this.extendedGA4GHApi);
                     } else if (CHECKER.equals(mode)) {
                         targetClient = getCheckerClient();
@@ -789,9 +791,9 @@ public class Client {
                             break;
                         default:
                             List<String> possibleCommands = new ArrayList<String>();
-                            possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML,
-                                    HELP, DEBUG_FLAG, VERSION, SERVER_METADATA, UPGRADE,
-                                    UPGRADE_STABLE, UPGRADE_UNSTABLE, CONFIG, SCRIPT_FLAG, CLEAN_CACHE));
+                            possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML, VERSION,
+                                    SERVER_METADATA, UPGRADE, UPGRADE_STABLE, UPGRADE_UNSTABLE, CLEAN_CACHE));
+                            possibleCommands.addAll(getGeneralFlags());
                             invalid("", cmd, possibleCommands);
                             break;
                         }
@@ -806,6 +808,12 @@ public class Client {
         } catch (Exception ex) {
             exceptionMessage(ex, "", GENERIC_ERROR);
         }
+    }
+
+    public static List<String> getGeneralFlags() {
+        List<String> generalFlags = new ArrayList<String>();
+        generalFlags.addAll(Arrays.asList(DEBUG_FLAG, HELP, CONFIG, SCRIPT_FLAG));
+        return generalFlags;
     }
 
     /**

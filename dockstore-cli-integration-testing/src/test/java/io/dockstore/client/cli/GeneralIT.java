@@ -43,10 +43,18 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.UPGRADE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LABEL;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.REFRESH;
+import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -96,7 +104,7 @@ class GeneralIT extends BaseIT {
     @Test
     @Category(ToilCompatibleTest.class)
     void testLocalLaunchCWL() {
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, "--local-entry",
             ResourceHelpers.resourceFilePath("arrays.cwl"), "--json",
             ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), SCRIPT_FLAG });
     }
@@ -107,7 +115,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testLocalLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, "--local-entry",
                         "imnotreal.cwl", "--json", "filtercount-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -118,7 +126,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testLocalLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--local-entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, "--local-entry",
                         "imnotreal.wdl", "--json", "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -129,7 +137,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testRemoteLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, "--entry",
                         "imnotreal.cwl", "--json", "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.IO_ERROR, exitCode);
     }
@@ -140,7 +148,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testRemoteLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "launch", "--entry", "imnotreal.wdl",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, "--entry", "imnotreal.wdl",
                         "--json", "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -151,7 +159,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testLabelIncorrectInput() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LABEL, "--entry",
                         "quay.io/dockstoretestuser2/quayandgithub", "--add", "docker-hub", "--add", "quay.io", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
@@ -162,14 +170,14 @@ class GeneralIT extends BaseIT {
     @Test
     void testAddEditRemoveLabel() {
         // Test adding/removing labels for different containers
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LABEL, "--entry",
             "quay.io/dockstoretestuser2/quayandgithub", "--add", "quay", "--add", "github", "--remove", "dockerhub", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LABEL, "--entry",
             "quay.io/dockstoretestuser2/quayandgithub", "--add", "github", "--add", "dockerhub", "--remove", "quay", SCRIPT_FLAG });
 
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LABEL, "--entry",
             "quay.io/dockstoretestuser2/quayandgithubalternate", "--add", "alternate", "--add", "github", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "label", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LABEL, "--entry",
             "quay.io/dockstoretestuser2/quayandgithubalternate", "--remove", "github", SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement("select count(*) from entry_label where entryid = '2'", long.class);
@@ -187,7 +195,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testVersionTagWDLCWLAndDockerfilePathsAlteration() {
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "update", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "update", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--cwl-path", "/testDir/Dockstore.cwl", "--wdl-path",
                 "/testDir/Dockstore.wdl", "--dockerfile-path", "/testDir/Dockerfile", SCRIPT_FLAG });
 
@@ -198,7 +206,7 @@ class GeneralIT extends BaseIT {
         assertEquals(1, count, "there should now be an invalid tag, found " + count);
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "update", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "update", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--cwl-path", "/Dockstore.cwl", "--wdl-path",
                 "/Dockstore.wdl", "--dockerfile-path", "/Dockerfile", SCRIPT_FLAG });
 
@@ -215,7 +223,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testVersionTagRemoveAutoContainer() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "remove", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "remove", "--entry",
                         "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
@@ -226,7 +234,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testVersionTagAddAutoContainer() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "add", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "add", "--entry",
                         "quay.io/dockstoretestuser2/quayandgithub", "--name", "masterTest", "--image-id",
                         "4728f8f5ce1709ec8b8a5282e274e63de3c67b95f03a519191e6ea675c5d34e8", "--git-reference", "master", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
@@ -237,13 +245,13 @@ class GeneralIT extends BaseIT {
      */
     @Test
     void testAddVersionTagManualContainer() {
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, MANUAL_PUBLISH, "--registry",
             Registry.QUAY_IO.name(), "--namespace", "dockstoretestuser2", "--name", "quayandgithub", "--git-url",
             "git@github.com:dockstoretestuser2/quayandgithubalternate.git", "--git-reference", "master", "--toolname", "alternate",
             "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", SCRIPT_FLAG });
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "add", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "add", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithub/alternate", "--name", "masterTest", "--image-id",
                 "4728f8f5ce1709ec8b8a5282e274e63de3c67b95f03a519191e6ea675c5d34e8", "--git-reference", "master", SCRIPT_FLAG });
 
@@ -261,14 +269,14 @@ class GeneralIT extends BaseIT {
     @Test
     void testVersionTagHide() {
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "update", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "update", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--hidden", "true", SCRIPT_FLAG });
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tag t, version_metadata vm where vm.hidden = 't' and t.id = vm.id", long.class);
         assertEquals(1, count, "there should be 1 hidden tag");
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "update", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "update", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--hidden", "false", SCRIPT_FLAG });
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tag t, version_metadata vm where vm.hidden = 't' and t.id = vm.id", long.class);
@@ -280,19 +288,19 @@ class GeneralIT extends BaseIT {
      */
     @Test
     void testVersionTagDelete() {
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, MANUAL_PUBLISH, "--registry",
             Registry.QUAY_IO.name(), "--namespace", "dockstoretestuser2", "--name", "quayandgithub", "--git-url",
             "git@github.com:dockstoretestuser2/quayandgithubalternate.git", "--git-reference", "master", "--toolname", "alternate",
             "--cwl-path", "/testDir/Dockstore.cwl", "--wdl-path", "/testDir/Dockstore.wdl", "--dockerfile-path", "/testDir/Dockerfile",
             SCRIPT_FLAG });
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "add", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "add", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithub/alternate", "--name", "masterTest", "--image-id",
                 "4728f8f5ce1709ec8b8a5282e274e63de3c67b95f03a519191e6ea675c5d34e8", "--git-reference", "master", SCRIPT_FLAG });
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "version_tag", "remove", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "remove", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithub/alternate", "--name", "masterTest", SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement("select count(*) from tag where name = 'masterTest'", long.class);
@@ -305,7 +313,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testRefreshIncorrectContainer() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "refresh", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, REFRESH, "--entry",
                         "quay.io/dockstoretestuser2/unknowncontainer", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
@@ -315,21 +323,21 @@ class GeneralIT extends BaseIT {
      */
     @Test
     void testTool2JSONWDL() {
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, PUBLISH, "--entry",
             "quay.io/dockstoretestuser2/quayandgithubwdl" });
         // need to refresh to overrride bad data in ye-olde seed DB that trips up improved validation now
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "refresh", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, REFRESH, "--entry",
             "quay.io/dockstoretestuser2/quayandgithubwdl", SCRIPT_FLAG });
         // need to publish before converting
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "convert", "entry2json", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, "entry2json", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithubwdl", "--descriptor", "wdl", SCRIPT_FLAG });
         assertTrue(systemOutRule.getText().contains("\"test.hello.name\": \"String\""));
     }
 
     @Test
     void registerUnregisterAndCopy() {
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, PUBLISH, "--entry",
             "quay.io/dockstoretestuser2/quayandgithubwdl" });
 
         boolean published = testingPostgres.runSelectStatement(
@@ -337,7 +345,7 @@ class GeneralIT extends BaseIT {
                 + "' and namespace = 'dockstoretestuser2' and name = 'quayandgithubwdl';", boolean.class);
         assertTrue(published, "tool not published");
 
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, PUBLISH, "--entry",
             "quay.io/dockstoretestuser2/quayandgithubwdl", "--entryname", "foo" });
 
         long count = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
@@ -345,7 +353,7 @@ class GeneralIT extends BaseIT {
         assertEquals(2, count, "should be two after republishing");
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "publish", "--unpub", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, PUBLISH, "--unpub", "--entry",
                 "quay.io/dockstoretestuser2/quayandgithubwdl" });
 
         published = testingPostgres.runSelectStatement("select ispublished from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
@@ -359,7 +367,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testWDL2JSON() {
         File sourceFile = new File(ResourceHelpers.resourceFilePath("wdl.wdl"));
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "convert", "wdl2json", "--wdl",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, "wdl2json", "--wdl",
             sourceFile.getAbsolutePath(), SCRIPT_FLAG });
         // TODO: Test that output is the expected WDL file
     }
@@ -368,7 +376,7 @@ class GeneralIT extends BaseIT {
     @Category(ToilCompatibleTest.class)
     void testCWL2JSON() {
         File sourceFile = new File(ResourceHelpers.resourceFilePath("dockstore-tool-bamstats.cwl"));
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "convert", "cwl2json", "--cwl",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, "cwl2json", "--cwl",
             sourceFile.getAbsolutePath(), SCRIPT_FLAG });
         // TODO: Test that output is the expected JSON file
     }
@@ -377,7 +385,7 @@ class GeneralIT extends BaseIT {
     @Category(ToilCompatibleTest.class)
     void testCWL2YAML() {
         File sourceFile = new File(ResourceHelpers.resourceFilePath("dockstore-tool-bamstats.cwl"));
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "convert", "cwl2yaml", "--cwl",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, "cwl2yaml", "--cwl",
             sourceFile.getAbsolutePath(), SCRIPT_FLAG });
         // TODO: Test that output is the expected yaml file
     }
@@ -388,7 +396,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testRefreshOtherUsersContainer() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "refresh", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, REFRESH, "--entry",
                         "quay.io/test_org/test1", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
@@ -398,11 +406,11 @@ class GeneralIT extends BaseIT {
      */
     @Test
     void testGetWdlAndCwl() {
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, PUBLISH, "--entry",
             "quay.io/dockstoretestuser2/quayandgithubwdl" });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "wdl", "--entry",
             "quay.io/dockstoretestuser2/quayandgithubwdl", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "publish", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, PUBLISH, "--entry",
             "quay.io/dockstoretestuser2/quayandgithub" });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "cwl", "--entry",
             "quay.io/dockstoretestuser2/quayandgithub", SCRIPT_FLAG });
@@ -425,7 +433,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testUserPrivilege() throws Exception {
         // Repo user has access to
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, MANUAL_PUBLISH, "--registry",
             Registry.QUAY_IO.name(), "--namespace", "dockstoretestuser2", "--name", "quayandgithub", "--git-url",
             "git@github.com:dockstoretestuser2/quayandgithubalternate.git", "--git-reference", "master", "--toolname", "testTool",
             "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", SCRIPT_FLAG });
@@ -434,7 +442,7 @@ class GeneralIT extends BaseIT {
         assertEquals(1, count, "the container should exist");
 
         // Repo user is part of org
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "manual_publish", "--registry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, MANUAL_PUBLISH, "--registry",
             Registry.QUAY_IO.name(), "--namespace", "dockstore2", "--name", "testrepo2", "--git-url",
             "git@github.com:dockstoretestuser2/quayandgithub.git", "--git-reference", "master", "--toolname", "testOrg", "--cwl-path",
             "/Dockstore.cwl", "--dockerfile-path", "/Dockerfile", SCRIPT_FLAG });
@@ -443,7 +451,7 @@ class GeneralIT extends BaseIT {
         assertEquals(1, count2, "the container should exist");
 
         // Repo user doesn't own
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "manual_publish", "--registry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, MANUAL_PUBLISH, "--registry",
                 Registry.QUAY_IO.name(), "--namespace", "dockstoretestuser", "--name", "testrepo", "--git-url",
                 "git@github.com:dockstoretestuser/quayandgithub.git", "--git-reference", "master", "--toolname", "testTool", "--cwl-path",
                 "/Dockstore.cwl", "--dockerfile-path", "/Dockerfile", SCRIPT_FLAG }));
@@ -508,7 +516,7 @@ class GeneralIT extends BaseIT {
         // test that these zips can be downloaded via CLI
 
         // download zip via CLI
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "download", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, DOWNLOAD, "--entry",
             refresh.getToolPath() + ":" + tag.getName(), "--zip", SCRIPT_FLAG });
         File downloadedZip = new File(new ToolClient(null, false).zipFilename(refresh));
         // record entries
@@ -517,7 +525,7 @@ class GeneralIT extends BaseIT {
         assertTrue(downloadedZip.delete());
 
         // download and unzip via CLI while at it
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "download", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, DOWNLOAD, "--entry",
             refresh.getToolPath() + ":" + tag.getName(), SCRIPT_FLAG });
         collect.forEach(entry -> {
             File innerFile = new File(System.getProperty("user.dir"), entry);

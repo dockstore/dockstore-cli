@@ -29,6 +29,7 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
@@ -170,7 +171,7 @@ public class WorkflowInDirectoryTestIT {
         args.add(CONFIG);
         args.add(configFile.getPath());
         args.add(entryType);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(descriptor.getPath());
         args.add("--yaml");

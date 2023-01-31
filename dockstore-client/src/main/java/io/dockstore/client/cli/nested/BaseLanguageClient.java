@@ -29,6 +29,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
@@ -178,10 +179,10 @@ public abstract class BaseLanguageClient {
                     provisionedParameterFile = provisionInputFiles();
                 } catch (ApiException ex) {
                     if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL)) {
-                        exceptionMessage(ex, "The " + TOOL + " entry does not exist. Did you mean to launch a local " + TOOL + " or a " + WORKFLOW + "?",
+                        exceptionMessage(ex, "The " + TOOL + " entry does not exist. Did you mean to " + LAUNCH + " a local " + TOOL + " or a " + WORKFLOW + "?",
                                 ENTRY_NOT_FOUND);
                     } else {
-                        exceptionMessage(ex, "The " + WORKFLOW + " entry does not exist. Did you mean to launch a local " + WORKFLOW + " or a " + TOOL + "?",
+                        exceptionMessage(ex, "The " + WORKFLOW + " entry does not exist. Did you mean to " + LAUNCH + " a local " + WORKFLOW + " or a " + TOOL + "?",
                                 ENTRY_NOT_FOUND);
                     }
                 } catch (Exception ex) {
@@ -317,10 +318,10 @@ public abstract class BaseLanguageClient {
                 out("Successfully downloaded files for entry '" + path + "'");
             } catch (ApiException ex) {
                 if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL)) {
-                    exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
+                    exceptionMessage(ex, "The tool entry does not exist. Did you mean to " + LAUNCH + " a local " + TOOL + " or a " + WORKFLOW + "?",
                             ENTRY_NOT_FOUND);
                 } else {
-                    exceptionMessage(ex, "The workflow entry does not exist. Did you mean to launch a local workflow or a tool?",
+                    exceptionMessage(ex, "The workflow entry does not exist. Did you mean to " + LAUNCH + " a local " + WORKFLOW + " or a " + TOOL + "?",
                             ENTRY_NOT_FOUND);
                 }
                 throw new RuntimeException(ex);

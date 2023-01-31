@@ -25,6 +25,8 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
@@ -159,7 +161,7 @@ class LaunchTestRunToolIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("convert");
+        args.add(CONVERT);
         args.add("cwl2json");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
@@ -301,7 +303,7 @@ class LaunchTestRunToolIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
         // failure relies on file provisioning plugins, oy!
-        runClientCommand(new ArrayList<>(List.of(PLUGIN, "download")));
+        runClientCommand(new ArrayList<>(List.of(PLUGIN, DOWNLOAD)));
         catchSystemExit(() -> runTool(cwlFile, cwlJSON));
         assertTrue(systemErrRule.getText().contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
                 "Error should occur, caused by Amazon S3 Exception, err output looked like: " + systemErrRule.getText() + "std out looked like" + systemOutRule.getText());

@@ -19,6 +19,7 @@ import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
@@ -93,7 +94,7 @@ public class LaunchTestYamlIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--entry");
         args.add(file.getAbsolutePath());
         args.add("--json");
@@ -154,7 +155,7 @@ public class LaunchTestYamlIT {
         strings.add(CONFIG);
         strings.add(ResourceHelpers.resourceFilePath("config"));
         strings.add(entryType);
-        strings.add("launch");
+        strings.add(LAUNCH);
         strings.add("--local-entry");
         strings.add(descriptorFile.getAbsolutePath());
 

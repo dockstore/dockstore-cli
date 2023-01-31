@@ -22,6 +22,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
@@ -82,7 +83,7 @@ class LaunchNoInternetTestIT {
     void directoryNotSpecified() throws Exception {
         List<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
@@ -111,7 +112,7 @@ class LaunchNoInternetTestIT {
 
         List<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
@@ -140,7 +141,7 @@ class LaunchNoInternetTestIT {
         }
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
@@ -173,7 +174,7 @@ class LaunchNoInternetTestIT {
         }
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
@@ -203,7 +204,7 @@ class LaunchNoInternetTestIT {
         }
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());
         args.add("--yaml");
@@ -231,7 +232,7 @@ class LaunchNoInternetTestIT {
         }
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());
         args.add("--json");
@@ -258,7 +259,7 @@ class LaunchNoInternetTestIT {
         }
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
-        args.add("launch");
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());
         args.add("--json");

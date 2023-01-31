@@ -77,6 +77,7 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
@@ -93,14 +94,13 @@ import static io.dockstore.client.cli.Client.WORKFLOW;
  * Grouping code for launching CWL tools and workflows
  */
 public class CWLClient extends BaseLanguageClient implements LanguageClientInterface {
-
+    public static final String WES = "wes";
     protected static final Logger LOG = LoggerFactory.getLogger(CWLClient.class);
     private static final String WORKING_DIRECTORY = "working-directory";
     private static final String CWL_RUNNER = "cwlrunner";
     private static final String DEFAULT_LAUNCHER = "cwltool";
     private static final String CWL_TOOL = "cwltool";
     private static final String CROMWELL = "cromwell";
-    private static final String WES = "wes";
 
     protected final Yaml yaml = new Yaml(new SafeConstructor());
     protected final Gson gson = CWL.getTypeSafeCWLToolDocument();
@@ -346,10 +346,10 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                     } else if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL) && matchTool.find()) {
                         classToolFound = true;
                     } else if ((abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL) && matchWf.find())) {
-                        errorMessage("Expected a " + TOOL + " but the CWL file specified a " + WORKFLOW + ". Use 'dockstore " + WORKFLOW + " launch ...' instead.",
+                        errorMessage("Expected a " + TOOL + " but the CWL file specified a " + WORKFLOW + ". Use 'dockstore " + WORKFLOW + " " + LAUNCH + " ...' instead.",
                             CLIENT_ERROR);
                     } else if (abstractEntryClient.getEntryType().equalsIgnoreCase(WORKFLOW) && matchTool.find()) {
-                        errorMessage("Expected a " + WORKFLOW + " but the CWL file specified a " + TOOL + ". Use 'dockstore " + TOOL + " launch ...' instead.",
+                        errorMessage("Expected a " + WORKFLOW + " but the CWL file specified a " + TOOL + ". Use 'dockstore " + TOOL + " " + LAUNCH + " ...' instead.",
                             CLIENT_ERROR);
                     }
                 }

@@ -174,7 +174,7 @@ public final class JCommanderUtility {
      * This function is used when nesting commands within commands (ex. list and download within plugin)
      *
      * @param parentCommand The parent command (ex. plugin)
-     * @param commandName   The nested command name (ex. "list")
+     * @param commandName   The nested command name (ex. LIST)
      * @param commandObject The nested command (ex. list)
      * @return
      */
