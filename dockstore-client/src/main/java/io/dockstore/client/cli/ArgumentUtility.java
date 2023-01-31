@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.DEBUG_FLAG;
 import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static java.lang.Math.max;
 
 /**
@@ -252,7 +253,7 @@ public final class ArgumentUtility {
         out("                       Default: false");
         out("  " + CONFIG + " <file>      Override config file");
         out("                       Default: ~/.dockstore/config");
-        out("  --script             For usage with scripts. Will not check for updates to Dockstore CLI.");
+        out("  " + SCRIPT_FLAG + "             For usage with scripts. Will not check for updates to Dockstore CLI.");
         out("                       Default: false");
     }
 

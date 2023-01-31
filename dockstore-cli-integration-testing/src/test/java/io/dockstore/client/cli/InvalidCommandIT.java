@@ -32,6 +32,7 @@ import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 
 @ExtendWith(SystemStubsExtension.class)
 public class InvalidCommandIT extends BaseIT {
@@ -51,7 +52,7 @@ public class InvalidCommandIT extends BaseIT {
         acceptedCommands.add(CHECKER);
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
-        acceptedCommands.add("yaml");
+        acceptedCommands.add(YAML);
         ArgumentUtility.invalid("", "z", acceptedCommands);
         System.out.println("HELLO");
         String output = systemOutRule.getOutput().getText();

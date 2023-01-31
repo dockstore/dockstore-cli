@@ -125,6 +125,7 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
 import static io.dockstore.common.DescriptorLanguage.WDL;
@@ -841,7 +842,7 @@ public abstract class AbstractEntryClient<T> {
      * Type.NONE if file extension is neither WDL nor CWL, could be no extension or some other random extension(e.g .txt)
      */
     Optional<DescriptorLanguage> checkFileExtension(String path) {
-        if (FilenameUtils.getExtension(path).equalsIgnoreCase(CWL.toString()) || FilenameUtils.getExtension(path).equalsIgnoreCase("yaml") || FilenameUtils.getExtension(path).equalsIgnoreCase("yml")) {
+        if (FilenameUtils.getExtension(path).equalsIgnoreCase(CWL.toString()) || FilenameUtils.getExtension(path).equalsIgnoreCase(YAML) || FilenameUtils.getExtension(path).equalsIgnoreCase("yml")) {
             return Optional.of(CWL);
         } else if (FilenameUtils.getExtension(path).equalsIgnoreCase(WDL.toString())) {
             return Optional.of(WDL);

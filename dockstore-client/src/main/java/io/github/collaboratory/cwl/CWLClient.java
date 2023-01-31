@@ -349,7 +349,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                         errorMessage("Expected a " + TOOL + " but the CWL file specified a " + WORKFLOW + ". Use 'dockstore " + WORKFLOW + " launch ...' instead.",
                             CLIENT_ERROR);
                     } else if (abstractEntryClient.getEntryType().equalsIgnoreCase(WORKFLOW) && matchTool.find()) {
-                        errorMessage("Expected a workflow but the CWL file specified a " + TOOL + ". Use 'dockstore " + TOOL + " launch ...' instead.",
+                        errorMessage("Expected a " + WORKFLOW + " but the CWL file specified a " + TOOL + ". Use 'dockstore " + TOOL + " launch ...' instead.",
                             CLIENT_ERROR);
                     }
                 }

@@ -400,7 +400,7 @@ public class CheckerClient extends WorkflowClient {
         Workflow checkerWorkflow = null;
         if (entry != null) {
             if (entry.getCheckerId() == null) {
-                errorMessage("The entry has no checker workflow.",
+                errorMessage("The entry has no " + CHECKER + " " + WORKFLOW + ".",
                     Client.CLIENT_ERROR);
             } else {
                 if (authRequired) {

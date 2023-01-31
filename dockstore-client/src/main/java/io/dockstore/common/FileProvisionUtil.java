@@ -61,6 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.PluginManager;
 
+import static io.dockstore.client.cli.Client.PLUGIN;
+
 /**
  * @author dyuen
  * @since 2/21/17
@@ -192,7 +194,7 @@ public final class FileProvisionUtil {
             try {
                 Files.createDirectories(path);
             } catch (IOException e) {
-                throw new RuntimeException("Could not create plugin directory", e);
+                throw new RuntimeException("Could not create " + PLUGIN + " directory", e);
             }
         }
         // need to systematically clean up old versions of plugins

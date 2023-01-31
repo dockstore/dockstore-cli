@@ -299,7 +299,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("Optional Parameter(s):");
         out("  --new-entry-name <new-tool-name>      " + "New name to give the tool specified by --entry. "
-                + "This will register and publish a new copy of the tool with the given name.");
+                + "This will register and publish a new copy of the " + TOOL + " with the given name.");
         printHelpFooter();
     }
 

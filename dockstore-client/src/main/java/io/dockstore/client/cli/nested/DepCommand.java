@@ -58,7 +58,7 @@ public final class DepCommand {
         private String pythonVersion = "3";
         // @Parameter(names = "--runner", description = "tool/workflow runner. Available options: 'cwltool'")
         private String runner = "cwltool";
-        @Parameter(names = HELP, description = "Prints help for deps", help = true)
+        @Parameter(names = HELP, description = "Prints help for " + DEPS, help = true)
         private boolean help = false;
     }
 }

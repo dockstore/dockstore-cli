@@ -53,6 +53,7 @@ import static io.dockstore.client.cli.Client.SERVER_METADATA;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.common.CLICommonTestUtilities.checkToolList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -430,7 +431,7 @@ class ClientIT extends BaseIT {
         acceptedCommands.add(CHECKER);
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
-        acceptedCommands.add("yaml");
+        acceptedCommands.add(YAML);
         ArgumentUtility.invalid("", "z", acceptedCommands);
         System.out.println("HELLO");
         String output = systemOutRule.getText();

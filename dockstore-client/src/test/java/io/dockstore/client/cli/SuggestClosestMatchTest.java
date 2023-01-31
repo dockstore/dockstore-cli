@@ -33,6 +33,7 @@ import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static org.junit.Assert.assertTrue;
 
 @ExtendWith(SystemStubsExtension.class)
@@ -88,7 +89,7 @@ public class SuggestClosestMatchTest {
         acceptedCommands.add(CHECKER);
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
-        acceptedCommands.add("yaml");
+        acceptedCommands.add(YAML);
         ArgumentUtility.invalid("", "z", acceptedCommands);
         Assertions.assertEquals("dockstore: 'z' is not a dockstore command. See 'dockstore " + HELP + "'.\n",
                 systemOutRule.getText());
@@ -124,7 +125,7 @@ public class SuggestClosestMatchTest {
         acceptedCommands.add(CHECKER);
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
-        acceptedCommands.add("yaml");
+        acceptedCommands.add(YAML);
 
         ArgumentUtility.invalid("", "CHECKER", acceptedCommands);
         Assertions.assertEquals("""
@@ -178,7 +179,7 @@ public class SuggestClosestMatchTest {
         acceptedCommands.add(CHECKER);
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
-        acceptedCommands.add("yaml");
+        acceptedCommands.add(YAML);
 
         ArgumentUtility.invalid("", "pluggn", acceptedCommands);
         Assertions.assertEquals("""
@@ -212,7 +213,7 @@ public class SuggestClosestMatchTest {
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
         acceptedCommands.add("test2");
-        acceptedCommands.add("yaml");
+        acceptedCommands.add(YAML);
 
         ArgumentUtility.invalid("", "test0", acceptedCommands);
         Assertions.assertEquals("""

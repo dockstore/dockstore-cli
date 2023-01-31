@@ -38,6 +38,7 @@ import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_MISMATCH_MESSAGE;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
@@ -177,10 +178,10 @@ public abstract class BaseLanguageClient {
                     provisionedParameterFile = provisionInputFiles();
                 } catch (ApiException ex) {
                     if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL)) {
-                        exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
+                        exceptionMessage(ex, "The " + TOOL + " entry does not exist. Did you mean to launch a local " + TOOL + " or a " + WORKFLOW + "?",
                                 ENTRY_NOT_FOUND);
                     } else {
-                        exceptionMessage(ex, "The workflow entry does not exist. Did you mean to launch a local workflow or a tool?",
+                        exceptionMessage(ex, "The " + WORKFLOW + " entry does not exist. Did you mean to launch a local " + WORKFLOW + " or a " + TOOL + "?",
                                 ENTRY_NOT_FOUND);
                     }
                 } catch (Exception ex) {
