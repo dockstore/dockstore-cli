@@ -131,6 +131,7 @@ import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggest
 import static io.dockstore.client.cli.JCommanderUtility.getUnknowParameter;
 import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static io.dockstore.client.cli.nested.WesCommandParser.ATTACH;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.INLINE_WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
@@ -1613,7 +1614,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Optional parameters:");
         out("  " + JSON + " <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
-        out("  --attach <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
+        out("  " + ATTACH +" <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
         out("  " + INLINE_WORKFLOW + "                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
         out("");
     }
