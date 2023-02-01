@@ -25,6 +25,7 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static org.junit.Assert.assertTrue;
 
 public class LaunchTestYamlIT {
@@ -95,7 +96,7 @@ public class LaunchTestYamlIT {
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
         args.add(LAUNCH);
-        args.add("--entry");
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--json");
         args.add(helloJSON.getPath());

@@ -77,6 +77,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
 
 /**
@@ -868,7 +869,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 }
             }
 
-            final String toolpath = reqVal(args, "--entry");
+            final String toolpath = reqVal(args, ENTRY);
             try {
                 DockstoreTool container = containersApi.getContainerByToolPath(toolpath, null);
                 long containerId = container.getId();
@@ -992,7 +993,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             updateToolHelp();
         } else {
-            final String toolpath = reqVal(args, "--entry");
+            final String toolpath = reqVal(args, ENTRY);
             try {
                 DockstoreTool tool = containersApi.getContainerByToolPath(toolpath, null);
                 long containerId = tool.getId();

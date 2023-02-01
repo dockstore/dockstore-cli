@@ -131,6 +131,7 @@ import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggest
 import static io.dockstore.client.cli.JCommanderUtility.getUnknowParameter;
 import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.VERBOSE;
 import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static io.dockstore.common.DescriptorLanguage.CWL;
@@ -531,7 +532,7 @@ public abstract class AbstractEntryClient<T> {
         } else if (containsHelpRequest(args)) {
             publishHelp();
         } else {
-            String first = reqVal(args, "--entry");
+            String first = reqVal(args, ENTRY);
             final boolean unpublishRequest = args.contains("--unpub");
 
             // --new-entry-name is the desired parameter flag, but maintaining backwards compatibility for --entryname
@@ -557,7 +558,7 @@ public abstract class AbstractEntryClient<T> {
         } else if (containsHelpRequest(args)) {
             starHelp();
         } else {
-            String first = reqVal(args, "--entry");
+            String first = reqVal(args, ENTRY);
             final boolean toStar = !args.contains("--unstar");
             handleStarUnstar(first, toStar);
         }
@@ -575,7 +576,7 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             descriptorHelp(descriptorType);
         } else {
-            final String entry = reqVal(args, "--entry");
+            final String entry = reqVal(args, ENTRY);
             handleDescriptor(descriptorType, entry);
         }
     }
@@ -584,7 +585,7 @@ public abstract class AbstractEntryClient<T> {
         if (containsHelpRequest(args)) {
             refreshHelp();
         } else if (!args.isEmpty()) {
-            final String toolpath = reqVal(args, "--entry");
+            final String toolpath = reqVal(args, ENTRY);
             refreshTargetEntry(toolpath);
         } else {
             // check user info after usage so that users can get usage without live webservice
@@ -596,7 +597,7 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             infoHelp();
         } else {
-            String path = reqVal(args, "--entry");
+            String path = reqVal(args, ENTRY);
             handleInfo(path);
         }
     }
@@ -605,7 +606,7 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             labelHelp();
         } else {
-            final String toolpath = reqVal(args, "--entry");
+            final String toolpath = reqVal(args, ENTRY);
             final List<String> adds = optVals(args, "--add");
             final Set<String> addsSet = adds.isEmpty() ? new HashSet<>() : new HashSet<>(adds);
             final List<String> removes = optVals(args, "--remove");
@@ -793,7 +794,7 @@ public abstract class AbstractEntryClient<T> {
         if (containsHelpRequest(args) || args.isEmpty()) {
             testParameterHelp();
         } else {
-            String entry = reqVal(args, "--entry");
+            String entry = reqVal(args, ENTRY);
             String version = reqVal(args, VERSION);
             String descriptorType = null;
             final List<String> adds = optVals(args, "--add");
@@ -1032,10 +1033,10 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             downloadHelp();
         } else {
-            if (!args.contains("--entry")) {
+            if (!args.contains(ENTRY)) {
                 errorMessage("dockstore: missing required flag --entry", CLIENT_ERROR);
             }
-            final String entry = reqVal(args, "--entry");
+            final String entry = reqVal(args, ENTRY);
             final boolean unzip = !args.contains("--zip");
             try {
                 downloadTargetEntry(entry, null, unzip);
@@ -1420,7 +1421,7 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             launchHelp();
         } else {
-            if (args.contains("--local-entry") && args.contains("--entry")) {
+            if (args.contains("--local-entry") && args.contains(ENTRY)) {
                 errorMessage("You can only use one of --local-entry and --entry at a time. Please use " + HELP + " for more information.",
                         CLIENT_ERROR);
             } else if (args.contains("--local-entry")) {
@@ -1431,7 +1432,7 @@ public abstract class AbstractEntryClient<T> {
                 checkIfDockerRunning();
                 checkEntryFile(localFilePath, args, descriptor);
             } else {
-                if (!args.contains("--entry")) {
+                if (!args.contains(ENTRY)) {
                     errorMessage("dockstore: missing required flag --entry", CLIENT_ERROR);
                 }
                 this.isLocalEntry = false;
@@ -1443,7 +1444,7 @@ public abstract class AbstractEntryClient<T> {
                 final String descriptor = optVal(args, "--descriptor", CWL.toString()).toUpperCase();
                 if (CWL.toString().equals(descriptor)) {
                     try {
-                        String entry = reqVal(args, "--entry");
+                        String entry = reqVal(args, ENTRY);
                         launchCwl(entry, args, false);
                     } catch (ApiException e) {
                         exceptionMessage(e, "API error launching workflow. Did you mean to use --local-entry instead of --entry?",
@@ -1511,7 +1512,7 @@ public abstract class AbstractEntryClient<T> {
     }
 
     private void launchWdl(final List<String> args, boolean isALocalEntry) throws IOException, ApiException {
-        final String entry = reqVal(args, "--entry");
+        final String entry = reqVal(args, ENTRY);
         launchWdl(entry, args, isALocalEntry);
     }
 
@@ -1532,7 +1533,7 @@ public abstract class AbstractEntryClient<T> {
     }
 
     private String convertEntry2Json(List<String> args, final boolean json) throws ApiException, IOException {
-        final String entry = reqVal(args, "--entry");
+        final String entry = reqVal(args, ENTRY);
         final String descriptor = optVal(args, "--descriptor", CWL.toString()).toUpperCase();
         LanguageClientInterface languageCLient = convertCLIStringToEnum(descriptor);
         return languageCLient.generateInputJson(entry, json);

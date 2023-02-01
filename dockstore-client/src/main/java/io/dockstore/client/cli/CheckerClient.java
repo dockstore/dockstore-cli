@@ -32,6 +32,7 @@ import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 
 /**
  * This implements all operations on the CLI that are specific to checkers
@@ -115,7 +116,7 @@ public class CheckerClient extends WorkflowClient {
             addCheckerHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
             final String descriptorType = optVal(args, "--descriptor-type", DescriptorLanguage.CWL.toString()).toUpperCase();
             String descriptorPath = reqVal(args, "--descriptor-path");
             String inputParameterPath = optVal(args, "--input-parameter-path", null);
@@ -176,7 +177,7 @@ public class CheckerClient extends WorkflowClient {
             updateCheckerHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
 
             // Get entry from path
             Entry entry = getEntryFromPath(entryPath);
@@ -245,7 +246,7 @@ public class CheckerClient extends WorkflowClient {
             String currentDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
 
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
             String version = reqVal(args, VERSION);
             final boolean unzip = !args.contains("--zip");
 
@@ -291,7 +292,7 @@ public class CheckerClient extends WorkflowClient {
             launchHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
 
             // Properly handle versions
             String[] splitPath = entryPath.split(":");
@@ -314,7 +315,7 @@ public class CheckerClient extends WorkflowClient {
                 if (version != null) {
                     checkerPath += ":" + version;
                 }
-                args.add("--entry");
+                args.add(ENTRY);
                 args.add(checkerPath);
                 launch(args);
             }
@@ -326,7 +327,7 @@ public class CheckerClient extends WorkflowClient {
             testParameterHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
 
             // Get entry from path
             Entry entry = getEntryFromPath(entryPath);
@@ -337,7 +338,7 @@ public class CheckerClient extends WorkflowClient {
             // Add/remove test parameter files
             if (entry != null && checkerWorkflow != null) {
                 // Add entry path to command, but with checker workflow
-                args.add("--entry");
+                args.add(ENTRY);
                 args.add(checkerWorkflow.getFullWorkflowPath());
 
                 // This is used by testParameter to properly display output/error messages
@@ -355,7 +356,7 @@ public class CheckerClient extends WorkflowClient {
             versionTagHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
 
             // Get entry from path
             Entry entry = getEntryFromPath(entryPath);
@@ -366,7 +367,7 @@ public class CheckerClient extends WorkflowClient {
             // Update version
             if (entry != null && checkerWorkflow != null) {
                 // Readd entry path to call, but with checker workflow
-                args.add("--entry");
+                args.add(ENTRY);
                 args.add(checkerWorkflow.getFullWorkflowPath());
 
                 // Call inherited test parameter function

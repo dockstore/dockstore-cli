@@ -12,6 +12,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LOGS;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.SERVICE_INFO;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -81,7 +82,7 @@ class WesCommandParserTest {
     void testCommandLaunch1() {
         final String[] args = {
             LAUNCH,
-            "--entry",
+            ENTRY,
             "my/fake/entry"
         };
 
@@ -97,7 +98,7 @@ class WesCommandParserTest {
     void testCommandLaunch2() {
         final String[] args = {
             LAUNCH,
-            "--entry",
+            ENTRY,
             "my/fake/entry"
         };
 
@@ -115,7 +116,7 @@ class WesCommandParserTest {
             LAUNCH,
             WES_URL,
             "banana",
-            "--entry",
+            ENTRY,
             "my/fake/entry"
         };
 

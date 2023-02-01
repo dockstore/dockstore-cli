@@ -26,6 +26,7 @@ import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.REFRESH;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
@@ -61,7 +62,7 @@ class BitBucketBasicIT extends BaseIT {
     @Test
     void testQuayAndBitbucketPublishAndUnpublishAentry() {
         // Publish
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, ENTRY,
             "quay.io/dockstoretestuser/quayandbitbucket", SCRIPT_FLAG });
 
         final long count = testingPostgres
@@ -69,7 +70,7 @@ class BitBucketBasicIT extends BaseIT {
         assertEquals(1, count, "there should be 1 registered");
 
         // Unpublish
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", ENTRY,
             "quay.io/dockstoretestuser/quayandbitbucket", SCRIPT_FLAG });
 
         final long count2 = testingPostgres
@@ -87,7 +88,7 @@ class BitBucketBasicIT extends BaseIT {
         // Setup database
 
         // Refresh a tool
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, ENTRY,
             "quay.io/dockstoretestuser/quayandbitbucket", SCRIPT_FLAG });
 
         // Check that user has been updated
@@ -103,19 +104,19 @@ class BitBucketBasicIT extends BaseIT {
      */
     @Test
     void testRefreshCorrectTool() {
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, ENTRY,
             "quay.io/dockstoretestuser/quayandbitbucket", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, MANUAL_PUBLISH, "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name",
             "dockerhubandbitbucket", "--git-url", "git@bitbucket.org:dockstoretestuser/dockstore-whalesay.git", "--git-reference", "master",
             "--toolname", "regular", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, ENTRY,
             "registry.hub.docker.com/dockstoretestuser/dockerhubandbitbucket/regular", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, MANUAL_PUBLISH, "--registry",
             Registry.DOCKER_HUB.name(), Registry.DOCKER_HUB.toString(), "--namespace", "dockstoretestuser", "--name", "dockerhubandgithub",
             "--git-url", "git@github.com:dockstoretestuser/dockstore-whalesay.git", "--git-reference", "master", "--toolname", "regular",
             SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, ENTRY,
             "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular", SCRIPT_FLAG });
     }
 
@@ -138,7 +139,7 @@ class BitBucketBasicIT extends BaseIT {
     @Test
     void testQuayBitbucketPublishAlternateStructure() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, ENTRY,
                         "quay.io/dockstoretestuser/quayandbitbucketalternate", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
         // TODO: change the tag tag locations of Dockerfile and Dockstore.cwl, now should be able to publish
@@ -161,7 +162,7 @@ class BitBucketBasicIT extends BaseIT {
         assertEquals(1, count, "there should be 1 entries, there are " + count);
 
         // Unpublish
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", ENTRY,
             "quay.io/dockstoretestuser/quayandbitbucketalternate/alternate", SCRIPT_FLAG });
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'alternate' and ispublished='t'", long.class);
@@ -186,7 +187,7 @@ class BitBucketBasicIT extends BaseIT {
         assertEquals(1, count, "there should be 1 entry");
 
         // Unpublish
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", ENTRY,
             "registry.hub.docker.com/dockstoretestuser/dockerhubandbitbucket/alternate", SCRIPT_FLAG });
 
         final long count3 = testingPostgres
@@ -239,14 +240,14 @@ class BitBucketBasicIT extends BaseIT {
             .runSelectStatement("select count(*) from tool where toolname like 'regular%' and ispublished='t'", long.class);
         assertEquals(2, count2, "there should be 2 entries");
 
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", ENTRY,
             "registry.hub.docker.com/dockstoretestuser/dockerhubandbitbucket/regular", SCRIPT_FLAG });
         final long count3 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'regular2' and ispublished='t'", long.class);
 
         assertEquals(1, count3, "there should be 1 entry");
 
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", ENTRY,
             "registry.hub.docker.com/dockstoretestuser/dockerhubandbitbucket/regular2", SCRIPT_FLAG });
         final long count4 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname like 'regular%' and ispublished='t'", long.class);
@@ -276,7 +277,7 @@ class BitBucketBasicIT extends BaseIT {
         assertEquals(1, count, "there should be 1 entries, there are " + count);
 
         // Unpublish
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", "--entry",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", ENTRY,
             "registry.hub.docker.com/dockstoretestuser/dockerhubandbitbucket/regular", SCRIPT_FLAG });
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tool where toolname = 'regular' and ispublished='t'", long.class);

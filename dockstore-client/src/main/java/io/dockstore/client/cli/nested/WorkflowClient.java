@@ -91,6 +91,7 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 
 /**
  * This stub will eventually implement all operations on the CLI that are specific to workflows.
@@ -991,7 +992,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             updateWorkflowHelp();
         } else {
-            final String entry = reqVal(args, "--entry");
+            final String entry = reqVal(args, ENTRY);
             try {
                 Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, "versions", false, true);
                 if (isAppTool) {
@@ -1097,7 +1098,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             versionTagHelp();
         } else {
-            final String entry = reqVal(args, "--entry");
+            final String entry = reqVal(args, ENTRY);
             final String name = reqVal(args, "--name");
 
             try {
@@ -1142,7 +1143,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             restubHelp();
         } else {
             try {
-                final String entry = reqVal(args, "--entry");
+                final String entry = reqVal(args, ENTRY);
                 Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, false, true);
                 if (this.isAppTool) {
                     errorMessage(GITHUB_APP_COMMAND_ERROR, COMMAND_ERROR);
@@ -1217,7 +1218,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     @Parameters(separators = "=", commandDescription = "Spit out a json run file for a given entry.")
     private static class CommandEntry2json {
 
-        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
+        @Parameter(names = ENTRY, description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
         @Parameter(names = HELP, description = "Prints help for entry2json command", help = true)
         private boolean help = false;
@@ -1228,7 +1229,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
         @Parameter(names = "--local-entry", description = "Allows you to specify a full path to a local descriptor instead of an entry path")
         private String localEntry;
-        @Parameter(names = "--entry", description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)")
+        @Parameter(names = ENTRY, description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)")
         private String entry;
         @Parameter(names = "--json", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
         private String json;

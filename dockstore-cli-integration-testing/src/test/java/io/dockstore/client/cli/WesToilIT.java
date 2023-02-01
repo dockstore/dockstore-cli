@@ -16,6 +16,7 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CANCEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.VERBOSE;
 import static io.github.collaboratory.cwl.CWLClient.WES;
 import static org.junit.Assert.assertTrue;
@@ -90,7 +91,7 @@ public class WesToilIT {
     public void testBasicLaunch1() throws InterruptedException {
         String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
             CONFIG, TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
             "--inline-workflow"
         };
@@ -106,7 +107,7 @@ public class WesToilIT {
     public void testBasicLaunch2() throws InterruptedException {
         String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
             CONFIG, TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/multi-descriptor-no-input:main",
+            ENTRY, "github.com/dockstore-testing/wes-testing/multi-descriptor-no-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"), // Toil requires workflow_params to be provided
             "--inline-workflow",
             VERBOSE
@@ -126,7 +127,7 @@ public class WesToilIT {
     public void testBasicLaunch3() throws InterruptedException {
         String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
             CONFIG, TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-no-input:main",
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-no-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"), // Toil requires workflow_params to be provided
             "--inline-workflow"
         };
@@ -142,7 +143,7 @@ public class WesToilIT {
     public void testCancel() throws InterruptedException {
         String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
             CONFIG, TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
             "--inline-workflow"
         };
@@ -166,7 +167,7 @@ public class WesToilIT {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
         String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
             CONFIG, TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
             "-a", ResourceHelpers.resourceFilePath("wesIt/w4_nested"),
             "--inline-workflow",
@@ -186,7 +187,7 @@ public class WesToilIT {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
         String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
             CONFIG, TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
             "-a", "src/test/resources/wesIt/w4_nested/w4_2_test.txt",
             "--inline-workflow",
@@ -207,7 +208,7 @@ public class WesToilIT {
         // all nested files relative to said absolute path. This means that the attachment JSON will be at the wrong path.
         String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
             CONFIG, TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
             "--attach", "src/test/resources/wesIt/w4_nested",
             "--inline-workflow",
@@ -228,7 +229,7 @@ public class WesToilIT {
         // all nested files relative to said absolute path. This means that the attachment JSON will be at the wrong path.
         String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
             CONFIG, TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
             "-a", "src/test/resources/wesIt/w4_nested",
             "--inline-workflow",
@@ -248,7 +249,7 @@ public class WesToilIT {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
         String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
             CONFIG, TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-complex-nested-input:main",
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-complex-nested-input:main",
             "--json", ResourceHelpers.resourceFilePath("wesIt/w5_1_test.json"),
             "--attach", ResourceHelpers.resourceFilePath("wesIt/w5_nested"),
             "--inline-workflow",

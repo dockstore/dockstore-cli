@@ -19,6 +19,7 @@ public class WesCommandParser {
 
     public static final String WES_URL = "--wes-url";
     public static final String VERBOSE = "--verbose";
+    public static final String ENTRY = "--entry";
     public WesMain wesMain;
     public CommandLaunch commandLaunch;
     public CommandCancel commandCancel;
@@ -78,7 +79,7 @@ public class WesCommandParser {
 
     @Parameters(commandDescription = "Launch a " + WORKFLOW + " using WES")
     public static class CommandLaunch extends WesMain {
-        @Parameter(names = "--entry", description = "Complete " + WORKFLOW + " path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
+        @Parameter(names = ENTRY, description = "Complete " + WORKFLOW + " path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
         @Parameter(names = "--inline-workflow", description = "Inlines " + WORKFLOW + " files contents directly into the WES HTTP request. This is required for some WES server implementations.")
         private boolean inlineWorkflow = false;

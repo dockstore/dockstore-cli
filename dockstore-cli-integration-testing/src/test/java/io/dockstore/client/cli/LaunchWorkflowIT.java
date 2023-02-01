@@ -22,6 +22,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_M
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
@@ -83,7 +84,7 @@ class LaunchWorkflowIT extends BaseIT {
     @Test
     @Category(ToilCompatibleTest.class)
     void testRemoteLaunchCWLNoFile() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--entry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
                 "imnotreal.cwl", "--json", "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -93,7 +94,7 @@ class LaunchWorkflowIT extends BaseIT {
      */
     @Test
     void testRemoteLaunchWDLNoFile() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--entry",
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
                 "imnotreal.wdl", "--json", "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
@@ -160,7 +161,7 @@ class LaunchWorkflowIT extends BaseIT {
 
         // ensure checksum validation is acknowledged, and no null checksums were discovered
         systemOutRule.clear();
-        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--entry",
+        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),
@@ -168,11 +169,11 @@ class LaunchWorkflowIT extends BaseIT {
 
         // unpublish the workflow
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, "--unpub", "--entry", "github.com/DockstoreTestUser2/md5sum-checker/checksumTester"});
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, "--unpub", ENTRY, "github.com/DockstoreTestUser2/md5sum-checker/checksumTester"});
 
         // ensure checksum validation is acknowledged for the unpublished workflow, and no null checksums were discovered
         systemOutRule.clear();
-        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--entry",
+        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
             "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),

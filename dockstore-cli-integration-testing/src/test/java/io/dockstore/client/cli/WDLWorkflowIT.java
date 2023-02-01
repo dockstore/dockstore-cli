@@ -49,6 +49,7 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -111,7 +112,7 @@ class WDLWorkflowIT extends BaseIT {
         FileUtils.writeStringToFile(tempFile.toFile(), testParameterFiles.get(0).getContent(), StandardCharsets.UTF_8);
         // launch without error
         // run a workflow
-        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, LAUNCH, "--entry", UNIFIED_WORKFLOW + ":" + testVersion, "--json", tempFile.toFile().getAbsolutePath()});
+        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, LAUNCH, ENTRY, UNIFIED_WORKFLOW + ":" + testVersion, "--json", tempFile.toFile().getAbsolutePath()});
     }
 
     /**
@@ -152,7 +153,7 @@ class WDLWorkflowIT extends BaseIT {
 
     private void checkOnConvert(String skylabWorkflowChecker, String branch, String prefix) {
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, CONVERT, ENTRY_2_JSON, "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, CONVERT, ENTRY_2_JSON, ENTRY,
                 skylabWorkflowChecker + ":" + branch, SCRIPT_FLAG });
         List<String> stringList = new ArrayList<>();
         stringList.add("\"" + prefix + ".gtf_file\": \"File\"");

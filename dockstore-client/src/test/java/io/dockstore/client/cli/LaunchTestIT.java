@@ -51,6 +51,7 @@ import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -419,7 +420,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
         args.add("--json");
@@ -449,7 +450,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add("wrongExtcwl.wdl");
         args.add("--local-entry");
         args.add("--json");
@@ -475,7 +476,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add("wrongExtwdl.cwl");
         args.add("--local-entry");
         args.add("--json");
@@ -501,7 +502,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add("cwlNoExt");
         args.add("--local-entry");
         args.add("--json");
@@ -527,7 +528,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
         args.add("--json");
@@ -555,7 +556,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
         args.add("--json");
@@ -582,7 +583,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
         args.add("--json");
@@ -609,7 +610,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
         args.add("--json");
@@ -635,7 +636,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
         args.add("--json");
@@ -661,7 +662,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
         args.add("--json");
@@ -687,7 +688,7 @@ class LaunchTestIT {
         File json = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--entry");
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
         args.add("--json");
