@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.MissingCommandException;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
@@ -34,10 +35,15 @@ import ro.fortsoft.pf4j.PluginManager;
 import ro.fortsoft.pf4j.PluginWrapper;
 
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
+import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
+import static io.dockstore.client.cli.JCommanderUtility.getUnknowParameter;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
+import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
 
 /**
@@ -59,19 +65,17 @@ public final class PluginClient {
     public static boolean handleCommand(List<String> args, INIConfiguration configFile) {
         String[] argv = args.toArray(new String[args.size()]);
         JCommander jc = new JCommander();
-
         CommandPlugin commandPlugin = new CommandPlugin();
         JCommander jcPlugin = JCommanderUtility.addCommand(jc, PLUGIN, commandPlugin);
 
         CommandPluginList commandPluginList = new CommandPluginList();
         JCommanderUtility.addCommand(jcPlugin, LIST, commandPluginList);
-
         CommandPluginDownload commandPluginDownload = new CommandPluginDownload();
         JCommanderUtility.addCommand(jcPlugin, DOWNLOAD, commandPluginDownload);
         // Not parsing with jc because we know the first command was plugin.  jc's purpose is to display help
-        jcPlugin.parse(argv);
         try {
-            if (args.isEmpty() || commandPlugin.help) {
+            jcPlugin.parse(argv);
+            if (commandPlugin.help || args.isEmpty()) {
                 printJCommanderHelp(jc, "dockstore", PLUGIN);
             } else {
                 switch (jcPlugin.getParsedCommand()) {
@@ -93,8 +97,15 @@ public final class PluginClient {
                     // fall through
                 }
             }
+        } catch (MissingCommandException e) {
+            displayJCommanderSuggestions(jcPlugin, e.getJCommander().getParsedCommand(), args.get(0), PLUGIN);
         } catch (ParameterException e) {
-            printJCommanderHelp(jc, "dockstore", PLUGIN);
+            if (wasErrorDueToUnknownParamter(e.getMessage())) {
+                String incorrectCommand = getUnknowParameter(e.getMessage());
+                displayJCommanderSuggestions(jcPlugin, e.getJCommander().getParsedCommand(), incorrectCommand, PLUGIN + " " + e.getJCommander().getParsedCommand().toString());
+            } else {
+                errorMessage(e.getMessage(), CLIENT_ERROR);
+            }
         }
         return true;
 

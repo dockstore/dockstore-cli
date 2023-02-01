@@ -1,7 +1,9 @@
 package io.dockstore.client.cli.nested;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.MissingCommandException;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import io.dockstore.client.cli.ArgumentUtility;
 import io.dockstore.client.cli.Client;
@@ -10,15 +12,24 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.Configuration;
 import io.swagger.client.api.MetadataApi;
 
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
+import static io.dockstore.client.cli.JCommanderUtility.getUnknowParameter;
+import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
 
 /**
  * @author gluu
  * @since 12/04/18
  */
 public final class DepCommand {
+
+    public static final String CLIENT_VERSION = "--client-version";
+    public static final String PYTHON_VERSION = "--python-version";
+
     private DepCommand() {
     }
 
@@ -31,7 +42,21 @@ public final class DepCommand {
         CommandDep commandDep = new CommandDep();
         JCommander jCommanderMain = new JCommander();
         JCommanderUtility.addCommand(jCommanderMain, DEPS, commandDep);
-        jCommanderMain.parse(args);
+
+        try {
+            jCommanderMain.parse(args);
+        } catch (MissingCommandException e) {
+            displayJCommanderSuggestions(jCommanderMain, e.getJCommander().getParsedCommand(), args[0], DEPS);
+            return true;
+        } catch (ParameterException e) {
+            if (wasErrorDueToUnknownParamter(e.getMessage())) {
+                String incorrectCommand = getUnknowParameter(e.getMessage());
+                displayJCommanderSuggestions(jCommanderMain, e.getJCommander().getParsedCommand(), incorrectCommand, DEPS);
+            } else {
+                errorMessage(e.getMessage(), CLIENT_ERROR);
+            }
+            return true;
+        }
         if (commandDep.help) {
             JCommanderUtility.printJCommanderHelp(jCommanderMain, "dockstore", DEPS);
         } else {
@@ -52,9 +77,9 @@ public final class DepCommand {
 
     @Parameters(separators = "=", commandDescription = "Print cwltool runner dependencies")
     private static class CommandDep {
-        @Parameter(names = "--client-version", description = "Dockstore version")
+        @Parameter(names = CLIENT_VERSION, description = "Dockstore version")
         private String clientVersion = Client.getClientVersion();
-        @Parameter(names = "--python-version", description = "Python version")
+        @Parameter(names = PYTHON_VERSION, description = "Python version")
         private String pythonVersion = "3";
         // @Parameter(names = "--runner", description = "tool/workflow runner. Available options: 'cwltool'")
         private String runner = "cwltool";

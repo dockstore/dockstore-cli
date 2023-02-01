@@ -76,9 +76,10 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.TEST_PARAMETER;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.VERIFY;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.WDL_2_JSON;
+import static io.dockstore.client.cli.nested.DepCommand.CLIENT_VERSION;
+import static io.dockstore.client.cli.nested.DepCommand.PYTHON_VERSION;
 import static io.dockstore.client.cli.nested.ToolClient.UPDATE_TOOL;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
-import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.ID;
 import static io.dockstore.client.cli.nested.WesCommandParser.INLINE_WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
@@ -289,7 +290,7 @@ class ClientIT extends BaseIT {
     @Test
     void testDepsCommandWithVersionAndPython3() throws IOException {
         Client.main(
-            new String[] { CONFIG, TestUtility.getConfigFileLocation(true), DEPS, "--client-version", "1.7.0", "--python-version",
+            new String[] { CONFIG, TestUtility.getConfigFileLocation(true), DEPS, CLIENT_VERSION, "1.7.0", PYTHON_VERSION,
                 "3" });
         assertFalse(systemOutRule.getText().contains("monotonic=="));
         assertDepsCommandOutput();
@@ -443,6 +444,7 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { CHECKER, "update", HELP });
         checkCommandForHelp(new String[] { CHECKER, "update_version", HELP });
         checkCommandForHelp(new String[] { CHECKER, TEST_PARAMETER, HELP });
+
     }
 
     private void checkCommandForHelp(String[] argv) throws IOException {
@@ -488,6 +490,12 @@ class ClientIT extends BaseIT {
         checkSuggestionIsGiven(new String[] {WORKFLOW, WES, SERVICE_INFO}, WES_URL);
         checkSuggestionIsGiven(new String[] {WORKFLOW, WES, LIST}, PAGE_TOKEN);
 
+        checkSuggestionIsGiven(new String[] {PLUGIN}, HELP);
+        checkSuggestionIsGiven(new String[] {PLUGIN}, LIST);
+        checkSuggestionIsGiven(new String[] {PLUGIN}, DOWNLOAD);
+
+        checkSuggestionIsGiven(new String[] {DEPS}, CLIENT_VERSION);
+        checkSuggestionIsGiven(new String[] {DEPS}, HELP);
 
     }
 
@@ -512,9 +520,6 @@ class ClientIT extends BaseIT {
 
         systemOutRule.clear();
         Client.main(commandsForCapitalizationTest.toArray(new String[0]));
-//        assertEquals("dockstore" + formmatedValidCommandString + ": '" + commandToBeTested.toUpperCase()
-//                + "' is not a dockstore command. See 'dockstore" + formmatedValidCommandString + " " + HELP
-//                + "'.\n\n" + "The most similar command is:\n    " + commandToBeTested + "\n", systemOutRule.getText());
         assertTrue(systemOutRule.getText().contains("dockstore" + formmatedValidCommandString + ": '" + commandToBeTested.toUpperCase()
                         + "' is not a dockstore command. See 'dockstore" + formmatedValidCommandString + " " + HELP
                         + "'.\n\n" + "The most similar command is:\n    " + commandToBeTested + "\n"));
