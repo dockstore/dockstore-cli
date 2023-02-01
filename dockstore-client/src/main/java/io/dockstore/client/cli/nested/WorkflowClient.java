@@ -484,7 +484,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                                 break;
                             case WDL:
                             case NEXTFLOW:
-                                conditionalErrorMessage((yamlRun != null), "--yaml is not supported please use --json instead", CLIENT_ERROR);
+                                conditionalErrorMessage((yamlRun != null), "--yaml is not supported please use " + JSON + " instead", CLIENT_ERROR);
                                 languageClientInterface.launch(entry, false, null, jsonRun, wdlOutputTarget, uuid);
                                 break;
                             default:

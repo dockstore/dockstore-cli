@@ -34,6 +34,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 
 /**
  * @author gluu
@@ -57,7 +58,7 @@ public final class JCommanderUtility {
                 + "   OR\n"
                 + "  --local-entry <local-entry>         Allows you to specify a full path to a local descriptor instead of an entry path\n");
         out("");
-        out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
+        out("  " + JSON + " <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("   OR");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs (only for CWL)");
         out("");

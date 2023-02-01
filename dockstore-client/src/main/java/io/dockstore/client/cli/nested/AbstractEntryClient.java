@@ -1612,7 +1612,7 @@ public abstract class AbstractEntryClient<T> {
         out("  " + ENTRY + " <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         out("");
         out("Optional parameters:");
-        out("  --json <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
+        out("  " + JSON + " <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
         out("  --attach <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
         out("  " + INLINE_WORKFLOW + "                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
         out("");
@@ -1920,7 +1920,7 @@ public abstract class AbstractEntryClient<T> {
         }
         out("");
         out("Optional parameters:");
-        out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
+        out("  " + JSON + " <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("  --descriptor <descriptor type>      Descriptor type used to " + LAUNCH + " " + WORKFLOW + ". Defaults to " + CWL.toString());
         if (!(this instanceof CheckerClient)) {
