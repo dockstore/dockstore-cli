@@ -16,6 +16,7 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CANCEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
+import static io.dockstore.client.cli.nested.WesCommandParser.ATTACH;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.INLINE_WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
@@ -212,7 +213,7 @@ public class WesToilIT {
             CONFIG, TOIL_CONFIG,
             ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
             JSON, ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
-            "--attach", "src/test/resources/wesIt/w4_nested",
+            ATTACH, "src/test/resources/wesIt/w4_nested",
             INLINE_WORKFLOW,
             VERBOSE
         };
@@ -253,7 +254,7 @@ public class WesToilIT {
             CONFIG, TOIL_CONFIG,
             ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-complex-nested-input:main",
             JSON, ResourceHelpers.resourceFilePath("wesIt/w5_1_test.json"),
-            "--attach", ResourceHelpers.resourceFilePath("wesIt/w5_nested"),
+            ATTACH, ResourceHelpers.resourceFilePath("wesIt/w5_nested"),
             INLINE_WORKFLOW,
             VERBOSE
         };

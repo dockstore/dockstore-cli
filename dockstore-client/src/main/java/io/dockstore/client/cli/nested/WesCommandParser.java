@@ -22,6 +22,7 @@ public class WesCommandParser {
     public static final String ENTRY = "--entry";
     public static final String INLINE_WORKFLOW = "--inline-workflow";
     public static final String JSON = "--json";
+    public static final String ATTACH = "--attach";
     public WesMain wesMain;
     public CommandLaunch commandLaunch;
     public CommandCancel commandCancel;
@@ -87,7 +88,7 @@ public class WesCommandParser {
         private boolean inlineWorkflow = false;
         @Parameter(names = JSON, description = "JSON file describing which attached file contains input parameters.")
         private String json;
-        @Parameter(names = {"--attach", "-a"}, description = "A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)", variableArity = true)
+        @Parameter(names = {ATTACH, "-a"}, description = "A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)", variableArity = true)
         private List<String> attachments;
 
         public String getEntry() {
