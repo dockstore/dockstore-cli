@@ -19,7 +19,12 @@ import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CANCEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LOGS;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.SERVICE_INFO;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
+import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static io.github.collaboratory.cwl.CWLClient.WES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -50,7 +55,7 @@ class AbstractEntryClientTestIT {
     @Test
     void testWESHelpMessages() {
         final String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
-        final String[] commandNames = {"", LAUNCH, "status", "cancel", "service-info", "logs", LIST};
+        final String[] commandNames = {"", LAUNCH, STATUS, CANCEL, SERVICE_INFO, LOGS, LIST};
 
         // has config file
         for (String command : commandNames) {
@@ -114,7 +119,7 @@ class AbstractEntryClientTestIT {
         AbstractEntryClient workflowClient = testAggregateHelper("configNoContent");
 
         String[] args = {
-            "service-info"
+            SERVICE_INFO
         };
         WesCommandParser parser = new WesCommandParser();
         parser.jCommander.parse(args);
@@ -129,8 +134,8 @@ class AbstractEntryClientTestIT {
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
         String[] args = {
-            "service-info",
-            "--wes-url",
+            SERVICE_INFO,
+            WES_URL,
             "myUrl"
         };
 
@@ -152,8 +157,8 @@ class AbstractEntryClientTestIT {
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
         String[] args = {
-            "service-info",
-            "--wes-url",
+            SERVICE_INFO,
+            WES_URL,
             "myUrl"
         };
 
@@ -180,8 +185,8 @@ class AbstractEntryClientTestIT {
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
         String[] args = {
-            "service-info",
-            "--wes-url",
+            SERVICE_INFO,
+            WES_URL,
             "myUrl"
         };
 
@@ -203,8 +208,8 @@ class AbstractEntryClientTestIT {
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfileNoAuth");
 
         String[] args = {
-            "service-info",
-            "--wes-url",
+            SERVICE_INFO,
+            WES_URL,
             "myUrl"
         };
 
@@ -231,8 +236,8 @@ class AbstractEntryClientTestIT {
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials2");
         String config = ResourceHelpers.resourceFilePath("fakeAwsConfig");
         String[] args = {
-            "service-info",
-            "--wes-url",
+            SERVICE_INFO,
+            WES_URL,
             "myUrl"
         };
 
@@ -256,8 +261,8 @@ class AbstractEntryClientTestIT {
         AbstractEntryClient workflowClient = testAggregateHelper("configWithBearerToken");
         
         String[] args = {
-            "service-info",
-            "--wes-url",
+            SERVICE_INFO,
+            WES_URL,
             "myUrl"
         };
 
@@ -276,7 +281,7 @@ class AbstractEntryClientTestIT {
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsProfile");
 
         String[] args = {
-            "service-info"
+            SERVICE_INFO
         };
 
         String credentials  = ResourceHelpers.resourceFilePath("fakeAwsCredentials");
@@ -302,8 +307,8 @@ class AbstractEntryClientTestIT {
         AbstractEntryClient workflowClient = testAggregateHelper("configWithAwsSessionProfile");
 
         String[] args = {
-            "service-info",
-            "--wes-url",
+            SERVICE_INFO,
+            WES_URL,
             "myUrl"
         };
 

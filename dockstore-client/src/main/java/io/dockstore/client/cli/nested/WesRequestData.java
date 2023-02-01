@@ -6,6 +6,7 @@ import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 
 public class WesRequestData {
 
@@ -37,7 +38,7 @@ public class WesRequestData {
     public WesRequestData(String url) {
         if (url == null || url.isEmpty()) {
             errorMessage("No WES URL found in config file and no WES URL entered on command line. Please add url: <url> to "
-                + "config file in a WES section or use --wes-url <url> option on the command line", CLIENT_ERROR);
+                + "config file in a WES section or use " + WES_URL + " <url> option on the command line", CLIENT_ERROR);
         }
         this.url = url;
         this.credentialType = CredentialType.NO_CREDENTIALS;

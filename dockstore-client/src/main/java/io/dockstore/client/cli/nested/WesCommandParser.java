@@ -9,10 +9,16 @@ import com.beust.jcommander.Parameters;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CANCEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LOGS;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.SERVICE_INFO;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
 
 public class WesCommandParser {
 
+    public static final String WES_URL = "--wes-url";
+    public static final String VERBOSE = "--verbose";
     public WesMain wesMain;
     public CommandLaunch commandLaunch;
     public CommandCancel commandCancel;
@@ -40,21 +46,21 @@ public class WesCommandParser {
         return JCommander.newBuilder()
             .addObject(this.wesMain)
             .addCommand(LAUNCH, this.commandLaunch)
-            .addCommand("cancel", this.commandCancel)
-            .addCommand("status", this.commandStatus)
-            .addCommand("logs", this.commandRunLogs)
-            .addCommand("service-info", this.commandServiceInfo)
+            .addCommand(CANCEL, this.commandCancel)
+            .addCommand(STATUS, this.commandStatus)
+            .addCommand(LOGS, this.commandRunLogs)
+            .addCommand(SERVICE_INFO, this.commandServiceInfo)
             .addCommand(LIST, this.commandRunList)
             .build();
     }
 
     @Parameters(commandDescription = "Execute WES commands")
     public static class WesMain {
-        @Parameter(names = "--wes-url", description = "The URL of the WES server.", required = false)
+        @Parameter(names = WES_URL, description = "The URL of the WES server.", required = false)
         private String wesUrl = null;
         @Parameter(names = HELP, description = "Prints help for launch command", help = true)
         private boolean help = false;
-        @Parameter(names = "--verbose", description = "Sets the CLI to verbose mode.")
+        @Parameter(names = VERBOSE, description = "Sets the CLI to verbose mode.")
         private boolean verbose = false;
 
         public String getWesUrl() {
@@ -100,7 +106,7 @@ public class WesCommandParser {
 
     @Parameters(commandDescription = "Cancel a remote WES entry")
     public static class CommandCancel extends WesMain {
-        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to cancel", required = true)
+        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to " + CANCEL, required = true)
         private String id;
 
         public String getId() {
@@ -108,9 +114,9 @@ public class WesCommandParser {
         }
     }
 
-    @Parameters(commandDescription = "Retrieve the status of a " + WORKFLOW)
+    @Parameters(commandDescription = "Retrieve the " + STATUS + " of a " + WORKFLOW)
     public static class CommandStatus extends WesMain {
-        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to cancel", required = true)
+        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to " + CANCEL, required = true)
         private String id;
 
         public String getId() {
@@ -119,9 +125,9 @@ public class WesCommandParser {
 
     }
 
-    @Parameters(commandDescription = "Retrieve the status of a " + WORKFLOW)
+    @Parameters(commandDescription = "Retrieve the " + STATUS + " of a " + WORKFLOW)
     public static class CommandRunLogs extends WesMain {
-        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to cancel", required = true)
+        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to " + CANCEL, required = true)
         private String id;
 
         public String getId() {

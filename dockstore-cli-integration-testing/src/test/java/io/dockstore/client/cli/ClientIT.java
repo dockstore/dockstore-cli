@@ -468,6 +468,7 @@ class ClientIT extends BaseIT {
         checkSuggestionIsGiven(new String[] {WORKFLOW, CONVERT}, CWL_2_JSON);
 
 
+
     }
 
     /** This method performs two tests, in the first test commandToBeTested is capitalised, and it ensures that

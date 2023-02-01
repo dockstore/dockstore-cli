@@ -131,6 +131,8 @@ import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggest
 import static io.dockstore.client.cli.JCommanderUtility.getUnknowParameter;
 import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static io.dockstore.client.cli.nested.WesCommandParser.VERBOSE;
+import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
 import static io.dockstore.common.DescriptorLanguage.WDL;
@@ -170,6 +172,10 @@ public abstract class AbstractEntryClient<T> {
     public static final String CWL_2_YAML = "cwl2yaml";
     public static final String WDL_2_JSON = "wdl2json";
     public static final String ENTRY_2_JSON = "entry2json";
+    public static final String STATUS = "status";
+    public static final String LOGS = "logs";
+    public static final String CANCEL = "cancel";
+    public static final String SERVICE_INFO = "service-info";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
     protected boolean isAdmin = false;
 
@@ -1142,7 +1148,7 @@ public abstract class AbstractEntryClient<T> {
             ObjectMapper mapper = new ObjectMapper();
             out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         } catch (io.openapi.wes.client.ApiException e) {
-            LOG.error("Error getting brief WES run status", e);
+            LOG.error("Error getting brief WES run " + STATUS, e);
         } catch (JsonProcessingException e) {
             LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
@@ -1159,7 +1165,7 @@ public abstract class AbstractEntryClient<T> {
             ObjectMapper mapper = new ObjectMapper();
             out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         } catch (io.openapi.wes.client.ApiException e) {
-            LOG.error("Error getting WES run logs", e);
+            LOG.error("Error getting WES run " + LOGS, e);
         } catch (JsonProcessingException e) {
             LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
@@ -1303,20 +1309,20 @@ public abstract class AbstractEntryClient<T> {
                     wesCommandParser.commandLaunch.getAttachments(),
                     wesCommandParser.commandLaunch.isVerbose());
                 break;
-            case "status":
+            case STATUS:
                 wesStatus(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandStatus.getId());
                 break;
-            case "logs":
+            case LOGS:
                 wesRunLogs(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandRunLogs.getId());
                 break;
-            case "cancel":
+            case CANCEL:
                 wesCancel(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandCancel.getId(),
                     wesCommandParser.commandCancel.isVerbose());
                 break;
-            case "service-info":
+            case SERVICE_INFO:
                 wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
             case LIST:
@@ -1582,10 +1588,10 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LAUNCH + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " status [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " logs [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " cancel [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " service-info [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + STATUS + " [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LOGS + " [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + CANCEL + " [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + SERVICE_INFO + " [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " list [parameters]");
         out("");
         out("Description:");
@@ -1620,11 +1626,11 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesStatusHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " status " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " status [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + STATUS + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + STATUS + " [parameters]");
         out("");
         out("Description:");
-        out("  Status, gets the status of a " + getEntryType() + ".");
+        out("  Status, gets the " + STATUS + " of a " + getEntryType() + ".");
         out("Required Parameters:");
         out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
@@ -1634,11 +1640,11 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesRunLogsHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " logs " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " logs [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LOGS + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LOGS + " [parameters]");
         out("");
         out("Description:");
-        out("  Logs, gets the verbose run logs of a " + getEntryType() + ".");
+        out("  Logs, gets the " + VERBOSE + " run " + LOGS + " of a " + getEntryType() + ".");
         out("Required Parameters:");
         out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
@@ -1648,8 +1654,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesCancelHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " cancel " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " cancel [parameters]");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + CANCEL + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + CANCEL + " [parameters]");
         out("");
         out("Description:");
         out("  Cancels a " + getEntryType() + ".");
@@ -1662,8 +1668,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesServiceInfoHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " service-info " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " service-info");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + SERVICE_INFO + " " + HELP);
+        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + SERVICE_INFO);
         out("");
         out("Description:");
         out("  Returns descriptive information of the provided WES server. ");
@@ -1688,7 +1694,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void printWesHelpFooter() {
         out("Global Optional Parameters:");
-        out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
+        out("  " + WES_URL + " <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
         out("");
         out("NOTE: Currently only WDL workflows are supported for WES requests. Further language support is under development.");
     }
