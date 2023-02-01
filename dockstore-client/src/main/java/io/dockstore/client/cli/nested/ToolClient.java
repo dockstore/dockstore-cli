@@ -306,7 +306,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         out("  Publish/unpublish a registered " + getEntryType() + ".");
         out("  No arguments will list the current and potential " + getEntryType() + "s to share.");
         out("Required Parameter(s):");
-        out("  --entry <entry>             Complete " + getEntryType()
+        out("  " + ENTRY + " <entry>             Complete " + getEntryType()
                 + " path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("Optional Parameter(s):");
         out("  --new-entry-name <new-tool-name>      " + "New name to give the tool specified by --entry. "
@@ -1193,7 +1193,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         out("  Update certain fields for a given tool.");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                              Complete tool path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + ENTRY + " <entry>                                              Complete tool path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("");
         out("Optional Parameters");
         out("  --cwl-path <cwl-path>                                        Path to default cwl location");
@@ -1235,7 +1235,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         out("  Remove an existing version tag of a tool.");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>         Complete tool path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + ENTRY + " <entry>         Complete tool path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --name <name>           Name of the version tag to remove");
         printHelpFooter();
     }
@@ -1249,7 +1249,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         out("  Update an existing version tag of a tool.");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                              Complete tool path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + ENTRY + " <entry>                                              Complete tool path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --name <name>                                                Name of the version tag to update");
         out("");
         out("Optional Parameters:");
@@ -1270,7 +1270,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         out("  Add a new version tag to a manually added tool.");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                          Complete tool path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + ENTRY + " <entry>                                          Complete tool path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --name <name>                                            Name of the version tag to add");
         out("");
         out("Optional Parameters:");

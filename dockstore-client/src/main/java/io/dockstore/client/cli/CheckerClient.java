@@ -163,7 +163,7 @@ public class CheckerClient extends WorkflowClient {
         out("  Add a " + CHECKER + " " + WORKFLOW + " to an existing " + TOOL + " or " + WORKFLOW + ".");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + ENTRY + " <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --descriptor-type <descriptor-type>                                      " + DescriptorLanguage.CWL.toString() + "/" + DescriptorLanguage.WDL.toString() + ", defaults to " + DescriptorLanguage.CWL.toString());
         out("  --descriptor-path <descriptor-path>                                      Path to the main descriptor file.");
         out("");
@@ -230,7 +230,7 @@ public class CheckerClient extends WorkflowClient {
         out("  Update an existing " + CHECKER + " " + WORKFLOW + " associated with an entry.");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:master)");
+        out("  " + ENTRY + " <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:master)");
         out("");
         out("Optional Parameters:");
         out("  --default-test-parameter-path <input parameter path>                     Path to the input parameter path, defaults to that of the entry.");
@@ -280,7 +280,7 @@ public class CheckerClient extends WorkflowClient {
         out("  Downloads all " + CHECKER + " " + WORKFLOW + " files for the given entry and stores them in the current directory.");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + ENTRY + " <entry>          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  " + VERSION + " <version>      Checker version");
         out("  --zip                    Keep the zip file rather than uncompress the files within");
         out("");
