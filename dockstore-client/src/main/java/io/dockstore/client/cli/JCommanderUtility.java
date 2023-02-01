@@ -15,6 +15,7 @@
  */
 package io.dockstore.client.cli;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.Strings;
 import com.beust.jcommander.WrappedParameter;
 
+import static io.dockstore.client.cli.ArgumentUtility.invalid;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.outFormatted;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
@@ -63,6 +65,39 @@ public final class JCommanderUtility {
                 + "  --uuid                              Allows you to specify a uuid for 3rd party notifications\n"
                 + "  --ignore-checksums                  Allows you to ignore validating checksums of each downloaded descriptor");
         printJCommanderHelpFooter();
+    }
+
+    public static boolean wasErrorDueToUnknownParamter(String errorMsg) {
+        return errorMsg.contains("but no main parameter was defined in your arg class");
+    }
+
+    // This method extracts the unknown command from an error message. It doesn't appear JCommander has a built in way to do this.
+    // The error message is always of the form "Was passed main parameter 'unknown_command' but no main parameter was defined in your arg class",
+    public static String getUnknowParameter(String errorMsg) {
+        return errorMsg.substring("Was passed main parameter '".length(),
+                errorMsg.length() - "' but no main parameter was defined in your arg class".length());
+    }
+    public static void displayJCommanderSuggestions(JCommander jc, String commandName, String incorrectCommand, String programName) {
+        List<String> possibleCommands = getPossibleJcommanderCommands(jc, commandName);
+        invalid(programName, incorrectCommand, possibleCommands);
+
+    }
+
+    private static List<String> getPossibleJcommanderCommands(JCommander jc, String commandName) {
+        JCommander commander;
+        if (commandName == null || commandName.isBlank()) {
+            commander = jc;
+        } else {
+            commander = jc.getCommands().get(commandName);
+        }
+        List<ParameterDescription> paramaters = commander.getParameters();
+        List<String> possibleCommands = new ArrayList<String>();
+
+        possibleCommands.addAll(commander.getCommands().keySet());
+        for (ParameterDescription pd: paramaters) {
+            possibleCommands.add(pd.getNames());
+        }
+        return possibleCommands;
     }
 
     public static void printJCommanderHelp(JCommander jc, String programName, String commandName) {

@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.MissingCommandException;
 import com.beust.jcommander.ParameterException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -126,6 +127,9 @@ import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.Client.getGeneralFlags;
+import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
+import static io.dockstore.client.cli.JCommanderUtility.getUnknowParameter;
+import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
@@ -1253,17 +1257,19 @@ public abstract class AbstractEntryClient<T> {
     private void processWesCommands(final List<String> args) {
         WesCommandParser wesCommandParser = new WesCommandParser();
         out(wesCommandParser.jCommander.getCommands().toString());
-//        for (String str : wesCommandParser.jCommander.getCommands().keySet()) {
-//            out(str);
-//        }
-//        for (String str : wesCommandParser.jCommander.getCommands().keySet()) {
-//            out(str);
-//        }
-
         // JCommander throws a parameter exception for invalid parameters. Catch this and print the error cleanly.
         try {
             wesCommandParser.jCommander.parse(args.toArray(new String[0]));
+        } catch (MissingCommandException e) {
+            displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), args.get(0), "wes");
+            return;
         } catch (ParameterException e) {
+            if (wasErrorDueToUnknownParamter(e.getMessage())) {
+                String incorrectCommand = getUnknowParameter(e.getMessage());
+                // get command after the commands that were successfully read
+                displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, "wes " + e.getJCommander().getParsedCommand().toString());
+                return;
+            }
             errorMessage(e.getMessage(), CLIENT_ERROR);
         }
 
