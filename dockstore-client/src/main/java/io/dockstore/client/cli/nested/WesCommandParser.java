@@ -23,6 +23,7 @@ public class WesCommandParser {
     public static final String INLINE_WORKFLOW = "--inline-workflow";
     public static final String JSON = "--json";
     public static final String ATTACH = "--attach";
+    public static final String ID = "--id";
     public WesMain wesMain;
     public CommandLaunch commandLaunch;
     public CommandCancel commandCancel;
@@ -110,7 +111,7 @@ public class WesCommandParser {
 
     @Parameters(commandDescription = "Cancel a remote WES entry")
     public static class CommandCancel extends WesMain {
-        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to " + CANCEL, required = true)
+        @Parameter(names = ID, description = "The ID of the " + WORKFLOW + " to " + CANCEL, required = true)
         private String id;
 
         public String getId() {
@@ -120,7 +121,7 @@ public class WesCommandParser {
 
     @Parameters(commandDescription = "Retrieve the " + STATUS + " of a " + WORKFLOW)
     public static class CommandStatus extends WesMain {
-        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to " + CANCEL, required = true)
+        @Parameter(names = ID, description = "The ID of the " + WORKFLOW + " to " + CANCEL, required = true)
         private String id;
 
         public String getId() {
@@ -131,7 +132,7 @@ public class WesCommandParser {
 
     @Parameters(commandDescription = "Retrieve the " + STATUS + " of a " + WORKFLOW)
     public static class CommandRunLogs extends WesMain {
-        @Parameter(names = "--id", description = "The ID of the " + WORKFLOW + " to " + CANCEL, required = true)
+        @Parameter(names = ID, description = "The ID of the " + WORKFLOW + " to " + CANCEL, required = true)
         private String id;
 
         public String getId() {

@@ -13,6 +13,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.LOGS;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.SERVICE_INFO;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.ID;
 import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -152,7 +153,7 @@ class WesCommandParserTest {
     void testCommandCancel() {
         final String[] args = {
             CANCEL,
-            "--id",
+            ID,
             "123456"
         };
 
@@ -174,7 +175,7 @@ class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         try {
             parser.parse(args);
-            fail("The parser should throw an exception for missing '--id' parameter");
+            fail("The parser should throw an exception for missing '" + ID + "' parameter");
         } catch (ParameterException e) {
             assertTrue(true);
         }
@@ -197,7 +198,7 @@ class WesCommandParserTest {
     void testCommandStatus1() {
         final String[] args = {
             STATUS,
-            "--id",
+            ID,
             "123456"
         };
 
@@ -213,7 +214,7 @@ class WesCommandParserTest {
     void testCommandStatus2() {
         final String[] args = {
             STATUS,
-            "--id",
+            ID,
             "123456"
         };
 
@@ -235,7 +236,7 @@ class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         try {
             parser.parse(args);
-            fail("The parser should throw an exception for missing '--id' parameter");
+            fail("The parser should throw an exception for missing '" + ID + "' parameter");
         } catch (ParameterException e) {
             assertTrue(true);
         }
@@ -328,7 +329,7 @@ class WesCommandParserTest {
     void testCommandRunlogs1() {
         final String[] args = {
             LOGS,
-            "--id",
+            ID,
             "123456"
         };
 

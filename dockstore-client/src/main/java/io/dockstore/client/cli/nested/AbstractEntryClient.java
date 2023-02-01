@@ -133,6 +133,7 @@ import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownPara
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.client.cli.nested.WesCommandParser.ATTACH;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.ID;
 import static io.dockstore.client.cli.nested.WesCommandParser.INLINE_WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.client.cli.nested.WesCommandParser.VERBOSE;
@@ -1614,7 +1615,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("Optional parameters:");
         out("  " + JSON + " <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
-        out("  " + ATTACH +" <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
+        out("  " + ATTACH + " <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
         out("  " + INLINE_WORKFLOW + "                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
         out("");
     }
@@ -1636,7 +1637,7 @@ public abstract class AbstractEntryClient<T> {
         out("Description:");
         out("  Status, gets the " + STATUS + " of a " + getEntryType() + ".");
         out("Required Parameters:");
-        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
+        out("  " + ID + " <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1650,7 +1651,7 @@ public abstract class AbstractEntryClient<T> {
         out("Description:");
         out("  Logs, gets the " + VERBOSE + " run " + LOGS + " of a " + getEntryType() + ".");
         out("Required Parameters:");
-        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
+        out("  " + ID + " <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1664,7 +1665,7 @@ public abstract class AbstractEntryClient<T> {
         out("Description:");
         out("  Cancels a " + getEntryType() + ".");
         out("Required Parameters:");
-        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
+        out("  " + ID + " <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
