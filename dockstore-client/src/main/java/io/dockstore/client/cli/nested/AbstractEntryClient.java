@@ -1252,8 +1252,15 @@ public abstract class AbstractEntryClient<T> {
      */
     private void processWesCommands(final List<String> args) {
         WesCommandParser wesCommandParser = new WesCommandParser();
+        out(wesCommandParser.jCommander.getCommands().toString());
+//        for (String str : wesCommandParser.jCommander.getCommands().keySet()) {
+//            out(str);
+//        }
+//        for (String str : wesCommandParser.jCommander.getCommands().keySet()) {
+//            out(str);
+//        }
 
-        // JCommander throws a parameter exception for invalid parameters. Catch this an print the error cleanly.
+        // JCommander throws a parameter exception for invalid parameters. Catch this and print the error cleanly.
         try {
             wesCommandParser.jCommander.parse(args.toArray(new String[0]));
         } catch (ParameterException e) {
