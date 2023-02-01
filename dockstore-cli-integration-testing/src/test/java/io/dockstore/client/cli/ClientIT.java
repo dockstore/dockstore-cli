@@ -58,25 +58,35 @@ import static io.dockstore.client.cli.Client.UPGRADE;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CANCEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_YAML;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.INFO;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LABEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LOGS;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.REFRESH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.SEARCH;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.SERVICE_INFO;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STAR;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.TEST_PARAMETER;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.VERIFY;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.WDL_2_JSON;
 import static io.dockstore.client.cli.nested.ToolClient.UPDATE_TOOL;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.ID;
+import static io.dockstore.client.cli.nested.WesCommandParser.INLINE_WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.client.cli.nested.WesCommandParser.PAGE_TOKEN;
+import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
 import static io.dockstore.common.CLICommonTestUtilities.checkToolList;
+import static io.github.collaboratory.cwl.CWLClient.WES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -468,6 +478,15 @@ class ClientIT extends BaseIT {
         checkSuggestionIsGiven(new String[] {WORKFLOW, CONVERT}, HELP);
         checkSuggestionIsGiven(new String[] {WORKFLOW, CONVERT}, CWL_2_JSON);
 
+        checkSuggestionIsGiven(new String[] {WORKFLOW, WES}, LAUNCH);
+        checkSuggestionIsGiven(new String[] {WORKFLOW, WES}, STATUS);
+
+        checkSuggestionIsGiven(new String[] {WORKFLOW, WES, LAUNCH}, INLINE_WORKFLOW);
+        checkSuggestionIsGiven(new String[] {WORKFLOW, WES, STATUS}, ID);
+        checkSuggestionIsGiven(new String[] {WORKFLOW, WES, LOGS}, ID);
+        checkSuggestionIsGiven(new String[] {WORKFLOW, WES, CANCEL}, ID);
+        checkSuggestionIsGiven(new String[] {WORKFLOW, WES, SERVICE_INFO}, WES_URL);
+        checkSuggestionIsGiven(new String[] {WORKFLOW, WES, LIST}, PAGE_TOKEN);
 
 
     }
@@ -493,6 +512,9 @@ class ClientIT extends BaseIT {
 
         systemOutRule.clear();
         Client.main(commandsForCapitalizationTest.toArray(new String[0]));
+//        assertEquals("dockstore" + formmatedValidCommandString + ": '" + commandToBeTested.toUpperCase()
+//                + "' is not a dockstore command. See 'dockstore" + formmatedValidCommandString + " " + HELP
+//                + "'.\n\n" + "The most similar command is:\n    " + commandToBeTested + "\n", systemOutRule.getText());
         assertTrue(systemOutRule.getText().contains("dockstore" + formmatedValidCommandString + ": '" + commandToBeTested.toUpperCase()
                         + "' is not a dockstore command. See 'dockstore" + formmatedValidCommandString + " " + HELP
                         + "'.\n\n" + "The most similar command is:\n    " + commandToBeTested + "\n"));

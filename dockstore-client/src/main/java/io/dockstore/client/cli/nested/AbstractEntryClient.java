@@ -1273,13 +1273,13 @@ public abstract class AbstractEntryClient<T> {
         try {
             wesCommandParser.jCommander.parse(args.toArray(new String[0]));
         } catch (MissingCommandException e) {
-            displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), args.get(0), "wes");
+            displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), args.get(0), WORKFLOW + " " + WES);
             return;
         } catch (ParameterException e) {
             if (wasErrorDueToUnknownParamter(e.getMessage())) {
                 String incorrectCommand = getUnknowParameter(e.getMessage());
                 // get command after the commands that were successfully read
-                displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, "wes " + e.getJCommander().getParsedCommand().toString());
+                displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, WORKFLOW + " " + WES + " " + e.getJCommander().getParsedCommand().toString());
                 return;
             }
             errorMessage(e.getMessage(), CLIENT_ERROR);
