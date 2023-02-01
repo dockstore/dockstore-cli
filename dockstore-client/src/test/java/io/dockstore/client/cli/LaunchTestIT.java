@@ -52,6 +52,7 @@ import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,7 +86,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(helloJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -109,7 +110,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -127,7 +128,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -147,7 +148,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -167,7 +168,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(helloJSON.getAbsolutePath());
         args.add("--wdl-output-target");
         args.add("noop://nowhere.test");
@@ -194,7 +195,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -245,7 +246,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -291,7 +292,7 @@ class LaunchTestIT {
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -317,7 +318,7 @@ class LaunchTestIT {
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
         args.add(CWL.getShortName());
@@ -345,7 +346,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -370,7 +371,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -395,7 +396,7 @@ class LaunchTestIT {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -423,7 +424,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
         args.add(WDL.getShortName());
@@ -453,7 +454,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add("wrongExtcwl.wdl");
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
         args.add(WDL.getShortName());
@@ -479,7 +480,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add("wrongExtwdl.cwl");
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
         args.add("--descriptor");
         args.add(CWL.getShortName());
@@ -505,7 +506,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add("cwlNoExt");
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -531,7 +532,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -559,7 +560,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -586,7 +587,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -613,7 +614,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -639,7 +640,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -665,7 +666,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -691,7 +692,7 @@ class LaunchTestIT {
         args.add(ENTRY);
         args.add(file.getAbsolutePath());
         args.add("--local-entry");
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         WorkflowsApi api = mock(WorkflowsApi.class);
@@ -717,7 +718,7 @@ class LaunchTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
 
@@ -734,7 +735,7 @@ class LaunchTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         catchSystemExit(() -> runClientCommand(args));
@@ -750,7 +751,7 @@ class LaunchTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         catchSystemExit(() -> runClientCommand(args));
@@ -767,7 +768,7 @@ class LaunchTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         runClientCommand(args);
@@ -784,7 +785,7 @@ class LaunchTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         catchSystemExit(() -> runClientCommand(args));
@@ -801,7 +802,7 @@ class LaunchTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(file.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(json.getAbsolutePath());
 
         runClientCommand(args);
@@ -903,7 +904,7 @@ class LaunchTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(helloWdl.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(jsonFile.getAbsolutePath());
 
         File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
@@ -923,7 +924,7 @@ class LaunchTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(helloWdl.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(jsonFile.getAbsolutePath());
 
         File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
@@ -943,7 +944,7 @@ class LaunchTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(helloWDL.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(helloJSON.getPath());
 
         File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));

@@ -20,6 +20,8 @@ public class WesCommandParser {
     public static final String WES_URL = "--wes-url";
     public static final String VERBOSE = "--verbose";
     public static final String ENTRY = "--entry";
+    public static final String INLINE_WORKFLOW = "--inline-workflow";
+    public static final String JSON = "--json";
     public WesMain wesMain;
     public CommandLaunch commandLaunch;
     public CommandCancel commandCancel;
@@ -81,9 +83,9 @@ public class WesCommandParser {
     public static class CommandLaunch extends WesMain {
         @Parameter(names = ENTRY, description = "Complete " + WORKFLOW + " path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)", required = true)
         private String entry;
-        @Parameter(names = "--inline-workflow", description = "Inlines " + WORKFLOW + " files contents directly into the WES HTTP request. This is required for some WES server implementations.")
+        @Parameter(names = INLINE_WORKFLOW, description = "Inlines " + WORKFLOW + " files contents directly into the WES HTTP request. This is required for some WES server implementations.")
         private boolean inlineWorkflow = false;
-        @Parameter(names = "--json", description = "JSON file describing which attached file contains input parameters.")
+        @Parameter(names = JSON, description = "JSON file describing which attached file contains input parameters.")
         private String json;
         @Parameter(names = {"--attach", "-a"}, description = "A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)", variableArity = true)
         private List<String> attachments;

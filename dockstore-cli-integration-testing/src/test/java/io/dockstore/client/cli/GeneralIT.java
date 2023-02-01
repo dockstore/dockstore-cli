@@ -60,6 +60,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.REFRESH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.WDL_2_JSON;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -110,7 +111,7 @@ class GeneralIT extends BaseIT {
     @Category(ToilCompatibleTest.class)
     void testLocalLaunchCWL() {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, "--local-entry",
-            ResourceHelpers.resourceFilePath("arrays.cwl"), "--json",
+            ResourceHelpers.resourceFilePath("arrays.cwl"), JSON,
             ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), SCRIPT_FLAG });
     }
 
@@ -121,7 +122,7 @@ class GeneralIT extends BaseIT {
     void testLocalLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, "--local-entry",
-                        "imnotreal.cwl", "--json", "filtercount-job.json", SCRIPT_FLAG }));
+                        "imnotreal.cwl", JSON, "filtercount-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -132,7 +133,7 @@ class GeneralIT extends BaseIT {
     void testLocalLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, "--local-entry",
-                        "imnotreal.wdl", "--json", "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
+                        "imnotreal.wdl", JSON, "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -143,7 +144,7 @@ class GeneralIT extends BaseIT {
     void testRemoteLaunchCWLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, ENTRY,
-                        "imnotreal.cwl", "--json", "imnotreal-job.json", SCRIPT_FLAG }));
+                        "imnotreal.cwl", JSON, "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.IO_ERROR, exitCode);
     }
 
@@ -154,7 +155,7 @@ class GeneralIT extends BaseIT {
     void testRemoteLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, ENTRY, "imnotreal.wdl",
-                        "--json", "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
+                        JSON, "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 

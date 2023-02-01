@@ -27,6 +27,7 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -235,7 +236,7 @@ class LaunchNoInternetTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(jsonFile.getAbsolutePath());
         args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
@@ -262,7 +263,7 @@ class LaunchNoInternetTestIT {
         args.add(LAUNCH);
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(jsonFile.getAbsolutePath());
         args.add(CONFIG);
         args.add(configPath.getAbsolutePath());

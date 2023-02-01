@@ -32,6 +32,7 @@ import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -79,7 +80,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
@@ -113,7 +114,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
@@ -143,7 +144,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
@@ -184,7 +185,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
@@ -203,7 +204,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);

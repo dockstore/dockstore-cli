@@ -132,6 +132,8 @@ import static io.dockstore.client.cli.JCommanderUtility.getUnknowParameter;
 import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.INLINE_WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.client.cli.nested.WesCommandParser.VERBOSE;
 import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static io.dockstore.common.DescriptorLanguage.CWL;
@@ -1060,7 +1062,7 @@ public abstract class AbstractEntryClient<T> {
     void preValidateLaunchArguments(List<String> args) {
         // Create a copy of args for prevalidation since optVals removes args from list
         List<String> argsCopy = new ArrayList<>(args);
-        String jsonFile = optVal(argsCopy, "--json", null);
+        String jsonFile = optVal(argsCopy, JSON, null);
         String yamlFile = optVal(argsCopy, "--yaml", null);
         conditionalErrorMessage((jsonFile != null) && (yamlFile != null),
                                 MULTIPLE_TEST_FILE_ERROR_MESSAGE,
@@ -1478,7 +1480,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void launchCwl(String entry, final List<String> args, boolean isALocalEntry) throws ApiException, IOException {
         final String yamlRun = optVal(args, "--yaml", null);
-        String jsonRun = optVal(args, "--json", null);
+        String jsonRun = optVal(args, JSON, null);
         final String uuid = optVal(args, "--uuid", null);
         CWLClient client = new CWLClient(this);
         client.launch(entry, isALocalEntry, yamlRun, jsonRun, null, uuid);
@@ -1518,7 +1520,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void launchWdl(String entry, final List<String> args, boolean isALocalEntry) throws ApiException {
         final String yamlRun = optVal(args, "--yaml", null);
-        String jsonRun = optVal(args, "--json", null);
+        String jsonRun = optVal(args, JSON, null);
         final String wdlOutputTarget = optVal(args, "--wdl-output-target", null);
         final String uuid = optVal(args, "--uuid", null);
         WDLClient client = new WDLClient(this);
@@ -1526,7 +1528,7 @@ public abstract class AbstractEntryClient<T> {
     }
 
     private void launchNextflow(String entry, final List<String> args, boolean isALocalEntry) throws ApiException {
-        final String json = reqVal(args, "--json");
+        final String json = reqVal(args, JSON);
         final String uuid = optVal(args, "--uuid", null);
         NextflowClient client = new NextflowClient(this);
         client.launch(entry, isALocalEntry, null, json, null, uuid);
@@ -1612,7 +1614,7 @@ public abstract class AbstractEntryClient<T> {
         out("Optional parameters:");
         out("  --json <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
         out("  --attach <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
-        out("  --inline-workflow                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
+        out("  " + INLINE_WORKFLOW + "                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
         out("");
     }
 

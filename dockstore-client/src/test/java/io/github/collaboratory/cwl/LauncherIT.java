@@ -51,6 +51,7 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 import static org.junit.Assert.assertTrue;
 
@@ -99,7 +100,7 @@ public abstract class LauncherIT {
         }
 
         Client.SCRIPT.set(true);
-        Client.main(new String[] { CONFIG, getConfigFile(), TOOL, LAUNCH, "--local-entry", cwlFile.getAbsolutePath(), "--json",
+        Client.main(new String[] { CONFIG, getConfigFile(), TOOL, LAUNCH, "--local-entry", cwlFile.getAbsolutePath(), JSON,
             jobFile.getAbsolutePath(), SCRIPT_FLAG });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
@@ -125,7 +126,7 @@ public abstract class LauncherIT {
         Client.SCRIPT.set(true);
         Client.main(
             new String[] { CONFIG, getConfigFileWithExtraParameters(), TOOL, LAUNCH, "--local-entry", cwlFile.getAbsolutePath(),
-                "--json", jobFile.getAbsolutePath(), SCRIPT_FLAG });
+                JSON, jobFile.getAbsolutePath(), SCRIPT_FLAG });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
             final String standardOutput = launcherOutput.toString();
@@ -147,7 +148,7 @@ public abstract class LauncherIT {
         }
 
         Client.SCRIPT.set(true);
-        Client.main(new String[] { CONFIG, getConfigFile(), TOOL, LAUNCH, "--local-entry", cwlFile.getAbsolutePath(), "--json",
+        Client.main(new String[] { CONFIG, getConfigFile(), TOOL, LAUNCH, "--local-entry", cwlFile.getAbsolutePath(), JSON,
             jobFile.getAbsolutePath(), SCRIPT_FLAG });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {
@@ -170,7 +171,7 @@ public abstract class LauncherIT {
         }
 
         Client.SCRIPT.set(true);
-        Client.main(new String[] { CONFIG, getConfigFile(), WORKFLOW, LAUNCH, "--local-entry", cwlFile.getAbsolutePath(), "--json",
+        Client.main(new String[] { CONFIG, getConfigFile(), WORKFLOW, LAUNCH, "--local-entry", cwlFile.getAbsolutePath(), JSON,
             jobFile.getAbsolutePath(), SCRIPT_FLAG });
 
         if (System.getenv("AWS_ACCESS_KEY") == null || System.getenv("AWS_SECRET_KEY") == null) {

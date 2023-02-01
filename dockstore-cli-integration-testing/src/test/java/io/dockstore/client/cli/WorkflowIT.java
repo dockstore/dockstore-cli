@@ -59,6 +59,7 @@ import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.swagger.client.model.ToolDescriptor.TypeEnum.CWL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -109,12 +110,12 @@ class WorkflowIT extends BaseIT {
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY, toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
+                JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
 
         // should not be able to launch properly with incorrect credentials
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, LAUNCH, ENTRY, toolpath,
-                        "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG }));
+                        JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -256,7 +257,7 @@ class WorkflowIT extends BaseIT {
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), CHECKER, LAUNCH, ENTRY, toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
+                JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
 
         // should be able to launch properly with incorrect credentials but the entry is published
         Client.main(
@@ -264,7 +265,7 @@ class WorkflowIT extends BaseIT {
                 SCRIPT_FLAG });
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, LAUNCH, ENTRY, toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
+                JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
 
         // should not be able to launch properly with incorrect credentials
         Client.main(
@@ -272,7 +273,7 @@ class WorkflowIT extends BaseIT {
                 "--unpub", SCRIPT_FLAG });
         int exitCode = catchSystemExit(() ->  Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, LAUNCH, ENTRY, toolpath,
-                        "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG }));
+                        JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -323,13 +324,13 @@ class WorkflowIT extends BaseIT {
 
         // launch the workflow, note that the latest version of the workflow should launch (i.e. the working one)
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
-            workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), SCRIPT_FLAG });
+            workflow.getFullWorkflowPath(), JSON, ResourceHelpers.resourceFilePath("revsort-job.json"), SCRIPT_FLAG });
 
         WorkflowsApi workflowsApi = new WorkflowsApi(webClient);
         workflowsApi.publish(workflow.getId(), SwaggerUtility.createPublishRequest(true));
         // should also launch successfully with the wrong credentials when published
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, LAUNCH, ENTRY,
-            workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), SCRIPT_FLAG });
+            workflow.getFullWorkflowPath(), JSON, ResourceHelpers.resourceFilePath("revsort-job.json"), SCRIPT_FLAG });
     }
 
     /**

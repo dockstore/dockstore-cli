@@ -28,6 +28,7 @@ import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag(SingularityTest.NAME)
@@ -67,7 +68,7 @@ class SingularityIT extends BaseIT {
         // run the md5sum-checker workflow
         Client.main(new String[] { CONFIG,  // this config file passes the --singularity option to cwltool
                 SINGULARITY_CONFIG_TEMPLATE, WORKFLOW, LAUNCH, ENTRY,
-                SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
+                SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", JSON,
                 ResourceHelpers.resourceFilePath("md5sum_cwl.json") });
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
@@ -93,7 +94,7 @@ class SingularityIT extends BaseIT {
 
         // run the md5sum-checker workflow
         Client.main(new String[] { CONFIG, tmpConfig.getAbsolutePath(), WORKFLOW, LAUNCH, ENTRY,
-                SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", "--json",
+                SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", JSON,
                 ResourceHelpers.resourceFilePath("md5sum_wdl.json") });
 
         // the phrase "singularity exec" will only be in the output if Singularity is actually being used

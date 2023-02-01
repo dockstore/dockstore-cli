@@ -92,6 +92,7 @@ import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 
 /**
  * This stub will eventually implement all operations on the CLI that are specific to workflows.
@@ -1231,7 +1232,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         private String localEntry;
         @Parameter(names = ENTRY, description = "Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)")
         private String entry;
-        @Parameter(names = "--json", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
+        @Parameter(names = JSON, description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
         private String json;
         @Parameter(names = "--yaml", description = "Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs")
         private String yaml;

@@ -38,6 +38,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.STAR;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.TEST_PARAMETER;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -162,7 +163,7 @@ class GitHubAppToolIT extends BaseIT {
 
     @Test
     void launch() throws ApiException {
-        Client.main(new String[]{WORKFLOW, LAUNCH, ENTRY, ENTRY_PATH_WITH_VERSION, "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG, CONFIG,
+        Client.main(new String[]{WORKFLOW, LAUNCH, ENTRY, ENTRY_PATH_WITH_VERSION, JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG, CONFIG,
             ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("Final process status is success"));
     }

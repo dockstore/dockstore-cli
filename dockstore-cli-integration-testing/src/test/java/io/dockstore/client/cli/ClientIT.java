@@ -74,6 +74,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.VERIFY;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.WDL_2_JSON;
 import static io.dockstore.client.cli.nested.ToolClient.UPDATE_TOOL;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
 import static io.dockstore.common.CLICommonTestUtilities.checkToolList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -236,7 +237,7 @@ class ClientIT extends BaseIT {
         final String firstWorkflowCWL = ResourceHelpers.resourceFilePath("1st-workflow.cwl");
         final String firstWorkflowJSON = ResourceHelpers.resourceFilePath("1st-workflow-job.json");
         Client.main(new String[] { SCRIPT_FLAG, CONFIG, TestUtility.getConfigFileLocation(true), WORKFLOW, LAUNCH, "--local-entry",
-            firstWorkflowCWL, "--json", firstWorkflowJSON });
+            firstWorkflowCWL, JSON, firstWorkflowJSON });
     }
 
     @Test
@@ -244,7 +245,7 @@ class ClientIT extends BaseIT {
     void launchingCWLToolWithRemoteParameters() throws IOException {
         Client.main(
             new String[] { SCRIPT_FLAG, CONFIG, TestUtility.getConfigFileLocation(true), TOOL, LAUNCH, "--local-entry", FIRST_TOOL,
-                "--json",
+                JSON,
                 "https://raw.githubusercontent.com/dockstore/dockstore/f343bcd6e4465a8ef790208f87740bd4d5a9a4da/dockstore-client/src/test/resources/test.cwl.json" });
     }
 

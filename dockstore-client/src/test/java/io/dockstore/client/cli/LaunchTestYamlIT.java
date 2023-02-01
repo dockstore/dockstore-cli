@@ -26,6 +26,7 @@ import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.Assert.assertTrue;
 
 public class LaunchTestYamlIT {
@@ -66,7 +67,7 @@ public class LaunchTestYamlIT {
         List<String> args = getLaunchStringList(entryType);
         args.add("--yaml");
         args.add(yamlTestParameterFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(jsonTestParameterFile.getAbsolutePath());
         exit.expectSystemExitWithStatus(CLIENT_ERROR);
         exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
@@ -98,7 +99,7 @@ public class LaunchTestYamlIT {
         args.add(LAUNCH);
         args.add(ENTRY);
         args.add(file.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(helloJSON.getPath());
         args.add("--yaml");
         args.add(helloYAML.getPath());
@@ -128,7 +129,7 @@ public class LaunchTestYamlIT {
         File jsonTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         List<String> yamlFileWithJSONFlag = getLaunchStringList(entryType);
-        yamlFileWithJSONFlag.add("--json");
+        yamlFileWithJSONFlag.add(JSON);
         yamlFileWithJSONFlag.add(yamlTestParameterFile.getAbsolutePath());
 
         List<String> yamlFileWithYAMLFlag = getLaunchStringList(entryType);
@@ -136,7 +137,7 @@ public class LaunchTestYamlIT {
         yamlFileWithYAMLFlag.add(yamlTestParameterFile.getAbsolutePath());
 
         List<String> jsonFileWithJSONFlag = getLaunchStringList(entryType);
-        jsonFileWithJSONFlag.add("--json");
+        jsonFileWithJSONFlag.add(JSON);
         jsonFileWithJSONFlag.add(jsonTestParameterFile.getAbsolutePath());
 
         List<String> jsonFileWithYAMLFlag = getLaunchStringList(entryType);
