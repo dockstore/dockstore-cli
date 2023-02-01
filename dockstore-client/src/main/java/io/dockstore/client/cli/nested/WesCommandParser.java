@@ -24,6 +24,8 @@ public class WesCommandParser {
     public static final String JSON = "--json";
     public static final String ATTACH = "--attach";
     public static final String ID = "--id";
+    public static final String COUNT = "--count";
+    public static final String PAGE_TOKEN = "--page-token";
     public WesMain wesMain;
     public CommandLaunch commandLaunch;
     public CommandCancel commandCancel;
@@ -148,9 +150,9 @@ public class WesCommandParser {
     public static class CommandRunList extends WesMain {
         private static final int DEFAULT_PAGE_SIZE = 10;
 
-        @Parameter(names = "--count", description = "The number of entries to print")
+        @Parameter(names = COUNT, description = "The number of entries to print")
         private int pageSize = DEFAULT_PAGE_SIZE;
-        @Parameter(names = "--page-token", description = "The page token returned from a previous list of runs")
+        @Parameter(names = PAGE_TOKEN, description = "The page token returned from a previous list of runs")
         private String pageToken = null;
 
         public int getPageSize() {
