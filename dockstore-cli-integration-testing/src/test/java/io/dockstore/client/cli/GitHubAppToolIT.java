@@ -27,6 +27,7 @@ import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.INFO;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LABEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
@@ -154,7 +155,7 @@ class GitHubAppToolIT extends BaseIT {
 
     @Test
     void convert() {
-        Client.main(new String[]{WORKFLOW, CONVERT, "entry2json", "--entry", ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, CONVERT, ENTRY_2_JSON, "--entry", ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("tmp/fill_me_in.txt"));
     }
 

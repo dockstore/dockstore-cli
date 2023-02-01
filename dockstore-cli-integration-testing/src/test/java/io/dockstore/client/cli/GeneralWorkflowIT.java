@@ -44,6 +44,7 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.INFO;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.REFRESH;
@@ -268,11 +269,11 @@ class GeneralWorkflowIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, "--entry",
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, CONVERT, "entry2json", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, CONVERT, ENTRY_2_JSON, "--entry",
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow:testBoth", SCRIPT_FLAG });
 
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, CONVERT, "entry2json", "--entry",
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, CONVERT, ENTRY_2_JSON, "--entry",
                         SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow:testCWL", SCRIPT_FLAG }));
         assertEquals(Client.GENERIC_ERROR, exitCode);
     }

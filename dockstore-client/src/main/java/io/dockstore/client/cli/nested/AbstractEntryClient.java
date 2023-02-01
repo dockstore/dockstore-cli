@@ -125,6 +125,7 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.Client.getGeneralFlags;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
@@ -161,6 +162,10 @@ public abstract class AbstractEntryClient<T> {
     public static final String VERIFY = "verify";
     public static final String TEST_PARAMETER = "test_parameter";
     public static final String NFL = "nfl";
+    public static final String CWL_2_JSON = "cwl2json";
+    public static final String CWL_2_YAML = "cwl2yaml";
+    public static final String WDL_2_JSON = "wdl2json";
+    public static final String ENTRY_2_JSON = "entry2json";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
     protected boolean isAdmin = false;
 
@@ -651,29 +656,30 @@ public abstract class AbstractEntryClient<T> {
     }
 
     private void convert(final List<String> args) throws ApiException, IOException {
-        if (args.isEmpty() || (containsHelpRequest(args) && !args.contains("cwl2json") && !args.contains("wdl2json") && !args
-                .contains("entry2json"))) {
+        if (args.isEmpty() || (containsHelpRequest(args) && !args.contains(CWL_2_JSON) && !args.contains(WDL_2_JSON) && !args
+                .contains(ENTRY_2_JSON))) {
             convertHelp(); // Display general help
         } else {
             final String cmd = args.remove(0);
             if (null != cmd) {
                 switch (cmd) {
-                case "cwl2json":
+                case CWL_2_JSON:
                     cwl2json(args, true);
                     break;
-                case "cwl2yaml":
+                case CWL_2_YAML:
                     cwl2json(args, false);
                     break;
-                case "wdl2json":
+                case WDL_2_JSON:
                     wdl2json(args);
                     break;
-                case "entry2json":
+                case ENTRY_2_JSON:
                     handleEntry2json(args);
                     break;
                 default:
-                    List<String> placeholder = new ArrayList<String>();
-                    placeholder.add("hold");
-                    invalid(cmd, "", placeholder);
+                    List<String> possibleCommands = new ArrayList<String>();
+                    possibleCommands.addAll(Arrays.asList(CWL_2_JSON, CWL_2_YAML, WDL_2_JSON, ENTRY_2_JSON));
+                    possibleCommands.addAll(getGeneralFlags());
+                    invalid(getEntryType().toLowerCase()  + " convert", cmd, possibleCommands);
                     break;
                 }
             }
@@ -1799,7 +1805,7 @@ public abstract class AbstractEntryClient<T> {
     private void cwl2yamlHelp() {
         printHelpHeader();
         out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2yaml [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + CWL_2_YAML + " [parameters]");
         out("");
         out("Description:");
         out("  Spit out a yaml run file for a given cwl document.");
@@ -1812,7 +1818,7 @@ public abstract class AbstractEntryClient<T> {
     private void cwl2jsonHelp() {
         printHelpHeader();
         out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2json [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + CWL_2_JSON + " [parameters]");
         out("");
         out("Description:");
         out("  Spit out a json run file for a given cwl document.");
@@ -1825,7 +1831,7 @@ public abstract class AbstractEntryClient<T> {
     private void wdl2jsonHelp() {
         printHelpHeader();
         out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " wdl2json [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + WDL_2_JSON + " [parameters]");
         out("");
         out("Description:");
         out("  Spit out a json run file for a given wdl document.");
@@ -1838,9 +1844,9 @@ public abstract class AbstractEntryClient<T> {
     private void convertHelp() {
         printHelpHeader();
         out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2json [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2yaml [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " wdl2json [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + CWL_2_JSON + " [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + CWL_2_YAML + " [parameters]");
+        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + WDL_2_JSON + " [parameters]");
         out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
         out("");
         out("Description:");

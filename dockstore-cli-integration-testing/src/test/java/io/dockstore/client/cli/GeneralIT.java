@@ -50,10 +50,14 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.UPGRADE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_YAML;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LABEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.REFRESH;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.WDL_2_JSON;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -330,7 +334,7 @@ class GeneralIT extends BaseIT {
             "quay.io/dockstoretestuser2/quayandgithubwdl", SCRIPT_FLAG });
         // need to publish before converting
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, "entry2json", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, ENTRY_2_JSON, "--entry",
                 "quay.io/dockstoretestuser2/quayandgithubwdl", "--descriptor", "wdl", SCRIPT_FLAG });
         assertTrue(systemOutRule.getText().contains("\"test.hello.name\": \"String\""));
     }
@@ -367,7 +371,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testWDL2JSON() {
         File sourceFile = new File(ResourceHelpers.resourceFilePath("wdl.wdl"));
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, "wdl2json", "--wdl",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, WDL_2_JSON, "--wdl",
             sourceFile.getAbsolutePath(), SCRIPT_FLAG });
         // TODO: Test that output is the expected WDL file
     }
@@ -376,7 +380,7 @@ class GeneralIT extends BaseIT {
     @Category(ToilCompatibleTest.class)
     void testCWL2JSON() {
         File sourceFile = new File(ResourceHelpers.resourceFilePath("dockstore-tool-bamstats.cwl"));
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, "cwl2json", "--cwl",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, CWL_2_JSON, "--cwl",
             sourceFile.getAbsolutePath(), SCRIPT_FLAG });
         // TODO: Test that output is the expected JSON file
     }
@@ -385,7 +389,7 @@ class GeneralIT extends BaseIT {
     @Category(ToilCompatibleTest.class)
     void testCWL2YAML() {
         File sourceFile = new File(ResourceHelpers.resourceFilePath("dockstore-tool-bamstats.cwl"));
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, "cwl2yaml", "--cwl",
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, CWL_2_YAML, "--cwl",
             sourceFile.getAbsolutePath(), SCRIPT_FLAG });
         // TODO: Test that output is the expected yaml file
     }

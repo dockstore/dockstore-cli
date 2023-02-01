@@ -20,6 +20,7 @@ import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.REFRESH;
@@ -69,7 +70,7 @@ class BitBucketWorkflowIT extends BaseIT {
             SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", SCRIPT_FLAG });
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, CONVERT, "entry2json", "--entry",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, CONVERT, ENTRY_2_JSON, "--entry",
                 SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow:wdl_import", SCRIPT_FLAG });
         assertTrue(systemOutRule.getText().contains("\"three_step.cgrep.pattern\": \"String\""));
     }

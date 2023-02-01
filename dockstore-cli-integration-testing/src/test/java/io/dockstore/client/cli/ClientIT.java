@@ -58,6 +58,9 @@ import static io.dockstore.client.cli.Client.UPGRADE;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_YAML;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.INFO;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LABEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
@@ -68,6 +71,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.SEARCH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STAR;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.TEST_PARAMETER;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.VERIFY;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.WDL_2_JSON;
 import static io.dockstore.client.cli.nested.ToolClient.UPDATE_TOOL;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
@@ -343,10 +347,10 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { TOOL, VERSION_TAG });
         checkCommandForHelp(new String[] { TOOL, UPDATE_TOOL });
 
-        checkCommandForHelp(new String[] { TOOL, CONVERT, "entry2json" });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, "cwl2yaml" });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, "cwl2json" });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, "wdl2json" });
+        checkCommandForHelp(new String[] { TOOL, CONVERT, ENTRY_2_JSON });
+        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_YAML });
+        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_JSON });
+        checkCommandForHelp(new String[] { TOOL, CONVERT, WDL_2_JSON });
 
         checkCommandForHelp(new String[] {});
         checkCommandForHelp(new String[] { TOOL });
@@ -360,10 +364,10 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { TOOL, REFRESH, HELP });
         checkCommandForHelp(new String[] { TOOL, LABEL, HELP });
         checkCommandForHelp(new String[] { TOOL, CONVERT, HELP });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, "cwl2json", HELP });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, "cwl2yaml", HELP });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, "wdl2json", HELP });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, "entry2json", HELP });
+        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_JSON, HELP });
+        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_YAML, HELP });
+        checkCommandForHelp(new String[] { TOOL, CONVERT, WDL_2_JSON, HELP });
+        checkCommandForHelp(new String[] { TOOL, CONVERT, ENTRY_2_JSON, HELP });
         checkCommandForHelp(new String[] { TOOL, LAUNCH, HELP });
         checkCommandForHelp(new String[] { TOOL, VERSION_TAG, HELP });
         checkCommandForHelp(new String[] { TOOL, VERSION_TAG, "remove", HELP });
@@ -376,10 +380,10 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { TOOL, VERIFY, HELP });
         checkCommandForHelp(new String[] { TOOL });
 
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "entry2json" });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "cwl2yaml" });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "cwl2json" });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "wdl2json" });
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, ENTRY_2_JSON });
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_YAML });
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_JSON });
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, WDL_2_JSON });
 
         checkCommandForHelp(new String[] { WORKFLOW, SEARCH });
         checkCommandForHelp(new String[] { WORKFLOW, INFO });
@@ -403,10 +407,10 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { WORKFLOW, REFRESH, HELP });
         checkCommandForHelp(new String[] { WORKFLOW, LABEL, HELP });
         checkCommandForHelp(new String[] { WORKFLOW, CONVERT, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "cwl2json", HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "cwl2yaml", HELP });
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_JSON, HELP });
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_YAML, HELP });
         checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "wd2json", HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "entry2json", HELP });
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, ENTRY_2_JSON, HELP });
         checkCommandForHelp(new String[] { WORKFLOW, LAUNCH, HELP });
         checkCommandForHelp(new String[] { WORKFLOW, VERSION_TAG, HELP });
         checkCommandForHelp(new String[] { WORKFLOW, UPDATE_WORKFLOW, HELP });
@@ -456,6 +460,12 @@ class ClientIT extends BaseIT {
         checkSuggestionIsGiven(new String[] {WORKFLOW}, CONVERT);
         checkSuggestionIsGiven(new String[] {WORKFLOW}, TEST_PARAMETER);
         checkSuggestionIsGiven(new String[] {WORKFLOW}, HELP);
+
+        checkSuggestionIsGiven(new String[] {TOOL, CONVERT}, HELP);
+        checkSuggestionIsGiven(new String[] {TOOL, CONVERT}, CWL_2_JSON);
+
+        checkSuggestionIsGiven(new String[] {WORKFLOW, CONVERT}, HELP);
+        checkSuggestionIsGiven(new String[] {WORKFLOW, CONVERT}, CWL_2_JSON);
 
 
     }

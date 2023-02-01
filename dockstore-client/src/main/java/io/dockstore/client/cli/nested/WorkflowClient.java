@@ -265,7 +265,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     @Override
     public void handleEntry2json(List<String> args) throws ApiException, IOException {
-        String commandName = "entry2json";
+        String commandName = ENTRY_2_JSON;
         String[] argv = args.toArray(new String[0]);
         String[] argv1 = {commandName};
         String[] both = ArrayUtils.addAll(argv1, argv);

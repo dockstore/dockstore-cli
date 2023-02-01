@@ -31,6 +31,7 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -162,7 +163,7 @@ class LaunchTestRunToolIT {
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
         args.add(CONVERT);
-        args.add("cwl2json");
+        args.add(CWL_2_JSON);
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
 

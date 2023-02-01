@@ -50,6 +50,7 @@ import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -221,7 +222,7 @@ class LaunchTestIT {
         ArrayList<String> args = new ArrayList<>();
         args.add(WORKFLOW);
         args.add(CONVERT);
-        args.add("cwl2json");
+        args.add(CWL_2_JSON);
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
 
@@ -881,7 +882,7 @@ class LaunchTestIT {
         ArrayList<String> args = new ArrayList<>();
         args.add(TOOL);
         args.add(CONVERT);
-        args.add("cwl2json");
+        args.add(CWL_2_JSON);
         args.add("--cwl");
         args.add(file.getAbsolutePath());
 
