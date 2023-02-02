@@ -551,7 +551,7 @@ public abstract class AbstractEntryClient<T> {
             // prevent specifying --unpub and --entryname together
             if (unpublishRequest && newEntryName != null) {
                 errorMessage("Unable to specify both --unpub and --new-entry-name together. If trying to unpublish an entry,"
-                    + " provide the entire entry path under the " + ENTRY + "y parameter.", COMMAND_ERROR);
+                    + " provide the entire entry path under the " + ENTRY + " parameter.", COMMAND_ERROR);
             } else {
                 handlePublishUnpublish(first, newEntryName, unpublishRequest);
             }
