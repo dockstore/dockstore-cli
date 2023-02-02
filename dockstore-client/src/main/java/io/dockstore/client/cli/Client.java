@@ -84,6 +84,7 @@ import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 
 /**
@@ -112,6 +113,7 @@ public class Client {
     private static ObjectMapper objectMapper;
 
     private String configFile = null;
+    private String serverUrl = null;
     private Ga4GhApi ga4ghApi;
     private Ga4Ghv20Api ga4ghv20Api;
     private ExtendedGa4GhApi extendedGA4GHApi;
@@ -121,6 +123,9 @@ public class Client {
     private ToolClient toolClient;
     private WorkflowClient workflowClient;
     private CheckerClient checkerClient;
+
+    private YamlClient yamlClient;
+
 
     /*
      * Dockstore Client Functions for CLI
@@ -409,9 +414,7 @@ public class Client {
                         out("Download complete. You are now on version " + latestUnstable + " of Dockstore.");
                     } else {
                         //user input '--upgrade' without knowing the version or the optional commands
-                        out("You are running the latest stable version...");
-                        out("If you wish to upgrade to the newest unstable version, please use the following command:");
-                        out("   dockstore --upgrade-unstable"); // takes you to the newest unstable version
+                        out("You are running the latest stable version.");
                     }
                 } else {    //current is not the most stable version
                     switch (optVal) {
@@ -423,8 +426,7 @@ public class Client {
                     case "none":
                         if (compareVersion(currentVersion)) {
                             // current version is the latest unstable version
-                            out("You are currently on the latest unstable version. If you wish to upgrade to the latest stable version, please use the following command:");
-                            out("   dockstore --upgrade-stable");
+                            out("You are currently on the latest unstable version.");
                         } else {
                             // current version is the older unstable version
                             // upgrade to latest stable version
@@ -572,9 +574,7 @@ public class Client {
         }
         //check if the current version is the latest stable version or not
         if (Objects.equals(currentVersion, latestVersion)) {
-            out("You are running the latest stable version...");
-            out("If you wish to upgrade to the latest unstable version, please use the following command:");
-            out("   dockstore --upgrade-unstable"); // takes you to the newest unstable version
+            out("You are running the latest stable version."); // takes you to the newest unstable version
         } else {
             //not the latest stable version, could be on the newest unstable or older unstable/stable version
             out("The latest stable version is " + latestVersion);
@@ -592,6 +592,7 @@ public class Client {
         out("   checker             Puts dockstore into checker mode.");
         out("   plugin              Configure and debug plugins.");
         out("   deps                Print tool/workflow runner dependencies.");
+        out("   " + YAML + "                Puts dockstore into " + YAML + " mode.");
         out("");
         printLineBreak();
         out("");
@@ -643,6 +644,7 @@ public class Client {
             final Metadata metadata = ga4ghApi.metadataGet();
             final Gson gson = io.cwl.avro.CWL.getTypeSafeCWLToolDocument();
             out(gson.toJson(metadata));
+            out("Dockstore server: " + serverUrl);
         } catch (ApiException ex) {
             exceptionMessage(ex, "", API_ERROR);
         } catch (CWL.GsonBuildException ex) {
@@ -719,6 +721,9 @@ public class Client {
                         String[] argsArray = new String[args.size()];
                         argsArray = args.toArray(argsArray);
                         handled = DepCommand.handleDepCommand(argsArray);
+                    } else if (YAML.equals(mode)) {
+                        yamlClient = new YamlClient();
+                        handled = yamlClient.handleCommand(args);
                     }
 
                     if (targetClient != null) {
@@ -771,7 +776,7 @@ public class Client {
                         }
                     }
                 } catch (Kill k) {
-                    k.printStackTrace();
+                    LOG.debug("client ran into unclassified error", k.getCause());
                     System.exit(GENERIC_ERROR);
                 }
             }
@@ -792,7 +797,7 @@ public class Client {
         INIConfiguration config = getIniConfiguration(args);
         // pull out the variables from the config
         String token = config.getString("token", "");
-        String serverUrl = config.getString("server-url", "https://dockstore.org/api");
+        serverUrl = config.getString("server-url", "https://dockstore.org/api");
         if (serverUrl.contains(":8443")) {
             err(DEPRECATED_PORT_MESSAGE);
         }

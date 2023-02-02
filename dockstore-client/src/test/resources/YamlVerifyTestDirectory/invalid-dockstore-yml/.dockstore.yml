@@ -1,0 +1,21 @@
+version: 1.2
+workflows:
+  -  name: test
+     subclass: WDL
+     authors:
+       - name: Denis Yuen
+         orcid: 0000-0002-6130-1021
+       - name: UCSC Genomics Institute
+         role: Institute
+         affiliation: UCSC
+     publish: true
+     testParameterFiles:
+       - /dockstore.wdl.json
+       - /dockstore.cwl.json
+       - /Dockstore.cwl
+     filters:
+       branches:
+         - develop
+       tags:
+         - gwas*
+

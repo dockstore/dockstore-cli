@@ -1,0 +1,37 @@
+version: 1.2
+workflows:
+  -  name: TEST-1
+     subclass: WDL
+     publish: true
+     primaryDescriptorPath: /Dockstore2.wdl
+     testParameterFiles:
+       - /dockstore.wdl.json
+       - /dockstore.cwl.json
+     filters:
+       branches:
+         - develop
+       tags:
+         - gwas*
+  -  name: TEST-2
+     subclass: WDL
+     publish: true
+     primaryDescriptorPath: /Dockstore3.wdl
+     testParameterFiles:
+       - /dockstore2.wdl.json
+       - /dockstore2.cwl.json
+       - /Dockstore2.cwl
+     filters:
+       branches:
+         - develop
+       tags:
+         - gwas*
+tools:
+  -  name: TEST-3
+     subclass: WDL
+     publish: true
+     primaryDescriptorPath: /Dockstore.cwl
+     filters:
+       branches:
+         - develop
+       tags:
+         - gwas*

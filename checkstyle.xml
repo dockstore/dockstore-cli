@@ -160,7 +160,14 @@
 
         <!-- Checks identation.                               -->
         <module name="Indentation">
+            <!-- Dockstore override, 2 to 4 -->
+            <property name="basicOffset" value="4"/>
+            <property name="braceAdjustment" value="0"/>
+            <!-- Dockstore override, 2 to 0 -->
             <property name="caseIndent" value="0"/>
+            <property name="throwsIndent" value="4"/>
+            <property name="lineWrappingIndentation" value="4"/>
+            <property name="arrayInitIndent" value="8"/>
         </module>
         <module name="OuterTypeFilename"/>
 

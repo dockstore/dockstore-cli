@@ -33,12 +33,12 @@
     -->
     <properties>
         <!-- the following properties set sane defaults when no revision properties are set from the command-line -->
-        <revision>1.13</revision>
+        <revision>1.14</revision>
         <changelist>.0-SNAPSHOT</changelist>
 
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.13.0-alpha.7</dockstore-core.version>
+        <dockstore-core.version>1.14.0-alpha.4</dockstore-core.version>
         <maven-failsafe.version>2.22.2</maven-failsafe.version>
         <maven-surefire.version>2.22.2</maven-surefire.version>
         <skipTests>false</skipTests>
@@ -53,6 +53,7 @@
             ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../reports/target/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         <!-- end sonarcloud properties -->
+        <cwlavro.version>2.0.4.7</cwlavro.version>
     </properties>
 
     <organization>
@@ -157,6 +158,44 @@
                 <artifactId>dropwizard-migrations</artifactId>
                 <scope>test</scope>
             </dependency>
+            <!--  cwl management -->
+            <dependency>
+                <groupId>io.cwl</groupId>
+                <artifactId>cwlavro-tools</artifactId>
+                <version>${cwlavro.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient-osgi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore-osgi</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- Used by cwlavro. Even though cwlavro uses 1.21, cwlavro's avro dependency uses 1.20 -->
+            <dependency>
+                <groupId>io.cwl</groupId>
+                <artifactId>cwlavro-generated</artifactId>
+                <version>${cwlavro.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient-osgi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore-osgi</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- remove after bom is updated with Dockstore or above 1.14.0 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-vfs2</artifactId>
+                <version>2.9.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -167,7 +206,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.7</version>
+                    <version>0.8.8</version>
                 </plugin>
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -184,7 +223,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
                     <configuration>
-                        <release>11</release>
+                        <release>17</release>
                         <showDeprecation>true</showDeprecation>
                     </configuration>
                 </plugin>
@@ -348,18 +387,6 @@
                             </configuration>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.eluder.coveralls</groupId>
-                    <artifactId>coveralls-maven-plugin</artifactId>
-                    <version>4.3.0</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>javax.xml.bind</groupId>
-                            <artifactId>jaxb-api</artifactId>
-                            <version>2.3.1</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -534,7 +561,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>11</release>
+                    <release>17</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -610,25 +637,17 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <configuration>
-                    <jacocoReports>
-                        <param>${project.basedir}/reports/target/site/jacoco-aggregate/jacoco.xml</param>
-                    </jacocoReports>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>net.revelc.code</groupId>
                 <artifactId>impsort-maven-plugin</artifactId>
-                <version>1.6.2</version>
+                <version>1.8.0</version>
                 <configuration>
                     <groups>java.,javax.,*</groups>
                     <staticAfter>true</staticAfter>
+                    <compliance>17</compliance>
                 </configuration>
                 <executions>
                     <execution>
@@ -656,7 +675,8 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.BenchmarkTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.client.cli.nested.WestTests
+                    io.dockstore.client.cli.nested.WesTests,
+                    io.dockstore.common.BitBucketTest
                 </excludeGroups>
             </properties>
 
@@ -711,7 +731,8 @@
                     io.dockstore.client.cli.nested.SingularityTest,
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
-                    io.dockstore.client.cli.nested.WesTests
+                    io.dockstore.client.cli.nested.WesTests,
+                    io.dockstore.common.BitBucketTest
                 </excludeGroups>
             </properties>
         </profile>
@@ -727,7 +748,8 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.WorkflowTest,
-                    io.dockstore.client.cli.nested.WesTests
+                    io.dockstore.client.cli.nested.WesTests,
+                    io.dockstore.common.BitBucketTest
                 </excludeGroups>
             </properties>
         </profile>
@@ -743,8 +765,17 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.ToolTest,
-                    io.dockstore.client.cli.nested.WesTests
+                    io.dockstore.client.cli.nested.WesTests,
+                    io.dockstore.common.BitBucketTest
                 </excludeGroups>
+            </properties>
+        </profile>
+        <profile>
+            <id>bitbucket-tests</id>
+            <properties>
+                <skipTests>true</skipTests>
+                <skipITs>false</skipITs>
+                <groups>io.dockstore.common.BitBucketTest</groups>
             </properties>
         </profile>
         <profile>
@@ -758,7 +789,8 @@
                     io.dockstore.common.SlowTest,
                     io.dockstore.common.ToilOnlyTest,
                     io.dockstore.common.ConfidentialTest,
-                    io.dockstore.client.cli.nested.WesTests
+                    io.dockstore.client.cli.nested.WesTests,
+                    io.dockstore.common.BitBucketTest
                 </excludeGroups>
             </properties>
         </profile>

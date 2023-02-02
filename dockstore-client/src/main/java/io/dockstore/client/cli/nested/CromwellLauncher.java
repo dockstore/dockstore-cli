@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import io.dockstore.common.DescriptorLanguage;
@@ -23,7 +22,6 @@ import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
 import io.github.collaboratory.cwl.CWLClient;
 import org.apache.commons.configuration2.INIConfiguration;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import wdl.draft3.parser.WdlParser;
 
@@ -36,7 +34,7 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 public class CromwellLauncher extends BaseLauncher {
     // If the Cromwell version is changed be sure to update the table
     // in the documentation at advanced-topics/advanced-features.rst:317
-    protected static final String DEFAULT_CROMWELL_VERSION = "77";
+    protected static final String DEFAULT_CROMWELL_VERSION = "84";
     protected Map<String, List<FileProvisioning.FileInfo>> outputMap;
     protected List<String>  cromwellExtraParameters;
     protected List<String>  cromwellVmOptions;
@@ -79,11 +77,8 @@ public class CromwellLauncher extends BaseLauncher {
         String cromwellTarget = libraryLocation + cromwellFileName;
         File cromwellTargetFile = new File(cromwellTarget);
         if (!cromwellTargetFile.exists()) {
-            try {
-                FileUtils.copyURLToFile(cromwellURL, cromwellTargetFile);
-            } catch (IOException e) {
-                throw new RuntimeException("Could not download " + launcherName + " location", e);
-            }
+            final int pluginDownloadAttempts = 5;
+            FileProvisioning.retryWrapper(null, cromwellURL.toString(), cromwellTargetFile.toPath(), pluginDownloadAttempts, true, 1);
         }
         executionFile = cromwellTargetFile;
     }
@@ -96,7 +91,7 @@ public class CromwellLauncher extends BaseLauncher {
         if (cromwellVmOptions.size() > 0) {
             List<String> cromwellVmOptionsParsed = cromwellVmOptions.stream().map(string -> string.split(","))
                     .flatMap(Arrays::stream).map(String::trim)
-                    .collect(Collectors.toList());
+                    .toList();
             arguments.addAll(cromwellVmOptionsParsed);
         }
 
@@ -119,7 +114,7 @@ public class CromwellLauncher extends BaseLauncher {
         if (cromwellExtraParameters.size() > 0) {
             List<String> cromwellExtraParametersParsed = cromwellExtraParameters.stream().map(string -> string.split(","))
                     .flatMap(Arrays::stream).map(String::trim)
-                    .collect(Collectors.toList());
+                    .toList();
             arguments.addAll(cromwellExtraParametersParsed);
         }
 

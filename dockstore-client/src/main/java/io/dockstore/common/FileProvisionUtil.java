@@ -85,7 +85,7 @@ public final class FileProvisionUtil {
         class CustomHttp4sFileProvider extends Http4sFileProvider {
             public HttpClientContext createHttpClientContext(final Http4FileSystemConfigBuilder builder,
                                                              final GenericFileName rootName, final FileSystemOptions fileSystemOptions,
-                                                             final UserAuthenticationData authData) throws FileSystemException {
+                                                             final UserAuthenticationData authData) {
 
                 HttpClientContext def = super.createHttpClientContext(builder, rootName, fileSystemOptions, authData);
                 if (rootName.getHostName().equals("github.com")) {

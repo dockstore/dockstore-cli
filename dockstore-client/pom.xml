@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~    Copyright 2017 OICR
+  ~    Copyright 2022 OICR, UCSC
   ~
   ~    Licensed under the Apache License, Version 2.0 (the "License");
   ~    you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 
     <properties>
         <docker-client.version>3.2.8</docker-client.version>
+        <argLine></argLine>
     </properties>
 
     <dependencies>
@@ -66,7 +67,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
@@ -170,12 +171,12 @@
         <!-- broad - cromwell stuff -->
         <dependency>
             <groupId>org.broadinstitute</groupId>
-            <artifactId>cromwell-wdl-transforms-draft3_2.12</artifactId>
+            <artifactId>cromwell-wdl-transforms-draft3_2.13</artifactId>
         </dependency>
 
         <dependency>
             <groupId>io.spray</groupId>
-            <artifactId>spray-json_2.12</artifactId>
+            <artifactId>spray-json_2.13</artifactId>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -189,7 +190,39 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.webcompere</groupId>
+            <artifactId>system-stubs-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.webcompere</groupId>
+            <artifactId>system-stubs-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
@@ -236,10 +269,16 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-vfs2</artifactId>
+            <!-- remove after bom is updated with Dockstore or above 1.14.0 -->
+            <version>2.9.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-httpclient</groupId>
                     <artifactId>commons-httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-hdfs-client</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -276,12 +315,8 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>profiles</artifactId>
-            <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-multipart</artifactId>
-        </dependency>
+
         <!--
         This is a zero-dependency package for calculating AWS SigV4 headers.
         GitHub: https://github.com/lucasweb78/aws-v4-signer-java
@@ -296,8 +331,20 @@
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.2.5.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+        </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -380,8 +427,13 @@
                             </ignoredUnusedDeclaredDependencies>
                             <usedDependencies>
                                 <usedDependency>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</usedDependency>
-                                <usedDependency>io.spray:spray-json_2.12</usedDependency>
+                                <usedDependency>io.spray:spray-json_2.13</usedDependency>
+                                <usedDependency>org.hibernate.validator:hibernate-validator</usedDependency>
+                                <usedDependency>org.glassfish:jakarta.el</usedDependency>
                             </usedDependencies>
+                            <ignoredNonTestScopedDependencies>
+                                <ignoredNonTestScopedDependency>software.amazon.awssdk:profiles</ignoredNonTestScopedDependency>
+                            </ignoredNonTestScopedDependencies>
 
                         </configuration>
                     </execution>
@@ -398,15 +450,24 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -426,6 +487,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <argLine>
+                        @{argLine}
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.io=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.base=ALL-UNNAMED
+                    </argLine>
                     <skipTests>${skipITs}</skipTests>
                     <excludedGroups>${excludeGroups}</excludedGroups>
                 </configuration>

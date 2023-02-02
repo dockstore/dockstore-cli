@@ -201,32 +201,36 @@ public abstract class AbstractEntryClient<T> {
         printUsageHelp(getEntryType().toLowerCase());
         out("Commands:");
         out("");
-        out("  list             :  lists all the " + getEntryType() + "s published by the user");
-        out("");
-        out("  search           :  allows a user to search for all published " + getEntryType() + "s that match the criteria");
-        out("");
-        out("  publish          :  publish/unpublish a " + getEntryType() + " in Dockstore");
-        out("");
-        out("  info             :  print detailed information about a particular published " + getEntryType());
+        out("  " + CONVERT + "          :  utilities that allow you to convert file types");
         out("");
         out("  " + CWL.toString() + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
         out("                      which enables integration with Global Alliance compliant systems");
         out("");
-        out("  " + WDL.toString() + "              :  returns the Workflow Descriptor Language definition for this Docker image");
+        out("  " + DOWNLOAD + "         :  download " + getEntryType() + "s to the local directory");
+        out("");
+        out("  info             :  print detailed information about a particular published " + getEntryType());
+        out("");
+        out("  label            :  updates labels for an individual " + getEntryType() + "");
+        out("");
+        out("  " + LAUNCH + "           :  launch " + getEntryType() + "s (locally)");
+        out("");
+        out("  list             :  lists all the " + getEntryType() + "s published by the user");
+        out("");
+        if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
+            out("  nfl              :  returns the Nextflow " + getEntryType() + " defintion for this entry");
+            out("");
+        }
+        out("  publish          :  publish/unpublish a " + getEntryType() + " in Dockstore");
         out("");
         out("  refresh          :  updates your list of " + getEntryType() + "s stored on Dockstore or an individual " + getEntryType());
         out("");
-        out("  label            :  updates labels for an individual " + getEntryType() + "");
+        out("  search           :  allows a user to search for all published " + getEntryType() + "s that match the criteria");
         out("");
         out("  star             :  star/unstar a " + getEntryType() + " in Dockstore");
         out("");
         out("  test_parameter   :  updates test parameter files for a version of a " + getEntryType() + "");
         out("");
-        out("  " + CONVERT + "          :  utilities that allow you to convert file types");
-        out("");
-        out("  " + LAUNCH + "           :  launch " + getEntryType() + "s (locally)");
-        out("");
-        out("  " + DOWNLOAD + "         :  download " + getEntryType() + "s to the local directory");
+        out("  " + WDL.toString() + "              :  returns the Workflow Descriptor Language definition for this entry");
         if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
             out("");
             out("  wes              :  calls a Workflow Execution Schema API (WES) for a version of a " + getEntryType() + "");
@@ -689,7 +693,7 @@ public abstract class AbstractEntryClient<T> {
             final String wdlPath = reqVal(args, "--wdl");
             File wdlFile = new File(wdlPath);
             final List<String> wdlDocuments = Lists.newArrayList(wdlFile.getAbsolutePath());
-            final scala.collection.immutable.List<String> wdlList = scala.collection.JavaConversions.asScalaBuffer(wdlDocuments).toList();
+            final scala.collection.immutable.List<String> wdlList = scala.jdk.javaapi.CollectionConverters.asScala(wdlDocuments).toList();
             WdlBridge wdlBridge = new WdlBridge();
             try {
                 String inputs = wdlBridge.getParameterFile(wdlFile.getAbsolutePath());
@@ -812,7 +816,7 @@ public abstract class AbstractEntryClient<T> {
 
         // get all the tool files and filter out anything not a descriptor
         try {
-            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, entryPath, versionID).stream()
+            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(entryPath, type, versionID, null).stream()
                 .filter(toolFile -> ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR.equals(toolFile.getFileType()) || ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR.equals(toolFile.getFileType()))
                 .collect(Collectors.toList());
         } catch (io.dockstore.openapi.client.ApiException ex) {

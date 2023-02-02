@@ -1,0 +1,25 @@
+version: 1.2
+workflows:
+  -  subclass: ERROR_SHOULD_OCCUR
+     name: wdl-workflow
+     authors:
+       - name: Denis Yuen
+         orcid: 0000-0002-6130-1021
+       - name: UCSC Genomics Institute
+         role: Institute
+         affiliation: UCSC
+     publish: true
+     primaryDescriptorPath: /Dockstore2.wdl
+     testParameterFiles:
+       - /dockstore.wdl.json
+     filters:
+       branches:
+         - develop
+       tags:
+         - gwas*
+  -  subclass: cwl
+     publish: no
+     name: cwl-workflow
+     primaryDescriptorPath: /Dockstore.cwl
+     testParameterFiles:
+       - /dockstore.cwl.json

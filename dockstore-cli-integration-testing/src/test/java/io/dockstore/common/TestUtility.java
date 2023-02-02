@@ -22,20 +22,21 @@ import java.nio.charset.StandardCharsets;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static io.dockstore.common.CommonTestUtilities.DUMMY_TOKEN_1;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 /**
  * @author jpatricia
  */
+@ExtendWith(SystemStubsExtension.class)
 public final class TestUtility {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestUtility.class);
-    @Rule
+    @TempDir
     public TemporaryFolder folder = new TemporaryFolder();
 
     private TestUtility() {
@@ -49,7 +50,7 @@ public final class TestUtility {
     public static String getConfigFileLocation(boolean correctUser, boolean validPort, boolean useCache) throws IOException {
         File tempDir = Files.createTempDir();
         final File tempFile = File.createTempFile("config", "config", tempDir);
-        FileUtils.write(tempFile, "token: " + (correctUser ? DUMMY_TOKEN_1 : "foobar") + "\n", StandardCharsets.UTF_8);
+        FileUtils.write(tempFile, "token: " + (correctUser ? CommonTestUtilities.DUMMY_TOKEN_1 : "foobar") + "\n", StandardCharsets.UTF_8);
         FileUtils.write(tempFile, "server-url: http://localhost:" + (validPort ? "8080" : "9001") + "\n", StandardCharsets.UTF_8, true);
         if (useCache) {
             FileUtils.write(tempFile, "use-cache: true\n", StandardCharsets.UTF_8, true);
@@ -70,7 +71,7 @@ public final class TestUtility {
     }
 
     /**
-     * Currently in production, the basePath is "/api/" and Nginx removes first /api it finds and redirects it to "http://webservice:8080/$uri"
+     * Currently in production, the basePath is "/api/" and Nginx removes first /api it finds and redirects it to "<a href="http://webservice:8080/$uri">...</a>"
      * This mimics the nginx functionality
      *
      * @param originalUrl The original URL that the UI2 and the Swagger UI displays

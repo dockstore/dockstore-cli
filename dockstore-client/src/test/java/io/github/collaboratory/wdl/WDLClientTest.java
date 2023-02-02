@@ -18,22 +18,23 @@ package io.github.collaboratory.wdl;
 import java.util.Map;
 
 import io.dropwizard.testing.ResourceHelpers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author gluu
  * @since 2019-08-23
  */
-public class WDLClientTest {
+class WDLClientTest {
 
     /**
      * Tests that all file-like inputs are recognized (File, Array[File], File?, Array[File]?)
      */
     @Test
-    public void getInputFilesTest() {
+    void getInputFilesTest() {
         String descriptorPath = ResourceHelpers.resourceFilePath("topmed_freeze3_calling.wdl");
         Map<String, String> inputFiles = WDLClient.getInputFiles(descriptorPath);
-        Assert.assertEquals(63, inputFiles.size());
+        assertEquals(63, inputFiles.size());
     }
 }
