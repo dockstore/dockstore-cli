@@ -78,7 +78,7 @@ public class SuggestClosestMatchTest {
         assertTrue(minDistance("zzzzzzzzzzzz", acceptedCommands).isEmpty());
         acceptedCommands.add("bbbbbbbb");
         assertTrue(minDistance("qqqqqqq", acceptedCommands).isEmpty());
-        acceptedCommands.add("fffffffff");
+        acceptedCommands.add("ffffffffff");
         assertTrue(minDistance("pppppppp", acceptedCommands).isEmpty());
     }
 
