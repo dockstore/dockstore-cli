@@ -1273,10 +1273,14 @@ public abstract class AbstractEntryClient<T> {
         try {
             wesCommandParser.jCommander.parse(args.toArray(new String[0]));
         } catch (MissingCommandException e) {
+            // This catch is called when JCommander parse doesn't understand any command. This is for incorrect commands of the form:
+            // dockstore workflow INCORRECT_COMMAND
             displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), args.get(0), WORKFLOW + " " + WES);
             return;
         } catch (ParameterException e) {
             if (wasErrorDueToUnknownParamter(e.getMessage())) {
+                // This is for when JCommander parse understands part of the command. This is for incorrect commands of the form:
+                // dockstore workflow CORRECT_COMMAND INCORRECT_COMMAND
                 String incorrectCommand = getUnknowParameter(e.getMessage());
                 // get command after the commands that were successfully read
                 displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, WORKFLOW + " " + WES + " " + e.getJCommander().getParsedCommand().toString());
