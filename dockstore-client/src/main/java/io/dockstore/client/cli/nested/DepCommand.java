@@ -42,7 +42,6 @@ public final class DepCommand {
         CommandDep commandDep = new CommandDep();
         JCommander jCommanderMain = new JCommander();
         JCommanderUtility.addCommand(jCommanderMain, DEPS, commandDep);
-
         try {
             jCommanderMain.parse(args);
         } catch (MissingCommandException e) {

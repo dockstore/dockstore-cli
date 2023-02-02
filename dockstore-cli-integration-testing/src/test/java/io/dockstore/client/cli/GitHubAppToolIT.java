@@ -150,10 +150,11 @@ class GitHubAppToolIT extends BaseIT {
 
     @Test
     void testParameter() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, TEST_PARAMETER, VERSION, "main", "--add", "test.json", ENTRY, ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
+        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, TEST_PARAMETER, "--version", "main", "--add", "test.json", ENTRY, ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
         assertTrue(systemOutRule.getText().contains("Cannot update test parameter files of GitHub App entries"));
     }
+
 
     @Test
     void convert() {

@@ -332,7 +332,7 @@ class ClientIT extends BaseIT {
      */
     @Test
     void testDepsCommandHelp() throws IOException {
-        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), DEPS, "HELP" });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), DEPS, HELP });
         assertTrue(systemOutRule.getText().contains("Print cwltool runner dependencies"));
     }
 
