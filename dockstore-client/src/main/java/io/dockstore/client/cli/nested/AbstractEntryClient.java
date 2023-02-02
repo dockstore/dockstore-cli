@@ -376,7 +376,7 @@ public abstract class AbstractEntryClient<T> {
                     possibleCommands.addAll(Arrays.asList(WES, NFL));
                 }
                 possibleCommands.addAll(getClientSpecificCommands());
-                possibleCommands.addAll(Client.getGeneralFlags());
+                possibleCommands.addAll(getGeneralFlags());
                 invalid(getEntryType().toLowerCase(), activeCommand, possibleCommands);
                 return true;
             }
