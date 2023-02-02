@@ -18,7 +18,6 @@ package io.dockstore.client.cli;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.google.common.collect.Lists;
 import io.dockstore.common.CLICommonTestUtilities;
@@ -57,7 +56,6 @@ import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.UPGRADE;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
-import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CANCEL;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_YAML;
@@ -454,7 +452,6 @@ class ClientIT extends BaseIT {
 
         Client.main(strings.toArray(new String[0]));
         assertTrue(systemOutRule.getText().contains("Usage: dockstore"));
-        Assertions.assertEquals("Hello", argv.toString());
         systemOutRule.clear();
     }
 
