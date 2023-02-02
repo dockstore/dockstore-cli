@@ -544,19 +544,5 @@ class ClientIT extends BaseIT {
 
     }
 
-    @Test
-    public void noSuggestions() {
-        List<String> acceptedCommands = new ArrayList<String>();
-        acceptedCommands.add(TOOL);
-        acceptedCommands.add(WORKFLOW);
-        acceptedCommands.add(CHECKER);
-        acceptedCommands.add(PLUGIN);
-        acceptedCommands.add(DEPS);
-        acceptedCommands.add(YAML);
-        ArgumentUtility.invalid("", "z", acceptedCommands);
-        System.out.println("HELLO");
-        String output = systemOutRule.getText();
-        Assertions.assertEquals("test", output);
-    }
 
 }
