@@ -19,7 +19,6 @@ package io.dockstore.client.cli;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
@@ -27,6 +26,8 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.invalid;
+import static io.dockstore.client.cli.ArgumentUtility.minDistance;
 import static io.dockstore.client.cli.Client.CHECKER;
 import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.HELP;
@@ -35,6 +36,7 @@ import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SystemStubsExtension.class)
 public class SuggestClosestMatchTest {
@@ -51,15 +53,15 @@ public class SuggestClosestMatchTest {
 
         acceptedCommands.add("orange");
         acceptedCommands.add("juice");
-        List<String> result = ArgumentUtility.minDistance("oran", acceptedCommands);
-        Assertions.assertEquals(1, result.size());
+        List<String> result = minDistance("oran", acceptedCommands);
+        assertEquals(1, result.size());
         assertTrue(result.contains("orange"));
 
         acceptedCommands.add("test1");
         acceptedCommands.add("test2");
         acceptedCommands.add("test3");
-        result = ArgumentUtility.minDistance("test7", acceptedCommands);
-        Assertions.assertEquals(3, result.size());
+        result = minDistance("test7", acceptedCommands);
+        assertEquals(3, result.size());
         assertTrue(result.contains("test1"));
         assertTrue(result.contains("test2"));
         assertTrue(result.contains("test3"));
@@ -73,11 +75,11 @@ public class SuggestClosestMatchTest {
         // The threshold could change, but these should never return a result
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add("abcdefgh");
-        assertTrue(ArgumentUtility.minDistance("zzzzzzzzzzzz", acceptedCommands).isEmpty());
+        assertTrue(minDistance("zzzzzzzzzzzz", acceptedCommands).isEmpty());
         acceptedCommands.add("bbbbbbbb");
-        assertTrue(ArgumentUtility.minDistance("qqqqqqq", acceptedCommands).isEmpty());
+        assertTrue(minDistance("qqqqqqq", acceptedCommands).isEmpty());
         acceptedCommands.add("fffffffff");
-        assertTrue(ArgumentUtility.minDistance("pppppppp", acceptedCommands).isEmpty());
+        assertTrue(minDistance("pppppppp", acceptedCommands).isEmpty());
     }
 
     @Test
@@ -90,24 +92,24 @@ public class SuggestClosestMatchTest {
         acceptedCommands.add(PLUGIN);
         acceptedCommands.add(DEPS);
         acceptedCommands.add(YAML);
-        ArgumentUtility.invalid("", "z", acceptedCommands);
-        Assertions.assertEquals("dockstore: 'z' is not a dockstore command. See 'dockstore " + HELP + "'.\n",
+        invalid("", "z", acceptedCommands);
+        assertEquals("dockstore: 'z' is not a dockstore command. See 'dockstore " + HELP + "'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        ArgumentUtility.invalid("", "xxzz", acceptedCommands);
-        Assertions.assertEquals("dockstore: 'xxzz' is not a dockstore command. See 'dockstore " + HELP + "'.\n",
+        invalid("", "xxzz", acceptedCommands);
+        assertEquals("dockstore: 'xxzz' is not a dockstore command. See 'dockstore " + HELP + "'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        ArgumentUtility.invalid("random_command_1", "xxzz", acceptedCommands);
-        Assertions.assertEquals("dockstore random_command_1: 'xxzz' is not a dockstore command. "
+        invalid("random_command_1", "xxzz", acceptedCommands);
+        assertEquals("dockstore random_command_1: 'xxzz' is not a dockstore command. "
                         + "See 'dockstore random_command_1 " + HELP + "'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        ArgumentUtility.invalid("random_command_1 random_command_2", "xxzz", acceptedCommands);
-        Assertions.assertEquals("dockstore random_command_1 random_command_2: 'xxzz' is not a dockstore command. "
+        invalid("random_command_1 random_command_2", "xxzz", acceptedCommands);
+        assertEquals("dockstore random_command_1 random_command_2: 'xxzz' is not a dockstore command. "
                         + "See 'dockstore random_command_1 random_command_2 " + HELP + "'.\n",
                 systemOutRule.getText());
         systemOutRule.clear();
@@ -127,8 +129,8 @@ public class SuggestClosestMatchTest {
         acceptedCommands.add(DEPS);
         acceptedCommands.add(YAML);
 
-        ArgumentUtility.invalid("", "CHECKER", acceptedCommands);
-        Assertions.assertEquals("""
+        invalid("", "CHECKER", acceptedCommands);
+        assertEquals("""
                         dockstore: 'CHECKER' is not a dockstore command. See 'dockstore --help'.
                                                 
                         The most similar command is:
@@ -137,8 +139,8 @@ public class SuggestClosestMatchTest {
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        ArgumentUtility.invalid("", "Checker", acceptedCommands);
-        Assertions.assertEquals("""
+        invalid("", "Checker", acceptedCommands);
+        assertEquals("""
                         dockstore: 'Checker' is not a dockstore command. See 'dockstore --help'.
                                                 
                         The most similar command is:
@@ -147,8 +149,8 @@ public class SuggestClosestMatchTest {
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        ArgumentUtility.invalid("", "cheCKer", acceptedCommands);
-        Assertions.assertEquals("""
+        invalid("", "cheCKer", acceptedCommands);
+        assertEquals("""
                         dockstore: 'cheCKer' is not a dockstore command. See 'dockstore --help'.
                                                 
                         The most similar command is:
@@ -165,8 +167,8 @@ public class SuggestClosestMatchTest {
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add(TOOL);
 
-        ArgumentUtility.invalid("", "too", acceptedCommands);
-        Assertions.assertEquals("""
+        invalid("", "too", acceptedCommands);
+        assertEquals("""
                         dockstore: 'too' is not a dockstore command. See 'dockstore --help'.
                         
                         The most similar command is:
@@ -181,8 +183,8 @@ public class SuggestClosestMatchTest {
         acceptedCommands.add(DEPS);
         acceptedCommands.add(YAML);
 
-        ArgumentUtility.invalid("", "pluggn", acceptedCommands);
-        Assertions.assertEquals("""
+        invalid("", "pluggn", acceptedCommands);
+        assertEquals("""
                         dockstore: 'pluggn' is not a dockstore command. See 'dockstore --help'.
                         
                         The most similar command is:
@@ -191,8 +193,8 @@ public class SuggestClosestMatchTest {
                 systemOutRule.getText());
         systemOutRule.clear();
 
-        ArgumentUtility.invalid("random_1 random_2", "y", acceptedCommands);
-        Assertions.assertEquals("""
+        invalid("random_1 random_2", "y", acceptedCommands);
+        assertEquals("""
                         dockstore random_1 random_2: 'y' is not a dockstore command. See 'dockstore random_1 random_2 --help'.
                         
                         The most similar command is:
@@ -215,8 +217,8 @@ public class SuggestClosestMatchTest {
         acceptedCommands.add("test2");
         acceptedCommands.add(YAML);
 
-        ArgumentUtility.invalid("", "test0", acceptedCommands);
-        Assertions.assertEquals("""
+        invalid("", "test0", acceptedCommands);
+        assertEquals("""
                         dockstore: 'test0' is not a dockstore command. See 'dockstore --help'.
                         
                         The most similar commands are:
@@ -227,8 +229,8 @@ public class SuggestClosestMatchTest {
         systemOutRule.clear();
 
         acceptedCommands.add("test8");
-        ArgumentUtility.invalid("random_1 random_2", "test0", acceptedCommands);
-        Assertions.assertEquals("""
+        invalid("random_1 random_2", "test0", acceptedCommands);
+        assertEquals("""
                         dockstore random_1 random_2: 'test0' is not a dockstore command. See 'dockstore random_1 random_2 --help'.
                         
                         The most similar commands are:
