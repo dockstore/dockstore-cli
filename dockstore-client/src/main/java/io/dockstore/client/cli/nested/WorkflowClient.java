@@ -182,7 +182,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  Update certain fields for a given workflow.");
         out("");
         out("Required Parameters:");
-        out("  " + ENTRY + "y <entry>                                              Complete workflow path in Dockstore (ex. github.com/collaboratory/seqware-bwa-workflow)");
+        out("  " + ENTRY + " <entry>                                              Complete workflow path in Dockstore (ex. github.com/collaboratory/seqware-bwa-workflow)");
         out("");
         out("Optional Parameters");
         out("  --descriptor-type <descriptor-type>                          Descriptor type of the given workflow.  Can only be altered if workflow is a STUB.");
@@ -201,7 +201,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  Update certain fields for a given " + getEntryType().toLowerCase() + " version.");
         out("");
         out("Required Parameters:");
-        out("  " + ENTRY + "y <entry>                                      Complete " + getEntryType().toLowerCase()
+        out("  " + ENTRY + " <entry>                                      Complete " + getEntryType().toLowerCase()
             + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --name <name>                                        Name of the " + getEntryType().toLowerCase() + " version.");
         out("");
