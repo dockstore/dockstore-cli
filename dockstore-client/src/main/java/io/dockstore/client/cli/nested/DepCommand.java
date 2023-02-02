@@ -65,7 +65,7 @@ public final class DepCommand {
             String runnerDependencies = metadataApi
                     .getRunnerDependencies(commandDep.clientVersion, commandDep.pythonVersion, commandDep.runner, "text");
             if (runnerDependencies == null) {
-                ArgumentUtility.errorMessage("Could not get runner dependencies", API_ERROR);
+                errorMessage("Could not get runner dependencies", API_ERROR);
             } else {
                 ArgumentUtility.out(runnerDependencies);
             }

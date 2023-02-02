@@ -75,6 +75,8 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+import static io.dockstore.client.cli.CheckerClient.ADD;
+import static io.dockstore.client.cli.CheckerClient.UPDATE;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
@@ -847,20 +849,20 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     private void versionTag(List<String> args) {
-        if (args.isEmpty() || (containsHelpRequest(args) && !args.contains("add") && !args.contains("update") && !args
+        if (args.isEmpty() || (containsHelpRequest(args) && !args.contains(ADD) && !args.contains(UPDATE) && !args
                 .contains("remove"))) {
             versionTagHelp();
         } else {
             String subcommand = args.remove(0);
             if (containsHelpRequest(args)) {
                 switch (subcommand) {
-                case "add":
+                case ADD:
                     versionTagAddHelp();
                     return;
                 case "remove":
                     versionTagRemoveHelp();
                     return;
-                case "update":
+                case UPDATE:
                     versionTagUpdateHelp();
                     return;
                 default:
@@ -874,7 +876,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 DockstoreTool container = containersApi.getContainerByToolPath(toolpath, null);
                 long containerId = container.getId();
                 switch (subcommand) {
-                case "add":
+                case ADD:
                     if (containsHelpRequest(args)) {
                         versionTagAddHelp();
                     } else {
@@ -910,7 +912,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                     }
 
                     break;
-                case "update":
+                case UPDATE:
                     if (containsHelpRequest(args)) {
                         versionTagUpdateHelp();
                     } else {

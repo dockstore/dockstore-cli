@@ -2,6 +2,8 @@ package io.dockstore.client.cli;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.dockstore.client.cli.nested.WorkflowClient;
@@ -19,6 +21,7 @@ import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.invalid;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.printFlagHelp;
@@ -32,6 +35,7 @@ import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.Client.getGeneralFlags;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 
 /**
@@ -40,12 +44,16 @@ import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
  */
 public class CheckerClient extends WorkflowClient {
 
+    public static final String ADD = "add";
+    public static final String UPDATE = "update";
+    public static final String UPDATE_VERSION = "update_version";
     private static final Logger LOG = LoggerFactory.getLogger(CheckerClient.class);
 
     public CheckerClient(WorkflowsApi workflowApi, UsersApi usersApi, Client client, boolean isAdmin) {
         super(workflowApi, usersApi, client, isAdmin);
     }
 
+    // If you add a command, please add it to possibleCommands
     @Override
     public void printGeneralHelp() {
         printHelpHeader();
@@ -58,11 +66,11 @@ public class CheckerClient extends WorkflowClient {
         out("");
         out("  " + LAUNCH + "               :  Launch a " + CHECKER + " " + WORKFLOW + " locally.");
         out("");
-        out("  add                  :  Adds a " + CHECKER + " " + WORKFLOW + " to and existing " + TOOL + "/" + WORKFLOW + ".");
+        out("  " + ADD + "                  :  Adds a " + CHECKER + " " + WORKFLOW + " to and existing " + TOOL + "/" + WORKFLOW + ".");
         out("");
-        out("  update               :  Updates an existing " + CHECKER + " " + WORKFLOW + ".");
+        out("  " + UPDATE + "               :  Updates an existing " + CHECKER + " " + WORKFLOW + ".");
         out("");
-        out("  update_version       :  Updates a specific version of an existing " + CHECKER + " " + WORKFLOW + ".");
+        out("  " + UPDATE_VERSION + "       :  Updates a specific version of an existing " + CHECKER + " " + WORKFLOW + ".");
         out("");
         out("  " + TEST_PARAMETER + "       :  Add/Remove test parameter files for a " + CHECKER + " " + WORKFLOW + " version.");
         out("");
@@ -85,10 +93,10 @@ public class CheckerClient extends WorkflowClient {
     public boolean processEntryCommands(List<String> args, String activeCommand) throws ApiException {
         if (null != activeCommand) {
             switch (activeCommand) {
-            case "add":
+            case ADD:
                 addChecker(args);
                 break;
-            case "update":
+            case UPDATE:
                 updateChecker(args);
                 break;
             case DOWNLOAD:
@@ -100,11 +108,15 @@ public class CheckerClient extends WorkflowClient {
             case TEST_PARAMETER:
                 testParameterChecker(args);
                 break;
-            case "update_version":
+            case UPDATE_VERSION:
                 updateVersionChecker(args);
                 break;
             default:
-                return false;
+                List<String> possibleCommands = new ArrayList<String>();
+                possibleCommands.addAll(Arrays.asList(ADD, UPDATE, DOWNLOAD, LAUNCH, TEST_PARAMETER, UPDATE_VERSION));
+                possibleCommands.addAll(getGeneralFlags());
+                invalid(getEntryType().toLowerCase(), activeCommand, possibleCommands);
+                return true;
             }
             return true;
         }

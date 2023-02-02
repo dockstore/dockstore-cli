@@ -46,6 +46,8 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.CheckerClient.ADD;
+import static io.dockstore.client.cli.CheckerClient.UPDATE;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
@@ -201,7 +203,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testVersionTagWDLCWLAndDockerfilePathsAlteration() {
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "update", ENTRY,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, UPDATE, ENTRY,
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--cwl-path", "/testDir/Dockstore.cwl", "--wdl-path",
                 "/testDir/Dockstore.wdl", "--dockerfile-path", "/testDir/Dockerfile", SCRIPT_FLAG });
 
@@ -212,7 +214,7 @@ class GeneralIT extends BaseIT {
         assertEquals(1, count, "there should now be an invalid tag, found " + count);
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "update", ENTRY,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, UPDATE, ENTRY,
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--cwl-path", "/Dockstore.cwl", "--wdl-path",
                 "/Dockstore.wdl", "--dockerfile-path", "/Dockerfile", SCRIPT_FLAG });
 
@@ -240,7 +242,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testVersionTagAddAutoContainer() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "add", ENTRY,
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, ADD, ENTRY,
                         "quay.io/dockstoretestuser2/quayandgithub", "--name", "masterTest", "--image-id",
                         "4728f8f5ce1709ec8b8a5282e274e63de3c67b95f03a519191e6ea675c5d34e8", "--git-reference", "master", SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
@@ -257,7 +259,7 @@ class GeneralIT extends BaseIT {
             "--cwl-path", "/testDir/Dockstore.cwl", "--dockerfile-path", "/testDir/Dockerfile", SCRIPT_FLAG });
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "add", ENTRY,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, ADD, ENTRY,
                 "quay.io/dockstoretestuser2/quayandgithub/alternate", "--name", "masterTest", "--image-id",
                 "4728f8f5ce1709ec8b8a5282e274e63de3c67b95f03a519191e6ea675c5d34e8", "--git-reference", "master", SCRIPT_FLAG });
 
@@ -275,14 +277,14 @@ class GeneralIT extends BaseIT {
     @Test
     void testVersionTagHide() {
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "update", ENTRY,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, UPDATE, ENTRY,
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--hidden", "true", SCRIPT_FLAG });
         final long count = testingPostgres
             .runSelectStatement("select count(*) from tag t, version_metadata vm where vm.hidden = 't' and t.id = vm.id", long.class);
         assertEquals(1, count, "there should be 1 hidden tag");
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "update", ENTRY,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, UPDATE, ENTRY,
                 "quay.io/dockstoretestuser2/quayandgithub", "--name", "master", "--hidden", "false", SCRIPT_FLAG });
         final long count2 = testingPostgres
             .runSelectStatement("select count(*) from tag t, version_metadata vm where vm.hidden = 't' and t.id = vm.id", long.class);
@@ -301,7 +303,7 @@ class GeneralIT extends BaseIT {
             SCRIPT_FLAG });
 
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, "add", ENTRY,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, VERSION_TAG, ADD, ENTRY,
                 "quay.io/dockstoretestuser2/quayandgithub/alternate", "--name", "masterTest", "--image-id",
                 "4728f8f5ce1709ec8b8a5282e274e63de3c67b95f03a519191e6ea675c5d34e8", "--git-reference", "master", SCRIPT_FLAG });
 

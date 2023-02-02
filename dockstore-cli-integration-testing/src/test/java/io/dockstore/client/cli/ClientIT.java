@@ -42,6 +42,9 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.CheckerClient.ADD;
+import static io.dockstore.client.cli.CheckerClient.UPDATE;
+import static io.dockstore.client.cli.CheckerClient.UPDATE_VERSION;
 import static io.dockstore.client.cli.Client.CHECKER;
 import static io.dockstore.client.cli.Client.CLEAN_CACHE;
 import static io.dockstore.client.cli.Client.CONFIG;
@@ -380,8 +383,8 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { TOOL, LAUNCH, HELP });
         checkCommandForHelp(new String[] { TOOL, VERSION_TAG, HELP });
         checkCommandForHelp(new String[] { TOOL, VERSION_TAG, "remove", HELP });
-        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, "update", HELP });
-        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, "add", HELP });
+        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, UPDATE, HELP });
+        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, ADD, HELP });
         checkCommandForHelp(new String[] { TOOL, UPDATE_TOOL, HELP });
         checkCommandForHelp(new String[] { TOOL, MANUAL_PUBLISH, HELP });
         checkCommandForHelp(new String[] { TOOL, STAR, HELP });
@@ -437,9 +440,9 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { CHECKER });
         checkCommandForHelp(new String[] { CHECKER, DOWNLOAD, HELP });
         checkCommandForHelp(new String[] { CHECKER, LAUNCH, HELP });
-        checkCommandForHelp(new String[] { CHECKER, "add", HELP });
-        checkCommandForHelp(new String[] { CHECKER, "update", HELP });
-        checkCommandForHelp(new String[] { CHECKER, "update_version", HELP });
+        checkCommandForHelp(new String[] { CHECKER, ADD, HELP });
+        checkCommandForHelp(new String[] { CHECKER, UPDATE, HELP });
+        checkCommandForHelp(new String[] { CHECKER, UPDATE_VERSION, HELP });
         checkCommandForHelp(new String[] { CHECKER, TEST_PARAMETER, HELP });
 
     }
@@ -492,6 +495,9 @@ class ClientIT extends BaseIT {
 
         checkSuggestionIsGiven(new String[] {DEPS}, CLIENT_VERSION);
         checkSuggestionIsGiven(new String[] {DEPS}, HELP);
+
+        checkSuggestionIsGiven(new String[] {CHECKER}, HELP);
+        checkSuggestionIsGiven(new String[] {CHECKER}, DOWNLOAD);
 
     }
 

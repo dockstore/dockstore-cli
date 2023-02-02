@@ -38,6 +38,8 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.CheckerClient.ADD;
+import static io.dockstore.client.cli.CheckerClient.UPDATE;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
@@ -97,7 +99,7 @@ class BasicIT extends BaseIT {
             SCRIPT_FLAG });
 
         // Add a tag
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, VERSION_TAG, "add", ENTRY,
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, VERSION_TAG, ADD, ENTRY,
             "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular", "--name", "masterTest", "--image-id",
             "4728f8f5ce1709ec8b8a5282e274e63de3c67b95f03a519191e6ea675c5d34e8", "--git-reference", "master", SCRIPT_FLAG });
 
@@ -106,7 +108,7 @@ class BasicIT extends BaseIT {
 
         // Update tag
         Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, VERSION_TAG, "update", ENTRY,
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, VERSION_TAG, UPDATE, ENTRY,
                 "registry.hub.docker.com/dockstoretestuser/dockerhubandgithub/regular", "--name", "masterTest", "--hidden", "true",
                 SCRIPT_FLAG });
 
