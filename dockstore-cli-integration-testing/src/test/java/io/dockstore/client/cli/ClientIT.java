@@ -363,8 +363,8 @@ class ClientIT extends BaseIT {
 
         checkCommandForHelp(new String[] {});
         checkCommandForHelp(new String[] { TOOL });
-        checkCommandForHelp(new String[] { TOOL, DOWNLOAD, "HELP" });
-        checkCommandForHelp(new String[] { TOOL, LIST, "HELP" });
+        checkCommandForHelp(new String[] { TOOL, DOWNLOAD, HELP });
+        checkCommandForHelp(new String[] { TOOL, LIST, HELP });
         checkCommandForHelp(new String[] { TOOL, SEARCH, HELP });
         checkCommandForHelp(new String[] { TOOL, PUBLISH, HELP });
         checkCommandForHelp(new String[] { TOOL, INFO, HELP });
