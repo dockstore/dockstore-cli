@@ -887,6 +887,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         return possibleCommands;
     }
 
+    // If adding command, please update getClientSpecificCommands()
     @Override
     public boolean processEntrySpecificCommands(List<String> args, String activeCommand) {
         if (null != activeCommand) {
