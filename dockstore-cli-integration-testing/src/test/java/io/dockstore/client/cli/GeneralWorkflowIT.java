@@ -38,7 +38,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
@@ -57,6 +59,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  */
 @Tag(ConfidentialTest.NAME)
 @Tag(WorkflowTest.NAME)
+@ExtendWith(SystemStubsExtension.class)
 class GeneralWorkflowIT extends BaseIT {
 
     @SystemStub
@@ -671,7 +674,7 @@ class GeneralWorkflowIT extends BaseIT {
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish",
                 "--repository", "workflow-dockstore-yml", "--organization", USER_2_USERNAME, "--git-version-control", "github", "--script" });
 
-        // force the workflow into DOCKSTOR_YML mode.
+        // force the workflow into DOCKSTORE_YML mode.
         testingPostgres.runUpdateStatement(
                 "UPDATE workflow SET mode = 'DOCKSTORE_YML' WHERE repository='workflow-dockstore-yml' AND organization='" + USER_2_USERNAME
                         + "';");
