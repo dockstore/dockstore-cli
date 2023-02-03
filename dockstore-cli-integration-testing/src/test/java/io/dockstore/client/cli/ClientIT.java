@@ -18,6 +18,7 @@ package io.dockstore.client.cli;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.google.common.collect.Lists;
 import io.dockstore.common.CLICommonTestUtilities;
@@ -515,7 +516,7 @@ class ClientIT extends BaseIT {
             formmatedValidCommandString += command;
         }
 
-        final ArrayList<String> commandsForCapitalizationTest = Lists.newArrayList(validCommands);
+        final List<String> commandsForCapitalizationTest = Lists.newArrayList(validCommands);
         commandsForCapitalizationTest.add(commandToBeTested.toUpperCase());
         commandsForCapitalizationTest.add(CONFIG);
         commandsForCapitalizationTest.add(TestUtility.getConfigFileLocation(true));
@@ -528,7 +529,7 @@ class ClientIT extends BaseIT {
 
         systemOutRule.clear();
 
-        final ArrayList<String> commandsForLetterChangeTest = Lists.newArrayList(validCommands);
+        final List<String> commandsForLetterChangeTest = Lists.newArrayList(validCommands);
         String commandWithLetterChanged;
         if (commandToBeTested.startsWith("z")) {
             commandWithLetterChanged = "a" + commandToBeTested.substring(1);
