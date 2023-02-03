@@ -92,11 +92,11 @@ public final class JCommanderUtility {
         } else {
             commander = jc.getCommands().get(commandName);
         }
-        List<ParameterDescription> paramaters = commander.getParameters();
+        List<ParameterDescription> parameters = commander.getParameters();
         List<String> possibleCommands = new ArrayList<String>();
 
         possibleCommands.addAll(commander.getCommands().keySet());
-        for (ParameterDescription pd: paramaters) {
+        for (ParameterDescription pd: parameters) {
             possibleCommands.add(pd.getNames());
         }
         return possibleCommands;
