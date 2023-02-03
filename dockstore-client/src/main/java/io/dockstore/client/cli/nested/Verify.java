@@ -47,7 +47,7 @@ final class Verify {
                             verifyCommand.filePath, verifyCommand.platform, verifyCommand.platformVersion, verifyCommand.metadata,
                             !verifyCommand.unverify);
             if (stringObjectMap == null) {
-                ArgumentUtility.errorMessage("Could not " + VERIFY + " " + TOOL, API_ERROR);
+                ArgumentUtility.errorMessage(String.join(" ", "Could not", VERIFY, TOOL), API_ERROR);
             } else {
                 Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
                 ArgumentUtility.out(gson.toJson(stringObjectMap));

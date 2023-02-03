@@ -37,6 +37,7 @@ import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.Client.getGeneralFlags;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static java.lang.String.join;
 
 /**
  * This implements all operations on the CLI that are specific to checkers
@@ -62,17 +63,17 @@ public class CheckerClient extends WorkflowClient {
         // Checker client help
         out("Commands:");
         out("");
-        out("  " + DOWNLOAD + "             :  Downloads all files associated with a " + CHECKER + " " + WORKFLOW + ".");
+        out(join(" ", "  " + DOWNLOAD + "             :  Downloads all files associated with a", CHECKER, WORKFLOW + "."));
         out("");
-        out("  " + LAUNCH + "               :  Launch a " + CHECKER + " " + WORKFLOW + " locally.");
+        out(join(" ", "  " + LAUNCH + "               :  Launch a", CHECKER, WORKFLOW, "locally."));
         out("");
-        out("  " + ADD + "                  :  Adds a " + CHECKER + " " + WORKFLOW + " to and existing " + TOOL + "/" + WORKFLOW + ".");
+        out(join(" ", "  " + ADD + "                  :  Adds a", CHECKER, WORKFLOW, "to and existing", TOOL + "/" + WORKFLOW + "."));
         out("");
-        out("  " + UPDATE + "               :  Updates an existing " + CHECKER + " " + WORKFLOW + ".");
+        out(join(" ", "  " + UPDATE + "               :  Updates an existing", CHECKER, WORKFLOW + "."));
         out("");
-        out("  " + UPDATE_VERSION + "       :  Updates a specific version of an existing " + CHECKER + " " + WORKFLOW + ".");
+        out(join(" ", "  " + UPDATE_VERSION + "       :  Updates a specific version of an existing", CHECKER, WORKFLOW + "."));
         out("");
-        out("  " + TEST_PARAMETER + "       :  Add/Remove test parameter files for a " + CHECKER + " " + WORKFLOW + " version.");
+        out(join(" ", "  " + TEST_PARAMETER + "       :  Add/Remove test parameter files for a", CHECKER, WORKFLOW, "version."));
         out("");
 
         if (isAdmin) {
@@ -158,9 +159,9 @@ public class CheckerClient extends WorkflowClient {
             if (entry != null) {
                 try {
                     workflowsApi.registerCheckerWorkflow(descriptorPath, entry.getId(), descriptorType, inputParameterPath);
-                    out("A " + CHECKER + " " + WORKFLOW + " has been successfully added to entry with path " + entryPath);
+                    out(join(" ", "A", CHECKER, WORKFLOW, "has been successfully added to entry with path", entryPath));
                 } catch (ApiException ex) {
-                    exceptionMessage(ex, "There was a problem registering the " + CHECKER + " " + WORKFLOW + ".", Client.API_ERROR);
+                    exceptionMessage(ex, join(" ", "There was a problem registering the", CHECKER, WORKFLOW + "."), Client.API_ERROR);
                 }
             }
         }
@@ -172,7 +173,7 @@ public class CheckerClient extends WorkflowClient {
         out("       dockstore " + getEntryType().toLowerCase() + " add [parameters]");
         out("");
         out("Description:");
-        out("  Add a " + CHECKER + " " + WORKFLOW + " to an existing " + TOOL + " or " + WORKFLOW + ".");
+        out(join(" ", "  Add a", CHECKER, WORKFLOW, "to an existing", TOOL, "or", WORKFLOW + "."));
         out("");
         out("Required Parameters:");
         out("  " + ENTRY + " <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
@@ -224,9 +225,9 @@ public class CheckerClient extends WorkflowClient {
 
                     // Refresh the checker workflow
                     workflowsApi.refresh(checkerWorkflow.getId(), true);
-                    out("The " + CHECKER + " " + WORKFLOW + " has been updated.");
+                    out(join(" ", "The", CHECKER, WORKFLOW, "has been updated."));
                 } catch (ApiException ex) {
-                    exceptionMessage(ex, "There was a problem updating the " + CHECKER + " " + WORKFLOW + ".", Client.API_ERROR);
+                    exceptionMessage(ex, join(" ", "There was a problem updating the", CHECKER, WORKFLOW + "."), Client.API_ERROR);
                 }
             }
         }
@@ -239,7 +240,7 @@ public class CheckerClient extends WorkflowClient {
         out("       dockstore " + getEntryType().toLowerCase() + " update [parameters]");
         out("");
         out("Description:");
-        out("  Update an existing " + CHECKER + " " + WORKFLOW + " associated with an entry.");
+        out(join(" ", "  Update an existing", CHECKER, WORKFLOW, "associated with an entry."));
         out("");
         out("Required Parameters:");
         out("  " + ENTRY + " <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:master)");
@@ -285,11 +286,11 @@ public class CheckerClient extends WorkflowClient {
 
     private void downloadCheckerHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + DOWNLOAD + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + DOWNLOAD + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), DOWNLOAD, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), DOWNLOAD, "[parameters]"));
         out("");
         out("Description:");
-        out("  Downloads all " + CHECKER + " " + WORKFLOW + " files for the given entry and stores them in the current directory.");
+        out(join(" ", "  Downloads all", CHECKER, WORKFLOW, "files for the given entry and stores them in the current directory."));
         out("");
         out("Required Parameters:");
         out("  " + ENTRY + " <entry>          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
@@ -415,7 +416,7 @@ public class CheckerClient extends WorkflowClient {
         Workflow checkerWorkflow = null;
         if (entry != null) {
             if (entry.getCheckerId() == null) {
-                errorMessage("The entry has no " + CHECKER + " " + WORKFLOW + ".",
+                errorMessage(join(" ", "The entry has no", CHECKER, WORKFLOW + "."),
                     Client.CLIENT_ERROR);
             } else {
                 if (authRequired) {

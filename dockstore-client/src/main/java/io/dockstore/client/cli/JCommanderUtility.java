@@ -35,6 +35,7 @@ import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static java.lang.String.join;
 
 /**
  * @author gluu
@@ -119,11 +120,11 @@ public final class JCommanderUtility {
     }
 
     private static void printJCommanderHelpUsage(String programName, String commandName, JCommander jc) {
-        out("Usage: " + programName + " " + commandName + " " + HELP);
+        out(join(" ", "Usage:", programName, commandName, HELP));
         if (jc.getCommands().isEmpty()) {
-            out("       " + programName + " " + commandName + " [parameters]");
+            out(join(" ", "       " + programName, commandName, "[parameters]"));
         } else {
-            out("       " + programName + " " + commandName + " [parameters] [command]");
+            out(join(" ", "       " + programName, commandName, "[parameters] [command]"));
         }
         out("");
     }

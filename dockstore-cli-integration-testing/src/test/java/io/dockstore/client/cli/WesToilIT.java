@@ -23,6 +23,7 @@ import static io.dockstore.client.cli.nested.WesCommandParser.INLINE_WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.client.cli.nested.WesCommandParser.VERBOSE;
 import static io.github.collaboratory.cwl.CWLClient.WES;
+import static java.lang.String.join;
 import static org.junit.Assert.assertTrue;
 
 @Category(WesTests.class)
@@ -117,7 +118,7 @@ public class WesToilIT {
             VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore " + WORKFLOW + " " + WES + " " + STATUS + " " + ID));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore", WORKFLOW, WES,  STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isError = waitForWorkflowState(runId, EXECUTOR_ERROR_STATE);
@@ -178,7 +179,7 @@ public class WesToilIT {
             VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow " + WES + " " + STATUS + " " + ID));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
@@ -198,7 +199,7 @@ public class WesToilIT {
             VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow " + WES + " " + STATUS + " " + ID));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
@@ -219,7 +220,7 @@ public class WesToilIT {
             VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow " + WES + " " + STATUS + " " + ID));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, EXECUTOR_ERROR_STATE);
@@ -240,7 +241,7 @@ public class WesToilIT {
             VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow " + WES + " " + STATUS + " " + ID));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
@@ -260,7 +261,7 @@ public class WesToilIT {
             VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow " + WES + " " + STATUS + " " + ID));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);

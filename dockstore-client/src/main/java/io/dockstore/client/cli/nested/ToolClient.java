@@ -81,6 +81,7 @@ import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
+import static java.lang.String.join;
 
 /**
  * Implement all operations that have to do with tools.
@@ -299,10 +300,10 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     @Override
     protected void publishHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + PUBLISH + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + PUBLISH);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + PUBLISH + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + PUBLISH + " --unpub [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), PUBLISH, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), PUBLISH));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), PUBLISH, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), PUBLISH, "--unpub [parameters]"));
         out("");
         out("Description:");
         out("  Publish/unpublish a registered " + getEntryType() + ".");
@@ -332,7 +333,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
             if (adds.size() > 0 || removes.size() > 0) {
                 containersApi.refresh(container.getId());
-                out("The test parameter files for tag " + versionName + " of " + TOOL + " " + parentEntry + " have been updated.");
+                out(join(" ", "The test parameter files for tag", versionName, "of", TOOL, parentEntry, "have been updated."));
             } else {
                 out("Please provide at least one test parameter file to add or remove.");
             }
@@ -1188,8 +1189,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void updateToolHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool " + UPDATE_TOOL + " " + HELP);
-        out("       dockstore tool " + UPDATE_TOOL + " [parameters]");
+        out(join(" ", "Usage: dockstore tool", UPDATE_TOOL, HELP));
+        out(join(" ", "       dockstore tool", UPDATE_TOOL, "[parameters]"));
         out("");
         out("Description:");
         out("  Update certain fields for a given tool.");
@@ -1212,8 +1213,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void versionTagHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool " + VERSION_TAG + " " + HELP);
-        out("       dockstore tool " + VERSION_TAG + " [command] " + HELP);
+        out(join(" ", "Usage: dockstore tool", VERSION_TAG, HELP));
+        out(join(" ", "       dockstore tool", VERSION_TAG, "[command]", HELP));
         out("       dockstore tool " + VERSION_TAG + " [command] [parameters]");
         out("");
         out("Description:");
@@ -1287,8 +1288,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
     private static void manualPublishHelp() {
         printHelpHeader();
-        out("Usage: dockstore tool " + MANUAL_PUBLISH + " " + HELP);
-        out("       dockstore tool " + MANUAL_PUBLISH + " [parameters]");
+        out(join(" ", "Usage: dockstore tool", MANUAL_PUBLISH, HELP));
+        out(join(" ", "       dockstore tool", MANUAL_PUBLISH, "[parameters]"));
         out("");
         out("Description:");
         out("  Manually register an tool in the dockstore.");

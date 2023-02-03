@@ -144,6 +144,7 @@ import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
 import static io.dockstore.common.DescriptorLanguage.WDL;
 import static io.github.collaboratory.cwl.CWLClient.WES;
+import static java.lang.String.join;
 
 /**
  * Handles the commands for a particular type of entry. (e.g. Workflows, Tools) Not a great abstraction, but enforces some structure for
@@ -1283,7 +1284,7 @@ public abstract class AbstractEntryClient<T> {
                 // dockstore workflow CORRECT_COMMAND INCORRECT_COMMAND
                 String incorrectCommand = getUnknowParameter(e.getMessage());
                 // get command after the commands that were successfully read
-                displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, WORKFLOW + " " + WES + " " + e.getJCommander().getParsedCommand().toString());
+                displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, join(" ", WORKFLOW, WES, e.getJCommander().getParsedCommand().toString()));
                 return;
             }
             errorMessage(e.getMessage(), CLIENT_ERROR);
@@ -1596,13 +1597,13 @@ public abstract class AbstractEntryClient<T> {
         printHelpHeader();
         out("Commands:");
         out("");
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LAUNCH + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + STATUS + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LOGS + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + CANCEL + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + SERVICE_INFO + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " list [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, LAUNCH, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, STATUS, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, LOGS, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, CANCEL, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, SERVICE_INFO, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, "list [parameters]"));
         out("");
         out("Description:");
         out(" Sends a request to a Workflow Execution Service (WES) endpoint.");
@@ -1627,8 +1628,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesLaunchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LAUNCH + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LAUNCH + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, LAUNCH, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, LAUNCH, "[parameters]"));
         printWesLaunchHelpBody();
         printWesHelpFooter();
         printHelpFooter();
@@ -1636,8 +1637,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesStatusHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + STATUS + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + STATUS + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, STATUS, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, STATUS, "[parameters]"));
         out("");
         out("Description:");
         out("  Status, gets the " + STATUS + " of a " + getEntryType() + ".");
@@ -1650,8 +1651,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesRunLogsHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LOGS + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + LOGS + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, LOGS, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, LOGS, "[parameters]"));
         out("");
         out("Description:");
         out("  Logs, gets the " + VERBOSE + " run " + LOGS + " of a " + getEntryType() + ".");
@@ -1664,8 +1665,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesCancelHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + CANCEL + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + CANCEL + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, CANCEL, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, CANCEL, "[parameters]"));
         out("");
         out("Description:");
         out("  Cancels a " + getEntryType() + ".");
@@ -1678,8 +1679,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesServiceInfoHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " " + SERVICE_INFO + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " " + SERVICE_INFO);
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, SERVICE_INFO, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, SERVICE_INFO));
         out("");
         out("Description:");
         out("  Returns descriptive information of the provided WES server. ");
@@ -1689,8 +1690,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesRunListHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + WES + " list " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + WES + " list");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, "list", HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, "list"));
         out("");
         out("Description:");
         out("  Returns information about past runs. ");
@@ -1713,10 +1714,10 @@ public abstract class AbstractEntryClient<T> {
 
     private void starHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + STAR + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + STAR);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + STAR + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + STAR + " --unstar [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), STAR, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), STAR));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), STAR, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), STAR, "--unstar [parameters]"));
         out("");
         out("Description:");
         out("  Star/unstar a registered " + getEntryType() + ".");
@@ -1739,8 +1740,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void labelHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + LABEL + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + LABEL + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), LABEL, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), LABEL, "[parameters]"));
         out("");
         out("Description:");
         out("  Add or remove labels from a given Dockstore " + getEntryType());
@@ -1756,8 +1757,8 @@ public abstract class AbstractEntryClient<T> {
 
     protected void testParameterHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + TEST_PARAMETER + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + TEST_PARAMETER + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), TEST_PARAMETER, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), TEST_PARAMETER, "[parameters]"));
         out("");
         out("Description:");
         out("  Add or remove test parameter files from a given Dockstore " + getEntryType() + " version");
@@ -1806,9 +1807,9 @@ public abstract class AbstractEntryClient<T> {
 
     private void refreshHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + REFRESH + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + REFRESH);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + REFRESH + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), REFRESH, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), REFRESH));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), REFRESH, "[parameters]"));
         out("");
         out("Description:");
         out("  Refresh an individual " + getEntryType() + " or all your " + getEntryType() + ".");
@@ -1820,8 +1821,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void searchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + SEARCH + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + SEARCH + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), SEARCH, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), SEARCH, "[parameters]"));
         out("");
         out("Description:");
         out("  Search for published " + getEntryType() + " on Dockstore.");
@@ -1833,8 +1834,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void cwl2yamlHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + CWL_2_YAML + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, CWL_2_YAML, "[parameters]"));
         out("");
         out("Description:");
         out("  Spit out a yaml run file for a given cwl document.");
@@ -1846,8 +1847,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void cwl2jsonHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + CWL_2_JSON + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, CWL_2_JSON, "[parameters]"));
         out("");
         out("Description:");
         out("  Spit out a json run file for a given cwl document.");
@@ -1859,8 +1860,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wdl2jsonHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + WDL_2_JSON + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, WDL_2_JSON, "[parameters]"));
         out("");
         out("Description:");
         out("  Spit out a json run file for a given wdl document.");
@@ -1872,11 +1873,11 @@ public abstract class AbstractEntryClient<T> {
 
     private void convertHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + CWL_2_JSON + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + CWL_2_YAML + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " " + WDL_2_JSON + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, CWL_2_JSON, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, CWL_2_YAML, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, WDL_2_JSON, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, "entry2json [parameters]"));
         out("");
         out("Description:");
         out("  They allow you to " + CONVERT + " between file representations.");
