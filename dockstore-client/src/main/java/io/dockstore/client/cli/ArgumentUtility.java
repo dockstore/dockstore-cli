@@ -271,12 +271,12 @@ public final class ArgumentUtility {
     public static List<String> minDistance(String invalidCommand, List<String> possibleCommands) {
         List<String> minDistanceArray = new ArrayList<String>();
         LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
-        int minDistance = -1;
+        int minDistance = Integer.MAX_VALUE;
         for (String str: possibleCommands) {
             int distance = levenshteinDistance.apply(str.toLowerCase(), invalidCommand);
             if (distance >= max(str.length(), invalidCommand.length())) {
                 continue;
-            } else if (distance < minDistance || minDistance == -1) {
+            } else if (distance < minDistance) {
                 minDistance = distance;
                 minDistanceArray.clear();
                 minDistanceArray.add(str);
