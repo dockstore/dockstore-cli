@@ -19,6 +19,7 @@ package io.dockstore.client.cli;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
@@ -45,11 +46,14 @@ public class SuggestClosestMatchTest {
     @SystemStub
     public final SystemErr systemErrRule = new SystemErr();
 
+    @BeforeEach
+    public void clearOutput() {
+        systemOutRule.clear();
+    }
 
 
     @Test
     public void noSuggestions() {
-        systemOutRule.clear();
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add(TOOL);
         acceptedCommands.add(WORKFLOW);
@@ -77,7 +81,6 @@ public class SuggestClosestMatchTest {
         assertEquals("dockstore random_command_1 random_command_2: 'xxzz' is not a dockstore command. "
                         + "See 'dockstore random_command_1 random_command_2 " + HELP + "'.\n",
                 systemOutRule.getText());
-        systemOutRule.clear();
     }
 
     /**
@@ -85,7 +88,6 @@ public class SuggestClosestMatchTest {
      */
     @Test
     public void usedUpperCase() {
-        systemOutRule.clear();
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add(TOOL);
         acceptedCommands.add(WORKFLOW);
@@ -122,13 +124,11 @@ public class SuggestClosestMatchTest {
                             checker
                         """,
                 systemOutRule.getText());
-        systemOutRule.clear();
 
     }
 
     @Test
     public void onlyOneCloseMatch() {
-        systemOutRule.clear();
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add(TOOL);
 
@@ -166,13 +166,10 @@ public class SuggestClosestMatchTest {
                             yaml
                         """,
                 systemOutRule.getText());
-        systemOutRule.clear();
-
     }
 
     @Test
     public void severalCloseMatches() {
-        systemOutRule.clear();
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add(WORKFLOW);
         acceptedCommands.add(CHECKER);
@@ -204,6 +201,5 @@ public class SuggestClosestMatchTest {
                             test8
                         """,
                 systemOutRule.getText());
-        systemOutRule.clear();
     }
 }
