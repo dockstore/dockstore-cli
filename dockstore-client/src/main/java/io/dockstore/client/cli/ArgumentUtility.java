@@ -268,6 +268,7 @@ public final class ArgumentUtility {
         out("");
     }
 
+
     private static List<String> minDistance(String invalidCommand, List<String> possibleCommands) {
         List<String> minDistanceArray = new ArrayList<String>();
         LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
@@ -286,6 +287,15 @@ public final class ArgumentUtility {
         }
         return minDistanceArray;
     }
+
+    /**
+     *
+     * @param correctCommand the command that was correctly read in and understood by the CLI. For example,
+     *                       if the user input "dockstore workflow INVALID_COMMAND", correctCommand would be "workflow"
+     *                       or if the user input "dockstore INVALID_COMMAND", correctCommand would be ""
+     * @param invalidCommand
+     * @param possibleCommands
+     */
 
     public static void invalid(String correctCommand, String invalidCommand, List<String> possibleCommands) {
 
