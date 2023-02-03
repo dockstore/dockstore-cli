@@ -459,7 +459,7 @@ class ClientIT extends BaseIT {
 
 
     @Test
-    public void touchAllInvalidCommands() throws IOException {
+    public void testAllValidCommandsWithSlightPermutation() throws IOException {
         checkSuggestionIsGiven(new String[] { }, CHECKER);
         checkSuggestionIsGiven(new String[] { }, PLUGIN);
         checkSuggestionIsGiven(new String[] { }, UPGRADE);
