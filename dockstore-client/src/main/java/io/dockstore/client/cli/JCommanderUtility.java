@@ -69,6 +69,7 @@ public final class JCommanderUtility {
         printJCommanderHelpFooter();
     }
 
+    // TODO: Find a better way to determine if Jcommander.parse failed due to an incorrect parameter being given
     public static boolean wasErrorDueToUnknownParamter(String errorMsg) {
         return errorMsg.contains("but no main parameter was defined in your arg class");
     }
