@@ -268,7 +268,7 @@ public final class ArgumentUtility {
         out("");
     }
 
-    public static List<String> minDistance(String invalidCommand, List<String> possibleCommands) {
+    private static List<String> minDistance(String invalidCommand, List<String> possibleCommands) {
         List<String> minDistanceArray = new ArrayList<String>();
         LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
         int minDistance = Integer.MAX_VALUE;

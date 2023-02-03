@@ -27,7 +27,6 @@ import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.ArgumentUtility.invalid;
-import static io.dockstore.client.cli.ArgumentUtility.minDistance;
 import static io.dockstore.client.cli.Client.CHECKER;
 import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.HELP;
@@ -35,7 +34,6 @@ import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SystemStubsExtension.class)
@@ -47,40 +45,7 @@ public class SuggestClosestMatchTest {
     @SystemStub
     public final SystemErr systemErrRule = new SystemErr();
 
-    @Test
-    public void onlyOneCorrectSolution() {
-        List<String> acceptedCommands = new ArrayList<String>();
 
-        acceptedCommands.add("orange");
-        acceptedCommands.add("juice");
-        List<String> result = minDistance("oran", acceptedCommands);
-        assertEquals(1, result.size());
-        assertTrue(result.contains("orange"));
-
-        acceptedCommands.add("test1");
-        acceptedCommands.add("test2");
-        acceptedCommands.add("test3");
-        result = minDistance("test7", acceptedCommands);
-        assertEquals(3, result.size());
-        assertTrue(result.contains("test1"));
-        assertTrue(result.contains("test2"));
-        assertTrue(result.contains("test3"));
-    }
-
-    /**
-     * Tests for the case when the word entered is not at all similar to any of the possible commands
-     */
-    @Test
-    public void noSolutionsShouldBeDisplayed() {
-        // The threshold could change, but these should never return a result
-        List<String> acceptedCommands = new ArrayList<String>();
-        acceptedCommands.add("abcdefgh");
-        assertTrue(minDistance("zzzzzzzzzzzz", acceptedCommands).isEmpty());
-        acceptedCommands.add("bbbbbbbb");
-        assertTrue(minDistance("qqqqqqq", acceptedCommands).isEmpty());
-        acceptedCommands.add("ffffffffff");
-        assertTrue(minDistance("pppppppp", acceptedCommands).isEmpty());
-    }
 
     @Test
     public void noSuggestions() {
