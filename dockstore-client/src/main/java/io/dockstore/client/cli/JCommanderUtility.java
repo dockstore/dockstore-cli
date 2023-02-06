@@ -82,12 +82,12 @@ public final class JCommanderUtility {
                 errorMsg.length() - "' but no main parameter was defined in your arg class".length());
     }
     public static void displayJCommanderSuggestions(JCommander jc, String commandName, String incorrectCommand, String programName) {
-        List<String> possibleCommands = getPossibleJcommanderCommands(jc, commandName);
+        List<String> possibleCommands = getPossibleJCommanderCommands(jc, commandName);
         invalid(programName, incorrectCommand, possibleCommands);
 
     }
 
-    private static List<String> getPossibleJcommanderCommands(JCommander jc, String commandName) {
+    private static List<String> getPossibleJCommanderCommands(JCommander jc, String commandName) {
         JCommander commander;
         if (commandName == null || commandName.isBlank()) {
             commander = jc;
