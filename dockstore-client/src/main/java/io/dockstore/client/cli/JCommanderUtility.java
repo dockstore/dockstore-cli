@@ -77,7 +77,7 @@ public final class JCommanderUtility {
 
     // This method extracts the unknown command from an error message. It doesn't appear JCommander has a built in way to do this.
     // The error message is always of the form "Was passed main parameter 'unknown_command' but no main parameter was defined in your arg class",
-    public static String getUnknowParameter(String errorMsg) {
+    public static String getUnknownParameter(String errorMsg) {
         return errorMsg.substring("Was passed main parameter '".length(),
                 errorMsg.length() - "' but no main parameter was defined in your arg class".length());
     }

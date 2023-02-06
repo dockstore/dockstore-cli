@@ -41,7 +41,7 @@ import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.PLUGIN;
 import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
-import static io.dockstore.client.cli.JCommanderUtility.getUnknowParameter;
+import static io.dockstore.client.cli.JCommanderUtility.getUnknownParameter;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
@@ -102,7 +102,7 @@ public final class PluginClient {
             displayJCommanderSuggestions(jcPlugin, e.getJCommander().getParsedCommand(), args.get(0), PLUGIN);
         } catch (ParameterException e) {
             if (wasErrorDueToUnknownParamter(e.getMessage())) {
-                String incorrectCommand = getUnknowParameter(e.getMessage());
+                String incorrectCommand = getUnknownParameter(e.getMessage());
                 displayJCommanderSuggestions(jcPlugin, e.getJCommander().getParsedCommand(), incorrectCommand, join(" ", PLUGIN, e.getJCommander().getParsedCommand().toString()));
             } else {
                 errorMessage(e.getMessage(), CLIENT_ERROR);

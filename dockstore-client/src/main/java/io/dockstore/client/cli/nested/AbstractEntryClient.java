@@ -128,7 +128,7 @@ import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.Client.getGeneralFlags;
 import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
-import static io.dockstore.client.cli.JCommanderUtility.getUnknowParameter;
+import static io.dockstore.client.cli.JCommanderUtility.getUnknownParameter;
 import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.client.cli.nested.WesCommandParser.ATTACH;
@@ -1282,7 +1282,7 @@ public abstract class AbstractEntryClient<T> {
             if (wasErrorDueToUnknownParamter(e.getMessage())) {
                 // This is for when JCommander parse understands part of the command. This is for incorrect commands of the form:
                 // dockstore workflow CORRECT_COMMAND INCORRECT_COMMAND
-                String incorrectCommand = getUnknowParameter(e.getMessage());
+                String incorrectCommand = getUnknownParameter(e.getMessage());
                 // get command after the commands that were successfully read
                 displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, join(" ", WORKFLOW, WES, e.getJCommander().getParsedCommand().toString()));
                 return;
