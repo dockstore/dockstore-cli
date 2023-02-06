@@ -100,14 +100,14 @@ class GitHubAppToolIT extends BaseIT {
     void wdl() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[]{"workflow", DescriptorType.WDL.toString(), "--entry", ENTRY_PATH_WITH_VERSION, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.API_ERROR, exitCode);
-        assertTrue(systemOutRule.getOutput().getText().contains("Invalid version"), "output missing invalid version message, looked like " + systemOutRule.getOutput().getText());
+        assertTrue(systemErrRule.getOutput().getText().contains("Invalid version"), "stderr missing invalid version message, looked like " + systemErrRule.getOutput().getText());
     }
 
     @Test
     void refresh() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[]{"workflow", "refresh", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
-        assertTrue(systemOutRule.getText().contains("GitHub Apps entries cannot be refreshed"), "output missing error message, looked like: " + systemOutRule.getText());
+        assertTrue(systemErrRule.getText().contains("GitHub Apps entries cannot be refreshed"), "stderr missing error message, looked like: " + systemErrRule.getText());
     }
 
     @Test
@@ -133,7 +133,7 @@ class GitHubAppToolIT extends BaseIT {
     void testParameter() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[]{"workflow", "test_parameter", "--version", "main", "--add", "test.json", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
-        assertTrue(systemOutRule.getText().contains("Cannot update test parameter files of GitHub App entries"));
+        assertTrue(systemErrRule.getText().contains("Cannot update test parameter files of GitHub App entries"));
     }
 
     @Test
@@ -162,21 +162,21 @@ class GitHubAppToolIT extends BaseIT {
     void updateWorkflow() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(new String[]{"workflow", "update_workflow", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
-        assertTrue(systemOutRule.getText().contains("Command not supported for GitHub App entries"));
+        assertTrue(systemErrRule.getText().contains("Command not supported for GitHub App entries"));
     }
 
     @Test
     void versionTag() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(new String[]{"workflow", "version_tag", "--name", "main", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
-        assertTrue(systemOutRule.getText().contains("Command not supported for GitHub App entries"));
+        assertTrue(systemErrRule.getText().contains("Command not supported for GitHub App entries"));
     }
 
     @Test
     void restub() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(new String[]{"workflow", "restub", "--entry", ENTRY_PATH, "--config", ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.COMMAND_ERROR, exitCode);
-        assertTrue(systemOutRule.getOutput().getText().contains("Command not supported for GitHub App entries"), "looked like: " + systemOutRule.getOutput().getText());
+        assertTrue(systemErrRule.getOutput().getText().contains("Command not supported for GitHub App entries"), "looked like: " + systemErrRule.getOutput().getText());
     }
 
     private void publishWorkflow() {
