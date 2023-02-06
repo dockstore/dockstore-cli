@@ -89,6 +89,7 @@ import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
 import static io.dockstore.common.CLICommonTestUtilities.checkToolList;
 import static io.github.collaboratory.cwl.CWLClient.WES;
+import static java.lang.String.join;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -510,10 +511,9 @@ class ClientIT extends BaseIT {
      * @param commandToBeTested A command that is valid, but will be modified to become invalid by this method
      */
     private void checkSuggestionIsGiven(String[] validCommands, String commandToBeTested) throws IOException {
-        String formmatedValidCommandString = "";
-        for (String command: validCommands) {
-            formmatedValidCommandString += " ";
-            formmatedValidCommandString += command;
+        String formmatedValidCommandString = join(" ", validCommands);
+        if (!formmatedValidCommandString.isBlank()) {
+            formmatedValidCommandString = " " + formmatedValidCommandString;
         }
 
         final List<String> commandsForCapitalizationTest = Lists.newArrayList(validCommands);
