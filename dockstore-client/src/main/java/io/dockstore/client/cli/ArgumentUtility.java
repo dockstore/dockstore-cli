@@ -26,8 +26,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-
 /**
  * Organizes all methods that have to do with parsing of input and creation of output.
  * This is a static utility class with no state.
