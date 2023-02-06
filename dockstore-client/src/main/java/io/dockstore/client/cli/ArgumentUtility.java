@@ -26,6 +26,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+
 /**
  * Organizes all methods that have to do with parsing of input and creation of output.
  * This is a static utility class with no state.
@@ -87,12 +89,16 @@ public final class ArgumentUtility {
     public static void exceptionMessage(Exception exception, String message, int exitCode) {
         if (!"".equals(message)) {
             err(message);
-        } else if (!"".equals(exception.getMessage()) && !LOG.isInfoEnabled()) {
-            err(exception.getMessage());
         }
+
         if (LOG.isInfoEnabled()) {
             err(ExceptionUtils.getStackTrace(exception));
+        } else if (!"".equals(exception.getMessage())) {
+            err(exception.getMessage());
+        } else if ("".equals(message)) {
+            err("An unknown error has occurred. Consider rerunning with --debug");
         }
+
         if (exitCode != 0) {
             System.exit(exitCode);
         }
