@@ -91,7 +91,7 @@ public final class ArgumentUtility {
 
         if (LOG.isInfoEnabled()) {
             err(ExceptionUtils.getStackTrace(exception));
-        } else if (!"".equals(exception.getMessage())) {
+        } else if (exception.getMessage() != null && !"".equals(exception.getMessage())) {
             err(exception.getMessage());
         } else if ("".equals(message)) {
             err("An unknown error has occurred. Consider rerunning with --debug");
