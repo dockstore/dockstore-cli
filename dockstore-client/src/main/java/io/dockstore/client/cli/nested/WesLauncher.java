@@ -334,7 +334,7 @@ public final class WesLauncher {
      */
     public static void wesCommandSuggestions(String runId) {
         out("To view the workflow run " + STATUS + ", execute: ");
-        out(MessageFormat.format("\tdockstore workflow " + WES + " " + STATUS + " " + ID + " {0}", runId));
-        out(MessageFormat.format("\tdockstore workflow " + WES + " " + LOGS + " " + ID + " {0}", runId));
+        out(MessageFormat.format("\tdockstore workflow {0} {1} {2} {3}", WES, STATUS, ID, runId));
+        out(MessageFormat.format("\tdockstore workflow {0} {1} {2} {3}", WES, LOGS, ID, runId));
     }
 }

@@ -280,7 +280,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                     containersApi.refresh(newContainer.getId());
                     publish(true, newContainer.getToolPath());
                 } catch (ApiException ex) {
-                    exceptionMessage(ex, "Unable to " + PUBLISH + " " + newName, Client.API_ERROR);
+                    exceptionMessage(ex, join(" ", "Unable to", PUBLISH, newName), Client.API_ERROR);
                 }
             } else {
                 out("The following tool is already registered: " + entryPath + "/" + newName);

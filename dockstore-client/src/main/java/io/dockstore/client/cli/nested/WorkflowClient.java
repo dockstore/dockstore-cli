@@ -93,6 +93,7 @@ import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static java.lang.String.join;
 
 /**
  * This stub will eventually implement all operations on the CLI that are specific to workflows.
@@ -153,8 +154,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     private void manualPublishHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + MANUAL_PUBLISH + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + MANUAL_PUBLISH + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), MANUAL_PUBLISH, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), MANUAL_PUBLISH, "[parameters]"));
         out("");
         out("Description:");
         out("  Manually register a workflow in dockstore. If this is successful and the workflow is valid, then publish.");
@@ -175,8 +176,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     private void updateWorkflowHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + UPDATE_WORKFLOW + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + UPDATE_WORKFLOW + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), UPDATE_WORKFLOW, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), UPDATE_WORKFLOW, "[parameters]"));
         out("");
         out("Description:");
         out("  Update certain fields for a given workflow.");
@@ -194,8 +195,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     protected void versionTagHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + VERSION_TAG + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + VERSION_TAG + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), VERSION_TAG, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), VERSION_TAG, "[parameters]"));
         out("");
         out("Description:");
         out("  Update certain fields for a given " + getEntryType().toLowerCase() + " version.");
@@ -765,10 +766,10 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     @Override
     protected void publishHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + PUBLISH + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + PUBLISH);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + PUBLISH + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + PUBLISH + " --unpub [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), PUBLISH, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), PUBLISH));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), PUBLISH, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), PUBLISH, "--unpub [parameters]"));
         out("");
         out("Description:");
         out("  Publish/unpublish a registered " + getEntryType() + ".");
@@ -1084,8 +1085,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             if (adds.size() > 0 || removes.size() > 0) {
                 workflowsApi.refresh(workflow.getId(), true);
-                out("The test parameter files for version " + versionName + " of " + getEntryType().toLowerCase() + " " + parentEntry
-                    + " have been updated.");
+                out(join(" ", "The test parameter files for version", versionName, "of",
+                        getEntryType().toLowerCase(), parentEntry, "have been updated."));
             } else {
                 out("Please provide at least one test parameter file to add or remove.");
             }

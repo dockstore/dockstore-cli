@@ -1886,8 +1886,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void entry2jsonHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, "entry2json", HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, "entry2json [parameters]"));
         out("");
         out("Description:");
         out("  Spit out a json run file for a given cwl document.");
@@ -1901,8 +1901,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void downloadHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + DOWNLOAD + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + DOWNLOAD + " [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), DOWNLOAD, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), DOWNLOAD, "[parameters]"));
         out("");
         out("Description:");
         out("  Download an entry to the working directory.");
@@ -1950,9 +1950,9 @@ public abstract class AbstractEntryClient<T> {
 
     private void verifyHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + VERIFY + " " + HELP);
-        out("       dockstore " + getEntryType().toLowerCase() + " " + VERIFY + " [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + VERIFY + " --unverify [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), VERIFY, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), VERIFY, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), VERIFY, "--unverify [parameters]"));
         out("");
         out("Description:");
         out("  Verify/unverify a version.");
