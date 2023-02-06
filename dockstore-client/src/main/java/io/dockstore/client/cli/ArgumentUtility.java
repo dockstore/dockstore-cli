@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 public final class ArgumentUtility {
 
     public static final String CONVERT = "convert";
+    public static final String ERROR_MESSAGE_START = "ERROR: ";
     public static final String LAUNCH = "launch";
     public static final String DOWNLOAD = "download";
     public static final String NAME_HEADER = "NAME";
@@ -57,11 +58,19 @@ public final class ArgumentUtility {
     }
 
     public static void err(String arg) {
-        LOG.error(arg);
+        if (LOG.isDebugEnabled()) {
+            LOG.error(arg);
+        } else {
+            out(ERROR_MESSAGE_START + arg);
+        }
     }
 
     private static void errFormatted(String format, Object... args) {
-        LOG.error((String.format(format, args)));
+        if (LOG.isDebugEnabled()) {
+            LOG.error(String.format(format, args));
+        } else {
+            out(String.format(ERROR_MESSAGE_START + format, args));
+        }
     }
 
     private static void kill(String format, Object... args) {
@@ -78,9 +87,12 @@ public final class ArgumentUtility {
     public static void exceptionMessage(Exception exception, String message, int exitCode) {
         if (!"".equals(message)) {
             err(message);
+        } else if (!"".equals(exception.getMessage()) && !LOG.isDebugEnabled()) {
+            err(exception.getMessage());
         }
-        err(ExceptionUtils.getStackTrace(exception));
-
+        if (LOG.isDebugEnabled()) {
+            err(ExceptionUtils.getStackTrace(exception));
+        }
         if (exitCode != 0) {
             System.exit(exitCode);
         }
