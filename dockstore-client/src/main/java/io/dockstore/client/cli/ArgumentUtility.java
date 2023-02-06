@@ -58,18 +58,18 @@ public final class ArgumentUtility {
     }
 
     public static void err(String arg) {
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isInfoEnabled()) {
             LOG.error(arg);
         } else {
-            out(ERROR_MESSAGE_START + arg);
+            System.err.println(ERROR_MESSAGE_START + arg);
         }
     }
 
     private static void errFormatted(String format, Object... args) {
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isInfoEnabled()) {
             LOG.error(String.format(format, args));
         } else {
-            out(String.format(ERROR_MESSAGE_START + format, args));
+            System.err.println(String.format(ERROR_MESSAGE_START + format, args));
         }
     }
 
@@ -87,10 +87,10 @@ public final class ArgumentUtility {
     public static void exceptionMessage(Exception exception, String message, int exitCode) {
         if (!"".equals(message)) {
             err(message);
-        } else if (!"".equals(exception.getMessage()) && !LOG.isDebugEnabled()) {
+        } else if (!"".equals(exception.getMessage()) && !LOG.isInfoEnabled()) {
             err(exception.getMessage());
         }
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isInfoEnabled()) {
             err(ExceptionUtils.getStackTrace(exception));
         }
         if (exitCode != 0) {
