@@ -883,7 +883,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     }
 
     protected List<String> getClientSpecificCommands() {
-        List<String> possibleCommands = new ArrayList<String>();
+        List<String> possibleCommands = new ArrayList<>();
         possibleCommands.addAll(Arrays.asList(UPDATE_WORKFLOW, VERSION_TAG, RESTUB));
         return possibleCommands;
     }
