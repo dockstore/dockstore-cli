@@ -38,7 +38,7 @@ import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SystemStubsExtension.class)
-public class SuggestClosestMatchTest {
+class SuggestClosestMatchTest {
 
     @SystemStub
     public final SystemOut systemOutRule = new SystemOut();
