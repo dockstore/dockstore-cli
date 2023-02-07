@@ -103,7 +103,7 @@ public final class PluginClient {
         } catch (ParameterException e) {
             if (wasErrorDueToUnknownParamter(e.getMessage())) {
                 String incorrectCommand = getUnknownParameter(e.getMessage());
-                displayJCommanderSuggestions(jcPlugin, e.getJCommander().getParsedCommand(), incorrectCommand, join(" ", PLUGIN, e.getJCommander().getParsedCommand().toString()));
+                displayJCommanderSuggestions(jcPlugin, e.getJCommander().getParsedCommand(), incorrectCommand, join(" ", PLUGIN, e.getJCommander().getParsedCommand()));
             } else {
                 errorMessage(e.getMessage(), CLIENT_ERROR);
             }
