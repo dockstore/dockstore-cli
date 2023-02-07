@@ -810,7 +810,7 @@ public class Client {
     }
 
     public static List<String> getGeneralFlags() {
-        List<String> generalFlags = new ArrayList<String>();
+        List<String> generalFlags = new ArrayList<>();
         generalFlags.addAll(Arrays.asList(DEBUG_FLAG, HELP, CONFIG, SCRIPT_FLAG));
         return generalFlags;
     }
