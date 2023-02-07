@@ -113,7 +113,7 @@ public class CheckerClient extends WorkflowClient {
                 updateVersionChecker(args);
                 break;
             default:
-                List<String> possibleCommands = new ArrayList<String>();
+                List<String> possibleCommands = new ArrayList<>();
                 possibleCommands.addAll(Arrays.asList(ADD, UPDATE, DOWNLOAD, LAUNCH, TEST_PARAMETER, UPDATE_VERSION));
                 possibleCommands.addAll(getGeneralFlags());
                 invalid(getEntryType().toLowerCase(), activeCommand, possibleCommands);
