@@ -276,7 +276,7 @@ public final class ArgumentUtility {
         for (String str: possibleCommands) {
             int distance = levenshteinDistance.apply(str.toLowerCase(), invalidCommand);
             if (distance >= max(str.length(), invalidCommand.length())) {
-                continue;
+                // do nothing
             } else if (distance < minDistance) {
                 minDistance = distance;
                 minDistanceArray.clear();
