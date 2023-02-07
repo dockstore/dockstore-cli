@@ -117,7 +117,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     }
 
     protected List<String> getClientSpecificCommands() {
-        List<String> possibleCommands = new ArrayList<String>();
+        List<String> possibleCommands = new ArrayList<>();
         possibleCommands.addAll(Arrays.asList(VERSION_TAG, UPDATE_TOOL));
         return possibleCommands;
     }
