@@ -789,7 +789,7 @@ public class Client {
                             clean();
                             break;
                         default:
-                            List<String> possibleCommands = new ArrayList<String>();
+                            List<String> possibleCommands = new ArrayList<>();
                             possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML, VERSION,
                                     SERVER_METADATA, UPGRADE, UPGRADE_STABLE, UPGRADE_UNSTABLE, CLEAN_CACHE));
                             possibleCommands.addAll(getGeneralFlags());
