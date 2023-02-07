@@ -6,6 +6,7 @@ import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.SourceControl;
 import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dropwizard.testing.ResourceHelpers;
+import org.elasticsearch.common.collect.Set;
 import org.hibernate.Session;
 import org.hibernate.context.internal.ManagedSessionContext;
 import org.junit.jupiter.api.AfterEach;
@@ -59,7 +60,7 @@ class BitBucketWorkflowIT extends BaseIT {
      */
     @Test
     void testRefreshAndConvertWithImportsWDL() {
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow"));
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
                 SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow", "--descriptor-type", "wdl",
@@ -107,7 +108,7 @@ class BitBucketWorkflowIT extends BaseIT {
      */
     @Test
     void testBitbucketDirtyBit() {
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.BITBUCKET + "/dockstore_testuser2/dockstore-workflow"));
 
         // refresh individual that is valid
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,

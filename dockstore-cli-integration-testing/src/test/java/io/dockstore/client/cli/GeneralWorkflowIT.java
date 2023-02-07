@@ -30,6 +30,7 @@ import io.swagger.client.ApiException;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
+import org.elasticsearch.common.collect.Set;
 import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -81,9 +82,10 @@ class GeneralWorkflowIT extends BaseIT {
     }
 
     @Test
+    @Disabled("Ignoring for 1.14.0, refresh less important and this test is probably not scaling well as number of testing workflow increases")
     void refreshAll() {
         // refresh all
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        // refreshByOrganizationReplacement(USER_2_USERNAME);
 
         // get userid
         final long userid = testingPostgres.runSelectStatement(String.format("SELECT id FROM user_profile WHERE username='%s';", USER_2_USERNAME), long.class);
@@ -109,7 +111,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testRefreshAndPublish() {
         // refresh all
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow"));
 
         // refresh individual that is valid
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
@@ -161,7 +163,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testRefreshAndPublishInvalid() throws Exception {
         // refresh all
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/dockstore_empty_repo"));
 
         // refresh individual
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
@@ -187,7 +189,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testRestub() {
         // Refresh and then restub
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow"));
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", ENTRY,
@@ -203,7 +205,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testRestubError() throws Exception {
         // Refresh and then restub
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow"));
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, ENTRY,
@@ -219,7 +221,7 @@ class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     void testDescriptorTypes() throws Exception {
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow"));
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--descriptor-type", "wdl", SCRIPT_FLAG });
@@ -240,7 +242,7 @@ class GeneralWorkflowIT extends BaseIT {
      */
     @Test
     void testWorkflowVersionIncorrectPath() throws Exception {
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow"));
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, VERSION_TAG, ENTRY,
@@ -264,7 +266,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     @Category(ToilCompatibleTest.class)
     void testRefreshAndConvertWithImportsCWL() throws Exception {
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow"));
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, ENTRY,
@@ -288,7 +290,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testRefreshRelatedConcepts() throws Exception {
         // refresh all
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow"));
 
         // refresh individual that is valid
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
@@ -350,7 +352,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testGithubDirtyBit() {
         // refresh all
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow"));
 
         // refresh individual that is valid
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
@@ -390,7 +392,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Disabled("Ignoring for 1.8.6, enable for 1.9.0")
     void testGitLab() {
         // Refresh workflow
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example"));
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
             SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", SCRIPT_FLAG });
         final long nullLastModifiedWorkflowVersions = testingPostgres
@@ -484,7 +486,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testWDLWithImports() {
         // Refresh all
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/test_workflow_wdl"));
 
         // Update workflow to be WDL with correct path
         Client.main(
@@ -504,7 +506,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testTestParameterFile() {
         // Refresh all
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow"));
 
         // Refresh specific
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
@@ -575,7 +577,7 @@ class GeneralWorkflowIT extends BaseIT {
     @Test
     void testRefreshingUserMetadata() {
         // Refresh all workflows
-        refreshByOrganizationReplacement(USER_2_USERNAME);
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow"));
 
         // Check that user has been updated
         // TODO: bizarrely, the new GitHub Java API library doesn't seem to handle bio

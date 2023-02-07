@@ -6,6 +6,7 @@ import io.dockstore.common.Registry;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.ToolTest;
 import io.dropwizard.testing.ResourceHelpers;
+import org.elasticsearch.common.collect.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -171,14 +172,15 @@ class QuayGitHubBasicIT extends BaseIT {
      */
     @Test
     void testRefreshWorkflow() throws Exception {
-        refreshByOrganizationReplacement(USER_1_USERNAME);
+        refreshByOrganizationReplacement(USER_1_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser/dockstore-whalesay-wdl",
+                SourceControl.GITHUB + "/DockstoreTestUser/ampa-nf"));
         // should have a certain number of workflows based on github contents
         final long secondWorkflowCount = testingPostgres.runSelectStatement("select count(*) from workflow", long.class);
         assertTrue(secondWorkflowCount > 0, "should find non-zero number of workflows");
 
         // refresh a specific workflow
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, REFRESH, ENTRY,
-            SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" });
+            SourceControl.GITHUB + "/DockstoreTestUser/dockstore-whalesay-wdl" });
 
         // artificially create an invalid version
         testingPostgres.runUpdateStatement("update workflowversion set name = 'test'");
@@ -186,7 +188,7 @@ class QuayGitHubBasicIT extends BaseIT {
 
         // refresh
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, REFRESH, ENTRY,
-            SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" });
+            SourceControl.GITHUB + "/DockstoreTestUser/dockstore-whalesay-wdl" });
 
         // check that the version was deleted
         final long updatedWorkflowVersionCount = testingPostgres.runSelectStatement("select count(*) from workflowversion", long.class);
@@ -204,7 +206,7 @@ class QuayGitHubBasicIT extends BaseIT {
 
         // refresh
         catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, REFRESH, ENTRY,
-                SourceControl.GITHUB.toString() + "/DockstoreTestUser/dockstore-whalesay-wdl" }));
+                SourceControl.GITHUB + "/DockstoreTestUser/dockstore-whalesay-wdl" }));
         final long thirdWorkflowCount = testingPostgres.runSelectStatement("select count(*) from workflow", long.class);
         assertEquals(secondWorkflowCount, thirdWorkflowCount, "there should be no change in count of workflows");
     }
