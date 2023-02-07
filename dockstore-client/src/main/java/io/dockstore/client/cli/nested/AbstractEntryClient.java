@@ -369,7 +369,7 @@ public abstract class AbstractEntryClient<T> {
                 }
                 break;
             default:
-                List<String> possibleCommands = new ArrayList<String>();
+                List<String> possibleCommands = new ArrayList<>();
                 possibleCommands.addAll(Arrays.asList(INFO, LIST, SEARCH, PUBLISH, STAR, REFRESH, LABEL, MANUAL_PUBLISH,
                         CONVERT, LAUNCH, DOWNLOAD, VERIFY, TEST_PARAMETER, WDL.toString(), CWL.toString()));
 
@@ -694,7 +694,7 @@ public abstract class AbstractEntryClient<T> {
                     handleEntry2json(args);
                     break;
                 default:
-                    List<String> possibleCommands = new ArrayList<String>();
+                    List<String> possibleCommands = new ArrayList<>();
                     possibleCommands.addAll(Arrays.asList(CWL_2_JSON, CWL_2_YAML, WDL_2_JSON, ENTRY_2_JSON));
                     possibleCommands.addAll(getGeneralFlags());
                     invalid(getEntryType().toLowerCase()  + " convert", cmd, possibleCommands);
@@ -1284,7 +1284,7 @@ public abstract class AbstractEntryClient<T> {
                 // dockstore workflow CORRECT_COMMAND INCORRECT_COMMAND
                 String incorrectCommand = getUnknownParameter(e.getMessage());
                 // get command after the commands that were successfully read
-                displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, join(" ", WORKFLOW, WES, e.getJCommander().getParsedCommand().toString()));
+                displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, join(" ", WORKFLOW, WES, e.getJCommander().getParsedCommand()));
                 return;
             }
             errorMessage(e.getMessage(), CLIENT_ERROR);
@@ -1886,8 +1886,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void entry2jsonHelp() {
         printHelpHeader();
-        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, "entry2json", HELP));
-        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, "entry2json [parameters]"));
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, ENTRY_2_JSON, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, ENTRY_2_JSON, "[parameters]"));
         out("");
         out("Description:");
         out("  Spit out a json run file for a given cwl document.");
