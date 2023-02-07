@@ -770,8 +770,7 @@ public class Client {
                     // see if this is a general command
                     if (null != cmd) {
                         switch (cmd) {
-                        case "-v":
-                        case VERSION:
+                        case "-v", VERSION:
                             version();
                             break;
                         case SERVER_METADATA:
