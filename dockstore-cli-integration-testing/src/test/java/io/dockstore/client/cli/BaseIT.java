@@ -16,6 +16,7 @@
 package io.dockstore.client.cli;
 
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +34,7 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.Repository;
+import org.jline.utils.Log;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -97,21 +99,25 @@ class BaseIT {
         return CLICommonTestUtilities.getWebClient(true, username, testingPostgresParameter);
     }
 
-    protected void refreshByOrganizationReplacement(final String username) {
+    protected void refreshByOrganizationReplacement(final String username, Set<String> whitelist) {
         final ApiClient webClient = getWebClient(username, testingPostgres);
         final WorkflowsApi workflowsApi = new WorkflowsApi(webClient);
-        refreshByOrganizationReplacement(workflowsApi, webClient);
+        refreshByOrganizationReplacement(workflowsApi, webClient, whitelist);
     }
 
-    protected void refreshByOrganizationReplacement(WorkflowsApi workflowApi, ApiClient apiClient) {
+    protected void refreshByOrganizationReplacement(WorkflowsApi workflowApi, ApiClient apiClient, Set<String> whitelist) {
         UsersApi openUsersApi = new UsersApi(apiClient);
         for (SourceControl control : SourceControl.values()) {
             List<String> userOrganizations = openUsersApi.getUserOrganizations(control.name());
             for (String org : userOrganizations) {
                 List<Repository> userOrganizationRepositories = openUsersApi.getUserOrganizationRepositories(control.name(), org);
                 for (Repository repo : userOrganizationRepositories) {
-                    workflowApi.manualRegister(control.name(), repo.getPath(), "/Dockstore.cwl", "",
-                            DescriptorLanguage.CWL.getShortName(), "");
+                    String pathName = control + "/" + repo.getPath();
+                    Log.debug("checking: " + pathName);
+                    if (whitelist.contains(pathName)) {
+                        workflowApi.manualRegister(control.name(), repo.getPath(), "/Dockstore.cwl", "",
+                                DescriptorLanguage.CWL.getShortName(), "");
+                    }
                 }
             }
         }
