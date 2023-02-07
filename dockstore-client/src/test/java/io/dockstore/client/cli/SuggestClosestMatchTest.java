@@ -53,7 +53,7 @@ class SuggestClosestMatchTest {
 
 
     @Test
-    public void noSuggestions() {
+    void noSuggestions() {
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add(TOOL);
         acceptedCommands.add(WORKFLOW);
@@ -128,7 +128,7 @@ class SuggestClosestMatchTest {
     }
 
     @Test
-    public void onlyOneCloseMatch() {
+    void onlyOneCloseMatch() {
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add(TOOL);
 
@@ -169,7 +169,7 @@ class SuggestClosestMatchTest {
     }
 
     @Test
-    public void severalCloseMatches() {
+    void severalCloseMatches() {
         List<String> acceptedCommands = new ArrayList<String>();
         acceptedCommands.add(WORKFLOW);
         acceptedCommands.add(CHECKER);
