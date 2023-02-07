@@ -774,7 +774,7 @@ class BasicIT extends BaseIT {
     }
 
     @Test
-    public void testPublishUnpublishHostedTool() {
+    void testPublishUnpublishHostedTool() {
 
         final String publishNameParameter = "--new-entry-name";
 

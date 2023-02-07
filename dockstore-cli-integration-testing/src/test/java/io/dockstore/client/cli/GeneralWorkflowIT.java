@@ -621,7 +621,7 @@ class GeneralWorkflowIT extends BaseIT {
     }
 
     @Test
-    public void testPublishUnpublishHostedWorkflow() {
+    void testPublishUnpublishHostedWorkflow() {
 
         final String publishNameParameter = "--new-entry-name";
 
@@ -668,7 +668,7 @@ class GeneralWorkflowIT extends BaseIT {
     }
 
     @Test
-    public void testPublishUnpublishedDockstoreYMLWorkflow() {
+    void testPublishUnpublishedDockstoreYMLWorkflow() {
 
         final String publishNameParameter = "--new-entry-name";
 
