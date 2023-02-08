@@ -32,6 +32,8 @@ import static io.dockstore.client.cli.Client.DEBUG_FLAG;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static java.lang.Math.max;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 
 /**
  * Organizes all methods that have to do with parsing of input and creation of output.
@@ -42,6 +44,7 @@ import static java.lang.Math.max;
 public final class ArgumentUtility {
 
     public static final String CONVERT = "convert";
+    public static final String ERROR_MESSAGE_START = "ERROR: ";
     public static final String LAUNCH = "launch";
     public static final String DOWNLOAD = "download";
     public static final String NAME_HEADER = "NAME";
@@ -65,11 +68,15 @@ public final class ArgumentUtility {
     }
 
     public static void err(String arg) {
-        LOG.error(arg);
+        if (LOG.isInfoEnabled()) {
+            LOG.error(arg);
+        } else {
+            System.err.println(ERROR_MESSAGE_START + arg);
+        }
     }
 
     private static void errFormatted(String format, Object... args) {
-        LOG.error((String.format(format, args)));
+        err(String.format(format, args));
     }
 
     private static void kill(String format, Object... args) {
@@ -87,7 +94,14 @@ public final class ArgumentUtility {
         if (!"".equals(message)) {
             err(message);
         }
-        err(ExceptionUtils.getStackTrace(exception));
+
+        if (LOG.isInfoEnabled()) {
+            err(ExceptionUtils.getStackTrace(exception));
+        } else if (isNotEmpty(exception.getMessage())) {
+            err(exception.getMessage());
+        } else if ("".equals(message)) {
+            err("An unknown error has occurred. Consider rerunning with --debug");
+        }
 
         if (exitCode != 0) {
             System.exit(exitCode);
