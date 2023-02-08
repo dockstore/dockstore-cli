@@ -30,18 +30,20 @@ import io.swagger.client.ApiException;
 import io.swagger.client.api.MetadataApi;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.common.PipHelper.convertPipRequirementsStringToMap;
 
 public class CWLToolWrapper implements CWLRunnerInterface {
     @Override
     public void checkForCWLDependencies(MetadataApi metadataApi) {
-        final String[] s1 = { "cwltool", "--version" };
+        final String[] s1 = { "cwltool", VERSION };
         final ImmutablePair<String, String> pair1 = io.cwl.avro.Utilities
                 .executeCommand(Joiner.on(" ").join(Arrays.asList(s1)), false, com.google.common.base.Optional.absent(),
                         com.google.common.base.Optional.absent());
         final String cwlToolVersion = pair1.getKey().split(" ")[1].trim();
 
-        final String[] s2 = { "schema-salad-tool", "--version", "schema" };
+        final String[] s2 = { "schema-salad-tool", VERSION, "schema" };
         final ImmutablePair<String, String> pair2 = io.cwl.avro.Utilities
                 .executeCommand(Joiner.on(" ").join(Arrays.asList(s2)), false, com.google.common.base.Optional.absent(),
                         com.google.common.base.Optional.absent());
@@ -58,11 +60,11 @@ public class CWLToolWrapper implements CWLRunnerInterface {
             final String expectedSchemaSaladVersion = stringStringMap.get("schema-salad");
             if (expectedCwltoolVersion != null && !cwlToolVersion.equals(expectedCwltoolVersion)) {
                 ArgumentUtility.errorMessage("cwltool version is " + cwlToolVersion + " , Dockstore is tested with " + expectedCwltoolVersion
-                    + "\nOverride and run with `--script`", Client.COMMAND_ERROR);
+                    + "\nOverride and run with `" + SCRIPT_FLAG + "`", Client.COMMAND_ERROR);
             }
             if (expectedSchemaSaladVersion != null && !schemaSaladVersion.equals(expectedSchemaSaladVersion)) {
                 ArgumentUtility.errorMessage("schema-salad version is " + schemaSaladVersion + " , Dockstore is tested with " + expectedSchemaSaladVersion
-                    + "\nOverride and run with `--script`", Client.COMMAND_ERROR);
+                    + "\nOverride and run with `" + SCRIPT_FLAG + "`", Client.COMMAND_ERROR);
             }
         } catch (ProcessingException | ApiException e) {
             ArgumentUtility.out("Could not get cwltool dependencies");

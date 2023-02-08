@@ -34,6 +34,8 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+
 public class NextflowIT {
     @Rule
     public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
@@ -52,7 +54,7 @@ public class NextflowIT {
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         client.setupClientEnvironment(Lists.newArrayList());
         WorkflowClient workflowClient = client.getWorkflowClient();
-        List<String> strings = Arrays.asList("--local-entry", "nextflow.config", "--json", "test.json");
+        List<String> strings = Arrays.asList("--local-entry", "nextflow.config", JSON, "test.json");
         workflowClient.launch(strings);
         Assert.assertTrue("nextflow workflow did not run correctly", systemOutRule.getLog().contains("results world!"));
 

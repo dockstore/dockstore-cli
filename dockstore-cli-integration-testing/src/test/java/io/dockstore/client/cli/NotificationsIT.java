@@ -28,6 +28,10 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -69,8 +73,8 @@ class NotificationsIT extends BaseIT {
     @Test
     void launchCWLToolWithNotificationsUUIDNoURL() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--local-entry", SAMPLE_CWL_DESCRIPTOR,
-                        "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" }));
+                new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, LAUNCH, "--local-entry", SAMPLE_CWL_DESCRIPTOR,
+                        JSON, SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
         String log = systemErrRule.getText();
         assertTrue(log.contains("Aborting launch."), log);
@@ -84,8 +88,8 @@ class NotificationsIT extends BaseIT {
     @Test
     void launchCWLToolWithNotificationsUUIDInvalidURL() throws Exception {
         Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocationWithInvalidNotifications(true), "tool", "launch", "--local-entry",
-                        SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
+                new String[] { CONFIG, TestUtility.getConfigFileLocationWithInvalidNotifications(true), TOOL, LAUNCH, "--local-entry",
+                        SAMPLE_CWL_DESCRIPTOR, JSON, SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
         String log = systemOutRule.getText();
         assertTrue(log.contains(SENDING_NOTIFICATION), log);
         assertFalse(log.contains(SLACK_DESTINATION), log);
@@ -99,8 +103,8 @@ class NotificationsIT extends BaseIT {
     @Test
     void launchCWLToolWithNotificationsUUIDValidURL() throws Exception {
         Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
-                        SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
+                new String[] { CONFIG, TestUtility.getConfigFileLocationWithValidNotifications(true), TOOL, LAUNCH, "--local-entry",
+                        SAMPLE_CWL_DESCRIPTOR, JSON, SAMPLE_CWL_TEST_JSON, "--uuid", "potato", "--info" });
         String log = systemOutRule.getText();
         assertTrue(log.contains(SENDING_NOTIFICATION), log);
         assertTrue(log.contains(SLACK_DESTINATION), log);
@@ -114,8 +118,8 @@ class NotificationsIT extends BaseIT {
     @Test
     void launchCWLToolWithNotificationsNoUUIDValidURL() throws Exception {
         Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
-                        SAMPLE_CWL_DESCRIPTOR, "--json", SAMPLE_CWL_TEST_JSON, "--info" });
+                new String[] { CONFIG, TestUtility.getConfigFileLocationWithValidNotifications(true), TOOL, LAUNCH, "--local-entry",
+                        SAMPLE_CWL_DESCRIPTOR, JSON, SAMPLE_CWL_TEST_JSON, "--info" });
         String log = systemOutRule.getText();
         assertTrue(log.contains(SENDING_NOTIFICATION), log);
         assertTrue(log.contains(GENERATING_UUID), log);
@@ -131,8 +135,8 @@ class NotificationsIT extends BaseIT {
     @Test
     void launchWDLToolWithNotificationsUUIDNoURL() throws Exception {
         int exitCode = catchSystemExit(() ->   Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--local-entry", SAMPLE_WDL_DESCRIPTOR,
-                        "--json", SAMPLE_WDL_TEST_JSON, "--uuid", "potato" }));
+                new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, LAUNCH, "--local-entry", SAMPLE_WDL_DESCRIPTOR,
+                        JSON, SAMPLE_WDL_TEST_JSON, "--uuid", "potato" }));
         String log = systemErrRule.getText();
         assertEquals(Client.CLIENT_ERROR, exitCode);
         assertTrue(log.contains("Aborting launch."), log);
@@ -146,8 +150,8 @@ class NotificationsIT extends BaseIT {
     @Test
     void launchWDLToolWithNotificationsUUIDInvalidURL() throws Exception {
         Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocationWithInvalidNotifications(true), "tool", "launch", "--local-entry",
-                        SAMPLE_WDL_DESCRIPTOR, "--json", SAMPLE_WDL_TEST_JSON, "--uuid", "potato", "--info" });
+                new String[] { CONFIG, TestUtility.getConfigFileLocationWithInvalidNotifications(true), TOOL, LAUNCH, "--local-entry",
+                        SAMPLE_WDL_DESCRIPTOR, JSON, SAMPLE_WDL_TEST_JSON, "--uuid", "potato", "--info" });
         String log = systemOutRule.getText();
         assertTrue(log.contains(SENDING_NOTIFICATION), log);
         assertFalse(log.contains(SLACK_DESTINATION), log);
@@ -161,8 +165,8 @@ class NotificationsIT extends BaseIT {
     @Test
     void launchWDLToolWithNotificationsUUIDValidURL() throws Exception {
         Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
-                        SAMPLE_WDL_DESCRIPTOR, "--json", SAMPLE_WDL_TEST_JSON, "--uuid", "potato", "--info" });
+                new String[] { CONFIG, TestUtility.getConfigFileLocationWithValidNotifications(true), TOOL, LAUNCH, "--local-entry",
+                        SAMPLE_WDL_DESCRIPTOR, JSON, SAMPLE_WDL_TEST_JSON, "--uuid", "potato", "--info" });
         String log = systemOutRule.getText();
         assertTrue(log.contains(SENDING_NOTIFICATION), log);
         assertTrue(log.contains(SLACK_DESTINATION), log);
@@ -176,8 +180,8 @@ class NotificationsIT extends BaseIT {
     @Test
     void launchWDLToolWithNotificationsNoUUIDValidURL() throws Exception {
         Client.main(
-                new String[] { "--config", TestUtility.getConfigFileLocationWithValidNotifications(true), "tool", "launch", "--local-entry",
-                        SAMPLE_WDL_DESCRIPTOR, "--json", SAMPLE_WDL_TEST_JSON, "--info" });
+                new String[] { CONFIG, TestUtility.getConfigFileLocationWithValidNotifications(true), TOOL, LAUNCH, "--local-entry",
+                        SAMPLE_WDL_DESCRIPTOR, JSON, SAMPLE_WDL_TEST_JSON, "--info" });
         String log = systemOutRule.getText();
         assertTrue(log.contains(GENERATING_UUID), log);
         assertTrue(log.contains(SENDING_NOTIFICATION), log);

@@ -85,6 +85,7 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.SEARCH;
 import static io.dockstore.common.FileProvisioning.getCacheDirectory;
 
 /**
@@ -107,11 +108,28 @@ public class Client {
     public static final AtomicBoolean INFO = new AtomicBoolean(false);
     public static final AtomicBoolean SCRIPT = new AtomicBoolean(false);
     public static final String DEPRECATED_PORT_MESSAGE = "Dockstore webservice has deprecated port 8443 and may remove it without warning. Please use 'https://dockstore.org/api' via the Dockstore config file (\"~/.dockstore/config\" by default) instead.";
-    private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
 
-    private static final Logger LOG = LoggerFactory.getLogger(Client.class);
+    // Command Names
+    public static final String TOOL = "tool";
+    public static final String WORKFLOW = "workflow";
+    public static final String CHECKER = "checker";
+    public static final String PLUGIN = "plugin";
+    public static final String DEPS = "deps";
+    public static final String DEBUG_FLAG = "--debug";
+
+    public static final String HELP = "--help";
+    public static final String VERSION = "--version";
+    public static final String SERVER_METADATA = "--server-metadata";
+    public static final String UPGRADE = "--upgrade";
+    public static final String UPGRADE_STABLE = "--upgrade-stable";
+    public static final String UPGRADE_UNSTABLE = "--upgrade-unstable";
+    public static final String CONFIG = "--config";
+    public static final String SCRIPT_FLAG = "--script";
+    public static final String CLEAN_CACHE = "--clean-cache";
     private static ObjectMapper objectMapper;
 
+    private static final String DOCKSTORE_CLI_REPO_URL = "https://api.github.com/repos/dockstore/dockstore-cli/releases";
+    private static final Logger LOG = LoggerFactory.getLogger(Client.class);
     private String configFile = null;
     private String serverUrl = null;
     private Ga4GhApi ga4ghApi;
@@ -439,7 +457,7 @@ public class Client {
                         if (Objects.equals(currentVersion, latestUnstable)) {
                             // current version is the latest unstable version
                             out("You are currently on the latest unstable version. If you wish to upgrade to the latest stable version, please use the following command:");
-                            out("   dockstore --upgrade-stable");
+                            out("   dockstore " + UPGRADE_STABLE);
                         } else {
                             //user wants to upgrade to newest unstable version
                             upgradeURL = getUnstableURL(latestUnstable, mapRel);
@@ -507,7 +525,7 @@ public class Client {
                                 out("Current version : " + currentVersion);
                                 out("You have the most recent stable release.");
                                 out("If you wish to upgrade to the latest unstable version, please use the following command:");
-                                out("   dockstore --upgrade-unstable"); // takes you to the newest unstable version
+                                out("   dockstore " + UPGRADE_UNSTABLE); // takes you to the newest unstable version
                             } else {
                                 err("Current version : " + currentVersion);
                                 //not the latest stable version, could be on the newest unstable or older unstable/stable version
@@ -531,11 +549,11 @@ public class Client {
         if (compareVersion(currentVersion)) {
             //current version is latest than latest stable
             out("You are currently on the latest unstable version. If you wish to upgrade to the latest stable version, please use the following command:");
-            out("   dockstore --upgrade-stable"); //takes you to the newest stable version no matter what
+            out("   dockstore " + UPGRADE_STABLE); //takes you to the newest stable version no matter what
         } else {
             //current version is older than latest stable
             out("Please upgrade with the following command:");
-            out("   dockstore --upgrade");  // takes you to the newest stable version, unless you're already "past it"
+            out("   dockstore " + UPGRADE);  // takes you to the newest stable version, unless you're already "past it"
         }
     }
 
@@ -582,40 +600,41 @@ public class Client {
         }
     }
 
+    // If you add a command, please update the list of commands given to the invalid function in the run method
     private static void printGeneralHelp() {
         printHelpHeader();
         out("Usage: dockstore [mode] [flags] [command] [command parameters]");
         out("");
         out("Modes:");
-        out("   tool                Puts dockstore into tool mode.");
-        out("   workflow            Puts dockstore into workflow mode.");
-        out("   checker             Puts dockstore into checker mode.");
-        out("   plugin              Configure and debug plugins.");
-        out("   deps                Print tool/workflow runner dependencies.");
+        out("   " + TOOL + "                Puts dockstore into " + TOOL + " mode.");
+        out("   " + WORKFLOW + "            Puts dockstore into " + WORKFLOW + " mode.");
+        out("   " + CHECKER + "             Puts dockstore into " + CHECKER + " mode.");
+        out("   " + PLUGIN + "              Configure and debug plugins.");
+        out("   " + DEPS + "                Print " + TOOL + "/" + WORKFLOW + " runner dependencies.");
         out("   " + YAML + "                Puts dockstore into " + YAML + " mode.");
         out("");
         printLineBreak();
         out("");
         out("Flags:");
-        out("  --help               Print help information");
+        out("  " + HELP + "               Print help information");
         out("                       Default: false");
-        out("  --debug              Print debugging information");
+        out("  " + DEBUG_FLAG + "              Print debugging information");
         out("                       Default: false");
-        out("  --version            Print dockstore's version");
+        out("  " + VERSION + "            Print dockstore's version");
         out("                       Default: false");
-        out("  --server-metadata    Print metadata describing the dockstore webservice");
+        out("  " + SERVER_METADATA + "    Print metadata describing the dockstore webservice");
         out("                       Default: false");
-        out("  --upgrade            Upgrades to the latest stable release of Dockstore");
+        out("  " + UPGRADE + "            Upgrades to the latest stable release of Dockstore");
         out("                       Default: false");
-        out("  --upgrade-stable     Force upgrade to the latest stable release of Dockstore");
+        out("  " + UPGRADE_STABLE + "     Force upgrade to the latest stable release of Dockstore");
         out("                       Default: false");
-        out("  --upgrade-unstable   Force upgrade to the latest unstable release of Dockstore");
+        out("  " + UPGRADE_UNSTABLE + "   Force upgrade to the latest unstable release of Dockstore");
         out("                       Default: false");
-        out("  --config <file>      Override config file");
+        out("  " + CONFIG + " <file>      Override config file");
         out("                       Default: ~/.dockstore/config");
-        out("  --script             Will not check Github for newer versions of Dockstore, or ask for user input");
+        out("  " + SCRIPT_FLAG + "             Will not check Github for newer versions of Dockstore, or ask for user input");
         out("                       Default: false");
-        out("  --clean-cache        Delete the Dockstore launcher cache to save space");
+        out("  " + CLEAN_CACHE + "        Delete the Dockstore launcher cache to save space");
         printHelpFooter();
     }
 
@@ -671,7 +690,7 @@ public class Client {
 
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)org.slf4j.LoggerFactory
                 .getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        if (flag(args, "--debug") || flag(args, "--d")) {
+        if (flag(args, DEBUG_FLAG) || flag(args, "--d")) {
             DEBUG.set(true);
             // turn on logback
             root.setLevel(Level.DEBUG);
@@ -682,7 +701,7 @@ public class Client {
         } else {
             root.setLevel(Level.ERROR);
         }
-        if (flag(args, "--script") || flag(args, "--s")) {
+        if (flag(args, SCRIPT_FLAG) || flag(args, "--s")) {
             SCRIPT.set(true);
         } else {
             SCRIPT.set(false);
@@ -706,18 +725,18 @@ public class Client {
                     // see if this is a tool command
                     boolean handled = false;
                     AbstractEntryClient targetClient = null;
-                    if ("tool".equals(mode)) {
+                    if (TOOL.equals(mode)) {
                         targetClient = getToolClient();
-                    } else if ("workflow".equals(mode)) {
+                    } else if (WORKFLOW.equals(mode)) {
                         targetClient = getWorkflowClient();
-                    } else if ("plugin".equals(mode)) {
+                    } else if (PLUGIN.equals(mode)) {
                         handled = PluginClient.handleCommand(args, Utilities.parseConfig(configFile));
-                    } else if ("search".equals(mode)) {
+                    } else if (SEARCH.equals(mode)) {
                         handled = SearchClient.handleCommand(args, this.extendedGA4GHApi);
-                    } else if ("checker".equals(mode)) {
+                    } else if (CHECKER.equals(mode)) {
                         targetClient = getCheckerClient();
-                    } else if ("deps".equals(mode)) {
-                        args.add(0, "deps");
+                    } else if (DEPS.equals(mode)) {
+                        args.add(0, DEPS);
                         String[] argsArray = new String[args.size()];
                         argsArray = args.toArray(argsArray);
                         handled = DepCommand.handleDepCommand(argsArray);
@@ -751,27 +770,30 @@ public class Client {
                     // see if this is a general command
                     if (null != cmd) {
                         switch (cmd) {
-                        case "-v":
-                        case "--version":
+                        case "-v", VERSION:
                             version();
                             break;
-                        case "--server-metadata":
+                        case SERVER_METADATA:
                             serverMetadata();
                             break;
-                        case "--upgrade":
+                        case UPGRADE:
                             upgrade("none");
                             break;
-                        case "--upgrade-stable":
+                        case UPGRADE_STABLE:
                             upgrade("stable");
                             break;
-                        case "--upgrade-unstable":
+                        case UPGRADE_UNSTABLE:
                             upgrade("unstable");
                             break;
-                        case "--clean-cache":
+                        case CLEAN_CACHE:
                             clean();
                             break;
                         default:
-                            invalid(cmd);
+                            List<String> possibleCommands = new ArrayList<>();
+                            possibleCommands.addAll(Arrays.asList(TOOL, WORKFLOW, CHECKER, PLUGIN, DEPS, YAML, VERSION,
+                                    SERVER_METADATA, UPGRADE, UPGRADE_STABLE, UPGRADE_UNSTABLE, CLEAN_CACHE));
+                            possibleCommands.addAll(getGeneralFlags());
+                            invalid("", cmd, possibleCommands);
                             break;
                         }
                     }
@@ -785,6 +807,12 @@ public class Client {
         } catch (Exception ex) {
             exceptionMessage(ex, "", GENERIC_ERROR);
         }
+    }
+
+    public static List<String> getGeneralFlags() {
+        List<String> generalFlags = new ArrayList<>();
+        generalFlags.addAll(Arrays.asList(DEBUG_FLAG, HELP, CONFIG, SCRIPT_FLAG));
+        return generalFlags;
     }
 
     /**
@@ -853,7 +881,7 @@ public class Client {
 
     private INIConfiguration getIniConfiguration(List<String> args) {
         String userHome = System.getProperty("user.home");
-        String commandLineConfigFile = optVal(args, "--config", userHome + File.separator + ".dockstore" + File.separator + "config");
+        String commandLineConfigFile = optVal(args, CONFIG, userHome + File.separator + ".dockstore" + File.separator + "config");
         if (this.configFile == null) {
             this.configFile = commandLineConfigFile;
         }

@@ -15,6 +15,7 @@
  */
 package io.dockstore.client.cli;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +27,15 @@ import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.Strings;
 import com.beust.jcommander.WrappedParameter;
 
+import static io.dockstore.client.cli.ArgumentUtility.invalid;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.outFormatted;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static java.lang.String.join;
 
 /**
  * @author gluu
@@ -48,11 +55,11 @@ public final class JCommanderUtility {
         printJCommanderHelpUsage(programName, commandName, jc);
         printJCommanderHelpDescription(description);
         out("Required parameters:\n"
-                + "  --entry <entry>                     Complete workflow path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)\n"
+                + "  " + ENTRY + " <entry>                     Complete " + WORKFLOW + " path in Dockstore (ex. NCI-GDC/gdc-dnaseq-cwl/GDC_DNASeq:master)\n"
                 + "   OR\n"
                 + "  --local-entry <local-entry>         Allows you to specify a full path to a local descriptor instead of an entry path\n");
         out("");
-        out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
+        out("  " + JSON + " <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("   OR");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs (only for CWL)");
         out("");
@@ -61,6 +68,40 @@ public final class JCommanderUtility {
                 + "  --uuid                              Allows you to specify a uuid for 3rd party notifications\n"
                 + "  --ignore-checksums                  Allows you to ignore validating checksums of each downloaded descriptor");
         printJCommanderHelpFooter();
+    }
+
+    // TODO: Find a better way to determine if Jcommander.parse failed due to an incorrect parameter being given
+    public static boolean wasErrorDueToUnknownParamter(String errorMsg) {
+        return errorMsg.contains("but no main parameter was defined in your arg class");
+    }
+
+    // This method extracts the unknown command from an error message. It doesn't appear JCommander has a built in way to do this.
+    // The error message is always of the form "Was passed main parameter 'unknown_command' but no main parameter was defined in your arg class",
+    public static String getUnknownParameter(String errorMsg) {
+        return errorMsg.substring("Was passed main parameter '".length(),
+                errorMsg.length() - "' but no main parameter was defined in your arg class".length());
+    }
+    public static void displayJCommanderSuggestions(JCommander jc, String commandName, String incorrectCommand, String programName) {
+        List<String> possibleCommands = getPossibleJCommanderCommands(jc, commandName);
+        invalid(programName, incorrectCommand, possibleCommands);
+
+    }
+
+    private static List<String> getPossibleJCommanderCommands(JCommander jc, String commandName) {
+        JCommander commander;
+        if (commandName == null || commandName.isBlank()) {
+            commander = jc;
+        } else {
+            commander = jc.getCommands().get(commandName);
+        }
+        List<ParameterDescription> parameters = commander.getParameters();
+        List<String> possibleCommands = new ArrayList<>();
+
+        possibleCommands.addAll(commander.getCommands().keySet());
+        for (ParameterDescription pd: parameters) {
+            possibleCommands.add(pd.getNames());
+        }
+        return possibleCommands;
     }
 
     public static void printJCommanderHelp(JCommander jc, String programName, String commandName) {
@@ -79,11 +120,11 @@ public final class JCommanderUtility {
     }
 
     private static void printJCommanderHelpUsage(String programName, String commandName, JCommander jc) {
-        out("Usage: " + programName + " " + commandName + " --help");
+        out(join(" ", "Usage:", programName, commandName, HELP));
         if (jc.getCommands().isEmpty()) {
-            out("       " + programName + " " + commandName + " [parameters]");
+            out(join(" ", "       " + programName, commandName, "[parameters]"));
         } else {
-            out("       " + programName + " " + commandName + " [parameters] [command]");
+            out(join(" ", "       " + programName, commandName, "[parameters] [command]"));
         }
         out("");
     }
@@ -116,7 +157,7 @@ public final class JCommanderUtility {
         boolean first = true;
         for (ParameterDescription pd : sorted) {
             WrappedParameter parameter = pd.getParameter();
-            if (parameter.required() && !Objects.equals(pd.getNames(), "--help")) {
+            if (parameter.required() && !Objects.equals(pd.getNames(), HELP)) {
                 if (first) {
                     out("Required parameters:");
                     first = false;
@@ -140,7 +181,7 @@ public final class JCommanderUtility {
         boolean first = true;
         for (ParameterDescription pd : sorted) {
             WrappedParameter parameter = pd.getParameter();
-            if (!parameter.required() && !pd.getNames().equals("--help")) {
+            if (!parameter.required() && !pd.getNames().equals(HELP)) {
                 if (first) {
                     out("Optional parameters:");
                     first = false;
