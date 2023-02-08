@@ -66,11 +66,7 @@ public final class ArgumentUtility {
     }
 
     private static void errFormatted(String format, Object... args) {
-        if (LOG.isInfoEnabled()) {
-            LOG.error(String.format(format, args));
-        } else {
-            System.err.println(String.format(ERROR_MESSAGE_START + format, args));
-        }
+        err(String.format(format, args));
     }
 
     private static void kill(String format, Object... args) {
