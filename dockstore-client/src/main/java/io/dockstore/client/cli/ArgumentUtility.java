@@ -26,6 +26,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 /**
  * Organizes all methods that have to do with parsing of input and creation of output.
  * This is a static utility class with no state.
@@ -87,7 +89,7 @@ public final class ArgumentUtility {
 
         if (LOG.isInfoEnabled()) {
             err(ExceptionUtils.getStackTrace(exception));
-        } else if (exception.getMessage() != null && !"".equals(exception.getMessage())) {
+        } else if (isNotEmpty(exception.getMessage())) {
             err(exception.getMessage());
         } else if ("".equals(message)) {
             err("An unknown error has occurred. Consider rerunning with --debug");
