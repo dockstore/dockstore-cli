@@ -502,11 +502,11 @@ class QuayGitHubBasicIT extends BaseIT {
             "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", SCRIPT_FLAG });
 
         // Publish a second time, should fail
-        systemOutRule.clear();
+        systemErrRule.clear();
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, ENTRY,
             "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", SCRIPT_FLAG });
         assertTrue(
-                systemOutRule.getText().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
+                systemErrRule.getText().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
                 "Attempting to publish a registered tool should notify the user");
 
         final long countPublish = testingPostgres
@@ -531,11 +531,11 @@ class QuayGitHubBasicIT extends BaseIT {
         assertEquals(0, countGoodUnpublish, "there should be 0 registered");
 
         // try to unpublish the unpublished tool
-        systemOutRule.clear();
+        systemErrRule.clear();
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", ENTRY,
             "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", SCRIPT_FLAG });
         assertTrue(
-                systemOutRule.getText().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
+                systemErrRule.getText().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
                 "Attempting to publish a registered tool should notify the user");
     }
 
@@ -553,11 +553,11 @@ class QuayGitHubBasicIT extends BaseIT {
             "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", SCRIPT_FLAG });
 
         // Publish a second time, should fail
-        systemOutRule.clear();
+        systemErrRule.clear();
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, ENTRY,
             "quay.io/dockstoretestuser/quayandgithub", publishNameParameter, "fake_tool_name", SCRIPT_FLAG });
         assertTrue(
-                systemOutRule.getText().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
+                systemErrRule.getText().contains("The following tool is already registered: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
                 "Attempting to publish a registered tool should notify the user");
 
         final long countPublish = testingPostgres
@@ -582,11 +582,11 @@ class QuayGitHubBasicIT extends BaseIT {
         assertEquals(0, countGoodUnpublish, "there should be 0 registered");
 
         // try to unpublish the unpublished tool
-        systemOutRule.clear();
+        systemErrRule.clear();
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, PUBLISH, "--unpub", ENTRY,
             "quay.io/dockstoretestuser/quayandgithub/fake_tool_name", SCRIPT_FLAG });
         assertTrue(
-                systemOutRule.getText().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
+                systemErrRule.getText().contains("The following tool is already unpublished: quay.io/dockstoretestuser/quayandgithub/fake_tool_name"),
                 "Attempting to publish a registered tool should notify the user");
     }
 

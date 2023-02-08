@@ -397,12 +397,12 @@ class ManualPublishWorkflowIT extends BaseIT {
                 ENTRY, "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", SCRIPT_FLAG});
 
         // publish workflow with name 'test_entryname' a second time, shouldn't work
-        systemOutRule.clear();
+        systemErrRule.clear();
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH,
                 ENTRY, "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", SCRIPT_FLAG});
         assertTrue(
-                systemOutRule.getText().contains("The following workflow is already registered: github.com/DockstoreTestUser2/parameter_test_workflow"),
+                systemErrRule.getText().contains("The following workflow is already registered: github.com/DockstoreTestUser2/parameter_test_workflow"),
                 "Attempting to publish a registered workflow should notify the user");
 
         // verify there are 2 workflows associated with the user
@@ -432,11 +432,11 @@ class ManualPublishWorkflowIT extends BaseIT {
             "SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' AND repository='parameter_test_workflow' AND workflowname='test_entryname' AND ispublished='f';", long.class);
         assertEquals(1, countUnpublishedWorkflowWithCustomName, "The workflow should exist and be unpublished");
 
-        systemOutRule.clear();
+        systemErrRule.clear();
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, "--unpub",
             ENTRY, "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", SCRIPT_FLAG});
         assertTrue(
-                systemOutRule.getText().contains("The following workflow is already unpublished: github.com/DockstoreTestUser2/parameter_test_workflow"),
+                systemErrRule.getText().contains("The following workflow is already unpublished: github.com/DockstoreTestUser2/parameter_test_workflow"),
                 "Attempting to publish a registered workflow should notify the user");
     }
 
@@ -464,12 +464,12 @@ class ManualPublishWorkflowIT extends BaseIT {
                 ENTRY, "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", SCRIPT_FLAG});
 
         // publish workflow with name 'test_entryname' a second time, shouldn't work
-        systemOutRule.clear();
+        systemErrRule.clear();
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH,
                 ENTRY, "github.com/DockstoreTestUser2/parameter_test_workflow", publishNameParameter, "test_entryname", SCRIPT_FLAG});
         assertTrue(
-                systemOutRule.getText().contains("The following workflow is already registered: github.com/DockstoreTestUser2/parameter_test_workflow"),
+                systemErrRule.getText().contains("The following workflow is already registered: github.com/DockstoreTestUser2/parameter_test_workflow"),
                 "Attempting to publish a registered workflow should notify the user");
 
         // verify there are 2 workflows associated with the user
@@ -502,11 +502,11 @@ class ManualPublishWorkflowIT extends BaseIT {
             "SELECT COUNT(*) FROM workflow WHERE organization='DockstoreTestUser2' AND repository='parameter_test_workflow' AND workflowname='test_entryname' AND ispublished='f';", long.class);
         assertEquals(1, countUnpublishedWorkflowWithCustomName, "The workflow should exist and be unpublished");
 
-        systemOutRule.clear();
+        systemErrRule.clear();
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, "--unpub",
             ENTRY, "github.com/DockstoreTestUser2/parameter_test_workflow/test_entryname", SCRIPT_FLAG});
         assertTrue(
-                systemOutRule.getText().contains("The following workflow is already unpublished: github.com/DockstoreTestUser2/parameter_test_workflow"),
+                systemErrRule.getText().contains("The following workflow is already unpublished: github.com/DockstoreTestUser2/parameter_test_workflow"),
                 "Attempting to publish a registered workflow should notify the user");
     }
 }

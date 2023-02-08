@@ -796,7 +796,7 @@ class BasicIT extends BaseIT {
         // Create a hosted tool
         final ApiClient webClient = getWebClient(BaseIT.USER_1_USERNAME, testingPostgres);
         HostedApi hostedApi = new HostedApi(webClient);
-        DockstoreTool hostedTool = hostedApi.createHostedTool("testHosted", Registry.QUAY_IO.getDockerPath().toLowerCase(),
+        hostedApi.createHostedTool("testHosted", Registry.QUAY_IO.getDockerPath().toLowerCase(),
                 DescriptorLanguage.CWL.getShortName(), "hostedToolNamespace", null);
 
         // verify there is an unpublished hosted tool
@@ -805,10 +805,10 @@ class BasicIT extends BaseIT {
         assertEquals(1, initialUnpublishedHostedCount, "There should be 1 unpublished hosted tool");
 
         // attempt to publish the tool with a custom name, should fail
-        systemOutRule.clear();
+        systemErrRule.clear();
         Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "tool", "publish", "--entry",
                 "quay.io/hostedToolNamespace/testHosted", publishNameParameter, "fakeName", "--script" });
-        assertTrue(systemOutRule.getText().contains(ToolClient.INVALID_TOOL_MODE_PUBLISH), "User should be notified that the command is invalid");
+        assertTrue(systemErrRule.getText().contains(ToolClient.INVALID_TOOL_MODE_PUBLISH), "User should be notified that the command is invalid");
 
         // verify there are no new published tools with the above/original name
         final long initialPublishedHostedCount = testingPostgres.runSelectStatement(
