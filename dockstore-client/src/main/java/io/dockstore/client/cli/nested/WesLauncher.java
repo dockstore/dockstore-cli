@@ -28,6 +28,10 @@ import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LOGS;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
+import static io.dockstore.client.cli.nested.WesCommandParser.ID;
+import static io.github.collaboratory.cwl.CWLClient.WES;
 
 public final class WesLauncher {
 
@@ -329,8 +333,8 @@ public final class WesLauncher {
      * @param runId The ID of the launched workflow. This ID is provided from the WES server.
      */
     public static void wesCommandSuggestions(String runId) {
-        out("To view the workflow run status, execute: ");
-        out(MessageFormat.format("\tdockstore workflow wes status --id {0}", runId));
-        out(MessageFormat.format("\tdockstore workflow wes logs --id {0}", runId));
+        out("To view the workflow run " + STATUS + ", execute: ");
+        out(MessageFormat.format("\tdockstore workflow {0} {1} {2} {3}", WES, STATUS, ID, runId));
+        out(MessageFormat.format("\tdockstore workflow {0} {1} {2} {3}", WES, LOGS, ID, runId));
     }
 }

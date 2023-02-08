@@ -25,6 +25,14 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.PLUGIN;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CWL_2_JSON;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -72,7 +80,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
@@ -106,7 +114,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
@@ -136,7 +144,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
@@ -154,9 +162,9 @@ class LaunchTestRunToolIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("dir6.cwl"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
-        args.add("convert");
-        args.add("cwl2json");
+        args.add(TOOL);
+        args.add(CONVERT);
+        args.add(CWL_2_JSON);
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
 
@@ -177,7 +185,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
@@ -196,7 +204,7 @@ class LaunchTestRunToolIT {
         args.add("--local-entry");
         args.add("--cwl");
         args.add(cwlFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(cwlJSON.getAbsolutePath());
 
         ContainersApi api = mock(ContainersApi.class);
@@ -297,7 +305,7 @@ class LaunchTestRunToolIT {
         File cwlFile = new File(ResourceHelpers.resourceFilePath("file_provision/split.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("file_provision/split_to_s3_failed.json"));
         // failure relies on file provisioning plugins, oy!
-        runClientCommand(new ArrayList<>(List.of("plugin", "download")));
+        runClientCommand(new ArrayList<>(List.of(PLUGIN, DOWNLOAD)));
         catchSystemExit(() -> runTool(cwlFile, cwlJSON));
         assertTrue(systemErrRule.getText().contains("Caused by: com.amazonaws.services.s3.model.AmazonS3Exception"),
                 "Error should occur, caused by Amazon S3 Exception, err output looked like: " + systemErrRule.getText() + "std out looked like" + systemOutRule.getText());
@@ -352,8 +360,8 @@ class LaunchTestRunToolIT {
 
     private void runClientCommand(List<String> args) {
         args.add(0, ResourceHelpers.resourceFilePath("config"));
-        args.add(0, "--config");
-        args.add(0, "--script");
+        args.add(0, CONFIG);
+        args.add(0, SCRIPT_FLAG);
         Client.main(args.toArray(new String[0]));
     }
 

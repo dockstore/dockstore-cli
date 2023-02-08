@@ -23,8 +23,15 @@ import java.util.List;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.Workflow;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.DEBUG_FLAG;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static java.lang.Math.max;
 
 /**
  * Organizes all methods that have to do with parsing of input and creation of output.
@@ -41,6 +48,7 @@ public final class ArgumentUtility {
     public static final String DESCRIPTION_HEADER = "DESCRIPTION";
     public static final String GIT_HEADER = "GIT REPO";
     public static final int MAX_DESCRIPTION = 50;
+    public static final int LEV_THRESHOLD = 5;
 
     private static final Logger LOG = LoggerFactory.getLogger(ArgumentUtility.class);
 
@@ -206,7 +214,7 @@ public final class ArgumentUtility {
     }
 
     static boolean isHelpRequest(String first) {
-        return "-h".equals(first) || "--help".equals(first);
+        return "-h".equals(first) || HELP.equals(first);
     }
 
     public static boolean containsHelpRequest(List<String> args) {
@@ -239,13 +247,13 @@ public final class ArgumentUtility {
     public static void printFlagHelp() {
         out("");
         out("Flags:");
-        out("  --help               Print help information");
+        out("  " + HELP + "               Print help information");
         out("                       Default: false");
-        out("  --debug              Print debugging information");
+        out("  " + DEBUG_FLAG + "              Print debugging information");
         out("                       Default: false");
-        out("  --config <file>      Override config file");
+        out("  " + CONFIG + " <file>      Override config file");
         out("                       Default: ~/.dockstore/config");
-        out("  --script             For usage with scripts. Will not check for updates to Dockstore CLI.");
+        out("  " + SCRIPT_FLAG + "             For usage with scripts. Will not check for updates to Dockstore CLI.");
         out("                       Default: false");
     }
 
@@ -260,8 +268,64 @@ public final class ArgumentUtility {
         out("");
     }
 
-    public static void invalid(String cmd) {
-        errorMessage("dockstore: " + cmd + " is not a dockstore command. See 'dockstore --help'.", Client.CLIENT_ERROR);
+
+    private static List<String> minDistance(String invalidCommand, List<String> possibleCommands) {
+        List<String> minDistanceArray = new ArrayList<>();
+        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
+        int minDistance = Integer.MAX_VALUE;
+        for (String str: possibleCommands) {
+            int distance = levenshteinDistance.apply(str.toLowerCase(), invalidCommand);
+            if (distance >= max(str.length(), invalidCommand.length())) {
+                // Do nothing, as this means the two strings have nothing in common
+                continue;
+            }
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                minDistanceArray.clear();
+                minDistanceArray.add(str);
+            } else if (distance == minDistance) {
+                minDistanceArray.add(str);
+            }
+        }
+        return minDistanceArray;
+    }
+
+    /**
+     *
+     * @param correctCommand the command that was correctly read in and understood by the CLI. For example,
+     *                       if the user input "dockstore workflow INVALID_COMMAND", correctCommand would be "workflow"
+     *                       or if the user input "dockstore INVALID_COMMAND", correctCommand would be ""
+     * @param invalidCommand
+     * @param possibleCommands
+     */
+
+    public static void invalid(String correctCommand, String invalidCommand, List<String> possibleCommands) {
+
+        List<String> mostSimilarCommands = minDistance(invalidCommand.toLowerCase(), possibleCommands);
+        String formattedCorrectCommand;
+        if (correctCommand.isBlank()) {
+            formattedCorrectCommand = "";
+        } else {
+            formattedCorrectCommand = " " + correctCommand;
+        }
+
+        out("dockstore" + formattedCorrectCommand + ": \'" + invalidCommand + "\'" + " is not a dockstore command. "
+                + "See 'dockstore" + formattedCorrectCommand + " " + HELP + "'.");
+
+        if (mostSimilarCommands.isEmpty()) {
+            return;
+        } else if (mostSimilarCommands.size() == 1) {
+            out("");
+            out("The most similar command is:");
+        } else {
+            out("");
+            out("The most similar commands are:");
+        }
+        for (String possibleCommand: mostSimilarCommands) {
+            out("    " + possibleCommand);
+        }
+
     }
 
     static boolean flag(List<String> args, String flag) {

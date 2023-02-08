@@ -50,6 +50,16 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.VERSION;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.swagger.client.model.ToolDescriptor.TypeEnum.CWL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -99,13 +109,13 @@ class WorkflowIT extends BaseIT {
         // should be able to launch properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY, toolpath,
+                JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
 
         // should not be able to launch properly with incorrect credentials
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry", toolpath,
-                        "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" }));
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, LAUNCH, ENTRY, toolpath,
+                        JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -150,8 +160,8 @@ class WorkflowIT extends BaseIT {
 
         // Download published workflow version
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
-                "--script" });
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, ENTRY, toolpath,
+                SCRIPT_FLAG });
         arbitraryURL = SwaggerUtility.getArbitraryURL("/workflows/" + workflowId + "/zip/" + versionId, new GenericType<byte[]>() {
         }, CLICommonTestUtilities.getWebClient(false, null, testingPostgres));
         File tempZip2 = File.createTempFile("temp", "zip");
@@ -163,8 +173,8 @@ class WorkflowIT extends BaseIT {
         tempZip2.deleteOnExit();
 
         // download and unzip via CLI
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "download", "--entry",
-            toolpath + ":" + workflowVersion.getName(), "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, DOWNLOAD, ENTRY,
+            toolpath + ":" + workflowVersion.getName(), SCRIPT_FLAG });
         zipFile.stream().forEach((ZipEntry entry) -> {
             if (!(entry).isDirectory()) {
                 File innerFile = new File(System.getProperty("user.dir"), entry.getName());
@@ -174,8 +184,8 @@ class WorkflowIT extends BaseIT {
         });
 
         // download zip via CLI
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "download", "--entry",
-            toolpath + ":" + workflowVersion.getName(), "--zip", "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, DOWNLOAD, ENTRY,
+            toolpath + ":" + workflowVersion.getName(), "--zip", SCRIPT_FLAG });
         File downloadedZip = new File(new WorkflowClient(null, null, null, false).zipFilename(workflow));
         assert (downloadedZip.exists());
         assert (downloadedZip.delete());
@@ -204,25 +214,25 @@ class WorkflowIT extends BaseIT {
         // should be able to download properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
-            new String[] { "--config", fileWithCorrectCredentials, "checker", "download", "--entry", toolpath, "--version", "master",
-                "--script" });
+            new String[] { CONFIG, fileWithCorrectCredentials, CHECKER, DOWNLOAD, ENTRY, toolpath, VERSION, "master",
+                SCRIPT_FLAG });
 
         // Publish the workflow
-        Client.main(new String[] { "--config", fileWithCorrectCredentials, "workflow", "publish", "--entry", toolpath, "--script" });
+        Client.main(new String[] { CONFIG, fileWithCorrectCredentials, WORKFLOW, PUBLISH, ENTRY, toolpath, SCRIPT_FLAG });
 
         // should be able to download properly with incorrect credentials because the entry is published
         Client.main(
-            new String[] { "--config", fileWithIncorrectCredentials, "checker", "download", "--entry", toolpath, "--version", "master",
-                "--script" });
+            new String[] { CONFIG, fileWithIncorrectCredentials, CHECKER, DOWNLOAD, ENTRY, toolpath, VERSION, "master",
+                SCRIPT_FLAG });
 
         // Unpublish the workflow
         Client.main(
-            new String[] { "--config", fileWithCorrectCredentials, "workflow", "publish", "--entry", toolpath, "--unpub", "--script" });
+            new String[] { CONFIG, fileWithCorrectCredentials, WORKFLOW, PUBLISH, ENTRY, toolpath, "--unpub", SCRIPT_FLAG });
 
         // should not be able to download properly with incorrect credentials because the entry is not published
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { "--config", fileWithIncorrectCredentials, "checker", "download", "--entry", toolpath, "--version", "master",
-                        "--script" }));
+                new String[] { CONFIG, fileWithIncorrectCredentials, CHECKER, DOWNLOAD, ENTRY, toolpath, VERSION, "master",
+                        SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -246,24 +256,24 @@ class WorkflowIT extends BaseIT {
         // should be able to launch properly with correct credentials even though the workflow is not published
         FileUtils.writeStringToFile(new File("md5sum.input"), "foo", StandardCharsets.UTF_8);
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "checker", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), CHECKER, LAUNCH, ENTRY, toolpath,
+                JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
 
         // should be able to launch properly with incorrect credentials but the entry is published
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
-                "--script" });
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, ENTRY, toolpath,
+                SCRIPT_FLAG });
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "checker", "launch", "--entry", toolpath,
-                "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, LAUNCH, ENTRY, toolpath,
+                JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
 
         // should not be able to launch properly with incorrect credentials
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry", toolpath,
-                "--unpub", "--script" });
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, ENTRY, toolpath,
+                "--unpub", SCRIPT_FLAG });
         int exitCode = catchSystemExit(() ->  Client.main(
-                new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "checker", "launch", "--entry", toolpath,
-                        "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" }));
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), CHECKER, LAUNCH, ENTRY, toolpath,
+                        JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -313,14 +323,14 @@ class WorkflowIT extends BaseIT {
         assertFalse(workflow.getOutputFileFormats().isEmpty());
 
         // launch the workflow, note that the latest version of the workflow should launch (i.e. the working one)
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
+            workflow.getFullWorkflowPath(), JSON, ResourceHelpers.resourceFilePath("revsort-job.json"), SCRIPT_FLAG });
 
         WorkflowsApi workflowsApi = new WorkflowsApi(webClient);
         workflowsApi.publish(workflow.getId(), SwaggerUtility.createPublishRequest(true));
         // should also launch successfully with the wrong credentials when published
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file.txt"), "workflow", "launch", "--entry",
-            workflow.getFullWorkflowPath(), "--json", ResourceHelpers.resourceFilePath("revsort-job.json"), "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), WORKFLOW, LAUNCH, ENTRY,
+            workflow.getFullWorkflowPath(), JSON, ResourceHelpers.resourceFilePath("revsort-job.json"), SCRIPT_FLAG });
     }
 
     /**
@@ -377,15 +387,15 @@ class WorkflowIT extends BaseIT {
         assertTrue(workflowVersion2.isValid());
         userWorkflowsApi.publish(workflowByPathGithub2.getId(), SwaggerUtility.createPublishRequest(true));
         List<String> args = new ArrayList<>();
-        args.add("workflow");
-        args.add("launch");
-        args.add("--entry");
+        args.add(WORKFLOW);
+        args.add(LAUNCH);
+        args.add(ENTRY);
         args.add("github.com/dockstore-testing/Workflows-For-CI/count-lines1-wf");
         args.add("--yaml");
         args.add(jsonFilePath);
-        args.add("--config");
+        args.add(CONFIG);
         args.add(clientConfig);
-        args.add("--script");
+        args.add(SCRIPT_FLAG);
 
         Client.main(args.toArray(new String[0]));
         assertTrue(systemOutRule.getText().contains("Final process status is success"));

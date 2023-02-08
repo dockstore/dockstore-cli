@@ -32,7 +32,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.PLUGIN;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.SEARCH;
 
 /**
  * @author dyuen
@@ -69,18 +75,18 @@ public final class SearchClient {
         JCommander jc = new JCommander();
 
         SearchPlugin searchPlugin = new SearchPlugin();
-        JCommander jcPlugin = addCommand(jc, "search", searchPlugin);
+        JCommander jcPlugin = addCommand(jc, SEARCH, searchPlugin);
 
         IndexPlugin indexPlugin = new IndexPlugin();
         addCommand(jcPlugin, "index", indexPlugin);
 
         SearchPluginList searchPluginList = new SearchPluginList();
-        addCommand(jcPlugin, "search", searchPluginList);
+        addCommand(jcPlugin, SEARCH, searchPluginList);
         // Not parsing with jc because we know the first command was search.  jc's purpose is to display help
         jcPlugin.parse(argv);
         try {
             if (args.isEmpty() || searchPlugin.help) {
-                printJCommanderHelp(jc, "dockstore", "plugin");
+                printJCommanderHelp(jc, "dockstore", PLUGIN);
             } else {
                 switch (jcPlugin.getParsedCommand()) {
                 case "index":
@@ -90,9 +96,9 @@ public final class SearchClient {
                         return index(api);
                     }
                     break;
-                case "search":
+                case SEARCH:
                     if (searchPluginList.help) {
-                        printJCommanderHelp(jc, "dockstore", "search");
+                        printJCommanderHelp(jc, "dockstore", SEARCH);
                     } else {
                         return search(api);
                     }
@@ -102,7 +108,7 @@ public final class SearchClient {
                 }
             }
         } catch (ParameterException e) {
-            printJCommanderHelp(jc, "dockstore", "search");
+            printJCommanderHelp(jc, "dockstore", SEARCH);
         }
         return true;
 
@@ -117,9 +123,9 @@ public final class SearchClient {
             ElasticSearchObject elasticSearchObject = gson.fromJson(s, ElasticSearchObject.class);
             for (ElasticSearchObject.HitsInternal hit : elasticSearchObject.hits.hits) {
                 if (hit.source instanceof ToolV1) {
-                    System.out.println("Found deserialized tool");
+                    out("Found deserialized " + TOOL);
                 } else {
-                    System.out.println("Found deserialized workflow");
+                    out("Found deserialized " + WORKFLOW);
                 }
             }
             System.out.println(s);
@@ -140,19 +146,19 @@ public final class SearchClient {
 
     @Parameters(separators = "=", commandDescription = "Search operations")
     private static class SearchPlugin {
-        @Parameter(names = "--help", description = "Prints help for search in general command", help = true)
+        @Parameter(names = HELP, description = "Prints help for search in general command", help = true)
         private boolean help = false;
     }
 
     @Parameters(separators = "=", commandDescription = "Trigger an explicit index update, should be admin-only eventually")
     private static class IndexPlugin {
-        @Parameter(names = "--help", description = "Prints help for index command", help = true)
+        @Parameter(names = HELP, description = "Prints help for index command", help = true)
         private boolean help = false;
     }
 
     @Parameters(separators = "=", commandDescription = "Search currently published tools and workflows")
     private static class SearchPluginList {
-        @Parameter(names = "--help", description = "Prints help for search command ", help = true)
+        @Parameter(names = HELP, description = "Prints help for search command ", help = true)
         private boolean help = false;
     }
 

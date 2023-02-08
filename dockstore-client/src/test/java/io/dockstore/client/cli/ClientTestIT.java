@@ -25,7 +25,9 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.DEPRECATED_PORT_MESSAGE;
+import static io.dockstore.client.cli.Client.HELP;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -57,7 +59,7 @@ class ClientTestIT {
     @Test
     void noErrorLogs() {
         String clientConfig = ResourceHelpers.resourceFilePath("clientConfig");
-        String[] command = { "--help", "--config", clientConfig };
+        String[] command = { HELP, CONFIG, clientConfig };
         Client.main(command);
         assertTrue(systemErrRule.getText().isBlank(), "There are unexpected error logs");
         assertFalse(systemErrRule.getText().contains(DEPRECATED_PORT_MESSAGE), "Should not have warned about port 8443");
@@ -69,7 +71,7 @@ class ClientTestIT {
     @Test
     void testPort8443() {
         String clientConfig = ResourceHelpers.resourceFilePath("oldClientConfig");
-        String[] command = { "--help", "--config", clientConfig };
+        String[] command = { HELP, CONFIG, clientConfig };
         Client.main(command);
         assertTrue(systemErrRule.getText().contains(DEPRECATED_PORT_MESSAGE), "Should have warned about port 8443");
     }

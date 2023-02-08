@@ -28,6 +28,8 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -112,7 +114,7 @@ class YamlValidatorTest {
     @Test
     void allFilesNotPresent() {
         final String baseTestDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present/";
-        List<String> directoryEnds1 = Arrays.asList("tool", "service", "workflow");
+        List<String> directoryEnds1 = Arrays.asList(TOOL, "service", WORKFLOW);
         for (String directoryEnd : directoryEnds1) {
             String testDirectory = baseTestDirectory + directoryEnd;
             String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE

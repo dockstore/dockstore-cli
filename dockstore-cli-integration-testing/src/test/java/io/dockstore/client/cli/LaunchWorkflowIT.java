@@ -14,8 +14,16 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
@@ -45,9 +53,9 @@ class LaunchWorkflowIT extends BaseIT {
     @Test
     @Disabled("broken on CI")
     void testLocalLaunchCWL() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
-            ResourceHelpers.resourceFilePath("filtercount.cwl.yaml"), "--json", ResourceHelpers.resourceFilePath("filtercount-job.json"),
-            "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--local-entry",
+            ResourceHelpers.resourceFilePath("filtercount.cwl.yaml"), JSON, ResourceHelpers.resourceFilePath("filtercount-job.json"),
+            SCRIPT_FLAG });
     }
 
     /**
@@ -55,8 +63,8 @@ class LaunchWorkflowIT extends BaseIT {
      */
     @Test
     void testLocalLaunchCWLNoFile() throws Exception {
-        int exitCode = catchSystemExit(() ->  Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
-                "imnotreal.cwl", "--json", "imnotreal-job.json", "--script" }));
+        int exitCode = catchSystemExit(() ->  Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--local-entry",
+                "imnotreal.cwl", JSON, "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -66,8 +74,8 @@ class LaunchWorkflowIT extends BaseIT {
      */
     @Test
     void testLocalLaunchWDLNoFile() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
-                "imnotreal.wdl", "--json", "imnotreal-job.json", "--script" }));
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--local-entry",
+                "imnotreal.wdl", JSON, "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -77,8 +85,8 @@ class LaunchWorkflowIT extends BaseIT {
     @Test
     @Category(ToilCompatibleTest.class)
     void testRemoteLaunchCWLNoFile() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-                "imnotreal.cwl", "--json", "imnotreal-job.json", "--script" }));
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
+                "imnotreal.cwl", JSON, "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -87,8 +95,8 @@ class LaunchWorkflowIT extends BaseIT {
      */
     @Test
     void testRemoteLaunchWDLNoFile() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-                "imnotreal.wdl", "--json", "imnotreal-job.json", "--script" }));
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
+                "imnotreal.wdl", JSON, "imnotreal-job.json", SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -97,8 +105,8 @@ class LaunchWorkflowIT extends BaseIT {
      */
     @Test
     void testLocalLaunchWDL() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
-            ResourceHelpers.resourceFilePath("wdl.wdl"), "--json", ResourceHelpers.resourceFilePath("wdl.json"), "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--local-entry",
+            ResourceHelpers.resourceFilePath("wdl.wdl"), JSON, ResourceHelpers.resourceFilePath("wdl.json"), SCRIPT_FLAG });
     }
 
 
@@ -107,9 +115,9 @@ class LaunchWorkflowIT extends BaseIT {
      */
     @Test
     void testLocalLaunchWDLWithDir() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
-            ResourceHelpers.resourceFilePath("directorytest.wdl"), "--json", ResourceHelpers.resourceFilePath("directorytest.json"),
-            "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--local-entry",
+            ResourceHelpers.resourceFilePath("directorytest.wdl"), JSON, ResourceHelpers.resourceFilePath("directorytest.json"),
+            SCRIPT_FLAG });
     }
 
 
@@ -120,9 +128,9 @@ class LaunchWorkflowIT extends BaseIT {
     @Test
     @Disabled("cromwell needs to support HTTP/HTTPS file prov")
     void testLocalLaunchWDLImportHTTP() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
-            ResourceHelpers.resourceFilePath("wdlhttpimport.wdl"), "--json", ResourceHelpers.resourceFilePath("wdlhttp.json"),
-            "--script" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--local-entry",
+            ResourceHelpers.resourceFilePath("wdlhttpimport.wdl"), JSON, ResourceHelpers.resourceFilePath("wdlhttp.json"),
+            SCRIPT_FLAG });
     }
 
     /**
@@ -134,8 +142,8 @@ class LaunchWorkflowIT extends BaseIT {
         // re-enable and test with versions of system rules newer than 1.17.1
         //        systemExit.checkAssertionAfterwards(
         //            () -> assertTrue("Output should indicate issues with WDL imports and exit", systemOutRule.getLog().contains("Could not get WDL imports")));
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--local-entry",
-                ResourceHelpers.resourceFilePath("wdlincorrecthttp.wdl"), "--json", ResourceHelpers.resourceFilePath("wdl.json"), "--script" }));
+        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, "--local-entry",
+                ResourceHelpers.resourceFilePath("wdlincorrecthttp.wdl"), JSON, ResourceHelpers.resourceFilePath("wdl.json"), SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
@@ -148,26 +156,26 @@ class LaunchWorkflowIT extends BaseIT {
     void launchWorkflowChecksumValidation() {
         // register and publish a workflow
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish", "--repository",
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, MANUAL_PUBLISH, "--repository",
                 "md5sum-checker", "--organization", "DockstoreTestUser2", "--git-version-control", "github",
-                "--workflow-path", "/checker-workflow-wrapping-tool.cwl", "--descriptor-type", "cwl", "--workflow-name", "checksumTester", "--script" });
+                "--workflow-path", "/checker-workflow-wrapping-tool.cwl", "--descriptor-type", "cwl", "--workflow-name", "checksumTester", SCRIPT_FLAG });
 
         // ensure checksum validation is acknowledged, and no null checksums were discovered
         systemOutRule.clear();
-        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),
                 "Output should indicate that checksums have been validated");
 
         // unpublish the workflow
         Client.main(
-            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--unpub", "--entry", "github.com/DockstoreTestUser2/md5sum-checker/checksumTester"});
+            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, "--unpub", ENTRY, "github.com/DockstoreTestUser2/md5sum-checker/checksumTester"});
 
         // ensure checksum validation is acknowledged for the unpublished workflow, and no null checksums were discovered
         systemOutRule.clear();
-        Client.main(new String[] {"--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "launch", "--entry",
-            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", "--json", ResourceHelpers.resourceFilePath("md5sum_cwl.json"), "--script" });
+        Client.main(new String[] {CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, LAUNCH, ENTRY,
+            "github.com/DockstoreTestUser2/md5sum-checker/checksumTester", JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json"), SCRIPT_FLAG });
         assertTrue(
                 systemOutRule.getText().contains(CHECKSUM_VALIDATED_MESSAGE) && !systemOutRule.getText().contains(CHECKSUM_NULL_MESSAGE),
                 "Output should indicate that checksums have been validated");

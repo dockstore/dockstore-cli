@@ -26,10 +26,13 @@ import io.dockstore.client.cli.Client;
 import io.swagger.client.api.MetadataApi;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.VERSION;
+
 public class ToilWrapper implements CWLRunnerInterface {
     @Override
     public void checkForCWLDependencies(MetadataApi metadataApi) {
-        final String[] s1 = { "toil-cwl-runner", "--version" };
+        final String[] s1 = { "toil-cwl-runner", VERSION };
         final ImmutablePair<String, String> pair1 = io.cwl.avro.Utilities
                 .executeCommand(Joiner.on(" ").join(Arrays.asList(s1)), false, com.google.common.base.Optional.absent(),
                         com.google.common.base.Optional.absent());
@@ -38,7 +41,7 @@ public class ToilWrapper implements CWLRunnerInterface {
         final String expectedToilVersion = "3.15.0";
         if (!toilVersion.equals(expectedToilVersion)) {
             ArgumentUtility.errorMessage("toil version is " + toilVersion + " , Dockstore is tested with " + expectedToilVersion
-                    + "\nOverride and run with `--script`", Client.COMMAND_ERROR);
+                    + "\nOverride and run with `" + SCRIPT_FLAG + "`", Client.COMMAND_ERROR);
         }
     }
 

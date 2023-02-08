@@ -30,6 +30,8 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.model.PublishRequest;
 import org.apache.commons.io.FileUtils;
 
+import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+
 public final class SwaggerUtility {
 
     private SwaggerUtility() {
@@ -76,7 +78,7 @@ public final class SwaggerUtility {
      */
     public static PublishRequest createPublishRequest(Boolean bool) {
         Map<String, Object> publishRequest = new HashMap<>();
-        publishRequest.put("publish", bool);
+        publishRequest.put(PUBLISH, bool);
         Gson gson = new Gson();
         String s = gson.toJson(publishRequest);
         return gson.fromJson(s, PublishRequest.class);
