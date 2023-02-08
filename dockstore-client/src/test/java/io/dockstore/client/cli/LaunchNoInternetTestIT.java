@@ -22,6 +22,12 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -77,15 +83,15 @@ class LaunchNoInternetTestIT {
     @Test
     void directoryNotSpecified() throws Exception {
         List<String> args = new ArrayList<>();
-        args.add("tool");
-        args.add("launch");
+        args.add(TOOL);
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(ResourceHelpers.resourceFilePath("config"));
-        args.add("--script");
+        args.add(SCRIPT_FLAG);
 
         int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
         assertNotEquals(0, exitCode);
@@ -106,15 +112,15 @@ class LaunchNoInternetTestIT {
         }
 
         List<String> args = new ArrayList<>();
-        args.add("tool");
-        args.add("launch");
+        args.add(TOOL);
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
-        args.add("--script");
+        args.add(SCRIPT_FLAG);
 
         int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
         assertNotEquals(0, exitCode);
@@ -135,15 +141,15 @@ class LaunchNoInternetTestIT {
             fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
-        args.add("launch");
+        args.add(TOOL);
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
-        args.add("--script");
+        args.add(SCRIPT_FLAG);
 
         int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
         assertNotEquals(0, exitCode);
@@ -168,15 +174,15 @@ class LaunchNoInternetTestIT {
             fail("Could not create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
-        args.add("launch");
+        args.add(TOOL);
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(DESCRIPTOR_FILE.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
-        args.add("--script");
+        args.add(SCRIPT_FLAG);
 
         int exitCode = catchSystemExit(() -> Client.main(args.toArray(new String[0])));
         assertNotEquals(0, exitCode);
@@ -198,15 +204,15 @@ class LaunchNoInternetTestIT {
             fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("tool");
-        args.add("launch");
+        args.add(TOOL);
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());
         args.add("--yaml");
         args.add(YAML_FILE.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
-        args.add("--script");
+        args.add(SCRIPT_FLAG);
 
         Client.main(args.toArray(new String[0]));
         assertTrue(systemOutRule.getText().contains("Final process status is success"), "Final process status was not success");
@@ -226,13 +232,13 @@ class LaunchNoInternetTestIT {
             fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
-        args.add("launch");
+        args.add(WORKFLOW);
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(jsonFile.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
 
         Client.main(args.toArray(new String[0]));
@@ -253,13 +259,13 @@ class LaunchNoInternetTestIT {
             fail("Could create temp config file");
         }
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
-        args.add("launch");
+        args.add(WORKFLOW);
+        args.add(LAUNCH);
         args.add("--local-entry");
         args.add(descriptorFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(jsonFile.getAbsolutePath());
-        args.add("--config");
+        args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
 
         Client.main(args.toArray(new String[0]));

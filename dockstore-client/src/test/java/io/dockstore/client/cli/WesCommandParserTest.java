@@ -5,6 +5,18 @@ import com.beust.jcommander.ParameterException;
 import io.dockstore.client.cli.nested.WesCommandParser;
 import org.junit.jupiter.api.Test;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CANCEL;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.LOGS;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.SERVICE_INFO;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
+import static io.dockstore.client.cli.nested.WesCommandParser.COUNT;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.ID;
+import static io.dockstore.client.cli.nested.WesCommandParser.PAGE_TOKEN;
+import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -16,7 +28,7 @@ class WesCommandParserTest {
     @Test
     void testWesMainHelp() {
         final String[] args = {
-            "--help"
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -31,7 +43,7 @@ class WesCommandParserTest {
     void testWesMainUrl() {
         final String wesUrl = "my.wes.url.com/ga4gh/v1/";
         final String[] args = {
-            "--wes-url",
+            WES_URL,
             wesUrl
         };
 
@@ -57,23 +69,23 @@ class WesCommandParserTest {
     @Test
     void testCommandLaunchHelp() {
         final String[] args = {
-            "launch",
-            "--help"
+            LAUNCH,
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
 
-        assertEquals("launch", parser.getParsedCommand(), "Parsed command should be 'launch'");
+        assertEquals(LAUNCH, parser.getParsedCommand(), "Parsed command should be 'launch'");
         assertTrue(wesCommandParser.commandLaunch.isHelp(), "Should be a help command");
     }
 
     @Test
     void testCommandLaunch1() {
         final String[] args = {
-            "launch",
-            "--entry",
+            LAUNCH,
+            ENTRY,
             "my/fake/entry"
         };
 
@@ -81,15 +93,15 @@ class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
 
-        assertEquals("launch", parser.getParsedCommand(), "Parsed command should be 'launch'");
+        assertEquals(LAUNCH, parser.getParsedCommand(), "Parsed command should be 'launch'");
         assertEquals("my/fake/entry", wesCommandParser.commandLaunch.getEntry(), "The parsed entry should be 'my/fake/entry'");
     }
 
     @Test
     void testCommandLaunch2() {
         final String[] args = {
-            "launch",
-            "--entry",
+            LAUNCH,
+            ENTRY,
             "my/fake/entry"
         };
 
@@ -97,17 +109,17 @@ class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
 
-        assertEquals("launch", parser.getParsedCommand(), "Parsed command should be 'launch'");
+        assertEquals(LAUNCH, parser.getParsedCommand(), "Parsed command should be 'launch'");
         assertEquals("my/fake/entry", wesCommandParser.commandLaunch.getEntry(), "The parsed entry should be 'my/fake/entry'");
     }
 
     @Test
     void testCommandLaunch3() {
         final String[] args = {
-            "launch",
-            "--wes-url",
+            LAUNCH,
+            WES_URL,
             "banana",
-            "--entry",
+            ENTRY,
             "my/fake/entry"
         };
 
@@ -115,7 +127,7 @@ class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
 
-        assertEquals("launch", parser.getParsedCommand(), "Parsed command should be 'launch'");
+        assertEquals(LAUNCH, parser.getParsedCommand(), "Parsed command should be 'launch'");
         assertEquals("banana", wesCommandParser.commandLaunch.getWesUrl(), "The parsed URL should be 'banana'");
         assertEquals("my/fake/entry", wesCommandParser.commandLaunch.getEntry(), "The parsed entry should be 'my/fake/entry'");
     }
@@ -123,7 +135,7 @@ class WesCommandParserTest {
     @Test
     void testCommandLaunchNoEntry() {
         final String[] args = {
-            "launch",
+            LAUNCH,
             "--yaml",
             "path/to/yaml.yaml"
         };
@@ -142,8 +154,8 @@ class WesCommandParserTest {
     @Test
     void testCommandCancel() {
         final String[] args = {
-            "cancel",
-            "--id",
+            CANCEL,
+            ID,
             "123456"
         };
 
@@ -151,21 +163,21 @@ class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
 
-        assertEquals("cancel", parser.getParsedCommand(), "Parsed command should be 'cancel'");
+        assertEquals(CANCEL, parser.getParsedCommand(), "Parsed command should be '" + CANCEL + "'");
         assertEquals("123456", wesCommandParser.commandCancel.getId(), "The parsed entry should be '123456'");
     }
 
     @Test
     void testCommandCancelNoID() {
         final String[] args = {
-            "cancel"
+            CANCEL
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
         JCommander parser = wesCommandParser.jCommander;
         try {
             parser.parse(args);
-            fail("The parser should throw an exception for missing '--id' parameter");
+            fail("The parser should throw an exception for missing '" + ID + "' parameter");
         } catch (ParameterException e) {
             assertTrue(true);
         }
@@ -174,8 +186,8 @@ class WesCommandParserTest {
     @Test
     void testCommandCancelHelp() {
         final String[] args = {
-            "cancel",
-            "--help"
+            CANCEL,
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -187,8 +199,8 @@ class WesCommandParserTest {
     @Test
     void testCommandStatus1() {
         final String[] args = {
-            "status",
-            "--id",
+            STATUS,
+            ID,
             "123456"
         };
 
@@ -196,15 +208,15 @@ class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
 
-        assertEquals("status", parser.getParsedCommand(), "Parsed command should be 'status'");
+        assertEquals(STATUS, parser.getParsedCommand(), "Parsed command should be '" + STATUS + "'");
         assertEquals("123456", wesCommandParser.commandStatus.getId(), "The parsed entry should be '123456'");
     }
 
     @Test
     void testCommandStatus2() {
         final String[] args = {
-            "status",
-            "--id",
+            STATUS,
+            ID,
             "123456"
         };
 
@@ -212,21 +224,21 @@ class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
 
-        assertEquals("status", parser.getParsedCommand(), "Parsed command should be 'status'");
+        assertEquals(STATUS, parser.getParsedCommand(), "Parsed command should be '" + STATUS + "'");
         assertEquals("123456", wesCommandParser.commandStatus.getId(), "The parsed entry should be '123456'");
     }
 
     @Test
     void testCommandStatusNoID() {
         final String[] args = {
-            "status"
+            STATUS
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
         JCommander parser = wesCommandParser.jCommander;
         try {
             parser.parse(args);
-            fail("The parser should throw an exception for missing '--id' parameter");
+            fail("The parser should throw an exception for missing '" + ID + "' parameter");
         } catch (ParameterException e) {
             assertTrue(true);
         }
@@ -235,8 +247,8 @@ class WesCommandParserTest {
     @Test
     void testCommandStatusHelp() {
         final String[] args = {
-            "status",
-            "--help"
+            STATUS,
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -248,7 +260,7 @@ class WesCommandParserTest {
     @Test
     void testCommandServiceInfo() {
         final String[] args = {
-            "service-info"
+            SERVICE_INFO
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -259,8 +271,8 @@ class WesCommandParserTest {
     @Test
     void testCommandServiceInfoHelp() {
         final String[] args = {
-            "service-info",
-            "--help"
+            SERVICE_INFO,
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -272,8 +284,8 @@ class WesCommandParserTest {
     @Test
     void testCommandRunListHelp() {
         final String[] args = {
-            "list",
-            "--help"
+            LIST,
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -286,10 +298,10 @@ class WesCommandParserTest {
     void testCommandRunList() {
         final int count = 3;
         final String[] args = {
-            "list",
-            "--count",
+            LIST,
+            COUNT,
             String.valueOf(count),
-            "--page-token",
+            PAGE_TOKEN,
             "banana"
         };
 
@@ -305,8 +317,8 @@ class WesCommandParserTest {
     @Test
     void testCommandRunLogsHelp() {
         final String[] args = {
-            "logs",
-            "--help"
+            LOGS,
+            HELP
         };
 
         WesCommandParser wesCommandParser = new WesCommandParser();
@@ -318,8 +330,8 @@ class WesCommandParserTest {
     @Test
     void testCommandRunlogs1() {
         final String[] args = {
-            "logs",
-            "--id",
+            LOGS,
+            ID,
             "123456"
         };
 
@@ -327,7 +339,7 @@ class WesCommandParserTest {
         JCommander parser = wesCommandParser.jCommander;
         parser.parse(args);
 
-        assertEquals("logs", parser.getParsedCommand(), "Parsed command should be 'logs'");
+        assertEquals(LOGS, parser.getParsedCommand(), "Parsed command should be '" + LOGS + "'");
         assertEquals("123456", wesCommandParser.commandRunLogs.getId(), "The parsed entry should be '123456'");
     }
 }

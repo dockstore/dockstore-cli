@@ -49,6 +49,13 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CLEAN_CACHE;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -138,8 +145,8 @@ public class MockedIT {
 
     @Test
     public void runLaunchOneJson() throws IOException, ApiException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry",
-            "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testOneRun.json"), "--script", "--ignore-checksums" });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, LAUNCH, ENTRY,
+            "quay.io/collaboratory/dockstore-tool-linux-sort", JSON, ResourceHelpers.resourceFilePath("testOneRun.json"), SCRIPT_FLAG, "--ignore-checksums" });
 
         assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
     }
@@ -147,9 +154,9 @@ public class MockedIT {
     // TODO: This is returning false positives, disabling for now until we add array support
     @Ignore
     public void runLaunchNJson() throws IOException {
-        Client.main(new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry",
-            "quay.io/collaboratory/dockstore-tool-linux-sort", "--json", ResourceHelpers.resourceFilePath("testMultipleRun.json"),
-            "--script" });
+        Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, LAUNCH, ENTRY,
+            "quay.io/collaboratory/dockstore-tool-linux-sort", JSON, ResourceHelpers.resourceFilePath("testMultipleRun.json"),
+            SCRIPT_FLAG });
     }
 
     /**
@@ -161,8 +168,8 @@ public class MockedIT {
     @Test
     public void runLaunchOneLocalArrayedJson() throws IOException, ApiException {
         Client.main(
-            new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry", "quay.io/collaboratory/arrays",
-                "--json", ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
+            new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, LAUNCH, ENTRY, "quay.io/collaboratory/arrays",
+                JSON, ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), SCRIPT_FLAG, "--ignore-checksums" });
 
         assertTrue(new File("/tmp/example.bedGraph").exists());
         assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
@@ -179,18 +186,18 @@ public class MockedIT {
         String configFileLocation = TestUtility.getConfigFileLocation(true, true, true);
         when(client.getConfigFile()).thenReturn(configFileLocation);
 
-        Client.main(new String[] { "--clean-cache", "--config", configFileLocation, "--script" });
+        Client.main(new String[] { CLEAN_CACHE, CONFIG, configFileLocation, SCRIPT_FLAG });
         // this is kind of redundant, it looks like we take the mocked config file no matter what
-        Client.main(new String[] { "--config", configFileLocation, "tool", "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
-            ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
+        Client.main(new String[] { CONFIG, configFileLocation, TOOL, LAUNCH, ENTRY, "quay.io/collaboratory/arrays", JSON,
+            ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), SCRIPT_FLAG, "--ignore-checksums" });
 
         assertTrue(new File("/tmp/example.bedGraph").exists());
         assertTrue("output should contain cwltool command", systemOutRule.getLog().contains("Executing: cwltool"));
         systemOutRule.clearLog();
 
         // try again, things should be cached now
-        Client.main(new String[] { "--config", configFileLocation, "tool", "launch", "--entry", "quay.io/collaboratory/arrays", "--json",
-            ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), "--script", "--ignore-checksums" });
+        Client.main(new String[] { CONFIG, configFileLocation, TOOL, LAUNCH, ENTRY, "quay.io/collaboratory/arrays", JSON,
+            ResourceHelpers.resourceFilePath("testArrayLocalInputLocalOutput.json"), SCRIPT_FLAG, "--ignore-checksums" });
         assertEquals("output should contain only hard linking", 6, StringUtils.countMatches(systemOutRule.getLog(), "hard-linking"));
         assertTrue("output should not contain warnings about skipping files", !systemOutRule.getLog().contains("skipping"));
     }
@@ -204,8 +211,8 @@ public class MockedIT {
     @Test
     public void runLaunchOneHTTPArrayedJson() throws IOException, ApiException {
         Client.main(
-            new String[] { "--config", TestUtility.getConfigFileLocation(true), "tool", "launch", "--entry", "quay.io/collaboratory/arrays",
-                "--json", ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), "--script", "--ignore-checksums" });
+            new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, LAUNCH, ENTRY, "quay.io/collaboratory/arrays",
+                JSON, ResourceHelpers.resourceFilePath("testArrayHttpInputLocalOutput.json"), SCRIPT_FLAG, "--ignore-checksums" });
 
         assertTrue(new File("/tmp/wc1.out").exists());
         assertTrue(new File("/tmp/wc2.out").exists());

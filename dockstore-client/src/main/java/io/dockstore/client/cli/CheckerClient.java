@@ -2,6 +2,8 @@ package io.dockstore.client.cli;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.dockstore.client.cli.nested.WorkflowClient;
@@ -14,9 +16,12 @@ import io.swagger.client.model.Workflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.invalid;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.printFlagHelp;
@@ -25,6 +30,14 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.printUsageHelp;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.VERSION;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.Client.getGeneralFlags;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static java.lang.String.join;
 
 /**
  * This implements all operations on the CLI that are specific to checkers
@@ -32,12 +45,16 @@ import static io.dockstore.client.cli.ArgumentUtility.reqVal;
  */
 public class CheckerClient extends WorkflowClient {
 
+    public static final String ADD = "add";
+    public static final String UPDATE = "update";
+    public static final String UPDATE_VERSION = "update_version";
     private static final Logger LOG = LoggerFactory.getLogger(CheckerClient.class);
 
     public CheckerClient(WorkflowsApi workflowApi, UsersApi usersApi, Client client, boolean isAdmin) {
         super(workflowApi, usersApi, client, isAdmin);
     }
 
+    // If you add a command, please add it to possibleCommands
     @Override
     public void printGeneralHelp() {
         printHelpHeader();
@@ -46,17 +63,17 @@ public class CheckerClient extends WorkflowClient {
         // Checker client help
         out("Commands:");
         out("");
-        out("  download             :  Downloads all files associated with a checker workflow.");
+        out(join(" ", "  " + DOWNLOAD + "             :  Downloads all files associated with a", CHECKER, WORKFLOW + "."));
         out("");
-        out("  launch               :  Launch a checker workflow locally.");
+        out(join(" ", "  " + LAUNCH + "               :  Launch a", CHECKER, WORKFLOW, "locally."));
         out("");
-        out("  add                  :  Adds a checker workflow to and existing tool/workflow.");
+        out(join(" ", "  " + ADD + "                  :  Adds a", CHECKER, WORKFLOW, "to and existing", TOOL + "/" + WORKFLOW + "."));
         out("");
-        out("  update               :  Updates an existing checker workflow.");
+        out(join(" ", "  " + UPDATE + "               :  Updates an existing", CHECKER, WORKFLOW + "."));
         out("");
-        out("  update_version       :  Updates a specific version of an existing checker workflow.");
+        out(join(" ", "  " + UPDATE_VERSION + "       :  Updates a specific version of an existing", CHECKER, WORKFLOW + "."));
         out("");
-        out("  test_parameter       :  Add/Remove test parameter files for a checker workflow version.");
+        out(join(" ", "  " + TEST_PARAMETER + "       :  Add/Remove test parameter files for a", CHECKER, WORKFLOW, "version."));
         out("");
 
         if (isAdmin) {
@@ -77,26 +94,30 @@ public class CheckerClient extends WorkflowClient {
     public boolean processEntryCommands(List<String> args, String activeCommand) throws ApiException {
         if (null != activeCommand) {
             switch (activeCommand) {
-            case "add":
+            case ADD:
                 addChecker(args);
                 break;
-            case "update":
+            case UPDATE:
                 updateChecker(args);
                 break;
-            case "download":
+            case DOWNLOAD:
                 downloadChecker(args);
                 break;
-            case "launch":
+            case LAUNCH:
                 launchChecker(args);
                 break;
-            case "test_parameter":
+            case TEST_PARAMETER:
                 testParameterChecker(args);
                 break;
-            case "update_version":
+            case UPDATE_VERSION:
                 updateVersionChecker(args);
                 break;
             default:
-                return false;
+                List<String> possibleCommands = new ArrayList<>();
+                possibleCommands.addAll(Arrays.asList(ADD, UPDATE, DOWNLOAD, LAUNCH, TEST_PARAMETER, UPDATE_VERSION));
+                possibleCommands.addAll(getGeneralFlags());
+                invalid(getEntryType().toLowerCase(), activeCommand, possibleCommands);
+                return true;
             }
             return true;
         }
@@ -108,7 +129,7 @@ public class CheckerClient extends WorkflowClient {
             addCheckerHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
             final String descriptorType = optVal(args, "--descriptor-type", DescriptorLanguage.CWL.toString()).toUpperCase();
             String descriptorPath = reqVal(args, "--descriptor-path");
             String inputParameterPath = optVal(args, "--input-parameter-path", null);
@@ -138,9 +159,9 @@ public class CheckerClient extends WorkflowClient {
             if (entry != null) {
                 try {
                     workflowsApi.registerCheckerWorkflow(descriptorPath, entry.getId(), descriptorType, inputParameterPath);
-                    out("A checker workflow has been successfully added to entry with path " + entryPath);
+                    out(join(" ", "A", CHECKER, WORKFLOW, "has been successfully added to entry with path", entryPath));
                 } catch (ApiException ex) {
-                    exceptionMessage(ex, "There was a problem registering the checker workflow.", Client.API_ERROR);
+                    exceptionMessage(ex, join(" ", "There was a problem registering the", CHECKER, WORKFLOW + "."), Client.API_ERROR);
                 }
             }
         }
@@ -148,14 +169,14 @@ public class CheckerClient extends WorkflowClient {
 
     private void addCheckerHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " add --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " add " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " add [parameters]");
         out("");
         out("Description:");
-        out("  Add a checker workflow to an existing tool or workflow.");
+        out(join(" ", "  Add a", CHECKER, WORKFLOW, "to an existing", TOOL, "or", WORKFLOW + "."));
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + ENTRY + " <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  --descriptor-type <descriptor-type>                                      " + DescriptorLanguage.CWL.toString() + "/" + DescriptorLanguage.WDL.toString() + ", defaults to " + DescriptorLanguage.CWL.toString());
         out("  --descriptor-path <descriptor-path>                                      Path to the main descriptor file.");
         out("");
@@ -169,7 +190,7 @@ public class CheckerClient extends WorkflowClient {
             updateCheckerHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
 
             // Get entry from path
             Entry entry = getEntryFromPath(entryPath);
@@ -204,9 +225,9 @@ public class CheckerClient extends WorkflowClient {
 
                     // Refresh the checker workflow
                     workflowsApi.refresh(checkerWorkflow.getId(), true);
-                    out("The checker workflow has been updated.");
+                    out(join(" ", "The", CHECKER, WORKFLOW, "has been updated."));
                 } catch (ApiException ex) {
-                    exceptionMessage(ex, "There was a problem updating the checker workflow.", Client.API_ERROR);
+                    exceptionMessage(ex, join(" ", "There was a problem updating the", CHECKER, WORKFLOW + "."), Client.API_ERROR);
                 }
             }
         }
@@ -215,14 +236,14 @@ public class CheckerClient extends WorkflowClient {
 
     private void updateCheckerHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " update --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " update " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " update [parameters]");
         out("");
         out("Description:");
-        out("  Update an existing checker workflow associated with an entry.");
+        out(join(" ", "  Update an existing", CHECKER, WORKFLOW, "associated with an entry."));
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:master)");
+        out("  " + ENTRY + " <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:master)");
         out("");
         out("Optional Parameters:");
         out("  --default-test-parameter-path <input parameter path>                     Path to the input parameter path, defaults to that of the entry.");
@@ -238,8 +259,8 @@ public class CheckerClient extends WorkflowClient {
             String currentDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
 
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
-            String version = reqVal(args, "--version");
+            String entryPath = reqVal(args, ENTRY);
+            String version = reqVal(args, VERSION);
             final boolean unzip = !args.contains("--zip");
 
             // Get entry from path
@@ -265,15 +286,15 @@ public class CheckerClient extends WorkflowClient {
 
     private void downloadCheckerHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " download --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " download [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), DOWNLOAD, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), DOWNLOAD, "[parameters]"));
         out("");
         out("Description:");
-        out("  Downloads all checker workflow files for the given entry and stores them in the current directory.");
+        out(join(" ", "  Downloads all", CHECKER, WORKFLOW, "files for the given entry and stores them in the current directory."));
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("  --version <version>      Checker version");
+        out("  " + ENTRY + " <entry>          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + VERSION + " <version>      Checker version");
         out("  --zip                    Keep the zip file rather than uncompress the files within");
         out("");
         printHelpFooter();
@@ -284,7 +305,7 @@ public class CheckerClient extends WorkflowClient {
             launchHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
 
             // Properly handle versions
             String[] splitPath = entryPath.split(":");
@@ -307,7 +328,7 @@ public class CheckerClient extends WorkflowClient {
                 if (version != null) {
                     checkerPath += ":" + version;
                 }
-                args.add("--entry");
+                args.add(ENTRY);
                 args.add(checkerPath);
                 launch(args);
             }
@@ -319,7 +340,7 @@ public class CheckerClient extends WorkflowClient {
             testParameterHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
 
             // Get entry from path
             Entry entry = getEntryFromPath(entryPath);
@@ -330,7 +351,7 @@ public class CheckerClient extends WorkflowClient {
             // Add/remove test parameter files
             if (entry != null && checkerWorkflow != null) {
                 // Add entry path to command, but with checker workflow
-                args.add("--entry");
+                args.add(ENTRY);
                 args.add(checkerWorkflow.getFullWorkflowPath());
 
                 // This is used by testParameter to properly display output/error messages
@@ -348,7 +369,7 @@ public class CheckerClient extends WorkflowClient {
             versionTagHelp();
         } else {
             // Retrieve arguments
-            String entryPath = reqVal(args, "--entry");
+            String entryPath = reqVal(args, ENTRY);
 
             // Get entry from path
             Entry entry = getEntryFromPath(entryPath);
@@ -359,7 +380,7 @@ public class CheckerClient extends WorkflowClient {
             // Update version
             if (entry != null && checkerWorkflow != null) {
                 // Readd entry path to call, but with checker workflow
-                args.add("--entry");
+                args.add(ENTRY);
                 args.add(checkerWorkflow.getFullWorkflowPath());
 
                 // Call inherited test parameter function
@@ -395,7 +416,7 @@ public class CheckerClient extends WorkflowClient {
         Workflow checkerWorkflow = null;
         if (entry != null) {
             if (entry.getCheckerId() == null) {
-                errorMessage("The entry has no checker workflow.",
+                errorMessage(join(" ", "The entry has no", CHECKER, WORKFLOW + "."),
                     Client.CLIENT_ERROR);
             } else {
                 if (authRequired) {
