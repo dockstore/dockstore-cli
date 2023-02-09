@@ -34,7 +34,6 @@ import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static java.lang.Math.max;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-
 /**
  * Organizes all methods that have to do with parsing of input and creation of output.
  * This is a static utility class with no state.

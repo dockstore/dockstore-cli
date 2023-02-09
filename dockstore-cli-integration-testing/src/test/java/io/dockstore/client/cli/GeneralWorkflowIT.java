@@ -19,6 +19,7 @@ package io.dockstore.client.cli;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.SourceControl;
@@ -27,7 +28,9 @@ import io.dockstore.common.WorkflowTest;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
+import io.swagger.client.api.HostedApi;
 import io.swagger.client.api.WorkflowsApi;
+import io.swagger.client.model.SourceFile;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
 import org.elasticsearch.common.collect.Set;
@@ -36,7 +39,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
@@ -55,6 +60,7 @@ import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
 import static io.dockstore.webservice.resources.WorkflowResource.FROZEN_VERSION_REQUIRED;
 import static io.dockstore.webservice.resources.WorkflowResource.NO_ZENDO_USER_TOKEN;
+import static io.swagger.client.model.ToolDescriptor.TypeEnum.CWL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,6 +73,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  */
 @Tag(ConfidentialTest.NAME)
 @Tag(WorkflowTest.NAME)
+@ExtendWith(SystemStubsExtension.class)
 class GeneralWorkflowIT extends BaseIT {
 
     @SystemStub
@@ -626,4 +633,81 @@ class GeneralWorkflowIT extends BaseIT {
         }
     }
 
+    @Test
+    void testPublishUnpublishHostedWorkflow() {
+
+        final String publishNameParameter = "--new-entry-name";
+
+        // Create a hosted workflow
+        final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
+        HostedApi hostedApi = new HostedApi(webClient);
+        Workflow hostedWorkflow = hostedApi.createHostedWorkflow("testHosted", null, CWL.toString(), null, null);
+        SourceFile source = new SourceFile();
+        source.setPath("/Dockstore.cwl");
+        source.setAbsolutePath("/Dockstore.cwl");
+        source.setContent("cwlVersion: v1.0\nclass: Workflow");
+        source.setType(SourceFile.TypeEnum.DOCKSTORE_CWL);
+        hostedApi.editHostedWorkflow(hostedWorkflow.getId(), Lists.newArrayList(source));
+
+        // Verify the user has 1 unpublished, hosted workflow
+        final long initialUnpublishedHostedCount = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='" + USER_2_USERNAME + "' "
+                + "AND repository='testHosted' AND mode='HOSTED' AND ispublished='f';", long.class);
+        assertEquals(1, initialUnpublishedHostedCount, "There should be 1 unpublished hosted workflow");
+
+        // Call publish with an entryname parameter specified
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+                "--entry", "dockstore.org/DockstoreTestUser2/testHosted", publishNameParameter, "fakeName", "--script"});
+        assertTrue(systemErrRule.getText().contains(WorkflowClient.INVALID_WORKFLOW_MODE_PUBLISH), "User should be notified that the command is invalid");
+
+        // Check that there are no published workflows for this user using the HOSTED name/custom names
+        final long countTotalPublishedWorkflows = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='" + USER_2_USERNAME + "' "
+                + "AND (repository='testHosted' OR repository='fakeName') AND ispublished='t';", long.class);
+        assertEquals(0, countTotalPublishedWorkflows, "Should contain no published workflows");
+
+        // attempt to call publish normally, it should succeed
+        Client.main(
+            new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish",
+                "--entry", "dockstore.org/DockstoreTestUser2/testHosted", "--script"});
+
+        // verify the workflow is published
+        final long finalPublishedCount = testingPostgres
+            .runSelectStatement("SELECT COUNT(*) FROM workflow WHERE organization='" + USER_2_USERNAME + "' "
+                + "AND repository='testHosted' AND ispublished='t';", long.class);
+        assertEquals(1, finalPublishedCount, "Should contain 1 published workflow");
+    }
+
+    @Test
+    void testPublishUnpublishedDockstoreYMLWorkflow() {
+
+        final String publishNameParameter = "--new-entry-name";
+
+        // publish a repo
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "manual_publish",
+                "--repository", "workflow-dockstore-yml", "--organization", USER_2_USERNAME, "--git-version-control", "github", "--script" });
+
+        // force the workflow into DOCKSTORE_YML mode.
+        testingPostgres.runUpdateStatement(
+                "UPDATE workflow SET mode = 'DOCKSTORE_YML' WHERE repository='workflow-dockstore-yml' AND organization='" + USER_2_USERNAME
+                        + "';");
+
+        // Verify the user has 1 published, apps workflow
+        final long initialPublishedYMLCount = testingPostgres.runSelectStatement(
+                "SELECT COUNT(*) FROM workflow WHERE organization='" + USER_2_USERNAME + "' " + "AND repository='workflow-dockstore-yml' AND mode='DOCKSTORE_YML' AND ispublished='t';", long.class);
+        assertEquals(1, initialPublishedYMLCount, "There should be 1 published DOCKSTORE_YML workflow");
+
+        // Call publish with an entryname parameter specified
+        systemErrRule.clear();
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("config_file2.txt"), "workflow", "publish", "--entry",
+                "github.com/" + USER_2_USERNAME + "/workflow-dockstore-yml", publishNameParameter, "fakeName", "--script" });
+        assertTrue(systemErrRule.getText()
+                .contains(WorkflowClient.INVALID_WORKFLOW_MODE_PUBLISH), "User should be notified that the command is invalid");
+
+        // Verify only 1 workflow is published
+        final long countTotalPublishedWorkflows = testingPostgres.runSelectStatement(
+                "SELECT COUNT(*) FROM workflow WHERE organization='" + USER_2_USERNAME + "' " + "AND (repository='workflow-dockstore-yml' OR repository='fakeName') AND ispublished='t';", long.class);
+        assertEquals(1, countTotalPublishedWorkflows, "User should have only 1 published workflow");
+    }
 }

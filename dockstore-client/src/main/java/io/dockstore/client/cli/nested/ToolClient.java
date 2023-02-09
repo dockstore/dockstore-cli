@@ -66,6 +66,7 @@ import static io.dockstore.client.cli.ArgumentUtility.NAME_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.boolWord;
 import static io.dockstore.client.cli.ArgumentUtility.columnWidthsTool;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
+import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.optVal;
@@ -80,7 +81,6 @@ import static io.dockstore.client.cli.CheckerClient.UPDATE;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
-import static io.swagger.client.model.DockstoreTool.ModeEnum.HOSTED;
 import static java.lang.String.join;
 
 /**
@@ -91,6 +91,7 @@ import static java.lang.String.join;
 public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     public static final String UPDATE_TOOL = "update_tool";
     public static final String VERSION_TAG = "version_tag";
+    public static final String INVALID_TOOL_MODE_PUBLISH = "Custom entry names are not supported for " + DockstoreTool.ModeEnum.HOSTED + " tools.";
     private static final Logger LOG = LoggerFactory.getLogger(ToolClient.class);
     private final Client client;
     private ContainersApi containersApi;
@@ -241,49 +242,55 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : PUBLISH + " ") + entryPath, Client.API_ERROR);
         }
 
+        assert (existingTool != null);
+
         if (unpublishRequest) {
             if (isPublished) {
                 publish(false, entryPath);
             } else {
-                out("The following " + TOOL + " is already unpublished: " + entryPath);
+                err("The following " + TOOL + " is already unpublished: " + entryPath);
             }
         } else {
             if (newName == null) {
                 if (isPublished) {
-                    out("The following " + TOOL + " is already published: " + entryPath);
+                    err("The following " + TOOL + " is already published: " + entryPath);
                 } else {
                     publish(true, entryPath);
                 }
             } else if (!toolExists(entryPath + "/" + newName)) {
-                try {
-                    DockstoreTool newContainer = new DockstoreTool();
+                if (DockstoreTool.ModeEnum.HOSTED == existingTool.getMode()) {
+                    err(ToolClient.INVALID_TOOL_MODE_PUBLISH);
+                } else {
+                    try {
+                        DockstoreTool newContainer = new DockstoreTool();
 
-                    // copy only the fields that we want to replicate, not sure why simply blanking
-                    // the returned container does not work
-                    newContainer.setMode(existingTool.getMode());
-                    newContainer.setName(existingTool.getName());
-                    newContainer.setNamespace(existingTool.getNamespace());
-                    newContainer.setRegistryString(existingTool.getRegistryString());
-                    newContainer.setDefaultDockerfilePath(existingTool.getDefaultDockerfilePath());
-                    newContainer.setDefaultCwlPath(existingTool.getDefaultCwlPath());
-                    newContainer.setDefaultWdlPath(existingTool.getDefaultWdlPath());
-                    newContainer.setDefaultCWLTestParameterFile(existingTool.getDefaultCWLTestParameterFile());
-                    newContainer.setDefaultWDLTestParameterFile(existingTool.getDefaultWDLTestParameterFile());
-                    newContainer.setIsPublished(false);
-                    newContainer.setGitUrl(existingTool.getGitUrl());
-                    newContainer.setToolname(newName);
+                        // copy only the fields that we want to replicate, not sure why simply blanking
+                        // the returned container does not work
+                        newContainer.setMode(existingTool.getMode());
+                        newContainer.setName(existingTool.getName());
+                        newContainer.setNamespace(existingTool.getNamespace());
+                        newContainer.setRegistryString(existingTool.getRegistryString());
+                        newContainer.setDefaultDockerfilePath(existingTool.getDefaultDockerfilePath());
+                        newContainer.setDefaultCwlPath(existingTool.getDefaultCwlPath());
+                        newContainer.setDefaultWdlPath(existingTool.getDefaultWdlPath());
+                        newContainer.setDefaultCWLTestParameterFile(existingTool.getDefaultCWLTestParameterFile());
+                        newContainer.setDefaultWDLTestParameterFile(existingTool.getDefaultWDLTestParameterFile());
+                        newContainer.setIsPublished(false);
+                        newContainer.setGitUrl(existingTool.getGitUrl());
+                        newContainer.setToolname(newName);
 
-                    newContainer = containersApi.registerManual(newContainer);
+                        newContainer = containersApi.registerManual(newContainer);
 
-                    out("Successfully registered " + entryPath + "/" + newName);
+                        err("Successfully registered " + entryPath + "/" + newName);
 
-                    containersApi.refresh(newContainer.getId());
-                    publish(true, newContainer.getToolPath());
-                } catch (ApiException ex) {
-                    exceptionMessage(ex, join(" ", "Unable to", PUBLISH, newName), Client.API_ERROR);
+                        containersApi.refresh(newContainer.getId());
+                        publish(true, newContainer.getToolPath());
+                    } catch (ApiException ex) {
+                        exceptionMessage(ex, join(" ", "Unable to", PUBLISH, newName), Client.API_ERROR);
+                    }
                 }
             } else {
-                out("The following tool is already registered: " + entryPath + "/" + newName);
+                err("The following tool is already registered: " + entryPath + "/" + newName);
             }
         }
     }
@@ -836,7 +843,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 out(builder.toString());
 
                 out("SOURCE CONTROL:");
-                if (Objects.equals(container.getMode(), HOSTED)) {
+                if (Objects.equals(container.getMode(), DockstoreTool.ModeEnum.HOSTED)) {
                     out("Dockstore.org");
                 } else {
                     out(container.getGitUrl());

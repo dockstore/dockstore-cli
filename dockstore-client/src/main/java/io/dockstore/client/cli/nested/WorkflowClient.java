@@ -101,7 +101,8 @@ import static java.lang.String.join;
  * @author dyuen
  */
 public class WorkflowClient extends AbstractEntryClient<Workflow> {
-
+    public static final String INVALID_WORKFLOW_MODE_PUBLISH = "Custom entry names are not supported for " + Workflow.ModeEnum.HOSTED + " and "
+        + Workflow.ModeEnum.DOCKSTORE_YML + " workflows.";
     public static final String BIOWORKFLOW = "bioworkflow";
     public static final String LAUNCH_COMMAND_NAME = LAUNCH;
     public static final String GITHUB_APP_COMMAND_ERROR = "Command not supported for GitHub App entries";
@@ -714,42 +715,48 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             exceptionMessage(ex, "Unable to " + (unpublishRequest ? "unpublish " : PUBLISH + " ") + entryPath, Client.API_ERROR);
         }
 
+        assert (existingWorkflow != null);
+
         if (unpublishRequest) {
             if (isPublished) {
                 publish(false, entryPath);
             } else {
-                out("The following workflow is already unpublished: " + entryPath);
+                err("The following workflow is already unpublished: " + entryPath);
             }
         } else {
             if (newName == null) {
                 if (isPublished) {
-                    out("The following workflow is already published: " + entryPath);
+                    err("The following workflow is already published: " + entryPath);
                 } else {
                     publish(true, entryPath);
                 }
             } else if (!workflowExists(entryPath + "/" + newName)) {
-                try {
-                    // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
-                    final Workflow newWorkflow = workflowsApi.manualRegister(
-                        getGitRegistry(existingWorkflow.getGitUrl()),
-                        existingWorkflow.getOrganization() + "/" + existingWorkflow.getRepository(),
-                        existingWorkflow.getWorkflowPath(),
-                        newName,
-                        existingWorkflow.getDescriptorType().toString(),
-                        existingWorkflow.getDefaultTestParameterFilePath()
-                    );
-
+                // Prevent specifying a custom name for both HOSTED and DOCKSTORE_YML workflows
+                if (Workflow.ModeEnum.HOSTED == existingWorkflow.getMode() || Workflow.ModeEnum.DOCKSTORE_YML == existingWorkflow.getMode()) {
+                    err(WorkflowClient.INVALID_WORKFLOW_MODE_PUBLISH);
+                } else {
                     final String completeEntryPath = entryPath + "/" + newName;
+                    try {
+                        // path should be represented as repository organization and name (ex. dockstore/dockstore-ui2)
+                        final Workflow newWorkflow = workflowsApi.manualRegister(
+                            getGitRegistry(existingWorkflow.getGitUrl()),
+                            existingWorkflow.getOrganization() + "/" + existingWorkflow.getRepository(),
+                            existingWorkflow.getWorkflowPath(),
+                            newName,
+                            existingWorkflow.getDescriptorType().toString(),
+                            existingWorkflow.getDefaultTestParameterFilePath()
+                        );
 
-                    out("Successfully registered " + completeEntryPath);
+                        err("Successfully registered " + completeEntryPath);
 
-                    workflowsApi.refresh(newWorkflow.getId(), true);
-                    publish(true, completeEntryPath);
-                } catch (ApiException ex) {
-                    exceptionMessage(ex, "Unable to " + PUBLISH + " " + entryPath + "/" + newName, Client.API_ERROR);
+                        workflowsApi.refresh(newWorkflow.getId(), true);
+                        publish(true, completeEntryPath);
+                    } catch (ApiException ex) {
+                        exceptionMessage(ex, "Unable to " + PUBLISH + " " + entryPath + "/" + newName, Client.API_ERROR);
+                    }
                 }
             } else {
-                out("The following workflow is already registered: " + entryPath + "/" + newName);
+                err("The following workflow is already registered: " + entryPath + "/" + newName);
             }
         }
     }
