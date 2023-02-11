@@ -6,12 +6,15 @@ import io.dockstore.common.FlushingSystemOut;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
+@ExtendWith(SystemStubsExtension.class)
 public class WesFileTest {
 
     @SystemStub
