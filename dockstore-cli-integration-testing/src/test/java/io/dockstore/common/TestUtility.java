@@ -33,6 +33,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
  * @author jpatricia
  */
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 public final class TestUtility {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestUtility.class);

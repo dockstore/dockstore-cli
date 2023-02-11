@@ -15,6 +15,7 @@
  */
 package io.dockstore.client.cli;
 
+import io.dockstore.common.MuteForSuccessfulTests;
 import io.dockstore.common.Utilities;
 import io.dropwizard.testing.ResourceHelpers;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Created by dyuen on 2/23/17.
  */
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 class ClientTestIT {
 
     @SystemStub

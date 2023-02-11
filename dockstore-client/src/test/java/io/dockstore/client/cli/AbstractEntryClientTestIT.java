@@ -4,6 +4,7 @@ import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.WesCommandParser;
 import io.dockstore.client.cli.nested.WesRequestData;
 import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.MuteForSuccessfulTests;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
@@ -36,6 +37,7 @@ import static software.amazon.awssdk.profiles.ProfileFileSystemSetting.AWS_SHARE
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 class AbstractEntryClientTestIT {
 
     static final String CONFIG_NO_CONTENT_RESOURCE = "configNoContent";

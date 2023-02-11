@@ -24,6 +24,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.MuteForSuccessfulTests;
 import io.dockstore.common.Utilities;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.dropwizard.testing.ResourceHelpers;
@@ -66,6 +67,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @ExtendWith(LaunchTestIT.TestStatus.class)
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 class LaunchTestIT {
     public static final long LAST_MODIFIED_TIME_100 = 100L;
     public static final long LAST_MODIFIED_TIME_1000 = 1000L;

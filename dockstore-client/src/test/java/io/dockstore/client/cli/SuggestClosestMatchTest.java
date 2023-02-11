@@ -19,6 +19,7 @@ package io.dockstore.client.cli;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.dockstore.common.MuteForSuccessfulTests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +39,7 @@ import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 class SuggestClosestMatchTest {
 
     @SystemStub
