@@ -51,9 +51,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Base integration test class
  * A default configuration that cleans the database between tests
  */
-@ExtendWith(BaseIT.TestStatus.class)
 @ExtendWith(SystemStubsExtension.class)
 @ExtendWith(MuteForSuccessfulTests.class)
+@ExtendWith(BaseIT.TestStatus.class)
 @Tag(ConfidentialTest.NAME)
 class BaseIT {
 

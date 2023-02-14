@@ -39,9 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
-@ExtendWith(LaunchTestIT.TestStatus.class)
 @ExtendWith(SystemStubsExtension.class)
 @ExtendWith(MuteForSuccessfulTests.class)
+@ExtendWith(LaunchTestIT.TestStatus.class)
 class LaunchTestRunToolIT {
 
     @SystemStub
