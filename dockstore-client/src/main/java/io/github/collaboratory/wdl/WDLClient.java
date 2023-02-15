@@ -228,7 +228,6 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
                 return false;   // not a WDL file, maybe a CWL file or something else
             } else {
                 // WDL file but some required fields are missing
-                Boolean missingPotentiallyRequiredField = false;
                 String missingPotentiallyRequiredFields = "";
                 String missingRequiredFields = "";
                 if (counter == 0) {
