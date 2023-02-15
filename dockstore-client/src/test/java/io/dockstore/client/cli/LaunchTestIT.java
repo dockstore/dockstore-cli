@@ -56,6 +56,7 @@ import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
+import static io.github.collaboratory.wdl.WDLClient.CALL;
 import static io.github.collaboratory.wdl.WDLClient.COMMAND;
 import static io.github.collaboratory.wdl.WDLClient.OUTPUT;
 import static io.github.collaboratory.wdl.WDLClient.TASK;
@@ -709,6 +710,62 @@ class LaunchTestIT {
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
         assertTrue(systemErrRule.getText().contains(WDL_CHECK_ERROR_MESSAGE + " '" + WORKFLOW + "'"),
                 "output should include an error message and exit");
+    }
+
+    @Test
+    void wdlWorkflowAndCallOnly() throws Exception {
+        //Test when content only contains 'workflow' and 'call'
+
+        File file = new File(ResourceHelpers.resourceFilePath("wfAndCallOnly.wdl"));
+        File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add(ENTRY);
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add(JSON);
+        args.add(json.getAbsolutePath());
+
+        WorkflowsApi api = mock(WorkflowsApi.class);
+        UsersApi usersApi = mock(UsersApi.class);
+        Client client = new Client();
+        client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
+        Client.SCRIPT.set(true);
+
+        WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
+        catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
+        assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + " '" + TASK + "' '" + COMMAND + "' '" + OUTPUT + "'"),
+                "output should include an error message and exit");
+        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START));
+    }
+
+    @Test
+    void wdlCommandOnly() throws Exception {
+        //Test when content is only 'command'
+
+        File file = new File(ResourceHelpers.resourceFilePath("commandOnly.wdl"));
+        File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add(ENTRY);
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add(JSON);
+        args.add(json.getAbsolutePath());
+
+        WorkflowsApi api = mock(WorkflowsApi.class);
+        UsersApi usersApi = mock(UsersApi.class);
+        Client client = new Client();
+        client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
+        Client.SCRIPT.set(true);
+
+        WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
+        catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
+        assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + " '" + TASK + "' '" +  OUTPUT + "'"),
+                "output should include an error message and exit");
+        assertTrue(systemErrRule.getText().contains(WDL_CHECK_ERROR_MESSAGE + " '" + WORKFLOW + "' '" + CALL + "'"));
+
+
     }
 
     @Test

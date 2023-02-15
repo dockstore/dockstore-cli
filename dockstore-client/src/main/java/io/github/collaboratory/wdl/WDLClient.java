@@ -243,11 +243,11 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
                     missing += " '" + WORKFLOW + "'";
                 }
                 if (!commandFound) {
-                    missing += " '" + COMMAND + "'";
+                    missingPotentiallyRequiredFields += " '" + COMMAND + "'";
+                    missingPotentiallyRequiredField = true;
                 }
                 if (!callFound) {
-                    missingPotentiallyRequiredFields += " '" + CALL + "'";
-                    missingPotentiallyRequiredField = true;
+                    missing += " '" + CALL + "'";
                 }
                 if (!outputFound) {
                     missingPotentiallyRequiredFields += " '" + OUTPUT + "'";
