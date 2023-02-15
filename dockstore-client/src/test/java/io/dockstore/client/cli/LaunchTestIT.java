@@ -43,6 +43,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.ERROR_MESSAGE_START;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.IO_ERROR;
@@ -55,6 +56,11 @@ import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
+import static io.github.collaboratory.wdl.WDLClient.COMMAND;
+import static io.github.collaboratory.wdl.WDLClient.OUTPUT;
+import static io.github.collaboratory.wdl.WDLClient.TASK;
+import static io.github.collaboratory.wdl.WDLClient.WDL_CHECK_ERROR_MESSAGE;
+import static io.github.collaboratory.wdl.WDLClient.WDL_CHECK_WARNING_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -625,9 +631,32 @@ class LaunchTestIT {
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
-        assertTrue(systemErrRule.getText().contains("Required fields that are missing from WDL file : 'task'"),
+        assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + " '" + TASK + "' '" + COMMAND + "' '" + OUTPUT + "'"),
                 "output should include an error message and exit");
+
+        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START));
     }
+
+    @Test
+    void wdlWithSubWorkflows() throws Exception {
+
+        //Tests if file provisioning can handle a json parameter that specifies a file path containing spaces
+        File workflowWDL = new File(ResourceHelpers.resourceFilePath("sub-workflow-test.wdl"));
+        File workflowJSON = new File(ResourceHelpers.resourceFilePath("sub-workflow-test.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add(WORKFLOW);
+        args.add(LAUNCH);
+        args.add("--local-entry");
+        args.add(workflowWDL.getAbsolutePath());
+        args.add(JSON);
+        args.add(workflowJSON.getPath());
+
+        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+        runClientCommandConfig(args, config);
+
+    }
+
 
     @Test
     void wdlNoCommand() throws Exception {
@@ -651,8 +680,9 @@ class LaunchTestIT {
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
-        assertTrue(systemErrRule.getText().contains("Required fields that are missing from WDL file : 'command'"),
+        assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + " '" + COMMAND + "'"),
                 "output should include an error message and exit");
+        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START));
     }
 
     @Test
@@ -677,7 +707,7 @@ class LaunchTestIT {
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
-        assertTrue(systemErrRule.getText().contains("Required fields that are missing from WDL file : 'workflow' 'call'"),
+        assertTrue(systemErrRule.getText().contains(WDL_CHECK_ERROR_MESSAGE + " '" + WORKFLOW + "'"),
                 "output should include an error message and exit");
     }
 
