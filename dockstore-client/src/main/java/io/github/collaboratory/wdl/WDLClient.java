@@ -184,8 +184,6 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
         Pattern outputPattern = Pattern.compile("(.*)(output)(.*)");
         boolean wfFound = false, commandFound = false, outputFound = false, callFound = false;
         int counter = 0;
-        String missing = WDL_CHECK_ERROR_MESSAGE;
-        String missingPotentiallyRequiredFields = WDL_CHECK_WARNING_MESSAGE;
         Path p = Paths.get(content.getPath());
         try {
             List<String> fileContent = java.nio.file.Files.readAllLines(p, StandardCharsets.UTF_8);
@@ -207,25 +205,22 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
                     outputFound = true;
                 }
             }
-            //check all the required fields and give error message if it's missing
+            // check all the required fields and give error message if it's missing
             if (wfFound && callFound) {
-                Boolean missingPotentiallyRequiredField = false;
+                String missingPotentiallyRequiredFields = "";
                 if (counter == 0) {
                     missingPotentiallyRequiredFields += " '" + TASK + "'";
-                    missingPotentiallyRequiredField = true;
                 }
                 if (!commandFound) {
                     missingPotentiallyRequiredFields += " '" + COMMAND + "'";
-                    missingPotentiallyRequiredField = true;
                 }
                 if (!outputFound) {
                     missingPotentiallyRequiredFields += " '" + OUTPUT + "'";
-                    missingPotentiallyRequiredField = true;
                 }
 
-                if (missingPotentiallyRequiredField) {
+                if (!missingPotentiallyRequiredFields.isEmpty()) {
                     // Gives user a warning if their entry file doesn't contain task, call, or output
-                    out(missingPotentiallyRequiredFields);
+                    out(WDL_CHECK_WARNING_MESSAGE + missingPotentiallyRequiredFields);
                 }
 
                 return true;    // this is potentially valid WDL file
@@ -234,30 +229,28 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
             } else {
                 // WDL file but some required fields are missing
                 Boolean missingPotentiallyRequiredField = false;
-
+                String missingPotentiallyRequiredFields = "";
+                String missingRequiredFields = "";
                 if (counter == 0) {
                     missingPotentiallyRequiredFields += " '" + TASK + "'";
-                    missingPotentiallyRequiredField = true;
                 }
                 if (!wfFound) {
-                    missing += " '" + WORKFLOW + "'";
+                    missingRequiredFields += " '" + WORKFLOW + "'";
                 }
                 if (!commandFound) {
                     missingPotentiallyRequiredFields += " '" + COMMAND + "'";
-                    missingPotentiallyRequiredField = true;
                 }
                 if (!callFound) {
-                    missing += " '" + CALL + "'";
+                    missingRequiredFields += " '" + CALL + "'";
                 }
                 if (!outputFound) {
                     missingPotentiallyRequiredFields += " '" + OUTPUT + "'";
-                    missingPotentiallyRequiredField = true;
                 }
 
-                if (missingPotentiallyRequiredField) {
-                    out(missingPotentiallyRequiredFields);
+                if (!missingPotentiallyRequiredFields.isEmpty()) {
+                    out(WDL_CHECK_WARNING_MESSAGE + missingPotentiallyRequiredFields);
                 }
-                errorMessage(missing, CLIENT_ERROR);
+                errorMessage(WDL_CHECK_ERROR_MESSAGE + missingRequiredFields, CLIENT_ERROR);
             }
 
         } catch (IOException e) {

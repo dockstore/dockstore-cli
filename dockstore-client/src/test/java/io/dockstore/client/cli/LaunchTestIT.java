@@ -65,6 +65,7 @@ import static io.github.collaboratory.wdl.WDLClient.WDL_CHECK_WARNING_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -639,7 +640,7 @@ class LaunchTestIT {
     }
 
     @Test
-    void wdlWithSubWorkflows() throws Exception {
+    void wdlWithSubWorkflows() {
 
         //Tests if file provisioning can handle a json parameter that specifies a file path containing spaces
         File workflowWDL = new File(ResourceHelpers.resourceFilePath("sub-workflow-test.wdl"));
@@ -653,8 +654,12 @@ class LaunchTestIT {
         args.add(JSON);
         args.add(workflowJSON.getPath());
 
-        File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
-        runClientCommandConfig(args, config);
+        try {
+            File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+            runClientCommandConfig(args, config);
+        } catch (Exception ex) {
+            fail("Workflow that should pass caused an exception");
+        }
 
     }
 
