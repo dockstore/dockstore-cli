@@ -687,8 +687,10 @@ class LaunchTestIT {
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
         assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + " '" + COMMAND + "'"),
-                "output should include an error message and exit");
-        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START));
+                "output should contain a warning that command is missing");
+        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START),
+                "given that noCommand.wdl is an invalid WDL, an error message should be given");
+
     }
 
     @Test
@@ -740,8 +742,9 @@ class LaunchTestIT {
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
         assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + " '" + TASK + "' '" + COMMAND + "' '" + OUTPUT + "'"),
-                "output should include an error message and exit");
-        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START));
+                "output should contain a warning that task, command and output are missing");
+        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START),
+                "given that wfAndCallOnly.wdl is an invalid WDL, an error message should be given");
     }
 
     @Test
@@ -767,8 +770,9 @@ class LaunchTestIT {
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
         assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + " '" + TASK + "' '" +  OUTPUT + "'"),
-                "output should include an error message and exit");
-        assertTrue(systemErrRule.getText().contains(WDL_CHECK_ERROR_MESSAGE + " '" + WORKFLOW + "' '" + CALL + "'"));
+                "output should include an error message that task and output are missing");
+        assertTrue(systemErrRule.getText().contains(WDL_CHECK_ERROR_MESSAGE + " '" + WORKFLOW + "' '" + CALL + "'"),
+                "stderr should have an error that says workflow and call are missing");
 
 
     }
