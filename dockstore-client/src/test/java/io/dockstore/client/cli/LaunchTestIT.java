@@ -44,6 +44,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.ERROR_MESSAGE_START;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.IO_ERROR;
@@ -56,9 +57,16 @@ import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
+import static io.github.collaboratory.wdl.WDLClient.CALL;
+import static io.github.collaboratory.wdl.WDLClient.COMMAND;
+import static io.github.collaboratory.wdl.WDLClient.OUTPUT;
+import static io.github.collaboratory.wdl.WDLClient.TASK;
+import static io.github.collaboratory.wdl.WDLClient.WDL_CHECK_ERROR_MESSAGE;
+import static io.github.collaboratory.wdl.WDLClient.WDL_CHECK_WARNING_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -627,9 +635,36 @@ class LaunchTestIT {
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
-        assertTrue(systemErrRule.getText().contains("Required fields that are missing from WDL file : 'task'"),
+        assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + "'" + TASK + "' '" + COMMAND + "' '" + OUTPUT + "'"),
                 "output should include an error message and exit");
+
+        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START));
     }
+
+    @Test
+    void wdlWithSubWorkflows() {
+
+        //Tests if file provisioning can handle a json parameter that specifies a file path containing spaces
+        File workflowWDL = new File(ResourceHelpers.resourceFilePath("sub-workflow-test.wdl"));
+        File workflowJSON = new File(ResourceHelpers.resourceFilePath("sub-workflow-test.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add(WORKFLOW);
+        args.add(LAUNCH);
+        args.add("--local-entry");
+        args.add(workflowWDL.getAbsolutePath());
+        args.add(JSON);
+        args.add(workflowJSON.getPath());
+
+        try {
+            File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
+            runClientCommandConfig(args, config);
+        } catch (Exception ex) {
+            fail("Workflow that should pass caused an exception");
+        }
+
+    }
+
 
     @Test
     void wdlNoCommand() throws Exception {
@@ -653,8 +688,11 @@ class LaunchTestIT {
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
-        assertTrue(systemErrRule.getText().contains("Required fields that are missing from WDL file : 'command'"),
-                "output should include an error message and exit");
+        assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + "'" + COMMAND + "'"),
+                "output should contain a warning that command is missing");
+        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START),
+                "given that noCommand.wdl is an invalid WDL, an error message should be given");
+
     }
 
     @Test
@@ -679,8 +717,66 @@ class LaunchTestIT {
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
         catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
-        assertTrue(systemErrRule.getText().contains("Required fields that are missing from WDL file : 'workflow' 'call'"),
+        assertTrue(systemErrRule.getText().contains(WDL_CHECK_ERROR_MESSAGE + "'" + WORKFLOW + "'"),
                 "output should include an error message and exit");
+    }
+
+    @Test
+    void wdlWorkflowAndCallOnly() throws Exception {
+        //Test when content only contains 'workflow' and 'call'
+
+        File file = new File(ResourceHelpers.resourceFilePath("wfAndCallOnly.wdl"));
+        File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add(ENTRY);
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add(JSON);
+        args.add(json.getAbsolutePath());
+
+        WorkflowsApi api = mock(WorkflowsApi.class);
+        UsersApi usersApi = mock(UsersApi.class);
+        Client client = new Client();
+        client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
+        Client.SCRIPT.set(true);
+
+        WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
+        catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
+        assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + "'" + TASK + "' '" + COMMAND + "' '" + OUTPUT + "'"),
+                "output should contain a warning that task, command and output are missing");
+        assertTrue(systemErrRule.getText().contains(ERROR_MESSAGE_START),
+                "given that wfAndCallOnly.wdl is an invalid WDL, an error message should be given");
+    }
+
+    @Test
+    void wdlCommandOnly() throws Exception {
+        //Test when content is only 'command'
+
+        File file = new File(ResourceHelpers.resourceFilePath("commandOnly.wdl"));
+        File json = new File(ResourceHelpers.resourceFilePath("hello.json"));
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add(ENTRY);
+        args.add(file.getAbsolutePath());
+        args.add("--local-entry");
+        args.add(JSON);
+        args.add(json.getAbsolutePath());
+
+        WorkflowsApi api = mock(WorkflowsApi.class);
+        UsersApi usersApi = mock(UsersApi.class);
+        Client client = new Client();
+        client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
+        Client.SCRIPT.set(true);
+
+        WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
+        catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
+        assertTrue(systemOutRule.getText().contains(WDL_CHECK_WARNING_MESSAGE + "'" + TASK + "' '" +  OUTPUT + "'"),
+                "output should include an error message that task and output are missing");
+        assertTrue(systemErrRule.getText().contains(WDL_CHECK_ERROR_MESSAGE + "'" + WORKFLOW + "' '" + CALL + "'"),
+                "stderr should have an error that says workflow and call are missing");
+
+
     }
 
     @Test
