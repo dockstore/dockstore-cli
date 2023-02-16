@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,14 +54,15 @@ import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.SCRIPT;
 import static io.dockstore.client.cli.Client.WORKFLOW;
+import static java.lang.String.join;
 
 /**
  * Grouping code for launching WDL tools and workflows
  */
 public class WDLClient extends BaseLanguageClient implements LanguageClientInterface {
 
-    public static final String WDL_CHECK_WARNING_MESSAGE = "WARNING: these fields are missing from WDL file, this could be causing errors:";
-    public static final String WDL_CHECK_ERROR_MESSAGE = "Required fields that are missing from WDL file:";
+    public static final String WDL_CHECK_WARNING_MESSAGE = "WARNING: these fields are missing from WDL file, this could be causing errors: ";
+    public static final String WDL_CHECK_ERROR_MESSAGE = "Required fields that are missing from WDL file: ";
     public static final String TASK = "task";
     public static final String CALL = "call";
     public static final String OUTPUT = "output";
@@ -207,20 +209,20 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
             }
             // check all the required fields and give error message if it's missing
             if (wfFound && callFound) {
-                String missingPotentiallyRequiredFields = "";
+                List<String> missingPotentiallyRequiredFields = new ArrayList<>();
                 if (counter == 0) {
-                    missingPotentiallyRequiredFields += " '" + TASK + "'";
+                    missingPotentiallyRequiredFields.add("'" + TASK + "'");
                 }
                 if (!commandFound) {
-                    missingPotentiallyRequiredFields += " '" + COMMAND + "'";
+                    missingPotentiallyRequiredFields.add("'" + COMMAND + "'");
                 }
                 if (!outputFound) {
-                    missingPotentiallyRequiredFields += " '" + OUTPUT + "'";
+                    missingPotentiallyRequiredFields.add("'" + OUTPUT + "'");
                 }
 
                 if (!missingPotentiallyRequiredFields.isEmpty()) {
                     // Gives user a warning if their entry file doesn't contain task, call, or output
-                    out(WDL_CHECK_WARNING_MESSAGE + missingPotentiallyRequiredFields);
+                    out(WDL_CHECK_WARNING_MESSAGE + join(" ", missingPotentiallyRequiredFields));
                 }
 
                 return true;    // this is potentially valid WDL file
@@ -228,28 +230,28 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
                 return false;   // not a WDL file, maybe a CWL file or something else
             } else {
                 // WDL file but some required fields are missing
-                String missingPotentiallyRequiredFields = "";
-                String missingRequiredFields = "";
+                List<String> missingPotentiallyRequiredFields = new ArrayList<>();
+                List<String> missingRequiredFields = new ArrayList<>();
                 if (counter == 0) {
-                    missingPotentiallyRequiredFields += " '" + TASK + "'";
+                    missingPotentiallyRequiredFields.add("'" + TASK + "'");
                 }
                 if (!wfFound) {
-                    missingRequiredFields += " '" + WORKFLOW + "'";
+                    missingRequiredFields.add("'" + WORKFLOW + "'");
                 }
                 if (!commandFound) {
-                    missingPotentiallyRequiredFields += " '" + COMMAND + "'";
+                    missingPotentiallyRequiredFields.add("'" + COMMAND + "'");
                 }
                 if (!callFound) {
-                    missingRequiredFields += " '" + CALL + "'";
+                    missingRequiredFields.add("'" + CALL + "'");
                 }
                 if (!outputFound) {
-                    missingPotentiallyRequiredFields += " '" + OUTPUT + "'";
+                    missingPotentiallyRequiredFields.add("'" + OUTPUT + "'");
                 }
 
                 if (!missingPotentiallyRequiredFields.isEmpty()) {
-                    out(WDL_CHECK_WARNING_MESSAGE + missingPotentiallyRequiredFields);
+                    out(WDL_CHECK_WARNING_MESSAGE + join(" ", missingPotentiallyRequiredFields));
                 }
-                errorMessage(WDL_CHECK_ERROR_MESSAGE + missingRequiredFields, CLIENT_ERROR);
+                errorMessage(WDL_CHECK_ERROR_MESSAGE + join(" ", missingRequiredFields), CLIENT_ERROR);
             }
 
         } catch (IOException e) {
