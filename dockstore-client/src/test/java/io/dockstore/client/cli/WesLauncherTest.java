@@ -7,6 +7,7 @@ import java.util.List;
 import io.dockstore.client.cli.nested.WesLauncher;
 import io.dockstore.client.cli.nested.WesRequestData;
 import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.MuteForSuccessfulTests;
 import io.dropwizard.testing.ResourceHelpers;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 class WesLauncherTest {
 
     public static final String RUN_ID = "123456-098765-123123-04983782";

@@ -31,6 +31,7 @@ import io.dockstore.client.cli.nested.LanguageClientInterface;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.MuteForSuccessfulTests;
 import io.dockstore.common.ToolTest;
 import io.dockstore.common.WDLFileProvisioning;
 import io.dockstore.common.WdlBridge;
@@ -57,6 +58,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  * @author dyuen
  */
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 @Tag(ConfidentialTest.NAME)
 @Tag(ToolTest.NAME)
 class CromwellIT {

@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.FlushingSystemErr;
 import io.dockstore.common.FlushingSystemOut;
+import io.dockstore.common.MuteForSuccessfulTests;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.UsersApi;
@@ -38,8 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
-@ExtendWith(LaunchTestIT.TestStatus.class)
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
+@ExtendWith(LaunchTestIT.TestStatus.class)
 class LaunchTestRunToolIT {
 
     @SystemStub

@@ -17,10 +17,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
@@ -32,7 +30,6 @@ import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag(SingularityTest.NAME)
-@ExtendWith(SystemStubsExtension.class)
 class SingularityIT extends BaseIT {
 
     @TempDir

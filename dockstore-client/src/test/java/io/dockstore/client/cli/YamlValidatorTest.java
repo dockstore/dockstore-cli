@@ -19,6 +19,7 @@ package io.dockstore.client.cli;
 import java.util.Arrays;
 import java.util.List;
 
+import io.dockstore.common.MuteForSuccessfulTests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 class YamlValidatorTest {
 
     @SystemStub

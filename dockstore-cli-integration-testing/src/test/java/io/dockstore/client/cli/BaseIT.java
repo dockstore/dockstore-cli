@@ -25,6 +25,7 @@ import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.CommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.MuteForSuccessfulTests;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.TestingPostgres;
 import io.dockstore.webservice.DockstoreWebserviceApplication;
@@ -50,8 +51,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Base integration test class
  * A default configuration that cleans the database between tests
  */
-@ExtendWith(BaseIT.TestStatus.class)
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
+@ExtendWith(BaseIT.TestStatus.class)
 @Tag(ConfidentialTest.NAME)
 class BaseIT {
 

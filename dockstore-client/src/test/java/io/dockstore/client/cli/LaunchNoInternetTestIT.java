@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.dockstore.common.MuteForSuccessfulTests;
 import io.dockstore.common.Utilities;
 import io.dropwizard.testing.ResourceHelpers;
 import org.apache.commons.io.FileUtils;
@@ -42,6 +43,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
  * @since 1.6.0
  */
 @ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 class LaunchNoInternetTestIT {
     private static final Logger LOG = LoggerFactory.getLogger(LaunchNoInternetTestIT.class);
     private static final File DESCRIPTOR_FILE = new File(ResourceHelpers.resourceFilePath("nonexistent_image/CWL/nonexistent_image.cwl"));

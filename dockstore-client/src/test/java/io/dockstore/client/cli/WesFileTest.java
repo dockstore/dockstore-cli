@@ -3,15 +3,20 @@ package io.dockstore.client.cli;
 import io.dockstore.client.cli.nested.WesFile;
 import io.dockstore.common.FlushingSystemErr;
 import io.dockstore.common.FlushingSystemOut;
+import io.dockstore.common.MuteForSuccessfulTests;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
+@ExtendWith(SystemStubsExtension.class)
+@ExtendWith(MuteForSuccessfulTests.class)
 public class WesFileTest {
 
     @SystemStub
