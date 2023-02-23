@@ -53,6 +53,7 @@ import io.dockstore.common.GeneratedConstants;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridgeShutDown;
 import io.dockstore.openapi.client.api.Ga4Ghv20Api;
+import io.dockstore.openapi.client.model.TRSService;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerInterface;
 import io.swagger.client.ApiClient;
@@ -61,12 +62,10 @@ import io.swagger.client.Configuration;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.ContainertagsApi;
 import io.swagger.client.api.ExtendedGa4GhApi;
-import io.swagger.client.api.Ga4GhApi;
 import io.swagger.client.api.MetadataApi;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.auth.ApiKeyAuth;
-import io.swagger.client.model.Metadata;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -132,7 +131,6 @@ public class Client {
     private static final Logger LOG = LoggerFactory.getLogger(Client.class);
     private String configFile = null;
     private String serverUrl = null;
-    private Ga4GhApi ga4ghApi;
     private Ga4Ghv20Api ga4ghv20Api;
     private ExtendedGa4GhApi extendedGA4GHApi;
     private MetadataApi metadataApi;
@@ -660,9 +658,9 @@ public class Client {
      */
     private void serverMetadata() {
         try {
-            final Metadata metadata = ga4ghApi.metadataGet();
+            final TRSService serviceinfo = ga4ghv20Api.getServiceInfo();
             final Gson gson = io.cwl.avro.CWL.getTypeSafeCWLToolDocument();
-            out(gson.toJson(metadata));
+            out(gson.toJson(serviceinfo));
             out("Dockstore server: " + serverUrl);
         } catch (ApiException ex) {
             exceptionMessage(ex, "", API_ERROR);
@@ -842,7 +840,6 @@ public class Client {
 
         ContainersApi containersApi = new ContainersApi(defaultApiClient);
         UsersApi usersApi = new UsersApi(defaultApiClient);
-        this.ga4ghApi = new Ga4GhApi(defaultApiClient);
         this.extendedGA4GHApi = new ExtendedGa4GhApi(defaultApiClient);
         this.metadataApi = new MetadataApi(defaultApiClient);
 
