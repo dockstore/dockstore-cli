@@ -129,7 +129,7 @@ import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.Client.getGeneralFlags;
 import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
 import static io.dockstore.client.cli.JCommanderUtility.getUnknownParameter;
-import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
+import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParameter;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static io.dockstore.client.cli.nested.WesCommandParser.ATTACH;
 import static io.dockstore.client.cli.nested.WesCommandParser.COUNT;
@@ -154,7 +154,7 @@ import static java.lang.String.join;
  * implementing classes that do not need to reference to the command line arguments directly.
  * <p>
  * Note that many of these methods depend on a unique identifier for an entry called a path for workflows and tools.
- * For example, a tool path looks like quay.io/collaboratory/bwa-tool:develop wheras a workflow path looks like
+ * For example, a tool path looks like quay.io/collaboratory/bwa-tool:develop whereas a workflow path looks like
  * collaboratory/bwa-workflow:develop
  *
  * @author dyuen
@@ -255,7 +255,7 @@ public abstract class AbstractEntryClient<T> {
         out("  " + LIST + "             :  lists all the " + getEntryType() + "s published by the user");
         out("");
         if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
-            out("  " + NFL + "              :  returns the Nextflow " + getEntryType() + " defintion for this entry");
+            out("  " + NFL + "              :  returns the Nextflow " + getEntryType() + " definition for this entry");
             out("");
         }
         out("  " + PUBLISH + "          :  publish/unpublish a " + getEntryType() + " in Dockstore");
@@ -389,7 +389,7 @@ public abstract class AbstractEntryClient<T> {
     /**
      * Handle search for an entry
      *
-     * @param pattern a pattern, currently a subtring for searching
+     * @param pattern a pattern, currently a substring for searching
      */
     protected abstract void handleSearch(String pattern);
 
@@ -1132,7 +1132,7 @@ public abstract class AbstractEntryClient<T> {
     /**
      * Attempts to launch a workflow (tools not currently supported) on a WES server
      * @param clientWorkflowExecutionServiceApi The WES API client
-     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
+     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworkflow:version1
      * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
      * @param paramsPath Path to the parameter JSON file
      * @param filePaths Paths to any other required files for the WES execution
@@ -1279,7 +1279,7 @@ public abstract class AbstractEntryClient<T> {
             displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), args.get(0), WORKFLOW + " " + WES);
             return;
         } catch (ParameterException e) {
-            if (wasErrorDueToUnknownParamter(e.getMessage())) {
+            if (wasErrorDueToUnknownParameter(e.getMessage())) {
                 // This is for when JCommander parse understands part of the command. This is for incorrect commands of the form:
                 // dockstore workflow CORRECT_COMMAND INCORRECT_COMMAND
                 String incorrectCommand = getUnknownParameter(e.getMessage());

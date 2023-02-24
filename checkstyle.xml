@@ -158,7 +158,7 @@
     <module name="TreeWalker">
         <property name="tabWidth" value="4"/>
 
-        <!-- Checks identation.                               -->
+        <!-- Checks indentation.                               -->
         <module name="Indentation">
             <!-- Dockstore override, 2 to 4 -->
             <property name="basicOffset" value="4"/>

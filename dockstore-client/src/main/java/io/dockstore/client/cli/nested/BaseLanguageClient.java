@@ -166,7 +166,7 @@ public abstract class BaseLanguageClient {
 
         /*
          Don't download the input files (from the input JSON or YAML) if we are making a request
-         to a WES endpoint. We want the WES endpoint to download the input files becuase they
+         to a WES endpoint. We want the WES endpoint to download the input files because they
          could be very large and in that case we cannot send their contents in a POST request
          efficiently.
          TODO if there are input files on the local file system maybe we should send those to

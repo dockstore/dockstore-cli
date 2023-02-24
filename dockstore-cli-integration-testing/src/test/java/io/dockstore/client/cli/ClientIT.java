@@ -201,7 +201,7 @@ class ClientIT extends BaseIT {
      Since the below containers use dummy data and don't connect with Github/Bitbucket/Quay, the refresh will throw an error.
      Todo: Set up these tests with real data (not confidential)
      */
-    @Disabled("Since dockstore now checks for associated tags for Quay container, manual publishing of nonexistant images won't work")
+    @Disabled("Since dockstore now checks for associated tags for Quay container, manual publishing of nonexistent images won't work")
     void manualRegisterABunchOfValidEntries() throws IOException {
         Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), TOOL, MANUAL_PUBLISH, "--registry",
             Registry.QUAY_IO.toString(), "--namespace", "pypi", "--name", "bd2k-python-lib", "--git-url",
@@ -508,9 +508,9 @@ class ClientIT extends BaseIT {
      * @param commandToBeTested A command that is valid, but will be modified to become invalid by this method
      */
     private void checkSuggestionIsGiven(String[] validCommands, String commandToBeTested) throws IOException {
-        String formmatedValidCommandString = join(" ", validCommands);
-        if (!formmatedValidCommandString.isBlank()) {
-            formmatedValidCommandString = " " + formmatedValidCommandString;
+        String formattedValidCommandString = join(" ", validCommands);
+        if (!formattedValidCommandString.isBlank()) {
+            formattedValidCommandString = " " + formattedValidCommandString;
         }
 
         final List<String> commandsForCapitalizationTest = Lists.newArrayList(validCommands);
@@ -520,8 +520,8 @@ class ClientIT extends BaseIT {
 
         systemOutRule.clear();
         Client.main(commandsForCapitalizationTest.toArray(new String[0]));
-        assertTrue(systemOutRule.getText().contains("dockstore" + formmatedValidCommandString + ": '" + commandToBeTested.toUpperCase()
-                        + "' is not a dockstore command. See 'dockstore" + formmatedValidCommandString + " " + HELP
+        assertTrue(systemOutRule.getText().contains("dockstore" + formattedValidCommandString + ": '" + commandToBeTested.toUpperCase()
+                        + "' is not a dockstore command. See 'dockstore" + formattedValidCommandString + " " + HELP
                         + "'.\n\n" + "The most similar command is:\n    " + commandToBeTested + "\n"));
 
         systemOutRule.clear();
@@ -538,8 +538,8 @@ class ClientIT extends BaseIT {
         commandsForLetterChangeTest.add(CONFIG);
         commandsForLetterChangeTest.add(TestUtility.getConfigFileLocation(true));
         Client.main(commandsForLetterChangeTest.toArray(new String[0]));
-        assertTrue(systemOutRule.getText().contains("dockstore" + formmatedValidCommandString + ": '" + commandWithLetterChanged
-                        + "' is not a dockstore command. See 'dockstore" + formmatedValidCommandString + " " + HELP
+        assertTrue(systemOutRule.getText().contains("dockstore" + formattedValidCommandString + ": '" + commandWithLetterChanged
+                        + "' is not a dockstore command. See 'dockstore" + formattedValidCommandString + " " + HELP
                         + "'.\n\n" + "The most similar command is:\n    " + commandToBeTested + "\n"));
 
     }

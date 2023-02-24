@@ -23,7 +23,7 @@ import java.math.RoundingMode;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * A printer of the progress for file provisoning plugins.
+ * A printer of the progress for file provisioning plugins.
  *
  * @author dyuen
  */
@@ -63,7 +63,7 @@ public class ProgressPrinter {
 
         if (streamSize <= 0) { // Unknown size
             if (System.console() != null) {
-                System.out.print(generateIntedeteminateBar());
+                System.out.print(generateIndeterminateBar());
 
                 if (spinnerAscending) {
                     spinnerIndex++;
@@ -130,7 +130,7 @@ public class ProgressPrinter {
         }
     }
 
-    private String generateIntedeteminateBar() {
+    private String generateIndeterminateBar() {
         final StringBuilder sb = new StringBuilder("\r[");
         if (spinnerIndex < INDETERMINATE_INDICATOR.length()) {
             sb.append(INDETERMINATE_INDICATOR);

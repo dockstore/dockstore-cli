@@ -713,7 +713,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     }
 
     /**
-     * Scours a CWL document paired with a JSON document to create our data structure for describing desired output files (for provisoning)
+     * Scours a CWL document paired with a JSON document to create our data structure for describing desired output files (for provisioning)
      *
      * @param cwl           deserialized CWL document
      * @param inputsOutputs inputs and output from json document
