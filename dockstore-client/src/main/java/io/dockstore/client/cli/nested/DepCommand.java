@@ -19,7 +19,7 @@ import static io.dockstore.client.cli.Client.DEPS;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
 import static io.dockstore.client.cli.JCommanderUtility.getUnknownParameter;
-import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParamter;
+import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParameter;
 
 /**
  * @author gluu
@@ -48,7 +48,7 @@ public final class DepCommand {
             displayJCommanderSuggestions(jCommanderMain, e.getJCommander().getParsedCommand(), args[0], DEPS);
             return true;
         } catch (ParameterException e) {
-            if (wasErrorDueToUnknownParamter(e.getMessage())) {
+            if (wasErrorDueToUnknownParameter(e.getMessage())) {
                 String incorrectCommand = getUnknownParameter(e.getMessage());
                 displayJCommanderSuggestions(jCommanderMain, e.getJCommander().getParsedCommand(), incorrectCommand, DEPS);
             } else {

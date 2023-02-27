@@ -515,7 +515,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     /**
      * Attempts to launch a workflow on a WES server
      * @param clientWorkflowExecutionServiceApi The WES API client
-     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
+     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworkflow:version1
      * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
      * @param paramsPath Path to the parameter JSON file
      * @param filePaths Paths to any other required files for the WES execution

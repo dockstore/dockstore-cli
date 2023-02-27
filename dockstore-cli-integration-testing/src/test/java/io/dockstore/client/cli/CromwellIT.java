@@ -129,7 +129,7 @@ class CromwellIT {
         // run a workflow
         final long run = wdlClient.launch(workflowFile.getAbsolutePath(), true, null, newJsonPath, tempDir.getAbsolutePath(), null);
         assertEquals(0, run);
-        // let's check that provisioning out occured
+        // let's check that provisioning out occurred
         final Collection<File> files = FileUtils.listFiles(tempDir, null, true);
         assertEquals(2, files.size());
     }

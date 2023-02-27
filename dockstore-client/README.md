@@ -77,7 +77,7 @@ To run the Launcher:
 
     export AWS_ACCESS_KEY=AAAAAAA
     export AWS_SECRET_KEY=SSSSSSS
-    java -cp <launcher.jar> io.github.collaboratory.LauncherCWL --config <path_to_launcher.config> --decriptor <path_to_json_descriptor>
+    java -cp <launcher.jar> io.github.collaboratory.LauncherCWL --config <path_to_launcher.config> --descriptor <path_to_json_descriptor>
 
     # for example:
     java -cp launcher/target/uber-io.github.collaboratory.launcher-1.0.2-SNAPSHOT.jar io.github.collaboratory.LauncherCWL --config launcher.ini --descriptor collab.cwl --job collab-cwl-job-pre.json

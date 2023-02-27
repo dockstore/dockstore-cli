@@ -651,7 +651,7 @@ workflow TopMedVariantCaller {
       # The resulting string will be empty if the contamination values
       # are not calculated
       contamination_output_file_names_string = "${ sep=',' contamination_output_files }"
-      # If DNA contaminiation was calculated for input files (CRAMs)
+      # If DNA contamination was calculated for input files (CRAMs)
       if len(contamination_output_file_names_string) > 0:
           contamination_output_file_names_list = contamination_output_file_names_string.split(',')
           print("variantCalling: Contamination output files list is {}".format(contamination_output_file_names_list))
@@ -673,7 +673,7 @@ workflow TopMedVariantCaller {
               # Get the Cromwell basename  of the CRAM file
               # The worklow will be able to access them
               # since the Cromwell path is mounted in the
-              # docker run commmand that Cromwell sets up
+              # docker run command that Cromwell sets up
               base_name = os.path.basename(cram_file)
               base_name_wo_extension = base_name.split('.')[0]
 
@@ -699,7 +699,7 @@ workflow TopMedVariantCaller {
               # Get the Cromwell basename  of the CRAM file
               # The worklow will be able to access them
               # since the Cromwell path is mounted in the
-              # docker run commmand that Cromwell sets up
+              # docker run command that Cromwell sets up
               base_name = os.path.basename(cram_file)
               base_name_wo_extension = base_name.split('.')[0]
  

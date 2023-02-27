@@ -36,7 +36,7 @@ import static io.dockstore.client.cli.ArgumentUtility.out;
 
 /*
     GENERAL STEPS:
-    1. Verfiy that YAML syntax is valid
+    1. Verify that YAML syntax is valid
     2. Verify that all fields are named correctly
     3. Verify that all required fields are present
     4. Verify that all files exist
