@@ -457,7 +457,7 @@ class ClientIT extends BaseIT {
      * @param includeHelpFlag If true, "--help" will be passed to Client.main after the arguments in argv
      * @throws IOException
      */
-    private void checkCommandForHelp(String[] argv, Boolean includeHelpFlag) throws IOException {
+    private void checkCommandForHelp(String[] argv, boolean includeHelpFlag) throws IOException {
         final ArrayList<String> strings = Lists.newArrayList(argv);
         if (includeHelpFlag) {
             strings.add(HELP);
