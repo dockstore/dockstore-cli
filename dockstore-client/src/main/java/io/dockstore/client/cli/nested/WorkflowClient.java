@@ -211,7 +211,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     private void printRequiredParametersForVersionTag() {
         out("Required Parameters:");
         out("  " + ENTRY + " <entry>                                      Complete " + getEntryType().toLowerCase()
-                + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+                + " path in Dockstore (ex. github.com/DataBiosphere/topmed-workflows/UM_variant_caller_wdl)");
         out("  --name <name>                                        Name of the " + getEntryType().toLowerCase() + " version.");
         out("");
         out("Optional Parameters");
