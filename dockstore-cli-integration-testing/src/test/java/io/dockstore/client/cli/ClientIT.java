@@ -347,112 +347,129 @@ class ClientIT extends BaseIT {
     @Test
     void touchOnAllHelpMessages() throws IOException {
 
-        checkCommandForHelp(new String[] { TOOL, SEARCH });
-        checkCommandForHelp(new String[] { TOOL, INFO });
-        checkCommandForHelp(new String[] { TOOL, "cwl" });
-        checkCommandForHelp(new String[] { TOOL, "wdl" });
-        checkCommandForHelp(new String[] { TOOL, LABEL });
-        checkCommandForHelp(new String[] { TOOL, TEST_PARAMETER });
-        checkCommandForHelp(new String[] { TOOL, CONVERT });
-        checkCommandForHelp(new String[] { TOOL, LAUNCH });
-        checkCommandForHelp(new String[] { TOOL, VERSION_TAG });
-        checkCommandForHelp(new String[] { TOOL, UPDATE_TOOL });
+        checkCommandForHelp(new String[] { TOOL, SEARCH }, false);
+        checkCommandForHelp(new String[] { TOOL, INFO }, false);
+        checkCommandForHelp(new String[] { TOOL, "CWL" }, false);
+        checkCommandForHelp(new String[] { TOOL, "WDL" }, false);
+        checkCommandForHelp(new String[] { TOOL, LABEL }, false);
+        checkCommandForHelp(new String[] { TOOL, TEST_PARAMETER }, false);
+        checkCommandForHelp(new String[] { TOOL, CONVERT }, false);
+        checkCommandForHelp(new String[] { TOOL, LAUNCH }, false);
+        checkCommandForHelp(new String[] { TOOL, VERSION_TAG }, false);
+        checkCommandForHelp(new String[] { TOOL, UPDATE_TOOL }, false);
 
-        checkCommandForHelp(new String[] { TOOL, CONVERT, ENTRY_2_JSON });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_YAML });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_JSON });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, WDL_2_JSON });
+        checkCommandForHelp(new String[] { TOOL, CONVERT, ENTRY_2_JSON }, false);
+        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_YAML }, false);
+        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_JSON }, false);
+        checkCommandForHelp(new String[] { TOOL, CONVERT, WDL_2_JSON }, false);
 
-        checkCommandForHelp(new String[] {});
-        checkCommandForHelp(new String[] { TOOL });
-        checkCommandForHelp(new String[] { TOOL, DOWNLOAD, HELP });
-        checkCommandForHelp(new String[] { TOOL, LIST, HELP });
-        checkCommandForHelp(new String[] { TOOL, SEARCH, HELP });
-        checkCommandForHelp(new String[] { TOOL, PUBLISH, HELP });
-        checkCommandForHelp(new String[] { TOOL, INFO, HELP });
-        checkCommandForHelp(new String[] { TOOL, "cwl", HELP });
-        checkCommandForHelp(new String[] { TOOL, "wdl", HELP });
-        checkCommandForHelp(new String[] { TOOL, REFRESH, HELP });
-        checkCommandForHelp(new String[] { TOOL, LABEL, HELP });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, HELP });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_JSON, HELP });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_YAML, HELP });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, WDL_2_JSON, HELP });
-        checkCommandForHelp(new String[] { TOOL, CONVERT, ENTRY_2_JSON, HELP });
-        checkCommandForHelp(new String[] { TOOL, LAUNCH, HELP });
-        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, HELP });
-        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, "remove", HELP });
-        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, UPDATE, HELP });
-        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, ADD, HELP });
-        checkCommandForHelp(new String[] { TOOL, UPDATE_TOOL, HELP });
-        checkCommandForHelp(new String[] { TOOL, MANUAL_PUBLISH, HELP });
-        checkCommandForHelp(new String[] { TOOL, STAR, HELP });
-        checkCommandForHelp(new String[] { TOOL, TEST_PARAMETER, HELP });
-        checkCommandForHelp(new String[] { TOOL, VERIFY, HELP });
-        checkCommandForHelp(new String[] { TOOL });
+        checkCommandForHelp(new String[] {}, false);
+        checkCommandForHelp(new String[] { TOOL }, false);
+        checkCommandForHelp(new String[] { TOOL, DOWNLOAD }, true);
+        checkCommandForHelp(new String[] { TOOL, LIST }, true);
+        checkCommandForHelp(new String[] { TOOL, SEARCH }, true);
+        checkCommandForHelp(new String[] { TOOL, PUBLISH }, true);
+        checkCommandForHelp(new String[] { TOOL, INFO }, true);
+        checkCommandForHelp(new String[] { TOOL, "CWL" }, true);
+        checkCommandForHelp(new String[] { TOOL, "WDL" }, true);
+        checkCommandForHelp(new String[] { TOOL, REFRESH }, true);
+        checkCommandForHelp(new String[] { TOOL, LABEL }, true);
+        checkCommandForHelp(new String[] { TOOL, CONVERT }, true);
+        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_JSON }, true);
+        checkCommandForHelp(new String[] { TOOL, CONVERT, CWL_2_YAML }, true);
+        checkCommandForHelp(new String[] { TOOL, CONVERT, WDL_2_JSON }, true);
+        checkCommandForHelp(new String[] { TOOL, CONVERT, ENTRY_2_JSON }, true);
+        checkCommandForHelp(new String[] { TOOL, LAUNCH }, true);
+        checkCommandForHelp(new String[] { TOOL, VERSION_TAG }, true);
+        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, "remove" }, true);
+        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, UPDATE }, true);
+        checkCommandForHelp(new String[] { TOOL, VERSION_TAG, ADD }, true);
+        checkCommandForHelp(new String[] { TOOL, UPDATE_TOOL }, true);
+        checkCommandForHelp(new String[] { TOOL, MANUAL_PUBLISH }, true);
+        checkCommandForHelp(new String[] { TOOL, STAR }, true);
+        checkCommandForHelp(new String[] { TOOL, TEST_PARAMETER }, true);
+        checkCommandForHelp(new String[] { TOOL, VERIFY }, true);
+        checkCommandForHelp(new String[] { TOOL }, false);
 
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, ENTRY_2_JSON });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_YAML });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_JSON });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, WDL_2_JSON });
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, ENTRY_2_JSON }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_YAML }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_JSON }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, WDL_2_JSON }, false);
 
-        checkCommandForHelp(new String[] { WORKFLOW, SEARCH });
-        checkCommandForHelp(new String[] { WORKFLOW, INFO });
-        checkCommandForHelp(new String[] { WORKFLOW, "cwl" });
-        checkCommandForHelp(new String[] { WORKFLOW, "wdl" });
-        checkCommandForHelp(new String[] { WORKFLOW, LABEL });
-        checkCommandForHelp(new String[] { WORKFLOW, TEST_PARAMETER });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT });
-        checkCommandForHelp(new String[] { WORKFLOW, LAUNCH });
-        checkCommandForHelp(new String[] { WORKFLOW, VERSION_TAG });
-        checkCommandForHelp(new String[] { WORKFLOW, UPDATE_WORKFLOW });
-        checkCommandForHelp(new String[] { WORKFLOW, "restub" });
+        checkCommandForHelp(new String[] { WORKFLOW, SEARCH }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, INFO }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, "CWL" }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, "WDL" }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, LABEL }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, TEST_PARAMETER }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, LAUNCH }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, VERSION_TAG }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, UPDATE_WORKFLOW }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, "restub" }, false);
 
-        checkCommandForHelp(new String[] { WORKFLOW, DOWNLOAD, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, LIST, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, SEARCH, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, PUBLISH, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, INFO, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, "cwl", HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, "wdl", HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, REFRESH, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, LABEL, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_JSON, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_YAML, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "wd2json", HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, ENTRY_2_JSON, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, LAUNCH, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, VERSION_TAG, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, UPDATE_WORKFLOW, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, MANUAL_PUBLISH, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, "restub", HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, STAR, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, TEST_PARAMETER, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW, VERIFY, HELP });
-        checkCommandForHelp(new String[] { WORKFLOW });
+        checkCommandForHelp(new String[] { WORKFLOW, DOWNLOAD }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, LIST }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, SEARCH }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, PUBLISH }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, INFO }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, "CWL" }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, "WDL" }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, REFRESH }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, LABEL }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_JSON }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, CWL_2_YAML }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, "wdl2json" }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, CONVERT, ENTRY_2_JSON }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, LAUNCH }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, VERSION_TAG }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, UPDATE_WORKFLOW }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, MANUAL_PUBLISH }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, "restub" }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, STAR }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, TEST_PARAMETER }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, VERIFY }, true);
+        checkCommandForHelp(new String[] { WORKFLOW }, false);
 
-        checkCommandForHelp(new String[] { PLUGIN, LIST, HELP });
-        checkCommandForHelp(new String[] { PLUGIN, DOWNLOAD, HELP });
-        checkCommandForHelp(new String[] { PLUGIN });
+        checkCommandForHelp(new String[] { PLUGIN, LIST }, true);
+        checkCommandForHelp(new String[] { PLUGIN, DOWNLOAD }, true);
+        checkCommandForHelp(new String[] { PLUGIN }, false);
 
-        checkCommandForHelp(new String[] { CHECKER });
-        checkCommandForHelp(new String[] { CHECKER, DOWNLOAD, HELP });
-        checkCommandForHelp(new String[] { CHECKER, LAUNCH, HELP });
-        checkCommandForHelp(new String[] { CHECKER, ADD, HELP });
-        checkCommandForHelp(new String[] { CHECKER, UPDATE, HELP });
-        checkCommandForHelp(new String[] { CHECKER, UPDATE_VERSION, HELP });
-        checkCommandForHelp(new String[] { CHECKER, TEST_PARAMETER, HELP });
+        checkCommandForHelp(new String[] { CHECKER }, false);
+        checkCommandForHelp(new String[] { CHECKER, DOWNLOAD }, true);
+        checkCommandForHelp(new String[] { CHECKER, LAUNCH }, true);
+        checkCommandForHelp(new String[] { CHECKER, ADD }, true);
+        checkCommandForHelp(new String[] { CHECKER, UPDATE }, true);
+        checkCommandForHelp(new String[] { CHECKER, UPDATE_VERSION }, true);
+        checkCommandForHelp(new String[] { CHECKER, TEST_PARAMETER }, true);
 
     }
 
-    private void checkCommandForHelp(String[] argv) throws IOException {
+    /**
+     * This method passes all the values in argv and --help if includeHelpFlag is true to Client.main and ensures
+     * that the output contains,
+     * 1) "Usage: dockstore", this ensures that some help page is being displayed
+     * 2) "dockstore" followed by the strings in argv, for example, if argv = {"test", "blue", "green"}, it would ensure
+     * that the output contained the string "dockstore test blue green"
+     *
+     * @param argv the arguments to pass to Client.main, do not pass "--help"
+     * @param includeHelpFlag If true, "--help" will be passed to Client.main after the arguments in argv
+     * @throws IOException
+     */
+    private void checkCommandForHelp(String[] argv, Boolean includeHelpFlag) throws IOException {
         final ArrayList<String> strings = Lists.newArrayList(argv);
+        if (includeHelpFlag) {
+            strings.add(HELP);
+        }
         strings.add(CONFIG);
         strings.add(TestUtility.getConfigFileLocation(true));
 
         Client.main(strings.toArray(new String[0]));
-        assertTrue(systemOutRule.getText().contains("Usage: dockstore"));
+        assertTrue(systemOutRule.getText().contains("Usage: dockstore"), "'Usage: dockstore' isn't being displayed, this probably means" +
+                "that no help page is being shown");
+        assertTrue(systemOutRule.getText().contains("dockstore " + join(" ", argv)), "`Usage: dockstore` is being displayed" +
+                "but it does not contain the strings found in argv, this probably means the wrong help page is being displayed");
         systemOutRule.clear();
     }
 

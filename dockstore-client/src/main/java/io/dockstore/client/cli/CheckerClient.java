@@ -366,23 +366,19 @@ public class CheckerClient extends WorkflowClient {
 
     private void updateVersionChecker(List<String> args) {
         if (containsHelpRequest(args) || args.isEmpty()) {
-            versionTagHelp();
+            updateVersionCheckerHelp();
         } else {
             // Retrieve arguments
             String entryPath = reqVal(args, ENTRY);
-
             // Get entry from path
             Entry entry = getEntryFromPath(entryPath);
-
             // Get checker workflow
             Workflow checkerWorkflow = getCheckerWorkflowFromEntry(entry, true);
-
             // Update version
             if (entry != null && checkerWorkflow != null) {
-                // Readd entry path to call, but with checker workflow
+                // Read entry path to call, but with checker workflow
                 args.add(ENTRY);
                 args.add(checkerWorkflow.getFullWorkflowPath());
-
                 // Call inherited test parameter function
                 versionTag(args);
             }

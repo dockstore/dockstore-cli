@@ -82,14 +82,14 @@ public final class PluginClient {
                 switch (jcPlugin.getParsedCommand()) {
                 case LIST:
                     if (commandPluginList.help) {
-                        printJCommanderHelp(jc, "dockstore", PLUGIN);
+                        printJCommanderHelp(jcPlugin, "dockstore " + PLUGIN, LIST);
                     } else {
                         return handleList(configFile);
                     }
                     break;
                 case DOWNLOAD:
                     if (commandPluginDownload.help) {
-                        printJCommanderHelp(jc, "dockstore", PLUGIN);
+                        printJCommanderHelp(jcPlugin, "dockstore " + PLUGIN, DOWNLOAD);
                     } else {
                         return handleDownload(configFile);
                     }
