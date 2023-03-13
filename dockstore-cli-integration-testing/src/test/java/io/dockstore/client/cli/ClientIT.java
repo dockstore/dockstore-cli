@@ -466,10 +466,10 @@ class ClientIT extends BaseIT {
         strings.add(TestUtility.getConfigFileLocation(true));
 
         Client.main(strings.toArray(new String[0]));
-        assertTrue(systemOutRule.getText().contains("Usage: dockstore"), "'Usage: dockstore' isn't being displayed, this probably means" +
-                "that no help page is being shown");
-        assertTrue(systemOutRule.getText().contains("dockstore " + join(" ", argv)), "`Usage: dockstore` is being displayed" +
-                "but it does not contain the strings found in argv, this probably means the wrong help page is being displayed");
+        assertTrue(systemOutRule.getText().contains("Usage: dockstore"), "'Usage: dockstore' isn't being displayed, this probably means"
+                + "that no help page is being shown");
+        assertTrue(systemOutRule.getText().contains("dockstore " + join(" ", argv)), "`Usage: dockstore` is being displayed"
+                + "but it does not contain the strings found in argv, this probably means the wrong help page is being displayed");
         systemOutRule.clear();
     }
 
