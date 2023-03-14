@@ -83,6 +83,8 @@ import static io.dockstore.client.cli.ArgumentUtility.printHelpFooter;
 import static io.dockstore.client.cli.ArgumentUtility.printHelpHeader;
 import static io.dockstore.client.cli.ArgumentUtility.printLineBreak;
 import static io.dockstore.client.cli.ArgumentUtility.reqVal;
+import static io.dockstore.client.cli.CheckerClient.UPDATE_VERSION;
+import static io.dockstore.client.cli.Client.CHECKER;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
@@ -202,14 +204,29 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("Description:");
         out("  Update certain fields for a given " + getEntryType().toLowerCase() + " version.");
         out("");
+        printRequiredParametersForVersionTag();
+        printHelpFooter();
+    }
+
+    private void printRequiredParametersForVersionTag() {
         out("Required Parameters:");
         out("  " + ENTRY + " <entry>                                      Complete " + getEntryType().toLowerCase()
-            + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+                + " path in Dockstore (ex. github.com/DataBiosphere/topmed-workflows/UM_variant_caller_wdl)");
         out("  --name <name>                                        Name of the " + getEntryType().toLowerCase() + " version.");
         out("");
         out("Optional Parameters");
         out("  --workflow-path <workflow-path>                      Path to " + getEntryType().toLowerCase() + " descriptor");
         out("  --hidden <true/false>                                Hide the tag from public viewing, default false");
+    }
+
+    protected void updateVersionCheckerHelp() {
+        printHelpHeader();
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), UPDATE_VERSION, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), UPDATE_VERSION, "[parameters]"));
+        out("");
+        out(join(" ", "Updates a specific version of an existing", CHECKER, WORKFLOW + "."));
+        out("");
+        printRequiredParametersForVersionTag();
         printHelpFooter();
     }
 

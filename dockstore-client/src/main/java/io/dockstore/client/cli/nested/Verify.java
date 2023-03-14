@@ -31,13 +31,13 @@ final class Verify {
      *
      * @param args The command line arguments
      */
-    static void handleVerifyCommand(String[] args) {
+    static void handleVerifyCommand(String[] args, String entryType) {
         VerifyCommand verifyCommand = new VerifyCommand();
         JCommander jCommanderMain = new JCommander();
         JCommanderUtility.addCommand(jCommanderMain, VERIFY, verifyCommand);
         jCommanderMain.parse(args);
         if (verifyCommand.help) {
-            JCommanderUtility.printJCommanderHelp(jCommanderMain, "dockstore", VERIFY);
+            JCommanderUtility.printJCommanderHelp(jCommanderMain, "dockstore " + entryType, VERIFY);
         } else {
             ApiClient defaultApiClient;
             defaultApiClient = Configuration.getDefaultApiClient();

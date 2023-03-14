@@ -791,7 +791,7 @@ public abstract class AbstractEntryClient<T> {
             args.add(0, VERIFY);
             String[] argsArray = new String[args.size()];
             argsArray = args.toArray(argsArray);
-            Verify.handleVerifyCommand(argsArray);
+            Verify.handleVerifyCommand(argsArray, getEntryType().toLowerCase());
         } else {
             out("This command is only accessible to Admins.");
         }
