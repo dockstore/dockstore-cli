@@ -63,6 +63,8 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.WDL_2_JSON;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -135,7 +137,7 @@ class GeneralIT extends BaseIT {
     void testLocalLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, "--local-entry",
-                        "imnotreal.wdl", JSON, "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
+                        "imnotreal.wdl", JSON, "imnotreal-job.json", "--descriptor", WDL.toString(), SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -157,7 +159,7 @@ class GeneralIT extends BaseIT {
     void testRemoteLaunchWDLNoFile() throws Exception {
         int exitCode = catchSystemExit(() ->  Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH, ENTRY, "imnotreal.wdl",
-                        JSON, "imnotreal-job.json", "--descriptor", "wdl", SCRIPT_FLAG }));
+                        JSON, "imnotreal-job.json", "--descriptor", WDL.toString(), SCRIPT_FLAG }));
         assertEquals(Client.ENTRY_NOT_FOUND, exitCode);
     }
 
@@ -339,7 +341,7 @@ class GeneralIT extends BaseIT {
         // need to publish before converting
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CONVERT, ENTRY_2_JSON, ENTRY,
-                "quay.io/dockstoretestuser2/quayandgithubwdl", "--descriptor", "wdl", SCRIPT_FLAG });
+                "quay.io/dockstoretestuser2/quayandgithubwdl", "--descriptor", WDL.toString(), SCRIPT_FLAG });
         assertTrue(systemOutRule.getText().contains("\"test.hello.name\": \"String\""));
     }
 
@@ -416,11 +418,11 @@ class GeneralIT extends BaseIT {
     void testGetWdlAndCwl() {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, PUBLISH, ENTRY,
             "quay.io/dockstoretestuser2/quayandgithubwdl" });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "wdl", ENTRY,
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, WDL.toString(), ENTRY,
             "quay.io/dockstoretestuser2/quayandgithubwdl", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, PUBLISH, ENTRY,
             "quay.io/dockstoretestuser2/quayandgithub" });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "cwl", ENTRY,
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, CWL.toString(), ENTRY,
             "quay.io/dockstoretestuser2/quayandgithub", SCRIPT_FLAG });
     }
 
@@ -430,7 +432,7 @@ class GeneralIT extends BaseIT {
     @Test
     void testGetWdlFailure() throws Exception {
         int exitCode = catchSystemExit(() -> Client.main(
-                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, "wdl", ENTRY,
+                new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, WDL.toString(), ENTRY,
                         "quay.io/dockstoretestuser2/quayandgithub", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }

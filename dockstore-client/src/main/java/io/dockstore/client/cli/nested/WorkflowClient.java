@@ -95,6 +95,8 @@ import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static io.dockstore.common.DescriptorLanguage.WDL;
 import static java.lang.String.join;
 
 /**
@@ -171,7 +173,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("Optional parameters:");
         out("  --workflow-path <workflow-path>                      Path for the descriptor file, defaults to /Dockstore.cwl");
         out("  --workflow-name <workflow-name>                      Workflow name, defaults to null");
-        out("  --descriptor-type <descriptor-type>                  Descriptor type, defaults to " + DescriptorLanguage.CWL);
+        out("  --descriptor-type <descriptor-type>                  Descriptor type, defaults to " + CWL);
         out("  --test-parameter-path <test-parameter-path>          Path to default test parameter file, defaults to /test.json");
 
         printHelpFooter();
@@ -944,11 +946,11 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             final String gitVersionControl = reqVal(args, "--git-version-control");
 
             final String workflowPath = optVal(args, "--workflow-path", "/Dockstore.cwl");
-            final String descriptorType = optVal(args, "--descriptor-type", DescriptorLanguage.CWL.toString()).toUpperCase();
+            final String descriptorType = optVal(args, "--descriptor-type", CWL.toString()).toUpperCase();
             final String testParameterFile = optVal(args, "--test-parameter-path", "/test.json");
 
             // Check if valid input
-            if (!DescriptorLanguage.CWL.toString().equals(descriptorType) && !DescriptorLanguage.WDL.toString().equals(descriptorType)) {
+            if (!CWL.toString().equals(descriptorType) && !WDL.toString().equals(descriptorType)) {
                 errorMessage("Please ensure that the descriptor type is either cwl or wdl.", Client.CLIENT_ERROR);
             }
 
@@ -1035,7 +1037,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 if (workflow.getMode() == io.swagger.client.model.Workflow.ModeEnum.STUB) {
 
                     // Check if valid input
-                    if (!"cwl".equalsIgnoreCase(descriptorType) && !"wdl".equalsIgnoreCase(descriptorType)) {
+                    if (!CWL.toString().equalsIgnoreCase(descriptorType) && !WDL.toString().equalsIgnoreCase(descriptorType)) {
                         errorMessage("Please ensure that the descriptor type is either cwl or wdl.", Client.CLIENT_ERROR);
                     }
 

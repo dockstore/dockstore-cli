@@ -27,6 +27,8 @@ import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag(SingularityTest.NAME)
@@ -59,7 +61,7 @@ class SingularityIT extends BaseIT {
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
-                "/checker-workflow-wrapping-workflow.cwl", "test", "cwl", null);
+                "/checker-workflow-wrapping-workflow.cwl", "test", CWL.toString(), null);
         workflowApi.refresh(workflow.getId(), true);
 
         // run the md5sum-checker workflow
@@ -82,7 +84,7 @@ class SingularityIT extends BaseIT {
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
-                "/checker-workflow-wrapping-workflow.wdl", "test", "wdl", null);
+                "/checker-workflow-wrapping-workflow.wdl", "test", WDL.toString(), null);
         workflowApi.refresh(workflow.getId(), true);
 
         // make a tmp copy of the dockstore config and add the cromwell conf file option to it

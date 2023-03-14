@@ -86,6 +86,8 @@ import static io.dockstore.client.cli.nested.WesCommandParser.PAGE_TOKEN;
 import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
 import static io.dockstore.common.CLICommonTestUtilities.checkToolList;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static io.dockstore.common.DescriptorLanguage.WDL;
 import static io.github.collaboratory.cwl.CWLClient.WES;
 import static java.lang.String.join;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -349,8 +351,8 @@ class ClientIT extends BaseIT {
 
         checkCommandForHelp(new String[] { TOOL, SEARCH }, false);
         checkCommandForHelp(new String[] { TOOL, INFO }, false);
-        checkCommandForHelp(new String[] { TOOL, "CWL" }, false);
-        checkCommandForHelp(new String[] { TOOL, "WDL" }, false);
+        checkCommandForHelp(new String[] { TOOL, CWL.toString() }, false);
+        checkCommandForHelp(new String[] { TOOL, WDL.toString() }, false);
         checkCommandForHelp(new String[] { TOOL, LABEL }, false);
         checkCommandForHelp(new String[] { TOOL, TEST_PARAMETER }, false);
         checkCommandForHelp(new String[] { TOOL, CONVERT }, false);
@@ -370,8 +372,8 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { TOOL, SEARCH }, true);
         checkCommandForHelp(new String[] { TOOL, PUBLISH }, true);
         checkCommandForHelp(new String[] { TOOL, INFO }, true);
-        checkCommandForHelp(new String[] { TOOL, "CWL" }, true);
-        checkCommandForHelp(new String[] { TOOL, "WDL" }, true);
+        checkCommandForHelp(new String[] { TOOL, CWL.toString() }, true);
+        checkCommandForHelp(new String[] { TOOL, WDL.toString() }, true);
         checkCommandForHelp(new String[] { TOOL, REFRESH }, true);
         checkCommandForHelp(new String[] { TOOL, LABEL }, true);
         checkCommandForHelp(new String[] { TOOL, CONVERT }, true);
@@ -398,8 +400,8 @@ class ClientIT extends BaseIT {
 
         checkCommandForHelp(new String[] { WORKFLOW, SEARCH }, false);
         checkCommandForHelp(new String[] { WORKFLOW, INFO }, false);
-        checkCommandForHelp(new String[] { WORKFLOW, "CWL" }, false);
-        checkCommandForHelp(new String[] { WORKFLOW, "WDL" }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, CWL.toString() }, false);
+        checkCommandForHelp(new String[] { WORKFLOW, WDL.toString() }, false);
         checkCommandForHelp(new String[] { WORKFLOW, LABEL }, false);
         checkCommandForHelp(new String[] { WORKFLOW, TEST_PARAMETER }, false);
         checkCommandForHelp(new String[] { WORKFLOW, CONVERT }, false);
@@ -413,8 +415,8 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { WORKFLOW, SEARCH }, true);
         checkCommandForHelp(new String[] { WORKFLOW, PUBLISH }, true);
         checkCommandForHelp(new String[] { WORKFLOW, INFO }, true);
-        checkCommandForHelp(new String[] { WORKFLOW, "CWL" }, true);
-        checkCommandForHelp(new String[] { WORKFLOW, "WDL" }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, CWL.toString() }, true);
+        checkCommandForHelp(new String[] { WORKFLOW, WDL.toString() }, true);
         checkCommandForHelp(new String[] { WORKFLOW, REFRESH }, true);
         checkCommandForHelp(new String[] { WORKFLOW, LABEL }, true);
         checkCommandForHelp(new String[] { WORKFLOW, CONVERT }, true);

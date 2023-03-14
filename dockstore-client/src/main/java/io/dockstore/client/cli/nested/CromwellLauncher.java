@@ -27,6 +27,7 @@ import wdl.draft3.parser.WdlParser;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.common.DescriptorLanguage.CWL;
 
 /**
  * This is a base class for clients that launch workflows with Cromwell
@@ -107,8 +108,8 @@ public class CromwellLauncher extends BaseLauncher {
         // There are currently issues with Cromwell 44 automatic type detection.  If it's CWL, the flag must be added.
         // https://github.com/broadinstitute/cromwell/issues/5085
         // Remove these 3 lines once the type can be detected again.
-        if (languageType == DescriptorLanguage.CWL) {
-            Collections.addAll(arguments, "--type", "cwl");
+        if (languageType == CWL) {
+            Collections.addAll(arguments, "--type", CWL.toString());
         }
 
         if (cromwellExtraParameters.size() > 0) {
@@ -128,7 +129,7 @@ public class CromwellLauncher extends BaseLauncher {
     public void provisionOutputFiles(String stdout, String stderr, String wdlOutputTarget) {
         if (Objects.equals(languageType, DescriptorLanguage.WDL)) {
             handleWDLOutputProvisioning(stdout, stderr, wdlOutputTarget);
-        } else if (Objects.equals(languageType, DescriptorLanguage.CWL)) {
+        } else if (Objects.equals(languageType, CWL)) {
             handleCWLOutputProvisioning(stdout, stderr);
         }
     }

@@ -56,6 +56,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.TEST_PARAMETER;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
+import static io.dockstore.common.DescriptorLanguage.WDL;
 import static io.dockstore.webservice.resources.WorkflowResource.FROZEN_VERSION_REQUIRED;
 import static io.dockstore.webservice.resources.WorkflowResource.NO_ZENDO_USER_TOKEN;
 import static io.swagger.client.model.ToolDescriptor.TypeEnum.CWL;
@@ -228,7 +229,7 @@ class GeneralWorkflowIT extends BaseIT {
         refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow"));
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
-                SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--descriptor-type", "wdl", SCRIPT_FLAG });
+                SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--descriptor-type", WDL.toString(), SCRIPT_FLAG });
 
         final long count = testingPostgres.runSelectStatement("select count(*) from workflow where descriptortype = 'wdl'", long.class);
         assertEquals(1, count, "there should be 1 wdl workflow, there are " + count);
@@ -237,7 +238,7 @@ class GeneralWorkflowIT extends BaseIT {
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
         int exitCode = catchSystemExit(() -> Client.main(
                 new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
-                        SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--descriptor-type", "cwl", SCRIPT_FLAG }));
+                        SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--descriptor-type", CWL.toString(), SCRIPT_FLAG }));
         assertEquals(Client.CLIENT_ERROR, exitCode);
     }
 
@@ -325,7 +326,7 @@ class GeneralWorkflowIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
                 SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow", "--workflow-path", "Dockstore.wdl",
-                "--descriptor-type", "wdl", SCRIPT_FLAG });
+                "--descriptor-type", WDL.toString(), SCRIPT_FLAG });
 
         // Can now publish workflow
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, ENTRY,
@@ -432,7 +433,7 @@ class GeneralWorkflowIT extends BaseIT {
             SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", SCRIPT_FLAG });
 
         // Should be able to grab descriptor
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "cwl", ENTRY,
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, CWL.toString(), ENTRY,
             SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example:master", SCRIPT_FLAG });
 
         // unpublish
@@ -472,7 +473,7 @@ class GeneralWorkflowIT extends BaseIT {
         // Convert to WDL workflow
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
-                SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", "--descriptor-type", "wdl",
+                SourceControl.GITLAB + "/dockstore.test.user2/dockstore-workflow-example", "--descriptor-type", WDL.toString(),
                 SCRIPT_FLAG });
 
         // Should now be a WDL workflow
@@ -495,7 +496,7 @@ class GeneralWorkflowIT extends BaseIT {
         // Update workflow to be WDL with correct path
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
-                SourceControl.GITHUB + "/DockstoreTestUser2/test_workflow_wdl", "--descriptor-type", "wdl", "--workflow-path",
+                SourceControl.GITHUB + "/DockstoreTestUser2/test_workflow_wdl", "--descriptor-type", WDL.toString(), "--workflow-path",
                 "/hello.wdl", SCRIPT_FLAG });
 
         // Check for WDL files
@@ -553,7 +554,7 @@ class GeneralWorkflowIT extends BaseIT {
         // Change to WDL
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
-                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", "--descriptor-type", "wdl",
+                SourceControl.GITHUB + "/DockstoreTestUser2/parameter_test_workflow", "--descriptor-type", WDL.toString(),
                 "--workflow-path", "Dockstore.wdl", SCRIPT_FLAG });
 
         // Should be no sourcefiles
@@ -598,7 +599,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         //register workflow
         Workflow githubWorkflow = workflowApi
-            .manualRegister("github", "DockstoreTestUser2/test_lastmodified", "/hello.wdl", "test-update-workflow", "wdl", "/test.json");
+            .manualRegister("github", "DockstoreTestUser2/test_lastmodified", "/hello.wdl", "test-update-workflow", WDL.toString(), "/test.json");
 
         Workflow workflowBeforeFreezing = workflowApi.refresh(githubWorkflow.getId(), true);
         WorkflowVersion master = workflowBeforeFreezing.getWorkflowVersions().stream().filter(v -> v.getName().equals("master")).findFirst()

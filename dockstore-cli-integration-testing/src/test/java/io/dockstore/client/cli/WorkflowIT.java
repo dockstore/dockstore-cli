@@ -100,7 +100,7 @@ class WorkflowIT extends BaseIT {
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
-            "/checker-workflow-wrapping-workflow.cwl", "test", "cwl", null);
+            "/checker-workflow-wrapping-workflow.cwl", "test", CWL.toString(), null);
         assertEquals(1, workflow.getUsers().size(), "There should be one user of the workflow after manually registering it.");
         Workflow refresh = workflowApi.refresh(workflow.getId(), true);
 
@@ -131,7 +131,7 @@ class WorkflowIT extends BaseIT {
         // Register and refresh workflow
         Workflow workflow = workflowApi
             .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
-                "test", "cwl", null);
+                "test", CWL.toString(), null);
         Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         Long workflowId = refresh.getId();
         WorkflowVersion workflowVersion = refresh.getWorkflowVersions().get(0);
@@ -202,10 +202,10 @@ class WorkflowIT extends BaseIT {
 
         Workflow workflow = workflowApi
             .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
-                "test", "cwl", null);
+                "test", CWL.toString(), null);
         Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         assertFalse(refresh.isIsPublished());
-        workflowApi.registerCheckerWorkflow("checker-workflow-wrapping-workflow.cwl", workflow.getId(), "cwl", "checker-input-cwl.json");
+        workflowApi.registerCheckerWorkflow("checker-workflow-wrapping-workflow.cwl", workflow.getId(), CWL.toString(), "checker-input-cwl.json");
         workflowApi.refresh(workflow.getId(), true);
 
         final String fileWithIncorrectCredentials = ResourceHelpers.resourceFilePath("config_file.txt");
@@ -245,11 +245,11 @@ class WorkflowIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi
             .manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker", "/md5sum/md5sum-workflow.cwl",
-                "test", "cwl", null);
+                "test", CWL.toString(), null);
         Workflow refresh = workflowApi.refresh(workflow.getId(), true);
         assertFalse(refresh.isIsPublished());
 
-        workflowApi.registerCheckerWorkflow("/checker-workflow-wrapping-workflow.cwl", workflow.getId(), "cwl", "checker-input-cwl.json");
+        workflowApi.registerCheckerWorkflow("/checker-workflow-wrapping-workflow.cwl", workflow.getId(), CWL.toString(), "checker-input-cwl.json");
 
         workflowApi.refresh(workflow.getId(), true);
 
@@ -345,7 +345,7 @@ class WorkflowIT extends BaseIT {
     void cwlVersion11() {
         final ApiClient userApiClient = CLICommonTestUtilities.getWebClient(true, USER_2_USERNAME, testingPostgres);
         WorkflowsApi userWorkflowsApi = new WorkflowsApi(userApiClient);
-        userWorkflowsApi.manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/metadata.cwl", "metadata", "cwl",
+        userWorkflowsApi.manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/metadata.cwl", "metadata", CWL.toString(),
             "/cwl/v1.1/cat-job.json");
         final Workflow workflowByPathGithub = userWorkflowsApi
             .getWorkflowByPath("github.com/dockstore-testing/Workflows-For-CI/metadata", WorkflowClient.BIOWORKFLOW, null);
@@ -373,7 +373,7 @@ class WorkflowIT extends BaseIT {
         assertFalse(workflowVersion.isValid());
 
         userWorkflowsApi
-            .manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/count-lines1-wf.cwl", "count-lines1-wf", "cwl",
+            .manualRegister("github", "dockstore-testing/Workflows-For-CI", "/cwl/v1.1/count-lines1-wf.cwl", "count-lines1-wf", CWL.toString(),
                 "/cwl/v1.1/wc-job.json");
         final Workflow workflowByPathGithub2 = userWorkflowsApi
             .getWorkflowByPath("github.com/dockstore-testing/Workflows-For-CI/count-lines1-wf", WorkflowClient.BIOWORKFLOW, null);
