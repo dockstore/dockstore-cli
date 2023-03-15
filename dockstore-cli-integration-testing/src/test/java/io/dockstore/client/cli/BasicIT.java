@@ -414,6 +414,65 @@ class BasicIT extends BaseIT {
         }
     }
 
+    /**
+     * This test is the same testTestJson, but CWL and WDL are in lowercase. This ensures that a user can use either
+     * upper or lower case for CWL and WDL.
+     */
+    @Test
+    void testTestJsonWithLowerCaseWDLandCWL() {
+        // Refresh
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json" });
+
+        // Check that no WDL or CWL test files
+        final long count = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
+        assertEquals(0, count, "there should be no sourcefiles that are test parameter files, there are " + count);
+
+        // Update tag with test parameters
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", CWL.toString().toLowerCase(), "--add", "test.cwl.json",
+                // Trying to remove a non-existent parameter file now fails
+                "--add", "test2.cwl.json", "--add", "fake.cwl.json", /*"--remove", "notreal.cwl.json",*/ SCRIPT_FLAG });
+        final long count2 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
+        assertEquals(2, count2, "there should be two sourcefiles that are test parameter files, there are " + count2);
+
+        // Update tag with test parameters
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", CWL.toString().toLowerCase(), "--add", "test.cwl.json",
+                "--remove", "test2.cwl.json", SCRIPT_FLAG });
+        final long count3 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
+        assertEquals(1, count3, "there should be one sourcefile that is a test parameter file, there are " + count3);
+
+        // Update tag wdltest with test parameters
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", WDL.toString().toLowerCase(), "--add", "test.wdl.json",
+                SCRIPT_FLAG });
+        final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='WDL_TEST_JSON'", long.class);
+        assertEquals(1, count4, "there should be one sourcefile that is a wdl test parameter file, there are " + count4);
+
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", CWL.toString().toLowerCase(), "--add", "test.cwl.json",
+                SCRIPT_FLAG });
+        final long count5 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='CWL_TEST_JSON'", long.class);
+        assertEquals(2, count5, "there should be two sourcefiles that are test parameter files, there are " + count5);
+
+        // refreshing again with the default paths set should not create extra redundant test parameter files
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, UPDATE_TOOL, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", "--test-cwl-path", "test.cwl.json" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, UPDATE_TOOL, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", "--test-wdl-path", "test.wdl.json" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json" });
+        final List<Long> testJsonCounts = testingPostgres.runSelectListStatement(
+                "select count(*) from sourcefile s, version_sourcefile vs where (s.type = 'CWL_TEST_JSON' or s.type = 'WDL_TEST_JSON') and s.id = vs.sourcefileid group by vs.versionid",
+                long.class);
+        assertTrue(testJsonCounts.size() >= 3,
+                "there should be at least three sets of test json sourcefiles " + testJsonCounts.size());
+        for (Long testJsonCount : testJsonCounts) {
+            assertTrue(testJsonCount <= 2, "there should be at most two test json for each version");
+        }
+    }
+
     @Test
     void testTestParameterOtherUsers() {
         final ApiClient correctWebClient = getWebClient(BaseIT.USER_1_USERNAME, testingPostgres);

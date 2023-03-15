@@ -449,18 +449,48 @@ class ClientIT extends BaseIT {
     }
 
     /**
-     * This method passes all the values in argv and --help if includeHelpFlag is true to Client.main and ensures
-     * that the output contains,
-     * 1) "Usage: dockstore", this ensures that some help page is being displayed
-     * 2) "dockstore" followed by the strings in argv, for example, if argv = {"test", "blue", "green"}, it would ensure
-     * that the output contained the string "dockstore test blue green"
-     *
-     * @param argv the arguments to pass to Client.main, do not pass "--help"
-     * @param includeHelpFlag If true, "--help" will be passed to Client.main after the arguments in argv
+     * This test ensures that a help page is still displayed for workflow WDL, if "wdl" is used instead of "WDL"
+     * @throws IOException
+     */
+    @Test
+    void checkWDLHelpMessageWithDifferentCapitalization() throws IOException {
+        checkCommandForHelp(new String[] { WORKFLOW, WDL.toString().toLowerCase() }, new String[] { WORKFLOW, WDL.toString() }, false);
+    }
+
+    /**
+     * This test ensures that a help page is still displayed for workflow CWL, if "cwl" is used instead of "CWL"
+     * @throws IOException
+     */
+    @Test
+    void checkCWLHelpMessageWithDifferentCapitalization() throws IOException {
+        checkCommandForHelp(new String[] { WORKFLOW, CWL.toString().toLowerCase() }, new String[] { WORKFLOW, CWL.toString() }, false);
+    }
+
+    /**
+     * This method calls checkCommandForHelp, with both commandsToBePassed and commandsThatShouldBeInHelpMessage set to argv
+     * @param argv
+     * @param includeHelpFlag
      * @throws IOException
      */
     private void checkCommandForHelp(String[] argv, boolean includeHelpFlag) throws IOException {
-        final ArrayList<String> strings = Lists.newArrayList(argv);
+        checkCommandForHelp(argv, argv, includeHelpFlag);
+    }
+
+    /**
+     * This method passes all the values in argv and --help if includeHelpFlag is true to Client.main and ensures
+     * that the output contains,
+     * 1) "Usage: dockstore", this ensures that some help page is being displayed
+     * 2) "dockstore" followed by the strings in commandsThatShouldBeInHelpMessage,
+     * for example, if commandsThatShouldBeInHelpMessage = {"test", "blue", "green"}, it would ensure
+     * that the output contained the string "dockstore test blue green"
+     *
+     * @param commandsToBePassed the arguments to pass to Client.main, do not pass "--help"
+     * @param commandsThatShouldBeInHelpMessage
+     * @param includeHelpFlag If true, "--help" will be passed to Client.main after the arguments in argv
+     * @throws IOException
+     */
+    private void checkCommandForHelp(String[] commandsToBePassed, String[] commandsThatShouldBeInHelpMessage, boolean includeHelpFlag) throws IOException {
+        final ArrayList<String> strings = Lists.newArrayList(commandsToBePassed);
         if (includeHelpFlag) {
             strings.add(HELP);
         }
@@ -470,10 +500,12 @@ class ClientIT extends BaseIT {
         Client.main(strings.toArray(new String[0]));
         assertTrue(systemOutRule.getText().contains("Usage: dockstore"), "'Usage: dockstore' isn't being displayed, this probably means"
                 + "that no help page is being shown");
-        assertTrue(systemOutRule.getText().contains("dockstore " + join(" ", argv)), "`Usage: dockstore` is being displayed"
+        assertTrue(systemOutRule.getText().contains("dockstore " + join(" ", commandsThatShouldBeInHelpMessage)), "`Usage: dockstore` is being displayed"
                 + "but it does not contain the strings found in argv, this probably means the wrong help page is being displayed");
         systemOutRule.clear();
     }
+
+
 
 
     @Test
