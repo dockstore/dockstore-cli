@@ -38,6 +38,7 @@ import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
+import static io.dockstore.common.DescriptorLanguage.CWL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
@@ -108,7 +109,7 @@ class GitHubAppToolIT extends BaseIT {
 
     @Test
     void cwl() {
-        Client.main(new String[]{WORKFLOW, DescriptorType.CWL.toString(), ENTRY, ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, CWL.toString(), ENTRY, ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("label: Simple md5sum tool"));
     }
 

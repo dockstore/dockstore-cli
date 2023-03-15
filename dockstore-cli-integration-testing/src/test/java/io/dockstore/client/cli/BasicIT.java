@@ -30,7 +30,6 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.HostedApi;
 import io.swagger.client.model.DockstoreTool;
-import io.swagger.model.DescriptorType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
@@ -429,21 +428,21 @@ class BasicIT extends BaseIT {
         assertEquals(0, count, "there should be no sourcefiles that are test parameter files, there are " + count);
 
         containersApi
-            .addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"), DescriptorType.CWL.toString(), "",
+            .addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"), CWL.toString(), "",
                 "master");
 
         boolean shouldFail = false;
         try {
             final ContainersApi containersApi1 = new ContainersApi(otherWebClient);
             containersApi1.addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"),
-                DescriptorType.CWL.toString(), "", "master");
+                CWL.toString(), "", "master");
         } catch (Exception e) {
             shouldFail = true;
         }
         assertTrue(shouldFail);
 
         containersApi
-            .addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"), DescriptorType.CWL.toString(),
+            .addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"), CWL.toString(),
                 "", "master");
 
         final long count3 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
@@ -454,16 +453,16 @@ class BasicIT extends BaseIT {
         try {
             final ContainersApi containersApi1 = new ContainersApi(otherWebClient);
             containersApi1.deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"),
-                DescriptorType.CWL.toString(), "master");
+                CWL.toString(), "master");
         } catch (Exception e) {
             shouldFail = true;
         }
         assertTrue(shouldFail);
         containersApi
-            .deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"), DescriptorType.CWL.toString(),
+            .deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"), CWL.toString(),
                 "master");
         containersApi.deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"),
-            DescriptorType.CWL.toString(), "master");
+            CWL.toString(), "master");
 
         final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals(0, count4, "there should be one sourcefile that is a test parameter file, there are " + count4);

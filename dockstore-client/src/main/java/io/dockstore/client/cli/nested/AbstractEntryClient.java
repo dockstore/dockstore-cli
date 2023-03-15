@@ -241,7 +241,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("  " + CONVERT + "          :  utilities that allow you to " + CONVERT + " file types");
         out("");
-        out("  " + CWL.toString() + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
+        out("  " + CWL + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
         out("                      which enables integration with Global Alliance compliant systems");
         out("");
         out("  " + DOWNLOAD + "         :  " + DOWNLOAD + " " + getEntryType() + "s to the local directory");
@@ -1768,7 +1768,7 @@ public abstract class AbstractEntryClient<T> {
                 + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         out("  " + VERSION + " <version>                                                      " + getEntryType() + " version name");
         if (getEntryType().equalsIgnoreCase(TOOL)) {
-            out("  --descriptor-type <descriptor-type>                                      " + DescriptorLanguage.CWL.toString() + "/" + DescriptorLanguage.WDL.toString());
+            out("  --descriptor-type <descriptor-type>                                      " + CWL + "/" + WDL);
         }
         out("");
         out("Optional Parameters:");
