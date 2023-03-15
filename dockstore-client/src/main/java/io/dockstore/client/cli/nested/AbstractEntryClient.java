@@ -268,7 +268,7 @@ public abstract class AbstractEntryClient<T> {
         out("");
         out("  " + TEST_PARAMETER + "   :  updates test parameter files for a version of a " + getEntryType() + "");
         out("");
-        out("  " + WDL.toString() + "              :  returns the Workflow Descriptor Language definition for this entry");
+        out("  " + WDL + "              :  returns the Workflow Descriptor Language definition for this entry");
         if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
             out("");
             out("  " + WES + "              :  calls a Workflow Execution Schema API (WES) for a version of a " + getEntryType() + "");
