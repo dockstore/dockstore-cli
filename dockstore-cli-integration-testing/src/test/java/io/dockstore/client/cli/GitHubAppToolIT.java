@@ -5,7 +5,6 @@ import io.dockstore.common.FlushingSystemErr;
 import io.dockstore.common.FlushingSystemOut;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.dropwizard.testing.ResourceHelpers;
-import io.openapi.model.DescriptorType;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.WorkflowsApi;
@@ -38,6 +37,8 @@ import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
@@ -108,13 +109,13 @@ class GitHubAppToolIT extends BaseIT {
 
     @Test
     void cwl() {
-        Client.main(new String[]{WORKFLOW, DescriptorType.CWL.toString(), ENTRY, ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
+        Client.main(new String[]{WORKFLOW, CWL.toString(), ENTRY, ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")});
         assertTrue(systemOutRule.getText().contains("label: Simple md5sum tool"));
     }
 
     @Test
     void wdl() throws Exception {
-        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, DescriptorType.WDL.toString(), ENTRY, ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
+        int exitCode = catchSystemExit(() -> Client.main(new String[]{WORKFLOW, WDL.toString(), ENTRY, ENTRY_PATH_WITH_VERSION, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
         assertEquals(Client.API_ERROR, exitCode);
         assertTrue(systemErrRule.getOutput().getText().contains("Invalid version"), "stderr missing invalid version message, looked like " + systemErrRule.getOutput().getText());
     }

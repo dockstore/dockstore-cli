@@ -31,6 +31,7 @@ import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LOGS;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
 import static io.dockstore.client.cli.nested.WesCommandParser.ID;
+import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.github.collaboratory.cwl.CWLClient.WES;
 
 public final class WesLauncher {
@@ -324,7 +325,7 @@ public final class WesLauncher {
      * @return A String type
      */
     public static String createWorkflowTypeVersion(String workflowType) {
-        return "CWL".equalsIgnoreCase(workflowType) ? "v" + WORKFLOW_TYPE_VERSION : WORKFLOW_TYPE_VERSION;
+        return CWL.toString().equalsIgnoreCase(workflowType) ? "v" + WORKFLOW_TYPE_VERSION : WORKFLOW_TYPE_VERSION;
     }
 
     /**

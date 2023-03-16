@@ -24,6 +24,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.common.DescriptorLanguage.CWL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
@@ -158,7 +159,7 @@ class LaunchWorkflowIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, MANUAL_PUBLISH, "--repository",
                 "md5sum-checker", "--organization", "DockstoreTestUser2", "--git-version-control", "github",
-                "--workflow-path", "/checker-workflow-wrapping-tool.cwl", "--descriptor-type", "cwl", "--workflow-name", "checksumTester", SCRIPT_FLAG });
+                "--workflow-path", "/checker-workflow-wrapping-tool.cwl", "--descriptor-type", CWL.toString(), "--workflow-name", "checksumTester", SCRIPT_FLAG });
 
         // ensure checksum validation is acknowledged, and no null checksums were discovered
         systemOutRule.clear();

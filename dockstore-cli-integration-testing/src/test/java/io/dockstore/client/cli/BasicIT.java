@@ -22,7 +22,6 @@ import java.util.List;
 import io.dockstore.client.cli.nested.ToolClient;
 import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Registry;
 import io.dockstore.common.SlowTest;
 import io.dockstore.common.ToolTest;
@@ -31,7 +30,6 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.api.ContainersApi;
 import io.swagger.client.api.HostedApi;
 import io.swagger.client.model.DockstoreTool;
-import io.swagger.model.DescriptorType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
@@ -57,6 +55,8 @@ import static io.dockstore.client.cli.nested.ToolClient.UPDATE_TOOL;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -371,7 +371,7 @@ class BasicIT extends BaseIT {
 
         // Update tag with test parameters
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
-            "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", "cwl", "--add", "test.cwl.json",
+            "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", CWL.toString(), "--add", "test.cwl.json",
             // Trying to remove a non-existent parameter file now fails
             "--add", "test2.cwl.json", "--add", "fake.cwl.json", /*"--remove", "notreal.cwl.json",*/ SCRIPT_FLAG });
         final long count2 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
@@ -379,20 +379,20 @@ class BasicIT extends BaseIT {
 
         // Update tag with test parameters
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
-            "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", "cwl", "--add", "test.cwl.json",
+            "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", CWL.toString(), "--add", "test.cwl.json",
             "--remove", "test2.cwl.json", SCRIPT_FLAG });
         final long count3 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals(1, count3, "there should be one sourcefile that is a test parameter file, there are " + count3);
 
         // Update tag wdltest with test parameters
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
-            "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", "wdl", "--add", "test.wdl.json",
+            "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", WDL.toString(), "--add", "test.wdl.json",
             SCRIPT_FLAG });
         final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='WDL_TEST_JSON'", long.class);
         assertEquals(1, count4, "there should be one sourcefile that is a wdl test parameter file, there are " + count4);
 
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
-            "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", "cwl", "--add", "test.cwl.json",
+            "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", CWL.toString(), "--add", "test.cwl.json",
             SCRIPT_FLAG });
         final long count5 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='CWL_TEST_JSON'", long.class);
         assertEquals(2, count5, "there should be two sourcefiles that are test parameter files, there are " + count5);
@@ -414,6 +414,65 @@ class BasicIT extends BaseIT {
         }
     }
 
+    /**
+     * This test is the same testTestJson, but CWL and WDL are in lowercase. This ensures that a user can use either
+     * upper or lower case for CWL and WDL.
+     */
+    @Test
+    void testTestJsonWithLowerCaseWDLandCWL() {
+        // Refresh
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json" });
+
+        // Check that no WDL or CWL test files
+        final long count = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
+        assertEquals(0, count, "there should be no sourcefiles that are test parameter files, there are " + count);
+
+        // Update tag with test parameters
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", CWL.toString().toLowerCase(), "--add", "test.cwl.json",
+                // Trying to remove a non-existent parameter file now fails
+                "--add", "test2.cwl.json", "--add", "fake.cwl.json", /*"--remove", "notreal.cwl.json",*/ SCRIPT_FLAG });
+        final long count2 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
+        assertEquals(2, count2, "there should be two sourcefiles that are test parameter files, there are " + count2);
+
+        // Update tag with test parameters
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", VERSION, "master", "--descriptor-type", CWL.toString().toLowerCase(), "--add", "test.cwl.json",
+                "--remove", "test2.cwl.json", SCRIPT_FLAG });
+        final long count3 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
+        assertEquals(1, count3, "there should be one sourcefile that is a test parameter file, there are " + count3);
+
+        // Update tag wdltest with test parameters
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", WDL.toString().toLowerCase(), "--add", "test.wdl.json",
+                SCRIPT_FLAG });
+        final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='WDL_TEST_JSON'", long.class);
+        assertEquals(1, count4, "there should be one sourcefile that is a wdl test parameter file, there are " + count4);
+
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, TEST_PARAMETER, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", VERSION, "wdltest", "--descriptor-type", CWL.toString().toLowerCase(), "--add", "test.cwl.json",
+                SCRIPT_FLAG });
+        final long count5 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='CWL_TEST_JSON'", long.class);
+        assertEquals(2, count5, "there should be two sourcefiles that are test parameter files, there are " + count5);
+
+        // refreshing again with the default paths set should not create extra redundant test parameter files
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, UPDATE_TOOL, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", "--test-cwl-path", "test.cwl.json" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, UPDATE_TOOL, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json", "--test-wdl-path", "test.wdl.json" });
+        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, REFRESH, ENTRY,
+                "quay.io/dockstoretestuser/test_input_json" });
+        final List<Long> testJsonCounts = testingPostgres.runSelectListStatement(
+                "select count(*) from sourcefile s, version_sourcefile vs where (s.type = 'CWL_TEST_JSON' or s.type = 'WDL_TEST_JSON') and s.id = vs.sourcefileid group by vs.versionid",
+                long.class);
+        assertTrue(testJsonCounts.size() >= 3,
+                "there should be at least three sets of test json sourcefiles " + testJsonCounts.size());
+        for (Long testJsonCount : testJsonCounts) {
+            assertTrue(testJsonCount <= 2, "there should be at most two test json for each version");
+        }
+    }
+
     @Test
     void testTestParameterOtherUsers() {
         final ApiClient correctWebClient = getWebClient(BaseIT.USER_1_USERNAME, testingPostgres);
@@ -428,21 +487,21 @@ class BasicIT extends BaseIT {
         assertEquals(0, count, "there should be no sourcefiles that are test parameter files, there are " + count);
 
         containersApi
-            .addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"), DescriptorType.CWL.toString(), "",
+            .addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"), CWL.toString(), "",
                 "master");
 
         boolean shouldFail = false;
         try {
             final ContainersApi containersApi1 = new ContainersApi(otherWebClient);
             containersApi1.addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"),
-                DescriptorType.CWL.toString(), "", "master");
+                CWL.toString(), "", "master");
         } catch (Exception e) {
             shouldFail = true;
         }
         assertTrue(shouldFail);
 
         containersApi
-            .addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"), DescriptorType.CWL.toString(),
+            .addTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"), CWL.toString(),
                 "", "master");
 
         final long count3 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
@@ -453,16 +512,16 @@ class BasicIT extends BaseIT {
         try {
             final ContainersApi containersApi1 = new ContainersApi(otherWebClient);
             containersApi1.deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"),
-                DescriptorType.CWL.toString(), "master");
+                CWL.toString(), "master");
         } catch (Exception e) {
             shouldFail = true;
         }
         assertTrue(shouldFail);
         containersApi
-            .deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"), DescriptorType.CWL.toString(),
+            .deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"), CWL.toString(),
                 "master");
         containersApi.deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"),
-            DescriptorType.CWL.toString(), "master");
+            CWL.toString(), "master");
 
         final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals(0, count4, "there should be one sourcefile that is a test parameter file, there are " + count4);
@@ -797,7 +856,7 @@ class BasicIT extends BaseIT {
         final ApiClient webClient = getWebClient(BaseIT.USER_1_USERNAME, testingPostgres);
         HostedApi hostedApi = new HostedApi(webClient);
         hostedApi.createHostedTool("testHosted", Registry.QUAY_IO.getDockerPath().toLowerCase(),
-                DescriptorLanguage.CWL.getShortName(), "hostedToolNamespace", null);
+                CWL.getShortName(), "hostedToolNamespace", null);
 
         // verify there is an unpublished hosted tool
         final long initialUnpublishedHostedCount = testingPostgres.runSelectStatement(

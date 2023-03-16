@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.DescriptorLanguage;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.api.WorkflowsApi;
@@ -37,6 +36,8 @@ import static io.dockstore.client.cli.Client.VERSION;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.Client.getGeneralFlags;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static io.dockstore.common.DescriptorLanguage.WDL;
 import static java.lang.String.join;
 
 /**
@@ -130,12 +131,12 @@ public class CheckerClient extends WorkflowClient {
         } else {
             // Retrieve arguments
             String entryPath = reqVal(args, ENTRY);
-            final String descriptorType = optVal(args, "--descriptor-type", DescriptorLanguage.CWL.toString()).toUpperCase();
+            final String descriptorType = optVal(args, "--descriptor-type", CWL.toString()).toUpperCase();
             String descriptorPath = reqVal(args, "--descriptor-path");
             String inputParameterPath = optVal(args, "--input-parameter-path", null);
 
             // Check that descriptor type is valid
-            if (!DescriptorLanguage.CWL.toString().equals(descriptorType) && !DescriptorLanguage.WDL.toString().equals(descriptorType)) {
+            if (!CWL.toString().equals(descriptorType) && !WDL.toString().equals(descriptorType)) {
                 errorMessage("The given descriptor type " + descriptorType + " is not valid.",
                     Client.CLIENT_ERROR);
             }
@@ -177,7 +178,7 @@ public class CheckerClient extends WorkflowClient {
         out("");
         out("Required Parameters:");
         out("  " + ENTRY + " <entry>                                                          Complete entry path in the Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("  --descriptor-type <descriptor-type>                                      " + DescriptorLanguage.CWL.toString() + "/" + DescriptorLanguage.WDL.toString() + ", defaults to " + DescriptorLanguage.CWL.toString());
+        out("  --descriptor-type <descriptor-type>                                      " + CWL + "/" + WDL + ", defaults to " + CWL);
         out("  --descriptor-path <descriptor-path>                                      Path to the main descriptor file.");
         out("");
         out("Optional Parameters:");

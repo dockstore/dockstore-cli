@@ -16,6 +16,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STAR;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.common.DescriptorLanguage.WDL;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -41,7 +42,7 @@ class StarIT extends BaseIT {
         Client.main(
             new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, MANUAL_PUBLISH, "--repository",
                 "hello-dockstore-workflow", "--organization", "DockstoreTestUser2", "--git-version-control", "github", "--workflow-name",
-                "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", "wdl", SCRIPT_FLAG });
+                "testname", "--workflow-path", "/Dockstore.wdl", "--descriptor-type", WDL.toString(), SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, ENTRY,
             SourceControl.GITHUB + "/DockstoreTestUser2/hello-dockstore-workflow/testname", "--pub", SCRIPT_FLAG });
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, STAR, ENTRY,
