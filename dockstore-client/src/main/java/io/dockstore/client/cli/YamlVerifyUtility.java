@@ -72,7 +72,7 @@ public final class YamlVerifyUtility {
         for (String path : paths) {
             Path pathToFile = Paths.get(base, path);
             if (!Files.exists(pathToFile)) {
-                missingFiles.add(pathToFile.toString() + FILE_DOES_NOT_EXIST);
+                missingFiles.add(pathToFile + FILE_DOES_NOT_EXIST);
             }
         }
         return missingFiles;
