@@ -170,7 +170,7 @@ class YamlValidatorTest {
 
     @Test
     void correctYamlAndFiles() {
-        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/correct-directory";
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/correct-directory/workflow";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
             String successMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
