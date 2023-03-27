@@ -82,7 +82,7 @@ class YamlClientIT extends BaseIT {
 
 
     @Test
-    void completeRunWithStandardTestParameterFile() throws IOException {
+    void completeRun() throws IOException {
         runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory");
     }
 
