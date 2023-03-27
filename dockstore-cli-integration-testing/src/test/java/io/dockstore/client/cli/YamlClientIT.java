@@ -72,17 +72,44 @@ class YamlClientIT extends BaseIT {
         systemOutRule.clear();
     }
 
-    @Test
-    void completeRun() throws IOException {
-        final String testDirectory = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory";
-        System.out.println(Lists.newArrayList(CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME,
-                "--path", testDirectory));
+    private void runYamlValidatorAndExpectSuccess(final String testDirectory) throws IOException {
         Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         String successMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
-            + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
+                + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
         assertTrue(systemOutRule.getText().contains(successMsg));
         systemOutRule.clear();
     }
+
+
+    @Test
+    void completeRunWithStandardTestParameterFile() throws IOException {
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory");
+    }
+
+    /** This test is for when a .dockstore.yml file has workflow or tool with a testParameterFiles field, but the field is empty
+     *
+     * @throws IOException
+     */
+    @Test
+    void completeRunWithDockstoreYmlThatContainsAnEmptyTestParameterField() throws IOException {
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/empty-test-parameter-files-field/tool");
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/empty-test-parameter-files-field/workflow");
+
+    }
+
+    /** This test is for when a .dockstore.yml file has workflow or tool with no testParameterFiles field
+     *
+     * @throws Exception
+     */
+    @Test
+    void completeRunWithDockstoreYmlThatContainsNoTestParameterField() throws IOException {
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/no-test-parameter-files-field/tool");
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/no-test-parameter-files-field/workflow");
+
+    }
+
+
+
 
 
     // Tests for when Help message should be generated
