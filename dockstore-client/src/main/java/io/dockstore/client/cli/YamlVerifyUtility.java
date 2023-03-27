@@ -70,6 +70,10 @@ public final class YamlVerifyUtility {
     private static List<String> filesExist(List<String> paths, String base) {
         List<String> missingFiles = new ArrayList<>();
         for (String path : paths) {
+            if (path == null) {
+                missingFiles.add("primaryDescriptorPath" + FILE_DOES_NOT_EXIST);
+                continue;
+            }
             Path pathToFile = Paths.get(base, path);
             if (!Files.exists(pathToFile)) {
                 missingFiles.add(pathToFile + FILE_DOES_NOT_EXIST);
@@ -80,32 +84,45 @@ public final class YamlVerifyUtility {
 
     // Determines if all the files in dockstoreYaml12 exist
     private static void allFilesExist(DockstoreYaml12 dockstoreYaml12, String basePath) throws ValidateYamlException {
-        List<String> missingFiles = new ArrayList<>();
+        List<String> filePathsToCheck = new ArrayList<>();
 
         // Check Workflows
         List<YamlWorkflow> workflows = dockstoreYaml12.getWorkflows();
         if (!workflows.isEmpty()) {
             for (YamlWorkflow workflow : workflows) {
-                List<String> filePaths = workflow.getTestParameterFiles();
-                filePaths.add(workflow.getPrimaryDescriptorPath());
-                missingFiles.addAll(filesExist(filePaths, basePath));
+                List<String> testParameterFiles = workflow.getTestParameterFiles();
+
+                if (testParameterFiles != null) {
+                    filePathsToCheck.addAll(testParameterFiles);
+                }
+
+                filePathsToCheck.add(workflow.getPrimaryDescriptorPath());
             }
         }
         // Check Tools
         List<YamlTool> tools = dockstoreYaml12.getTools();
         if (!tools.isEmpty()) {
             for (YamlWorkflow tool : tools) {
-                List<String> filePaths = tool.getTestParameterFiles();
-                filePaths.add(tool.getPrimaryDescriptorPath());
-                missingFiles.addAll(filesExist(filePaths, basePath));
+                List<String> testParameterFiles = tool.getTestParameterFiles();
+
+                if (testParameterFiles != null) {
+                    filePathsToCheck.addAll(testParameterFiles);
+                }
+
+                filePathsToCheck.add(tool.getPrimaryDescriptorPath());
             }
         }
 
         // Check service
         Service12 service = dockstoreYaml12.getService();
         if (service != null) {
-            missingFiles.addAll(filesExist(service.getFiles(), basePath));
+            List<String> files = service.getFiles();
+            if (files != null) {
+                filePathsToCheck.addAll(service.getFiles());
+            }
         }
+
+        List<String> missingFiles = filesExist(filePathsToCheck, basePath);
         if (!missingFiles.isEmpty()) {
             StringBuilder errorMsgBuild = new StringBuilder();
             for (String missingFile: missingFiles) {
