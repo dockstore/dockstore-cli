@@ -30,6 +30,8 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.YamlVerifyUtility.INVALID_FILE_STRUCTURE;
+import static io.dockstore.client.cli.YamlVerifyUtility.SERVICE_DOES_NOT_HAVE_FILES;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -64,7 +66,7 @@ class YamlClientIT extends BaseIT {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
         System.out.println(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
-        String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
+        String errorMsg = INVALID_FILE_STRUCTURE
             + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
             + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
         System.out.println(errorMsg);
@@ -83,7 +85,9 @@ class YamlClientIT extends BaseIT {
 
     @Test
     void completeRun() throws IOException {
-        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory");
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/workflow");
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/tool");
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/service");
     }
 
     /** This test is for when a .dockstore.yml file has workflow or tool with a testParameterFiles field, but the field is empty
@@ -109,8 +113,19 @@ class YamlClientIT extends BaseIT {
     }
 
 
+    private void ensureCorrectErrorMessageWhenNoFileAreProvidedToAService(final String testDirectory) throws IOException {
+        Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
+        String errorMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
+                + INVALID_FILE_STRUCTURE + SERVICE_DOES_NOT_HAVE_FILES;
+        assertTrue(systemOutRule.getText().contains(errorMsg));
+        systemOutRule.clear();
+    }
 
-
+    @Test
+    void serviceWithNoFiles() throws IOException {
+        ensureCorrectErrorMessageWhenNoFileAreProvidedToAService("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/service-empty-files-parameter");
+        ensureCorrectErrorMessageWhenNoFileAreProvidedToAService("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/service-no-files-parameter");
+    }
 
     // Tests for when Help message should be generated
 

@@ -55,6 +55,7 @@ public final class YamlVerifyUtility {
     public static final String CONTAINS_ERRORS = " has the following errors:" + System.lineSeparator();
     public static final String EMPTY_FILE = " is empty";
     public static final String FILE_DOES_NOT_EXIST = " does not exist";
+    public static final String SERVICE_DOES_NOT_HAVE_FILES = "The service does not have any files";
     public static final String INVALID_FILE_STRUCTURE = "Your file structure has the following errors:" + System.lineSeparator();
 
     public static final String INVALID_YAML = " is not a valid " + YAML + " file:" + System.lineSeparator();
@@ -85,6 +86,7 @@ public final class YamlVerifyUtility {
     // Determines if all the files in dockstoreYaml12 exist
     private static void allFilesExist(DockstoreYaml12 dockstoreYaml12, String basePath) throws ValidateYamlException {
         List<String> filePathsToCheck = new ArrayList<>();
+        List<String> missingFiles = new ArrayList<>();
 
         // Check Workflows
         List<YamlWorkflow> workflows = dockstoreYaml12.getWorkflows();
@@ -119,10 +121,12 @@ public final class YamlVerifyUtility {
             List<String> files = service.getFiles();
             if (files != null) {
                 filePathsToCheck.addAll(service.getFiles());
+            } else {
+                missingFiles.add(SERVICE_DOES_NOT_HAVE_FILES);
             }
         }
 
-        List<String> missingFiles = filesExist(filePathsToCheck, basePath);
+        missingFiles.addAll(filesExist(filePathsToCheck, basePath));
         if (!missingFiles.isEmpty()) {
             StringBuilder errorMsgBuild = new StringBuilder();
             for (String missingFile: missingFiles) {
