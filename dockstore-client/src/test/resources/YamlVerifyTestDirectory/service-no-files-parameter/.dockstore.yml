@@ -14,7 +14,7 @@ service:
       description: testing testing testing
   data:
     test-2:
-      targetDirectory: ~/test
+      targetDirectory: test/directory
       files:
         test.txt:
           description: test
