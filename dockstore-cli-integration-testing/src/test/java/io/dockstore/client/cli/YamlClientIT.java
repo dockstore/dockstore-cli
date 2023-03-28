@@ -30,7 +30,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.HELP;
-import static io.dockstore.client.cli.YamlVerifyUtility.INVALID_FILE_STRUCTURE;
+import static io.dockstore.client.cli.YamlVerifyUtility.MISSING_FILE_ERROR;
 import static io.dockstore.client.cli.YamlVerifyUtility.SERVICE_DOES_NOT_HAVE_FILES;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -66,7 +66,7 @@ class YamlClientIT extends BaseIT {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
         System.out.println(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
-        String errorMsg = INVALID_FILE_STRUCTURE
+        String errorMsg = MISSING_FILE_ERROR
             + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
             + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
         System.out.println(errorMsg);
@@ -116,7 +116,7 @@ class YamlClientIT extends BaseIT {
     private void ensureCorrectErrorMessageWhenNoFileAreProvidedToAService(final String testDirectory) throws IOException {
         Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
         String errorMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
-                + INVALID_FILE_STRUCTURE + SERVICE_DOES_NOT_HAVE_FILES;
+                + MISSING_FILE_ERROR + SERVICE_DOES_NOT_HAVE_FILES;
         assertTrue(systemOutRule.getText().contains(errorMsg));
         systemOutRule.clear();
     }

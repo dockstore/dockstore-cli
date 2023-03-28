@@ -56,7 +56,7 @@ public final class YamlVerifyUtility {
     public static final String EMPTY_FILE = " is empty";
     public static final String FILE_DOES_NOT_EXIST = " does not exist";
     public static final String SERVICE_DOES_NOT_HAVE_FILES = "The service does not have any files";
-    public static final String INVALID_FILE_STRUCTURE = "Your " + DOCKSTOREYML + CONTAINS_ERRORS;
+    public static final String MISSING_FILE_ERROR = "Your " + DOCKSTOREYML + CONTAINS_ERRORS;
 
     public static final String INVALID_YAML = " is not a valid " + YAML + " file:" + System.lineSeparator();
     // This message is displayed when it is determined that DOCKSTOREYML is a valid yaml file,
@@ -132,7 +132,7 @@ public final class YamlVerifyUtility {
                 errorMsgBuild.append(missingFile);
             }
             String errorMsg = errorMsgBuild.toString();
-            throw new ValidateYamlException(INVALID_FILE_STRUCTURE + errorMsg);
+            throw new ValidateYamlException(MISSING_FILE_ERROR + errorMsg);
         }
     }
 
