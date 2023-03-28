@@ -120,7 +120,7 @@ public final class YamlVerifyUtility {
         if (service != null) {
             List<String> files = service.getFiles();
             if (files != null) {
-                filePathsToCheck.addAll(service.getFiles());
+                filePathsToCheck.addAll(files);
             } else {
                 missingFiles.add(SERVICE_DOES_NOT_HAVE_FILES);
             }
