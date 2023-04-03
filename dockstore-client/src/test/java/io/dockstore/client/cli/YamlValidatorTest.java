@@ -119,7 +119,7 @@ class YamlValidatorTest {
         List<String> directoryEnds1 = Arrays.asList(TOOL, "service", WORKFLOW);
         for (String directoryEnd : directoryEnds1) {
             String testDirectory = baseTestDirectory + directoryEnd;
-            String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
+            String errorMsg = YamlVerifyUtility.MISSING_FILE_ERROR
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/dockstore.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
@@ -134,7 +134,7 @@ class YamlValidatorTest {
         List<String> directoryEnds2 = Arrays.asList("multiple-workflows", "multiple-tools", "workflows-and-tools-1", "workflows-and-tools-2");
         for (String directoryEnd : directoryEnds2) {
             String testDirectory = baseTestDirectory + directoryEnd;
-            String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
+            String errorMsg = YamlVerifyUtility.MISSING_FILE_ERROR
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/dockstore.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore2.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
@@ -159,7 +159,7 @@ class YamlValidatorTest {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
             fail("non-present test files not caught");
         } catch (YamlVerifyUtility.ValidateYamlException ex) {
-            String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
+            String errorMsg = YamlVerifyUtility.MISSING_FILE_ERROR
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/dockstore.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
@@ -170,7 +170,7 @@ class YamlValidatorTest {
 
     @Test
     void correctYamlAndFiles() {
-        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/correct-directory";
+        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/correct-directory/workflow";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
             String successMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
@@ -189,7 +189,7 @@ class YamlValidatorTest {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
             fail("non-present test files not caught");
         } catch (YamlVerifyUtility.ValidateYamlException ex) {
-            String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
+            String errorMsg = YamlVerifyUtility.MISSING_FILE_ERROR
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
             assertEquals(errorMsg, ex.getMessage());
@@ -242,7 +242,7 @@ class YamlValidatorTest {
             YamlVerifyUtility.dockstoreValidate(testDirectory + "/" + YamlVerifyUtility.GITHUB_DIRECTORY_NAME);
             fail("non-present test files not caught");
         } catch (YamlVerifyUtility.ValidateYamlException ex) {
-            String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
+            String errorMsg = YamlVerifyUtility.MISSING_FILE_ERROR
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
             assertEquals(errorMsg, ex.getMessage());

@@ -10,9 +10,6 @@ workflows:
      publish: true
      primaryDescriptorPath: /Dockstore2.wdl
      testParameterFiles:
-       - /dockstore.wdl.json
-       - /dockstore.cwl.json
-       - /Dockstore.cwl
      filters:
        branches:
          - develop

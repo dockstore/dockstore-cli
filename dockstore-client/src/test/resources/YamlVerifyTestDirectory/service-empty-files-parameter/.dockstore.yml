@@ -6,13 +6,9 @@ service:
       email: test@test.net
   description: This is a test
   publish: true
-  files:
-    - /dockstore.wdl.json
-    - /dockstore.cwl.json
-    - /Dockstore.cwl
-    - /Dockstore2.wdl
   scripts:
     start: start.sh
+  files:
   environment:
     TEST-1:
       default: testing
