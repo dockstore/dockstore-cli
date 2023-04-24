@@ -21,7 +21,6 @@ import java.util.List;
 
 import io.dockstore.common.MuteForSuccessfulTests;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
