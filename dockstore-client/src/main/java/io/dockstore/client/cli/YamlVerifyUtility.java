@@ -185,7 +185,7 @@ public final class YamlVerifyUtility {
         // Validates file dockstoreYaml in general
         DockstoreYaml12 dockstoreYaml12 = null;
         try {
-            dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(dockstoreYmlString);
+            dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(dockstoreYmlString, true);
         } catch (Exception ex) {
             throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + CONTAINS_ERRORS + ex.getMessage());
         }
