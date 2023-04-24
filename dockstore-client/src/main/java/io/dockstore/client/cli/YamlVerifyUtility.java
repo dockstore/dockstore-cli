@@ -141,19 +141,19 @@ public final class YamlVerifyUtility {
 
         // Verify that the path is a valid directory
         if (!Files.isDirectory(workflowPath)) {
-            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + workflowPath.toString() + FILE_DOES_NOT_EXIST);
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + workflowPath + FILE_DOES_NOT_EXIST);
         }
 
         // Verify that .dockstore.yml exists
         Path dockstoreYmlPath = Paths.get(path, DOCKSTOREYML);
         if (!Files.exists(dockstoreYmlPath)) {
-            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + FILE_DOES_NOT_EXIST);
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath + FILE_DOES_NOT_EXIST);
         }
 
         // Verify that .dockstore.yml is non-empty
         File dockstoreYml = new File(dockstoreYmlPath.toString());
         if (dockstoreYml.length() == 0) {
-            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + EMPTY_FILE);
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath + EMPTY_FILE);
         }
 
         // Load dockstoreYml into string
@@ -162,7 +162,7 @@ public final class YamlVerifyUtility {
             dockstoreYmlString = Files.readString(dockstoreYmlPath);
         } catch (IOException ex) {
             // Unlikely to ever catch
-            throw new ValidateYamlException("Error reading " + dockstoreYmlPath.toString() + " :" +  System.lineSeparator() + ex.getMessage());
+            throw new ValidateYamlException("Error reading " + dockstoreYmlPath + " :" +  System.lineSeparator() + ex.getMessage());
         }
 
         // Verify that the Yaml is valid, however does not verify it is valid for dockstore
@@ -171,7 +171,7 @@ public final class YamlVerifyUtility {
             safeYaml.load(Files.readString(dockstoreYmlPath));
             out(dockstoreYmlPath + VALID_YAML_ONLY);
         } catch (Exception ex) {
-            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + INVALID_YAML + ex.getMessage());
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath + INVALID_YAML + ex.getMessage());
         }
 
         // Running validate first, as if readAsDockstoreYaml12 is run first and a parameter is incorrect it is difficult to understand
@@ -179,7 +179,7 @@ public final class YamlVerifyUtility {
         try {
             DockstoreYamlHelper.validateDockstoreYamlProperties(dockstoreYmlString);
         } catch (Exception ex) {
-            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + CONTAINS_ERRORS + ex.getMessage());
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath + CONTAINS_ERRORS + ex.getMessage());
         }
 
         // Validates file dockstoreYaml in general
@@ -187,7 +187,7 @@ public final class YamlVerifyUtility {
         try {
             dockstoreYaml12 = DockstoreYamlHelper.readAsDockstoreYaml12(dockstoreYmlString, true);
         } catch (Exception ex) {
-            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath.toString() + CONTAINS_ERRORS + ex.getMessage());
+            throw new ValidateYamlException(INVALID_DOCKSTORE_YML + dockstoreYmlPath + CONTAINS_ERRORS + ex.getMessage());
         }
 
         if (workflowPath.endsWith(GITHUB_DIRECTORY_NAME)) {
