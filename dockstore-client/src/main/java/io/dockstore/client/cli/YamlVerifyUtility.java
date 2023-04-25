@@ -71,10 +71,6 @@ public final class YamlVerifyUtility {
     private static List<String> filesExist(List<String> paths, String base) {
         List<String> missingFiles = new ArrayList<>();
         for (String path : paths) {
-            if (path == null) {
-                missingFiles.add("primaryDescriptorPath" + FILE_DOES_NOT_EXIST);
-                continue;
-            }
             Path pathToFile = Paths.get(base, path);
             if (!Files.exists(pathToFile)) {
                 missingFiles.add(pathToFile + FILE_DOES_NOT_EXIST);
