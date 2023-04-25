@@ -10,7 +10,7 @@ service:
     - /dockstore.wdl.json
     - /dockstore.cwl.json
     - /Dockstore.cwl
-    - /Dockstore2.wdl
+    - /Dockstore2.cwl
   scripts:
     start: start.sh
   environment:
