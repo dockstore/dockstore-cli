@@ -8,7 +8,7 @@ tools:
          role: Institute
          affiliation: UCSC
      publish: true
-     primaryDescriptorPath: /Dockstore2.wdl
+     primaryDescriptorPath: /Dockstore2.cwl
      testParameterFiles:
        - /dockstore.wdl.json
        - /dockstore.cwl.json
