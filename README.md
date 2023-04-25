@@ -8,6 +8,11 @@
 [![CircleCI](https://circleci.com/gh/dockstore/dockstore-cli/tree/develop.svg?style=svg)](https://circleci.com/gh/dockstore/dockstore-cli/tree/develop)
 [![Documentation Status](https://readthedocs.org/projects/dockstore/badge/?version=develop)](https://dockstore.readthedocs.io/en/develop/?badge=develop)
 
+# About this Branch
+
+This branch explores running services locally with the CLI. Because services haven't taken off, it was put on hold.
+
+It would download the service locally, then start/stop the service per entries in the .dockstore.yml
 
 # Dockstore
 
