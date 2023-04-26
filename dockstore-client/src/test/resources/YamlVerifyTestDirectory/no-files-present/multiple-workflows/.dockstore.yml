@@ -3,10 +3,10 @@ workflows:
   -  name: TEST-1
      subclass: WDL
      publish: true
-     primaryDescriptorPath: /Dockstore2.wdl
+     primaryDescriptorPath: /test1.file
      testParameterFiles:
-       - /dockstore.wdl.json
-       - /dockstore.cwl.json
+       - /test2.file
+       - /test3.file
      filters:
        branches:
          - develop
@@ -15,11 +15,11 @@ workflows:
   -  name: TEST-2
      subclass: WDL
      publish: true
-     primaryDescriptorPath: /Dockstore3.wdl
+     primaryDescriptorPath: /test4.file
      testParameterFiles:
-       - /dockstore2.wdl.json
-       - /dockstore2.cwl.json
-       - /Dockstore2.cwl
+       - /test5.file
+       - /test6.file
+       - /test7.file
      filters:
        branches:
          - develop
@@ -28,7 +28,7 @@ workflows:
   -  name: TEST-3
      subclass: WDL
      publish: true
-     primaryDescriptorPath: /Dockstore.cwl
+     primaryDescriptorPath: /test8.file
      filters:
        branches:
          - develop

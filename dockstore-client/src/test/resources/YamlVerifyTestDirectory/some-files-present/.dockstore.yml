@@ -1,6 +1,6 @@
 version: 1.2
 workflows:
-  -  subclass: ERROR_SHOULD_OCCUR
+  -  subclass: WDL
      name: wdl-workflow
      authors:
        - name: Denis Yuen
@@ -17,7 +17,7 @@ workflows:
          - develop
        tags:
          - gwas*
-  -  subclass: cwl
+  -  subclass: CWL
      publish: no
      name: cwl-workflow
      primaryDescriptorPath: /Dockstore.cwl
