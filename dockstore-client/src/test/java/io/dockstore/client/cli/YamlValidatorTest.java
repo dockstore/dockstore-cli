@@ -237,6 +237,7 @@ class YamlValidatorTest {
         String testDirectory = "src/test/resources/YamlVerifyTestDirectory/invalid-subclass";
         try {
             YamlVerifyUtility.dockstoreValidate(testDirectory);
+            fail("A .dockstore.yml file that is invalid passed the dockstoreValidate method without throwing an error");
         } catch (YamlVerifyUtility.ValidateYamlException ex) {
             String errorMsg = YamlVerifyUtility.INVALID_DOCKSTORE_YML + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML
                     + YamlVerifyUtility.CONTAINS_ERRORS
