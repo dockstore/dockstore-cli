@@ -248,11 +248,7 @@ class YamlValidatorTest {
         }
     }
 
-
-    @Test
-    void noPrimaryDescriptorPath() {
-        final String baseTestDirectory = "src/test/resources/YamlVerifyTestDirectory/no-primary-descriptor-path/";
-        List<String> directoryEnds = Arrays.asList(TOOL, WORKFLOW);
+    private void missingOrEmptyPrimaryDescriptorPathTest(String baseTestDirectory, List<String> directoryEnds) {
         for (String directoryEnd : directoryEnds) {
             try {
                 String testDirectory = baseTestDirectory + directoryEnd;
@@ -265,18 +261,13 @@ class YamlValidatorTest {
     }
 
     @Test
+    void noPrimaryDescriptorPath() {
+        missingOrEmptyPrimaryDescriptorPathTest("src/test/resources/YamlVerifyTestDirectory/no-primary-descriptor-path/", Arrays.asList(TOOL, WORKFLOW));
+    }
+
+    @Test
     void emptyPrimaryDescriptorPath() {
-        final String baseTestDirectory = "src/test/resources/YamlVerifyTestDirectory/empty-primary-descriptor-path/";
-        List<String> directoryEnds = Arrays.asList(TOOL, WORKFLOW);
-        for (String directoryEnd : directoryEnds) {
-            try {
-                String testDirectory = baseTestDirectory + directoryEnd;
-                YamlVerifyUtility.dockstoreValidate(testDirectory);
-                fail("A .dockstore.yml that has an empty primary descriptor path passed");
-            } catch (YamlVerifyUtility.ValidateYamlException ex) {
-                assertTrue(ex.getMessage().contains("primaryDescriptorPath\" is missing but required"));
-            }
-        }
+        missingOrEmptyPrimaryDescriptorPathTest("src/test/resources/YamlVerifyTestDirectory/empty-primary-descriptor-path/", Arrays.asList(TOOL, WORKFLOW));
     }
 
 
