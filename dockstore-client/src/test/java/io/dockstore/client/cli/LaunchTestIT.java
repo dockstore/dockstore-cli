@@ -64,7 +64,6 @@ import static io.github.collaboratory.wdl.WDLClient.TASK;
 import static io.github.collaboratory.wdl.WDLClient.WDL_CHECK_ERROR_MESSAGE;
 import static io.github.collaboratory.wdl.WDLClient.WDL_CHECK_WARNING_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
