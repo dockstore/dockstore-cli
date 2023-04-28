@@ -1087,29 +1087,26 @@ class LaunchTestIT {
 
     }
 
-    @Test
-    void missingTestParameterFileCWL() throws Exception {
-        // Tests that the CWLrunner is able to handle workflows that do not specify
-        // test parameter files.
-        File file = new File(ResourceHelpers.resourceFilePath("no-input-echo.cwl"));
+
+    void testCWLWorkflowOrToolWithNoTestParameterFile(String type, File entry, String expectedMessage) {
+        systemErrRule.clear();
         ArrayList<String> args = new ArrayList<>();
-        args.add(WORKFLOW);
+        args.add(type);
         args.add(LAUNCH);
         args.add("--local-entry");
-        args.add(file.getAbsolutePath());
-
+        args.add(entry.getAbsolutePath());
         File config = new File(ResourceHelpers.resourceFilePath("clientConfig"));
-        int exitcode = catchSystemExit(() -> runClientCommandConfig(args, config));
-        assertEquals(1, exitcode);
+        runClientCommandConfig(args, config);
+        assertTrue(systemErrRule.getText().contains(expectedMessage),
+                "CWLTool should be able to run this workflow without any problems");
+    }
 
-        assertThrows(ArgumentUtility.Kill.class, () -> runClientCommandConfig(args, config));
-        // FIXME: The CWLTool should be able to execute this workflow, there is an
-        //        issue with how outputs are handled.
-        //        https://github.com/dockstore/dockstore/issues/4922
-        if (false) {
-            assertTrue(systemOutRule.getText().contains("[job no-input-echo.cwl] completed success"),
-                    "CWLTool should be able to run this workflow without any problems");
-        }
+    @Test
+    void missingTestParameterFileCWL() {
+        testCWLWorkflowOrToolWithNoTestParameterFile(WORKFLOW, new File(ResourceHelpers.resourceFilePath("no-input-echo.cwl")), "[job no-input-echo.cwl] completed success");
+        testCWLWorkflowOrToolWithNoTestParameterFile(TOOL, new File(ResourceHelpers.resourceFilePath("no-input-echo.cwl")), "[job no-input-echo.cwl] completed success");
+        testCWLWorkflowOrToolWithNoTestParameterFile(WORKFLOW, new File(ResourceHelpers.resourceFilePath("hello_world.cwl")), "[job hello_world.cwl] completed success");
+        testCWLWorkflowOrToolWithNoTestParameterFile(TOOL, new File(ResourceHelpers.resourceFilePath("hello_world.cwl")), "[job hello_world.cwl] completed success");
     }
 
     public static class TestStatus implements org.junit.jupiter.api.extension.TestWatcher {

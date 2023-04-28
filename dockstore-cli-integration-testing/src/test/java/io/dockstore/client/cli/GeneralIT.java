@@ -544,14 +544,6 @@ class GeneralIT extends BaseIT {
         });
     }
 
-    /**
-     * This test verifies that a tool that does not require a json file, can be run without a json file
-     */
-    @Test
-    void noJsonFileRequiredTool() {
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), TOOL, LAUNCH,
-                "--local-entry", ResourceHelpers.resourceFilePath("hello_world.cwl"), SCRIPT_FLAG});
-    }
 
 
 }
