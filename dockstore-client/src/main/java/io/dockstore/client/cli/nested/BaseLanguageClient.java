@@ -174,12 +174,11 @@ public abstract class BaseLanguageClient {
          endpoint.
         */
 
-        Boolean provisionFiles = true;
+        boolean provisionFiles = true;
         if (!abstractEntryClient.isWesCommand()) {
             if (provisionedParameterFile != null || selectedParameterFile != null) {
                 try {
                     provisionedParameterFile = provisionInputFiles();
-                    provisionFiles = true;
                 } catch (ApiException ex) {
                     if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL)) {
                         exceptionMessage(ex, "The " + TOOL + " entry does not exist. Did you mean to " + LAUNCH + " a local " + TOOL + " or a " + WORKFLOW + "?",
