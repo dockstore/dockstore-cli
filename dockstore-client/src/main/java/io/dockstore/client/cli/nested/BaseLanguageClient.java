@@ -213,7 +213,7 @@ public abstract class BaseLanguageClient {
 
             // Provision the output files if run is successful and provisioning files were provided
             if (provisionFiles) {
-                provisionOutputFiles();
+            provisionOutputFiles();
             }
         } catch (ApiException ex) {
             exceptionMessage(ex, ex.getMessage(), API_ERROR);
