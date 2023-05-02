@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.dockstore</groupId>
   <artifactId>dockstore-client</artifactId>
-  <version>1.14.0-SNAPSHOT</version>
+  <version>1.14.0-beta.0</version>
   <licenses>
     <license>
       <name>Apache Software License, Version 2.0</name>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.14.0-alpha.9</version>
+      <version>1.14.0-beta.0</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -78,25 +78,25 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>swagger-java-client</artifactId>
-      <version>1.14.0-alpha.9</version>
+      <version>1.14.0-beta.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.14.0-alpha.9</version>
+      <version>1.14.0-beta.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-wes-client</artifactId>
-      <version>1.14.0-SNAPSHOT</version>
+      <version>1.14.0-beta.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-file-plugin-parent</artifactId>
-      <version>1.14.0-SNAPSHOT</version>
+      <version>1.14.0-beta.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -243,7 +243,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20220924</version>
+      <version>20230227</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
