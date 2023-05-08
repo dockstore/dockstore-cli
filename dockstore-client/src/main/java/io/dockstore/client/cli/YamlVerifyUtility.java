@@ -29,6 +29,7 @@ import io.dockstore.common.yaml.DockstoreYamlHelper;
 import io.dockstore.common.yaml.Service12;
 import io.dockstore.common.yaml.YamlTool;
 import io.dockstore.common.yaml.YamlWorkflow;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -162,7 +163,7 @@ public final class YamlVerifyUtility {
         }
 
         // Verify that the Yaml is valid, however does not verify it is valid for dockstore
-        final Yaml safeYaml = new Yaml(new SafeConstructor());
+        final Yaml safeYaml = new Yaml(new SafeConstructor(new LoaderOptions()));
         try {
             safeYaml.load(Files.readString(dockstoreYmlPath));
             out(dockstoreYmlPath + VALID_YAML_ONLY);

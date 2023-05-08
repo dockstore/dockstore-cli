@@ -28,7 +28,7 @@
     <name>dockstore-client</name>
 
     <properties>
-        <docker-client.version>3.2.8</docker-client.version>
+        <docker-client.version>3.3.0</docker-client.version>
         <argLine></argLine>
     </properties>
 
@@ -345,7 +345,7 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.2.5.Final</version>
+            <version>7.0.5.Final</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>

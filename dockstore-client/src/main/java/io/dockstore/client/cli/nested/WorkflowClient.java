@@ -30,8 +30,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.GenericType;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -54,6 +52,7 @@ import io.swagger.client.model.ToolDescriptor;
 import io.swagger.client.model.User;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
+import jakarta.ws.rs.core.GenericType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;

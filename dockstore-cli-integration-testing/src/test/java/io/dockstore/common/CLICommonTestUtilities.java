@@ -32,7 +32,7 @@ import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dockstore.webservice.DockstoreWebserviceConfiguration;
 import io.dockstore.webservice.core.Token;
 import io.dockstore.webservice.jdbi.TokenDAO;
-import io.dropwizard.Application;
+import io.dropwizard.core.Application;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
 import io.swagger.client.ApiClient;

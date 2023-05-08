@@ -23,11 +23,10 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.ws.rs.core.GenericType;
-
 import com.google.gson.Gson;
 import io.swagger.client.ApiClient;
 import io.swagger.client.model.PublishRequest;
+import jakarta.ws.rs.core.GenericType;
 import org.apache.commons.io.FileUtils;
 
 import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
