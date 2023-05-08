@@ -325,9 +325,9 @@ commands:
      - run:
          name: Install postgresql client
          command: |
-           sudo apt update
            # https://discuss.circleci.com/t/heroku-gpg-issues-in-ubuntu-images/43834/3
-           rm -Rf /etc/apt/sources.list.d/heroku.list
+           sudo rm -Rf /etc/apt/sources.list.d/heroku.list
+           sudo apt update
            sudo apt install -y postgresql-client
 
   setup_for_unit_tests:
