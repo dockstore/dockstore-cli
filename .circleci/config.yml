@@ -386,7 +386,7 @@ commands:
           name: install pip
           command: |
             sudo apt update
-            sudo apt install python3-distutils python3-dev libxml2 libxslt
+            sudo apt install python3-distutils python3-dev
             curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
             python3 get-pip.py
             # For debug purposes, a python3 version was installed in the image, pip is untagged
