@@ -302,6 +302,10 @@
             <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
@@ -441,6 +445,7 @@
                                 <usedDependency>io.spray:spray-json_2.13</usedDependency>
                                 <usedDependency>org.hibernate.validator:hibernate-validator</usedDependency>
                                 <usedDependency>org.glassfish:jakarta.el</usedDependency>
+                                <usedDependency>org.apache.httpcomponents.client5:httpclient5</usedDependency>
                             </usedDependencies>
                             <ignoredNonTestScopedDependencies>
                                 <ignoredNonTestScopedDependency>software.amazon.awssdk:profiles</ignoredNonTestScopedDependency>
