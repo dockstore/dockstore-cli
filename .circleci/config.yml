@@ -12,14 +12,14 @@ executors:
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2204:2023.04.2
+      image: ubuntu-2204:2022.10.1
     environment:
       PGHOST: 127.0.0.1
     resource_class: medium
 
   toil_wes_test_executor:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2204:2023.04.2
+      image: ubuntu-2204:2022.10.1
     resource_class: medium
 
 common_filters: &common_filters
@@ -326,6 +326,8 @@ commands:
          name: Install postgresql client
          command: |
            sudo apt update
+           # https://discuss.circleci.com/t/heroku-gpg-issues-in-ubuntu-images/43834/3
+           rm -Rf /etc/apt/sources.list.d/heroku.list
            sudo apt install -y postgresql-client
 
   setup_for_unit_tests:
@@ -386,7 +388,7 @@ commands:
           name: install pip
           command: |
             sudo apt update
-            sudo apt install python3-distutils python3-dev libxml2-dev libxslt-dev
+            sudo apt install python3-distutils python3-dev
             curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
             python3 get-pip.py
             # For debug purposes, a python3 version was installed in the image, pip is untagged
