@@ -325,13 +325,7 @@ commands:
      - run:
          name: Install postgresql client
          command: |
-           sudo rm -rf /var/lib/apt/lists/*
-           # heroku.com is not updating their keys
-           # https://github.com/heroku/cli/issues/1464
-           curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
            sudo apt update
-           # NOTE: this may be installing latest client; perhaps should
-           # specify version
            sudo apt install -y postgresql-client
 
   setup_for_unit_tests:
