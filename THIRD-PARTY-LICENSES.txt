@@ -1,5 +1,5 @@
 
-Lists of 391 third-party dependencies.
+Lists of 393 third-party dependencies.
      (Apache License, Version 2.0) akka-actor (com.typesafe.akka:akka-actor_2.13:2.5.32 - https://akka.io/)
      (Apache License, Version 2.0) akka-protobuf (com.typesafe.akka:akka-protobuf_2.13:2.5.32 - https://akka.io/)
      (Apache License, Version 2.0) akka-slf4j (com.typesafe.akka:akka-slf4j_2.13:2.5.32 - https://akka.io/)
@@ -228,9 +228,11 @@ Lists of 391 third-party dependencies.
      (The MIT License) Java SemVer (com.github.zafarkhaja:java-semver:0.9.0 - https://github.com/zafarkhaja/jsemver)
      (The Apache Software License, Version 2.0) java-diff-utils (io.github.java-diff-utils:java-diff-utils:4.12 - https://github.com/java-diff-utils/java-diff-utils/java-diff-utils)
      (CDDL/GPLv2+CE) JavaBeans Activation Framework (com.sun.activation:javax.activation:1.2.0 - http://java.net/all/javax.activation/)
+     (CDDL/GPLv2+CE) JavaBeans Activation Framework API jar (javax.activation:javax.activation-api:1.2.0 - http://java.net/all/javax.activation-api/)
      (Apache License 2.0) (LGPL 2.1) (MPL 1.1) Javassist (org.javassist:javassist:3.29.2-GA - http://www.javassist.org/)
      (Eclipse Distribution License - v 1.0) JAXB Core (org.glassfish.jaxb:jaxb-core:3.0.2 - https://eclipse-ee4j.github.io/jaxb-ri/)
      (Eclipse Distribution License - v 1.0) JAXB Runtime (org.glassfish.jaxb:jaxb-runtime:3.0.2 - https://eclipse-ee4j.github.io/jaxb-ri/)
+     (CDDL 1.1) (GPL2 w/ CPE) jaxb-api (javax.xml.bind:jaxb-api:2.3.1 - https://github.com/javaee/jaxb-spec/jaxb-api)
      (Apache License, version 2.0) JBoss Logging 3 (org.jboss.logging:jboss-logging:3.4.3.Final - http://www.jboss.org)
      (Apache License, Version 2.0) JCL 1.2 implemented over SLF4J (org.slf4j:jcl-over-slf4j:2.0.7 - http://www.slf4j.org)
      (Apache License, Version 2.0) jcommander (com.beust:jcommander:1.82 - https://jcommander.org)

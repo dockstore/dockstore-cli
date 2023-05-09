@@ -532,8 +532,8 @@
                                         <exclude>javax.servlet:javax.servlet-api</exclude>
                                         <!-- Replaced with jakarta.validation:jakarta.validation-api -->
                                         <exclude>javax.validation:validation-api</exclude>
-                                        <!-- Replaced with jakarta.xml.bind:jakarta.xml.bind-api -->
-                                        <exclude>javax.xml.bind:jaxb-api</exclude>
+                                        <!-- Replaced with jakarta.xml.bind:jakarta.xml.bind-api, but need to keep around for old plugins -->
+                                        <!-- <exclude>javax.xml.bind:jaxb-api</exclude> -->
                                         <!-- should be using v2 api -->
                                         <exclude>com.amazonaws:*</exclude>
                                         <!-- we should be using jpa 2.2 -->
