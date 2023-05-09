@@ -452,7 +452,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
             return null;
         } catch (ClassCastException ex) {
             errorMessage("Cannot generate a JSON for this workflow.\n"
-                    + "The structure of its input is currently not supported. Please provide items as a String.", GENERIC_ERROR);
+                    + "The structure of its input is currently not supported. Please provide type and items as a string.", GENERIC_ERROR);
         }
         return null;
     }
