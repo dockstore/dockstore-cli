@@ -173,6 +173,8 @@ public abstract class BaseLanguageClient {
          the WES endpoint instead of assuming they will exist on the file system at the WES
          endpoint.
         */
+
+        boolean provisionFiles = true;
         if (!abstractEntryClient.isWesCommand()) {
             if (provisionedParameterFile != null || selectedParameterFile != null) {
                 try {
@@ -190,6 +192,8 @@ public abstract class BaseLanguageClient {
                 }
             } else {
                 LOG.debug("No test parameter file provided, skipping provisioning");
+                provisionFiles = false;
+
             }
         }
 
@@ -206,8 +210,10 @@ public abstract class BaseLanguageClient {
             launcher.printLaunchMessage();
             executeEntry();
 
-            // Provision the output files if run is successful
-            provisionOutputFiles();
+            // Provision the output files if run is successful and provisioning files were provided
+            if (provisionFiles) {
+                provisionOutputFiles();
+            }
         } catch (ApiException ex) {
             exceptionMessage(ex, ex.getMessage(), API_ERROR);
         }  catch (IOException ex) {
