@@ -796,7 +796,6 @@ public class Client {
                     }
                 } catch (Kill k) {
                     LOG.debug("client ran into unclassified error", k.getCause());
-                    ArgumentUtility.flushLogging();
                     System.exit(GENERIC_ERROR);
                 }
             }
@@ -808,7 +807,9 @@ public class Client {
     }
 
     public static List<String> getGeneralFlags() {
-        return new ArrayList<>(Arrays.asList(DEBUG_FLAG, HELP, CONFIG, SCRIPT_FLAG));
+        List<String> generalFlags = new ArrayList<>();
+        generalFlags.addAll(Arrays.asList(DEBUG_FLAG, HELP, CONFIG, SCRIPT_FLAG));
+        return generalFlags;
     }
 
     /**

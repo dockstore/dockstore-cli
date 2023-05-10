@@ -20,12 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ch.qos.logback.classic.LoggerContext;
 import io.swagger.client.model.DockstoreTool;
 import io.swagger.client.model.Workflow;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,25 +103,12 @@ public final class ArgumentUtility {
         }
 
         if (exitCode != 0) {
-            flushLogging();
             System.exit(exitCode);
-        }
-    }
-
-    /**
-     * Think system exits are interferring with logging, flush logs just in case
-     */
-    public static void flushLogging() {
-        ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
-        // Check for logback implementation of slf4j
-        if (loggerFactory instanceof LoggerContext context) {
-            context.stop();
         }
     }
 
     public static void errorMessage(String message, int exitCode) {
         err(message);
-        flushLogging();
         System.exit(exitCode);
     }
 
