@@ -33,12 +33,12 @@
     -->
     <properties>
         <!-- the following properties set sane defaults when no revision properties are set from the command-line -->
-        <revision>1.14</revision>
+        <revision>1.15</revision>
         <changelist>.0-SNAPSHOT</changelist>
 
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.14.0-alpha.9</dockstore-core.version>
+        <dockstore-core.version>1.15.0-alpha.1</dockstore-core.version>
         <maven-failsafe.version>2.22.2</maven-failsafe.version>
         <maven-surefire.version>2.22.2</maven-surefire.version>
         <skipTests>false</skipTests>
@@ -532,12 +532,22 @@
                                         <exclude>javax.servlet:javax.servlet-api</exclude>
                                         <!-- Replaced with jakarta.validation:jakarta.validation-api -->
                                         <exclude>javax.validation:validation-api</exclude>
-                                        <!-- Replaced with jakarta.xml.bind:jakarta.xml.bind-api -->
-                                        <exclude>javax.xml.bind:jaxb-api</exclude>
+                                        <!-- Replaced with jakarta.xml.bind:jakarta.xml.bind-api, but need to keep around for old plugins -->
+                                        <!-- <exclude>javax.xml.bind:jaxb-api</exclude> -->
                                         <!-- should be using v2 api -->
                                         <exclude>com.amazonaws:*</exclude>
                                         <!-- we should be using jpa 2.2 -->
                                         <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.1-api</exclude>
+                                        <!-- more bans from the javax to jakarta merge -->
+                                        <exclude>com.fasterxml.jackson.datatype:jackson-datatype-hibernate5</exclude>
+                                        <exclude>javax.persistence:javax.persistence-api</exclude>
+                                        <exclude>javax.transaction:javax.transaction-api</exclude>
+                                        <exclude>org.eclipse.jetty.toolchain:jetty-servlet-api</exclude>
+                                        <exclude>io.dropwizard.metrics:metrics-servlets</exclude>
+                                        <exclude>io.swagger.core.v3:swagger-integration</exclude>
+                                        <exclude>io.swagger:swagger-jaxrs</exclude>
+                                        <exclude>io.swagger.core.v3:swagger-jaxrs2-servlet-initializer</exclude>
+                                        <exclude>io.swagger:swagger-jersey2-jaxrs</exclude>
                                     </excludes>
                                 </bannedDependencies>
                             </rules>

@@ -3,11 +3,10 @@ package io.dockstore.client.cli;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-
 import io.dockstore.client.cli.nested.ApiClientExtended;
 import io.dockstore.client.cli.nested.WesRequestData;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.Test;
 

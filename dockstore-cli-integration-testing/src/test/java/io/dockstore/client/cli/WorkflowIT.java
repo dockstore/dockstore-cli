@@ -27,8 +27,6 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.ws.rs.core.GenericType;
-
 import com.google.common.collect.Lists;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.CLICommonTestUtilities;
@@ -42,6 +40,7 @@ import io.swagger.client.api.WorkflowsApi;
 import io.swagger.client.model.SourceFile;
 import io.swagger.client.model.Workflow;
 import io.swagger.client.model.WorkflowVersion;
+import jakarta.ws.rs.core.GenericType;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;

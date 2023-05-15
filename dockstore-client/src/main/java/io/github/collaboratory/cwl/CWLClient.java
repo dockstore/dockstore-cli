@@ -74,6 +74,7 @@ import org.json.JSONObject;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -102,7 +103,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     private static final String CWL_TOOL = "cwltool";
     private static final String CROMWELL = "cromwell";
 
-    protected final Yaml yaml = new Yaml(new SafeConstructor());
+    protected final Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
     protected final Gson gson = CWL.getTypeSafeCWLToolDocument();
     private final FileProvisioning fileProvisioning;
     private String originalTestParameterFilePath;
@@ -455,7 +456,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         // if we have a yaml parameter file, convert it into a json
         if (yamlRun != null) {
             final File tempFile = File.createTempFile("temp", "json");
-            Yaml yamlLocal = new Yaml(new SafeConstructor());
+            Yaml yamlLocal = new Yaml(new SafeConstructor(new LoaderOptions()));
             final FileInputStream fileInputStream = FileUtils.openInputStream(new File(yamlRun));
             Map<String, Object> map = yamlLocal.load(fileInputStream);
             JSONObject jsonObject = new JSONObject(map);
