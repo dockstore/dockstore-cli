@@ -42,7 +42,7 @@ jobs:
       - name: Post to a Slack channel on failure
         if: failure()
         id: slack
-        uses: slackapi/slack-github-action@v1.23.0
+        uses: slackapi/slack-github-action@v1.24.0
         with:
             payload: "{\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"dockstore-cli/.github/workflows/cron.yml has failed!\"}}]}"
             channel-id: 'CTWPH9Q03'  # Slack channel id to post message
