@@ -11,6 +11,19 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.experimental.categories.Category;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.CANCEL;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
+import static io.dockstore.client.cli.nested.WesCommandParser.ATTACH;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.ID;
+import static io.dockstore.client.cli.nested.WesCommandParser.INLINE_WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.client.cli.nested.WesCommandParser.VERBOSE;
+import static io.github.collaboratory.cwl.CWLClient.WES;
+import static java.lang.String.join;
 import static org.junit.Assert.assertTrue;
 
 @Category(WesTests.class)
@@ -62,9 +75,9 @@ public class WesToilIT {
         for (int i = 0; i < WAIT_COUNT; i++) {
 
             // Check on a workflow's run status
-            String[] commandStatementStatus = new String[]{ "workflow", "wes", "status",
-                "--config", TOIL_CONFIG,
-                "--id", runId
+            String[] commandStatementStatus = new String[]{ WORKFLOW, WES, STATUS,
+                CONFIG, TOIL_CONFIG,
+                ID, runId
             };
             Client.main(commandStatementStatus);
 
@@ -81,11 +94,11 @@ public class WesToilIT {
 
     @Test
     public void testBasicLaunch1() throws InterruptedException {
-        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
-            "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
-            "--inline-workflow"
+        String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
+            CONFIG, TOIL_CONFIG,
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
+            JSON, ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
+            INLINE_WORKFLOW
         };
         Client.main(commandStatementRun);
 
@@ -97,15 +110,15 @@ public class WesToilIT {
 
     @Test
     public void testBasicLaunch2() throws InterruptedException {
-        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/multi-descriptor-no-input:main",
-            "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"), // Toil requires workflow_params to be provided
-            "--inline-workflow",
-            "--verbose"
+        String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
+            CONFIG, TOIL_CONFIG,
+            ENTRY, "github.com/dockstore-testing/wes-testing/multi-descriptor-no-input:main",
+            JSON, ResourceHelpers.resourceFilePath("wesIt/w1_test.json"), // Toil requires workflow_params to be provided
+            INLINE_WORKFLOW,
+            VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore", WORKFLOW, WES,  STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isError = waitForWorkflowState(runId, EXECUTOR_ERROR_STATE);
@@ -117,11 +130,11 @@ public class WesToilIT {
 
     @Test
     public void testBasicLaunch3() throws InterruptedException {
-        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-no-input:main",
-            "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"), // Toil requires workflow_params to be provided
-            "--inline-workflow"
+        String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
+            CONFIG, TOIL_CONFIG,
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-no-input:main",
+            JSON, ResourceHelpers.resourceFilePath("wesIt/w1_test.json"), // Toil requires workflow_params to be provided
+            INLINE_WORKFLOW
         };
         Client.main(commandStatementRun);
 
@@ -133,40 +146,40 @@ public class WesToilIT {
 
     @Test
     public void testCancel() throws InterruptedException {
-        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
-            "--json", ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
-            "--inline-workflow"
+        String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
+            CONFIG, TOIL_CONFIG,
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-with-input:main",
+            JSON, ResourceHelpers.resourceFilePath("wesIt/w1_test.json"),
+            INLINE_WORKFLOW
         };
         Client.main(commandStatementRun);
 
         final String runId = findWorkflowIdFromDefaultLaunch(systemOutRule.getLog());
 
-        String[] commandStatementCancel = new String[]{ "workflow", "wes", "cancel",
-            "--config", TOIL_CONFIG,
-            "--id", runId
+        String[] commandStatementCancel = new String[]{ WORKFLOW, WES, CANCEL,
+            CONFIG, TOIL_CONFIG,
+            ID, runId
         };
         Client.main(commandStatementCancel);
 
         final boolean isCanceled = waitForWorkflowState(runId, CANCELED_STATE);
 
-        assertTrue("The workflow did not cancel in time.", isCanceled);
+        assertTrue("The workflow did not " + CANCEL + " in time.", isCanceled);
     }
 
     @Test
     public void testDirectoryAttachment() throws InterruptedException {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
-        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
-            "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
+        String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
+            CONFIG, TOIL_CONFIG,
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            JSON, ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
             "-a", ResourceHelpers.resourceFilePath("wesIt/w4_nested"),
-            "--inline-workflow",
-            "--verbose"
+            INLINE_WORKFLOW,
+            VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
@@ -177,16 +190,16 @@ public class WesToilIT {
     @Test
     public void testRelativeFileAttachment() throws InterruptedException {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
-        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
-            "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
+        String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
+            CONFIG, TOIL_CONFIG,
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            JSON, ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
             "-a", "src/test/resources/wesIt/w4_nested/w4_2_test.txt",
-            "--inline-workflow",
-            "--verbose"
+            INLINE_WORKFLOW,
+            VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
@@ -198,16 +211,16 @@ public class WesToilIT {
     public void testRelativeDirectoryAttachment() throws InterruptedException {
         // When we pass the relative path to a directory, the CLI will convert it to an absolute path and upload
         // all nested files relative to said absolute path. This means that the attachment JSON will be at the wrong path.
-        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
-            "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
-            "--attach", "src/test/resources/wesIt/w4_nested",
-            "--inline-workflow",
-            "--verbose"
+        String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
+            CONFIG, TOIL_CONFIG,
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            JSON, ResourceHelpers.resourceFilePath("wesIt/w4_1_test_relative.json"),
+            ATTACH, "src/test/resources/wesIt/w4_nested",
+            INLINE_WORKFLOW,
+            VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, EXECUTOR_ERROR_STATE);
@@ -219,16 +232,16 @@ public class WesToilIT {
     public void testRelativeDirectoryAttachment2() throws InterruptedException {
         // When we pass the relative path to a directory, the CLI will convert it to an absolute path and upload
         // all nested files relative to said absolute path. This means that the attachment JSON will be at the wrong path.
-        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
-            "--json", ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
+        String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
+            CONFIG, TOIL_CONFIG,
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-nested-input:main",
+            JSON, ResourceHelpers.resourceFilePath("wesIt/w4_1_test.json"),
             "-a", "src/test/resources/wesIt/w4_nested",
-            "--inline-workflow",
-            "--verbose"
+            INLINE_WORKFLOW,
+            VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);
@@ -239,16 +252,16 @@ public class WesToilIT {
     @Test
     public void testComplexNestedDirectoryAttachments() throws InterruptedException {
         // These tests pass, and the files provisioned by Toil look correct, but the outputs are not.
-        String[] commandStatementRun = new String[]{ "workflow", "wes", "launch",
-            "--config", TOIL_CONFIG,
-            "--entry", "github.com/dockstore-testing/wes-testing/single-descriptor-complex-nested-input:main",
-            "--json", ResourceHelpers.resourceFilePath("wesIt/w5_1_test.json"),
-            "--attach", ResourceHelpers.resourceFilePath("wesIt/w5_nested"),
-            "--inline-workflow",
-            "--verbose"
+        String[] commandStatementRun = new String[]{ WORKFLOW, WES, LAUNCH,
+            CONFIG, TOIL_CONFIG,
+            ENTRY, "github.com/dockstore-testing/wes-testing/single-descriptor-complex-nested-input:main",
+            JSON, ResourceHelpers.resourceFilePath("wesIt/w5_1_test.json"),
+            ATTACH, ResourceHelpers.resourceFilePath("wesIt/w5_nested"),
+            INLINE_WORKFLOW,
+            VERBOSE
         };
         Client.main(commandStatementRun);
-        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains("dockstore workflow wes status --id"));
+        assertTrue("A helper command should be printed to stdout when a workflow is successfully started", systemOutRule.getLog().contains(join(" ", "dockstore workflow", WES, STATUS, ID)));
 
         final String runId = findWorkflowIdFromVerboseLaunch(systemOutRule.getLog());
         final boolean isSuccessful = waitForWorkflowState(runId, COMPLETED_STATE);

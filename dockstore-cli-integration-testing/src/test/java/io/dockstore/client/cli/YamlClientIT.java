@@ -20,80 +20,119 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.google.common.collect.Lists;
-import io.dockstore.common.CommonTestUtilities;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.TestUtility;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.YamlVerifyUtility.MISSING_FILE_ERROR;
+import static io.dockstore.client.cli.YamlVerifyUtility.SERVICE_DOES_NOT_HAVE_FILES;
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class YamlClientIT extends BaseIT {
+class YamlClientIT extends BaseIT {
 
-    @Rule
-    public final SystemOutRule systemOutRule = new FlushingSystemOutRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemOut systemOutRule = new SystemOut();
 
-    @Rule
-    public final SystemErrRule systemErrRule = new FlushingSystemErrRule().enableLog().muteForSuccessfulTests();
+    @SystemStub
+    public final SystemErr systemErrRule = new SystemErr();
 
-    @Rule
-    public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
+    public final String yamlHelpMsg = "dockstore yaml " + HELP;
+    public final String validateHelpMsg = "dockstore yaml validate " + HELP;
 
-    public final String yamlHelpMsg = "dockstore yaml --help";
-    public final String validateHelpMsg = "dockstore yaml validate --help";
-
-    @Before
+    @BeforeEach
     @Override
     public void resetDBBetweenTests() throws Exception {
-        CommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
+        CLICommonTestUtilities.cleanStatePrivate1(SUPPORT, testingPostgres);
         Client.DEBUG.set(false);
     }
 
     @Test
-    public void missingPathParameter() throws IOException {
-        Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", "validate"});
-        assertTrue(systemOutRule.getLog().contains("The following option is required: [--path]"));
-        assertTrue(systemOutRule.getLog().contains("Usage: dockstore"));
-        systemOutRule.clearLog();
+    void missingPathParameter() throws IOException {
+        Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, "validate"});
+        assertTrue(systemOutRule.getText().contains("The following option is required: [--path]"));
+        assertTrue(systemOutRule.getText().contains("Usage: dockstore"));
+        systemOutRule.clear();
     }
 
     @Test
-    public void verifyErrorMessagesArePrinted() throws IOException {
+    void verifyErrorMessagesArePrinted() throws IOException {
         final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/some-files-present";
-        System.out.println(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
-        Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
-        String errorMsg = YamlVerifyUtility.INVALID_FILE_STRUCTURE
+        System.out.println(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
+        Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
+        String errorMsg = MISSING_FILE_ERROR
             + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
             + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator();
         System.out.println(errorMsg);
-        assertTrue(systemOutRule.getLog().contains(errorMsg));
-        systemOutRule.clearLog();
+        assertTrue(systemOutRule.getText().contains(errorMsg));
+        systemOutRule.clear();
+    }
+
+    private void runYamlValidatorAndExpectSuccess(final String testDirectory) throws IOException {
+        Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
+        String successMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
+                + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
+        assertTrue(systemOutRule.getText().contains(successMsg));
+        systemOutRule.clear();
+    }
+
+
+    @Test
+    void completeRun() throws IOException {
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/workflow");
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/tool");
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory/service");
+    }
+
+    /** This test is for when a .dockstore.yml file has workflow or tool with a testParameterFiles field, but the field is empty
+     *
+     * @throws IOException
+     */
+    @Test
+    void completeRunWithDockstoreYmlThatContainsAnEmptyTestParameterField() throws IOException {
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/empty-test-parameter-files-field/tool");
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/empty-test-parameter-files-field/workflow");
+
+    }
+
+    /** This test is for when a .dockstore.yml file has workflow or tool with no testParameterFiles field
+     *
+     * @throws Exception
+     */
+    @Test
+    void completeRunWithDockstoreYmlThatContainsNoTestParameterField() throws IOException {
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/no-test-parameter-files-field/tool");
+        runYamlValidatorAndExpectSuccess("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/no-test-parameter-files-field/workflow");
+
+    }
+
+
+    private void ensureCorrectErrorMessageWhenNoFileAreProvidedToAService(final String testDirectory) throws IOException {
+        Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
+        String errorMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
+                + MISSING_FILE_ERROR + SERVICE_DOES_NOT_HAVE_FILES;
+        assertTrue(systemOutRule.getText().contains(errorMsg));
+        systemOutRule.clear();
     }
 
     @Test
-    public void completeRun() throws IOException {
-        final String testDirectory = "../dockstore-client/src/test/resources/YamlVerifyTestDirectory/correct-directory";
-        System.out.println(Lists.newArrayList(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory}));
-        Client.main(new String[]{"--config", TestUtility.getConfigFileLocation(true), "yaml", YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
-        String successMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
-            + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
-        assertTrue(systemOutRule.getLog().contains(successMsg));
-        systemOutRule.clearLog();
+    void serviceWithNoFiles() throws IOException {
+        ensureCorrectErrorMessageWhenNoFileAreProvidedToAService("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/service-empty-files-parameter");
+        ensureCorrectErrorMessageWhenNoFileAreProvidedToAService("../dockstore-client/src/test/resources/YamlVerifyTestDirectory/service-no-files-parameter");
     }
-
 
     // Tests for when Help message should be generated
 
     @Test
-    public void testHelpCommands() throws Exception {
-        checkCommandForHelp(new String[]{YAML, "--help"}, yamlHelpMsg);
-        checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME, "--help"}, validateHelpMsg);
+    void testHelpCommands() throws Exception {
+        checkCommandForHelp(new String[]{YAML, HELP}, yamlHelpMsg);
+        checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME, HELP}, validateHelpMsg);
     }
 
 
@@ -101,7 +140,7 @@ public class YamlClientIT extends BaseIT {
     // This tests for when a help message should be generated even though no help flag was given
     // it also tests for the appropriate error message
     @Test
-    public void testHelpCommandsNoHelpFlag() throws Exception {
+    void testHelpCommandsNoHelpFlag() throws Exception {
         checkCommandForHelp(new String[]{YAML}, yamlHelpMsg, YamlClient.ERROR_NO_COMMAND);
         checkCommandForHelp(new String[]{YAML, YamlVerifyUtility.COMMAND_NAME}, validateHelpMsg, "The following option is required: [--path]");
         checkCommandForHelp(new String[]{YAML, "--path", YamlVerifyUtility.COMMAND_NAME}, "Usage: dockstore yaml");
@@ -114,11 +153,11 @@ public class YamlClientIT extends BaseIT {
 
     private void checkCommandForHelp(String[] argv, String helpMsg, String errorMsg) throws Exception {
         final ArrayList<String> strings = Lists.newArrayList(argv);
-        strings.add("--config");
+        strings.add(CONFIG);
         strings.add(TestUtility.getConfigFileLocation(true));
         Client.main(strings.toArray(new String[0]));
-        assertTrue(systemOutRule.getLog().contains(helpMsg));
-        assertTrue(systemOutRule.getLog().contains(errorMsg));
-        systemOutRule.clearLog();
+        assertTrue(systemOutRule.getText().contains(helpMsg));
+        assertTrue(systemOutRule.getText().contains(errorMsg));
+        systemOutRule.clear();
     }
 }

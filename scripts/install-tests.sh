@@ -14,13 +14,14 @@ fi
 if [ "${TESTING_PROFILE}" = "toil-integration-tests" ]; then
     pip3 install --user toil[cwl]==3.15.0
 else
-    pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.10.0/requirements3.txt
+    pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.13.0/requirements3.txt
 fi
 
 if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     # Install singularity from source
     # need singularity > 3.0.0, which is not available as an ubuntu package
-    sudo apt-get update && sudo apt-get install -y \
+    # https://askubuntu.com/questions/1367139/apt-get-upgrade-auto-restart-services
+    sudo apt-get update && sudo NEEDRESTART_MODE=a apt install \
     build-essential \
     libssl-dev \
     uuid-dev \

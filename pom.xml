@@ -33,12 +33,12 @@
     -->
     <properties>
         <!-- the following properties set sane defaults when no revision properties are set from the command-line -->
-        <revision>1.13</revision>
+        <revision>1.14</revision>
         <changelist>.0-SNAPSHOT</changelist>
 
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.13.0-beta.3</dockstore-core.version>
+        <dockstore-core.version>1.14.0-alpha.9</dockstore-core.version>
         <maven-failsafe.version>2.22.2</maven-failsafe.version>
         <maven-surefire.version>2.22.2</maven-surefire.version>
         <skipTests>false</skipTests>
@@ -53,6 +53,7 @@
             ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../reports/target/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         <!-- end sonarcloud properties -->
+        <cwlavro.version>2.0.4.7</cwlavro.version>
     </properties>
 
     <organization>
@@ -157,6 +158,44 @@
                 <artifactId>dropwizard-migrations</artifactId>
                 <scope>test</scope>
             </dependency>
+            <!--  cwl management -->
+            <dependency>
+                <groupId>io.cwl</groupId>
+                <artifactId>cwlavro-tools</artifactId>
+                <version>${cwlavro.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient-osgi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore-osgi</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- Used by cwlavro. Even though cwlavro uses 1.21, cwlavro's avro dependency uses 1.20 -->
+            <dependency>
+                <groupId>io.cwl</groupId>
+                <artifactId>cwlavro-generated</artifactId>
+                <version>${cwlavro.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient-osgi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore-osgi</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- remove after bom is updated with Dockstore or above 1.14.0 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-vfs2</artifactId>
+                <version>2.9.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -167,7 +206,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.7</version>
+                    <version>0.8.8</version>
                 </plugin>
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -184,7 +223,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
                     <configuration>
-                        <release>11</release>
+                        <release>17</release>
                         <showDeprecation>true</showDeprecation>
                     </configuration>
                 </plugin>
@@ -340,7 +379,7 @@
                             </goals>
                             <configuration>
                                 <transformers>
-                                    <!-- Akka used by Cromwell expects a consistant reference.conf file.  Also order matters, so keep it first in the list of transformers -->
+                                    <!-- Akka used by Cromwell expects a consistent reference.conf file.  Also order matters, so keep it first in the list of transformers -->
                                     <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                         <resource>reference.conf</resource>
                                     </transformer>
@@ -348,18 +387,6 @@
                             </configuration>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.eluder.coveralls</groupId>
-                    <artifactId>coveralls-maven-plugin</artifactId>
-                    <version>4.3.0</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>javax.xml.bind</groupId>
-                            <artifactId>jaxb-api</artifactId>
-                            <version>2.3.1</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -469,7 +496,15 @@
                                         <exclude>io.dockstore:*</exclude>
                                     </excludes>
                                 </requireReleaseDeps>
-                                <requireUpperBoundDeps />
+                                <requireUpperBoundDeps>
+                                    <excludes>
+                                        <!-- inconsistent in dropwizard 2.1.5 list of transient dependencies and causes this to break, nonetheless the actual versions end up being consistent as checked by
+                                         keysmap.list and mvn dependency:tree. Weird -->
+                                        <exclude>com.fasterxml.jackson.module:jackson-module-jaxb-annotations</exclude>
+                                        <exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
+                                        <exclude>com.fasterxml.jackson.core:jackson-annotations</exclude>
+                                    </excludes>
+                                </requireUpperBoundDeps>
                                 <requireMavenVersion>
                                     <version>3.8.1</version>
                                 </requireMavenVersion>
@@ -534,7 +569,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>11</release>
+                    <release>17</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -610,25 +645,17 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <configuration>
-                    <jacocoReports>
-                        <param>${project.basedir}/reports/target/site/jacoco-aggregate/jacoco.xml</param>
-                    </jacocoReports>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>net.revelc.code</groupId>
                 <artifactId>impsort-maven-plugin</artifactId>
-                <version>1.6.2</version>
+                <version>1.8.0</version>
                 <configuration>
                     <groups>java.,javax.,*</groups>
                     <staticAfter>true</staticAfter>
+                    <compliance>17</compliance>
                 </configuration>
                 <executions>
                     <execution>

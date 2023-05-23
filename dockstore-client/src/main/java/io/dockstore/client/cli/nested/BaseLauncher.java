@@ -15,6 +15,9 @@ import io.dockstore.common.Utilities;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+
 /**
  * This class is the base class for launchers used by the Dockstore CLI.
  * Launchers such as cwltool and cromwell extend this.
@@ -82,7 +85,7 @@ public abstract class BaseLauncher {
      * Prints the launch message
      */
     public void printLaunchMessage() {
-        System.out.println("Calling out to " + launcherName + " to run your workflow");
+        out("Calling out to " + launcherName + " to run your " + WORKFLOW);
     }
 
     /**

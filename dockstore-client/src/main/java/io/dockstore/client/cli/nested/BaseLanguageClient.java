@@ -29,6 +29,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.err;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
@@ -37,6 +38,8 @@ import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_MISMATCH_MESSAGE;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_NULL_MESSAGE;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CHECKSUM_VALIDATED_MESSAGE;
@@ -163,23 +166,25 @@ public abstract class BaseLanguageClient {
 
         /*
          Don't download the input files (from the input JSON or YAML) if we are making a request
-         to a WES endpoint. We want the WES endpoint to download the input files becuase they
+         to a WES endpoint. We want the WES endpoint to download the input files because they
          could be very large and in that case we cannot send their contents in a POST request
          efficiently.
          TODO if there are input files on the local file system maybe we should send those to
          the WES endpoint instead of assuming they will exist on the file system at the WES
          endpoint.
         */
+
+        boolean provisionFiles = true;
         if (!abstractEntryClient.isWesCommand()) {
             if (provisionedParameterFile != null || selectedParameterFile != null) {
                 try {
                     provisionedParameterFile = provisionInputFiles();
                 } catch (ApiException ex) {
-                    if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool")) {
-                        exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
+                    if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL)) {
+                        exceptionMessage(ex, "The " + TOOL + " entry does not exist. Did you mean to " + LAUNCH + " a local " + TOOL + " or a " + WORKFLOW + "?",
                                 ENTRY_NOT_FOUND);
                     } else {
-                        exceptionMessage(ex, "The workflow entry does not exist. Did you mean to launch a local workflow or a tool?",
+                        exceptionMessage(ex, "The " + WORKFLOW + " entry does not exist. Did you mean to " + LAUNCH + " a local " + WORKFLOW + " or a " + TOOL + "?",
                                 ENTRY_NOT_FOUND);
                     }
                 } catch (Exception ex) {
@@ -187,6 +192,8 @@ public abstract class BaseLanguageClient {
                 }
             } else {
                 LOG.debug("No test parameter file provided, skipping provisioning");
+                provisionFiles = false;
+
             }
         }
 
@@ -203,8 +210,10 @@ public abstract class BaseLanguageClient {
             launcher.printLaunchMessage();
             executeEntry();
 
-            // Provision the output files if run is successful
-            provisionOutputFiles();
+            // Provision the output files if run is successful and provisioning files were provided
+            if (provisionFiles) {
+                provisionOutputFiles();
+            }
         } catch (ApiException ex) {
             exceptionMessage(ex, ex.getMessage(), API_ERROR);
         }  catch (IOException ex) {
@@ -249,7 +258,7 @@ public abstract class BaseLanguageClient {
             Optional<Checksum> remoteDescriptorChecksum = Optional.empty();
             try {
                 // The TRS endpoint only discovers published entries
-                final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(type.toString(), ga4ghv20Path, versionID, toolFile.getPath());
+                final FileWrapper remoteDescriptor = ga4ghv20api.toolsIdVersionsVersionIdTypeDescriptorRelativePathGet(ga4ghv20Path, type.toString(), versionID, toolFile.getPath());
                 remoteDescriptorChecksum = remoteDescriptor.getChecksum()
                     .stream()
                     .filter(c -> c.getType().equals(checksumFunction))
@@ -314,11 +323,11 @@ public abstract class BaseLanguageClient {
                 zipFile = new File(workingDir, convertedName);
                 out("Successfully downloaded files for entry '" + path + "'");
             } catch (ApiException ex) {
-                if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool")) {
-                    exceptionMessage(ex, "The tool entry does not exist. Did you mean to launch a local tool or a workflow?",
+                if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL)) {
+                    exceptionMessage(ex, "The tool entry does not exist. Did you mean to " + LAUNCH + " a local " + TOOL + " or a " + WORKFLOW + "?",
                             ENTRY_NOT_FOUND);
                 } else {
-                    exceptionMessage(ex, "The workflow entry does not exist. Did you mean to launch a local workflow or a tool?",
+                    exceptionMessage(ex, "The workflow entry does not exist. Did you mean to " + LAUNCH + " a local " + WORKFLOW + " or a " + TOOL + "?",
                             ENTRY_NOT_FOUND);
                 }
                 throw new RuntimeException(ex);

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,16 +48,25 @@ import wdl.draft3.parser.WdlParser;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.SCRIPT;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static java.lang.String.join;
 
 /**
  * Grouping code for launching WDL tools and workflows
  */
 public class WDLClient extends BaseLanguageClient implements LanguageClientInterface {
 
+    public static final String WDL_CHECK_WARNING_MESSAGE = "WARNING: these fields are missing from WDL file, this could be causing errors: ";
+    public static final String WDL_CHECK_ERROR_MESSAGE = "Required fields that are missing from WDL file: ";
+    public static final String TASK = "task";
+    public static final String CALL = "call";
+    public static final String OUTPUT = "output";
+    public static final String COMMAND = "command";
     private static final Logger LOG = LoggerFactory.getLogger(WDLClient.class);
 
     public WDLClient(AbstractEntryClient abstractEntryClient) {
@@ -168,6 +178,7 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
     @Override
     public Boolean check(File content) {
         /* WDL: check for 'task' (must be >=1) ,'call', 'command', 'output' and 'workflow' */
+
         Pattern taskPattern = Pattern.compile("(.*)(task)(\\s)(.*)(\\{)");
         Pattern wfPattern = Pattern.compile("(.*)(workflow)(\\s)(.*)(\\{)");
         Pattern commandPattern = Pattern.compile("(.*)(command)(.*)");
@@ -175,9 +186,7 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
         Pattern outputPattern = Pattern.compile("(.*)(output)(.*)");
         boolean wfFound = false, commandFound = false, outputFound = false, callFound = false;
         int counter = 0;
-        String missing = "Required fields that are missing from WDL file :";
         Path p = Paths.get(content.getPath());
-        //go through each line of the file content and find the word patterns as described above
         try {
             List<String> fileContent = java.nio.file.Files.readAllLines(p, StandardCharsets.UTF_8);
             for (String line : fileContent) {
@@ -198,35 +207,58 @@ public class WDLClient extends BaseLanguageClient implements LanguageClientInter
                     outputFound = true;
                 }
             }
-            //check all the required fields and give error message if it's missing
-            if (counter > 0 && wfFound && commandFound && callFound && outputFound) {
-                return true;    //this is a valid WDL file
-            } else if (counter == 0 && !wfFound && !commandFound && !callFound && !outputFound) {
-                return false;   //not a WDL file, maybe a CWL file or something else
-            } else {
-                //WDL file but some required fields are missing
+            // check all the required fields and give error message if it's missing
+            if (wfFound && callFound) {
+                List<String> missingPotentiallyRequiredFields = new ArrayList<>();
                 if (counter == 0) {
-                    missing += " 'task'";
-                }
-                if (!wfFound) {
-                    missing += " 'workflow'";
+                    missingPotentiallyRequiredFields.add("'" + TASK + "'");
                 }
                 if (!commandFound) {
-                    missing += " 'command'";
-                }
-                if (!callFound) {
-                    missing += " 'call'";
+                    missingPotentiallyRequiredFields.add("'" + COMMAND + "'");
                 }
                 if (!outputFound) {
-                    missing += " 'output'";
+                    missingPotentiallyRequiredFields.add("'" + OUTPUT + "'");
                 }
-                errorMessage(missing, CLIENT_ERROR);
+
+                if (!missingPotentiallyRequiredFields.isEmpty()) {
+                    // Gives user a warning if their entry file doesn't contain task, call, or output
+                    out(WDL_CHECK_WARNING_MESSAGE + join(" ", missingPotentiallyRequiredFields));
+                }
+
+                return true;    // this is potentially valid WDL file
+            } else if (counter == 0 && !wfFound && !commandFound && !callFound && !outputFound) {
+                return false;   // not a WDL file, maybe a CWL file or something else
+            } else {
+                // WDL file but some required fields are missing
+                List<String> missingPotentiallyRequiredFields = new ArrayList<>();
+                List<String> missingRequiredFields = new ArrayList<>();
+                if (counter == 0) {
+                    missingPotentiallyRequiredFields.add("'" + TASK + "'");
+                }
+                if (!wfFound) {
+                    missingRequiredFields.add("'" + WORKFLOW + "'");
+                }
+                if (!commandFound) {
+                    missingPotentiallyRequiredFields.add("'" + COMMAND + "'");
+                }
+                if (!callFound) {
+                    missingRequiredFields.add("'" + CALL + "'");
+                }
+                if (!outputFound) {
+                    missingPotentiallyRequiredFields.add("'" + OUTPUT + "'");
+                }
+
+                if (!missingPotentiallyRequiredFields.isEmpty()) {
+                    out(WDL_CHECK_WARNING_MESSAGE + join(" ", missingPotentiallyRequiredFields));
+                }
+                errorMessage(WDL_CHECK_ERROR_MESSAGE + join(" ", missingRequiredFields), CLIENT_ERROR);
             }
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to get content of entry file.", e);
         }
-        return false;
+
+        return true;
     }
 
     /**

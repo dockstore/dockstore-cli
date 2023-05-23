@@ -15,5 +15,5 @@ https://raw.githubusercontent.com/ga4gh/workflow-execution-service-schemas/1.0.0
 1. Click on the green box with the down arrow at the top right of the editor
 1. Select 'Convert to OpenAPI 3.0'
 1. In the 'Convert to OpenAPI 3.0?' dialog click 'Convert & Update'
-1. Click the 'Export' button on the uppper right hand area of the page
+1. Click the 'Export' button on the upper right hand area of the page
 1. Select '< Download API' and then 'YAML Unresolved' ..The yaml file will be downloaded to your local machine

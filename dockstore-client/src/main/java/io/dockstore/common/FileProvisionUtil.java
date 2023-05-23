@@ -61,6 +61,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.PluginManager;
 
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.Client.PLUGIN;
+
 /**
  * @author dyuen
  * @since 2/21/17
@@ -85,7 +88,7 @@ public final class FileProvisionUtil {
         class CustomHttp4sFileProvider extends Http4sFileProvider {
             public HttpClientContext createHttpClientContext(final Http4FileSystemConfigBuilder builder,
                                                              final GenericFileName rootName, final FileSystemOptions fileSystemOptions,
-                                                             final UserAuthenticationData authData) throws FileSystemException {
+                                                             final UserAuthenticationData authData) {
 
                 HttpClientContext def = super.createHttpClientContext(builder, rootName, fileSystemOptions, authData);
                 if (rootName.getHostName().equals("github.com")) {
@@ -192,7 +195,7 @@ public final class FileProvisionUtil {
             try {
                 Files.createDirectories(path);
             } catch (IOException e) {
-                throw new RuntimeException("Could not create plugin directory", e);
+                throw new RuntimeException("Could not create " + PLUGIN + " directory", e);
             }
         }
         // need to systematically clean up old versions of plugins
@@ -299,7 +302,7 @@ public final class FileProvisionUtil {
             downloadPlugin(filePluginLocation, version, name, sourceLocation);
             return true;
         } catch (MalformedURLException | URISyntaxException e) {
-            LOG.error("Could not download plugin: " + e.getMessage());
+            LOG.error("Could not " + DOWNLOAD + " plugin: " + e.getMessage());
             return false;
         }
     }

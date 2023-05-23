@@ -10,7 +10,7 @@ service:
     - /dockstore.wdl.json
     - /dockstore.cwl.json
     - /Dockstore.cwl
-    - Dockstore2.wdl
+    - /Dockstore2.wdl
   scripts:
     start: start.sh
   environment:
@@ -19,7 +19,7 @@ service:
       description: testing testing testing
   data:
     test-2:
-      targetDirectory: ~/test
+      targetDirectory: test/directory
       files:
         test.txt:
           description: test

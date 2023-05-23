@@ -19,26 +19,26 @@ import java.io.File;
 
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.dockstore.common.FileProvisionUtil.PLUGINS_JSON_FILENAME;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author gluu
  * @since 14/03/17
  */
-public class FileProvisionUtilTest {
+class FileProvisionUtilTest {
     @Test
-    public void downloadPlugins() {
+    void downloadPlugins() {
         File iniFile = FileUtils.getFile("src", "test", "resources", "launcher.cwltool.ini");
         INIConfiguration config = Utilities.parseConfig(iniFile.getAbsolutePath());
         FileProvisionUtil.downloadPlugins(config);
     }
 
     @Test
-    public void createPluginJSONFile() {
+    void createPluginJSONFile() {
         String userHome = System.getProperty("user.home");
         String pluginFile = userHome + File.separator + ".dockstore" + File.separator + PLUGINS_JSON_FILENAME;
         FileProvisionUtil.createPluginJSONFile(pluginFile);
@@ -48,7 +48,7 @@ public class FileProvisionUtilTest {
     }
 
     @Test
-    public void testFileProvisioningCustom() {
+    void testFileProvisioningCustom() {
         File iniFile = FileUtils.getFile("src", "test", "resources", "config.withTestPlugin");
         FileProvisioning fileProvisioning = new FileProvisioning(iniFile.getAbsolutePath());
         assertNotNull(fileProvisioning);

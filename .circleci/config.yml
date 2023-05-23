@@ -2,7 +2,7 @@ version: 2.1
 parameters:
   java-tag:
     type: string
-    default: "11.0.12"
+    default: "17.0.3"
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
@@ -12,14 +12,14 @@ executors:
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2204:2022.10.1
     environment:
       PGHOST: 127.0.0.1
     resource_class: medium
 
   toil_wes_test_executor:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2204:2022.10.1
     resource_class: medium
 
 common_filters: &common_filters
@@ -155,9 +155,14 @@ jobs:
           JAVA_TOOL_OPTIONS: -Xmx512m
     steps: # a collection of executable commands
       - checkout # check out source code to working directory
-      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
+      - restore_cache:
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: dockstore-cli-java-{{ checksum "pom.xml" }}
+          keys:
+            # Find a cache corresponding to this specific licenses file checksum
+            # when this file is changed, this key will fail
+            - dockstore-cli-java-{{ checksum "THIRD-PARTY-LICENSES.txt" }}
+            # Find the most recent cache used from any branch
+            - dockstore-cli-java-
       - install_yq
       - install-git-secrets
       - install_confidential_test_data
@@ -174,7 +179,7 @@ jobs:
           name: Generate test lists
           command: bash scripts/generate-test-list.sh
       - store_artifacts:
-          path: temp/test-lists
+          path: temp/test-list
       - persist_to_workspace:
           root: .
           paths:
@@ -185,11 +190,8 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
-          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: dockstore-java-{{ checksum "pom.xml" }}
       - restore_cache:
-          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+          key: dockstore-cli-java-{{ checksum "THIRD-PARTY-LICENSES.txt" }}
       - install-git-secrets
       - run:
           name: build
@@ -197,6 +199,8 @@ jobs:
       - run:
           name: SonarCloud scan - coverage
           command: mvn -Dsonar.coverage.jacoco.xmlReportPaths=../coverage/* sonar:sonar
+      - store_artifacts:
+          path: misses
 
 commands:
   setup_machine:
@@ -209,14 +213,14 @@ commands:
             python3 -V
       - run:
           name: Docker-Compose
-          command: docker-compose up -d
+          command: docker compose up -d
 
   install_confidential_test_data:
     steps:
       - run:
           name: decrypt and expand confidential test data
           command: |
-            sudo apt install openssl -y
+            sudo NEEDRESTART_MODE=a apt install openssl
             bash scripts/decrypt.sh
 
   send_coverage:
@@ -286,7 +290,7 @@ commands:
       - save_cache: # saves the project dependencies
           paths:
             - ~/.m2
-          key: dockstore-cli-java-{{ checksum "pom.xml" }}
+          key: dockstore-cli-java-{{ checksum "THIRD-PARTY-LICENSES.txt" }}
 
   install_yq:
     steps:
@@ -321,13 +325,9 @@ commands:
      - run:
          name: Install postgresql client
          command: |
-           sudo rm -rf /var/lib/apt/lists/*
-           # heroku.com is not updating their keys
-           # https://github.com/heroku/cli/issues/1464
-           curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+           # https://discuss.circleci.com/t/heroku-gpg-issues-in-ubuntu-images/43834/3
+           sudo rm -Rf /etc/apt/sources.list.d/heroku.list
            sudo apt update
-           # NOTE: this may be installing latest client; perhaps should
-           # specify version
            sudo apt install -y postgresql-client
 
   setup_for_unit_tests:
@@ -348,11 +348,30 @@ commands:
     steps:
       - attach_workspace:
           at: .
-      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
-          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: dockstore-java-{{ checksum "pom.xml" }}
       - restore_cache:
-          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+          keys:
+            # Find a cache corresponding to this specific licenses file checksum
+            # when this file is changed, this key will fail
+            - dockstore-cli-java-{{ checksum "THIRD-PARTY-LICENSES.txt" }}
+            # Find the most recent cache used from any branch
+            - dockstore-cli-java-
+      - run:
+          name: identify tests to run
+          command: |
+            if [ $CIRCLE_NODE_TOTAL != 1 ] 
+            then
+              TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
+            else 
+              TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | tr '\n' ',')
+            fi
+            echo $TESTS_TO_RUN | tee /tmp/tests-to-run.txt
+          # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
+      - restore_cache:
+          keys:
+            - dockstore-cli-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/tests-to-run.txt" }}-{{ .Branch }}
+            - dockstore-cli-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/tests-to-run.txt" }}-
+            - dockstore-cli-web-cache-{{ .Environment.CIRCLE_JOB }}-
+            - dockstore-cli-web-cache-
 
   setup_for_tests:
     steps:
@@ -386,14 +405,14 @@ commands:
             # but at this time how to do that is unknown
             # so we have to add /home/circleci/.local/bin to the PATH
             export CWLTOOL_PATH=${HOME}/.local/bin
-            echo "export CWLTOOL_PATH=${HOME}/.local/bin" >> $BASH_ENV
+            echo 'export CWLTOOL_PATH=${HOME}/.local/bin' >> $BASH_ENV
 
             export GO_PATH=/usr/local
-            echo "export GO_PATH=/usr/local" >> $BASH_ENV
+            echo 'export GO_PATH=/usr/local' >> $BASH_ENV
             export SINGULARITY_PATH=${HOME}/go
-            echo "export SINGULARITY_PATH=${HOME}/go" >> $BASH_ENV
+            echo 'export SINGULARITY_PATH=${HOME}/go' >> $BASH_ENV
 
-            echo "export PATH=${CWLTOOL_PATH}:${GO_PATH}/go/bin:${PATH}:${SINGULARITY_PATH}/bin" >> $BASH_ENV
+            echo 'export PATH=${CWLTOOL_PATH}:${GO_PATH}/go/bin:${PATH}:${SINGULARITY_PATH}/bin' >> $BASH_ENV
       - run:
           name: install pip dependencies
           command: scripts/install-tests.sh
@@ -404,14 +423,12 @@ commands:
       - run:
           name: run tests
           command: |  
-            if [ $CIRCLE_NODE_TOTAL != 1 ] 
+            if [ $CIRCLE_NODE_TOTAL != 1 ]
             then
-              TESTS_TO_RUN=$(cat temp/test-list/IT/all.txt | circleci tests split --split-by=timings --time-default=0.1s | tr '\n' ',')
-              echo $TESTS_TO_RUN
-              mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean $MAVEN_GOAL -Dit.test=$TESTS_TO_RUN -DfailIfNoTests=false \
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Dit.test=`cat /tmp/tests-to-run.txt` -DfailIfNoTests=false \
               -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
-            else 
-              mvn -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate $MAVEN_GOAL -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+            else
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
             fi
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:
@@ -425,11 +442,19 @@ commands:
       - store_test_results:
           path: ~/test-results
       - save_cache:
-          key: dockstore-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ .Environment.CACHE_SEGMENTED_VERSION }}-segmented
+          key: dockstore-cli-web-cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/tests-to-run.txt" }}-{{ .Branch }}
           paths:
             - /tmp/dockstore-web-cache
-      - store_artifacts:
-          path: /tmp/dockstore-web-cache.misses.log
+      - run:
+          name: Move cache miss log
+          command: |
+            mkdir misses
+            touch /tmp/dockstore-web-cache.misses.log
+            cp /tmp/dockstore-web-cache.misses.log misses/dockstore-web-cache.misses-${CIRCLE_JOB}-${CIRCLE_NODE_INDEX}.log
+      - persist_to_workspace:
+          root: .
+          paths:
+            - misses
 
   setup_toil_wes_server:
     steps:

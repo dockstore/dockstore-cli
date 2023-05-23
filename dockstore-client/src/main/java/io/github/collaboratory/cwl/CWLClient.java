@@ -77,6 +77,7 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
@@ -86,19 +87,20 @@ import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
 import static io.dockstore.client.cli.Client.IO_ERROR;
 import static io.dockstore.client.cli.Client.SCRIPT;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 
 /**
  * Grouping code for launching CWL tools and workflows
  */
 public class CWLClient extends BaseLanguageClient implements LanguageClientInterface {
-
+    public static final String WES = "wes";
     protected static final Logger LOG = LoggerFactory.getLogger(CWLClient.class);
     private static final String WORKING_DIRECTORY = "working-directory";
     private static final String CWL_RUNNER = "cwlrunner";
     private static final String DEFAULT_LAUNCHER = "cwltool";
     private static final String CWL_TOOL = "cwltool";
     private static final String CROMWELL = "cromwell";
-    private static final String WES = "wes";
 
     protected final Yaml yaml = new Yaml(new SafeConstructor());
     protected final Gson gson = CWL.getTypeSafeCWLToolDocument();
@@ -339,15 +341,15 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
                 } else if (matchSteps.find()) {
                     stepsFound = true;
                 } else {
-                    if (abstractEntryClient.getEntryType().equalsIgnoreCase("workflow") && matchWf.find()) {
+                    if (abstractEntryClient.getEntryType().equalsIgnoreCase(WORKFLOW) && matchWf.find()) {
                         classWfFound = true;
-                    } else if (abstractEntryClient.getEntryType().equalsIgnoreCase("tool") && matchTool.find()) {
+                    } else if (abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL) && matchTool.find()) {
                         classToolFound = true;
-                    } else if ((abstractEntryClient.getEntryType().equalsIgnoreCase("tool") && matchWf.find())) {
-                        errorMessage("Expected a tool but the CWL file specified a workflow. Use 'dockstore workflow launch ...' instead.",
+                    } else if ((abstractEntryClient.getEntryType().equalsIgnoreCase(TOOL) && matchWf.find())) {
+                        errorMessage("Expected a " + TOOL + " but the CWL file specified a " + WORKFLOW + ". Use 'dockstore " + WORKFLOW + " " + LAUNCH + " ...' instead.",
                             CLIENT_ERROR);
-                    } else if (abstractEntryClient.getEntryType().equalsIgnoreCase("workflow") && matchTool.find()) {
-                        errorMessage("Expected a workflow but the CWL file specified a tool. Use 'dockstore tool launch ...' instead.",
+                    } else if (abstractEntryClient.getEntryType().equalsIgnoreCase(WORKFLOW) && matchTool.find()) {
+                        errorMessage("Expected a " + WORKFLOW + " but the CWL file specified a " + TOOL + ". Use 'dockstore " + TOOL + " " + LAUNCH + " ...' instead.",
                             CLIENT_ERROR);
                     }
                 }
@@ -405,7 +407,16 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     public String generateInputJson(String entry, final boolean json) throws ApiException, IOException {
         final File tempDir = Files.createTempDir();
         final File primaryFile = abstractEntryClient.downloadTargetEntry(entry, ToolDescriptor.TypeEnum.CWL, true, tempDir);
+        try {
+            return createInputJson(primaryFile, json);
+        } catch (ClassCastException ex) {
+            errorMessage("Cannot generate a JSON for this workflow.\n"
+                    + "The structure of its input is currently not supported. Please provide type and items as a string.", GENERIC_ERROR);
+        }
+        return null;
+    }
 
+    private String createInputJson(File primaryFile, final boolean json) throws ApiException, IOException {
         // need to suppress output
         final ImmutablePair<String, String> output = abstractEntryClient.getCwlUtil().parseCWL(primaryFile.getAbsolutePath());
         final Map<String, Object> stringObjectMap = abstractEntryClient.getCwlUtil().extractRunJson(output.getLeft());
@@ -711,7 +722,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     }
 
     /**
-     * Scours a CWL document paired with a JSON document to create our data structure for describing desired output files (for provisoning)
+     * Scours a CWL document paired with a JSON document to create our data structure for describing desired output files (for provisioning)
      *
      * @param cwl           deserialized CWL document
      * @param inputsOutputs inputs and output from json document

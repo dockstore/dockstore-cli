@@ -19,7 +19,14 @@ import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static org.junit.Assert.assertTrue;
 
 public class LaunchTestYamlIT {
@@ -45,12 +52,12 @@ public class LaunchTestYamlIT {
 
     @Test
     public void yamlAndJsonWorkflowCorrect() {
-        yamlAndJsonEntryCorrect("workflow");
+        yamlAndJsonEntryCorrect(WORKFLOW);
     }
 
     @Test
     public void yamlAndJsonToolCorrect() {
-        yamlAndJsonEntryCorrect("tool");
+        yamlAndJsonEntryCorrect(TOOL);
     }
 
     private void yamlAndJsonEntryCorrect(String entryType) {
@@ -60,7 +67,7 @@ public class LaunchTestYamlIT {
         List<String> args = getLaunchStringList(entryType);
         args.add("--yaml");
         args.add(yamlTestParameterFile.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(jsonTestParameterFile.getAbsolutePath());
         exit.expectSystemExitWithStatus(CLIENT_ERROR);
         exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
@@ -71,7 +78,7 @@ public class LaunchTestYamlIT {
     public void testMaliciousParameterYaml() {
         File yamlTestParameterFile = new File(ResourceHelpers.resourceFilePath("malicious.input.yaml"));
 
-        List<String> args = getLaunchStringList("workflow");
+        List<String> args = getLaunchStringList(WORKFLOW);
         args.add("--yaml");
         args.add(yamlTestParameterFile.getAbsolutePath());
         exit.expectSystemExit();
@@ -88,11 +95,11 @@ public class LaunchTestYamlIT {
         File helloYAML = new File(ResourceHelpers.resourceFilePath("hello.yaml"));
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("workflow");
-        args.add("launch");
-        args.add("--entry");
+        args.add(WORKFLOW);
+        args.add(LAUNCH);
+        args.add(ENTRY);
         args.add(file.getAbsolutePath());
-        args.add("--json");
+        args.add(JSON);
         args.add(helloJSON.getPath());
         args.add("--yaml");
         args.add(helloYAML.getPath());
@@ -102,19 +109,19 @@ public class LaunchTestYamlIT {
         exit.checkAssertionAfterwards(() -> assertTrue("Client error should be returned",
             systemErrRule.getLog().contains(AbstractEntryClient.MULTIPLE_TEST_FILE_ERROR_MESSAGE)));
         args.add(0, config.getPath());
-        args.add(0, "--config");
-        args.add(0, "--script");
+        args.add(0, CONFIG);
+        args.add(0, SCRIPT_FLAG);
         Client.main(args.toArray(new String[0]));
     }
 
     @Test
     public void wdlWorkflowCorrectFlags() {
-        wdlEntryCorrectFlags("workflow");
+        wdlEntryCorrectFlags(WORKFLOW);
     }
 
     @Test
     public void wdlToolCorrectFlags() {
-        wdlEntryCorrectFlags("tool");
+        wdlEntryCorrectFlags(TOOL);
     }
 
     private void wdlEntryCorrectFlags(String entryType) {
@@ -122,7 +129,7 @@ public class LaunchTestYamlIT {
         File jsonTestParameterFile = new File(ResourceHelpers.resourceFilePath("hello.json"));
 
         List<String> yamlFileWithJSONFlag = getLaunchStringList(entryType);
-        yamlFileWithJSONFlag.add("--json");
+        yamlFileWithJSONFlag.add(JSON);
         yamlFileWithJSONFlag.add(yamlTestParameterFile.getAbsolutePath());
 
         List<String> yamlFileWithYAMLFlag = getLaunchStringList(entryType);
@@ -130,7 +137,7 @@ public class LaunchTestYamlIT {
         yamlFileWithYAMLFlag.add(yamlTestParameterFile.getAbsolutePath());
 
         List<String> jsonFileWithJSONFlag = getLaunchStringList(entryType);
-        jsonFileWithJSONFlag.add("--json");
+        jsonFileWithJSONFlag.add(JSON);
         jsonFileWithJSONFlag.add(jsonTestParameterFile.getAbsolutePath());
 
         List<String> jsonFileWithYAMLFlag = getLaunchStringList(entryType);
@@ -146,11 +153,11 @@ public class LaunchTestYamlIT {
     private List<String> getLaunchStringList(String entryType) {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("hello.wdl"));
         final List<String> strings = new ArrayList<>();
-        strings.add("--script");
-        strings.add("--config");
+        strings.add(SCRIPT_FLAG);
+        strings.add(CONFIG);
         strings.add(ResourceHelpers.resourceFilePath("config"));
         strings.add(entryType);
-        strings.add("launch");
+        strings.add(LAUNCH);
         strings.add("--local-entry");
         strings.add(descriptorFile.getAbsolutePath());
 

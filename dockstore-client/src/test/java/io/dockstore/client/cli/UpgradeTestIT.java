@@ -16,16 +16,14 @@
 
 package io.dockstore.client.cli;
 
-import java.util.Objects;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class UpgradeTestIT {
-    private ObjectMapper objectMapper;
+class UpgradeTestIT {
 
     /**
      * This method will decide which version to upgrade to depending on the command "stable","unstable", and "none"
@@ -74,10 +72,10 @@ public class UpgradeTestIT {
         return null;
     }
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
 
-        this.objectMapper = mock(ObjectMapper.class);
+        ObjectMapper objectMapper = mock(ObjectMapper.class);
         Client.setObjectMapper(objectMapper);
 
         /*
@@ -99,81 +97,81 @@ public class UpgradeTestIT {
     }
 
     @Test
-    public void upgradeTest() {
+    void upgradeTest() {
         //if current is older, upgrade to the most stable version right away
         String detectedVersion = "0.4-beta.1";
         String currentVersion = "0.3-beta.1";
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String desiredVersion = decideOutput("none", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(desiredVersion, "0.4-beta.1"));
+        assertEquals("0.4-beta.1", desiredVersion);
     }
 
     @Test
-    public void upTestStableOption() {
-        //if the current is newer and unstable, output "--upgrade-stable" command option
+    void upTestStableOption() {
+        //if the current is newer and unstable, output UPGRADE_STABLE command option
         String detectedVersion = "0.3-beta.1";  //detectedVersion is the latest stable
         String currentVersion = "0.4-beta.0";   //current is newer and unstable
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String optCommand = decideOutput("none", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(optCommand, "upgrade-stable"));
+        assertEquals("upgrade-stable", optCommand);
     }
 
     @Test
-    public void upTestUnstableOption() {
+    void upTestUnstableOption() {
         //else if current is the latest stable version, output "you are currently running the most stable version"
-        //         and option to "--upgrade-unstable"
+        //         and option to UPGRADE_UNSTABLE"
         String detectedVersion = "0.4-beta.1";
         String currentVersion = "0.4-beta.1";
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String optCommand = decideOutput("none", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(optCommand, "upgrade-unstable"));
+        assertEquals("upgrade-unstable", optCommand);
     }
 
     @Test
-    public void upgradeStable() {
+    void upgradeStable() {
         //if the current is not latest stable, upgrade to the latest stable version
         String detectedVersion = "0.4-beta.1";
         String currentVersion = "0.4-beta.0";  //can also be 0.3-beta.1 , as long as it's not latest stable
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String desiredVersion = decideOutput("stable", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(desiredVersion, "0.4-beta.1"));
+        assertEquals("0.4-beta.1", desiredVersion);
     }
 
     @Test
-    public void upgradeStableOption() {
-        //if the current is latest stable, output option to "--upgrade-unstable"
+    void upgradeStableOption() {
+        //if the current is latest stable, output option to UPGRADE_UNSTABLE"
         String detectedVersion = "0.4-beta.1";
         String currentVersion = "0.4-beta.1";
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String optCommand = decideOutput("stable", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(optCommand, "upgrade-unstable"));
+        assertEquals("upgrade-unstable", optCommand);
     }
 
     @Test
-    public void upgradeUnstable() {
+    void upgradeUnstable() {
         //if the current is not latest unstable, upgrade to the most unstable version
         String detectedVersion = "0.4-beta.1";
         String currentVersion = "0.3-beta.0";
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String desiredVersion = decideOutput("unstable", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(desiredVersion, "0.4-beta.0"));
+        assertEquals("0.4-beta.0", desiredVersion);
     }
 
     @Test
-    public void upgradeUnstableOption() {
-        //if the current is latest unstable, output option to "--upgrade-stable"'
+    void upgradeUnstableOption() {
+        //if the current is latest unstable, output option to UPGRADE_STABLE'
         String detectedVersion = "0.4-beta.1";
         String currentVersion = "0.4-beta.0";
         String unstable = "0.4-beta.0";
         // assert that the value matches the mocking
         String optCommand = decideOutput("unstable", currentVersion, detectedVersion, unstable);
-        assert (Objects.equals(optCommand, "upgrade-stable"));
+        assertEquals("upgrade-stable", optCommand);
     }
 }
 

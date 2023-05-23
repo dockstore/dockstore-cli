@@ -1,6 +1,7 @@
 version: 1.2
 workflows:
   -  subclass: ERROR_SHOULD_OCCUR
+     name: wdl-workflow
      authors:
        - name: Denis Yuen
          orcid: 0000-0002-6130-1021
@@ -17,6 +18,7 @@ workflows:
        tags:
          - gwas*
   -  subclass: cwl
+     name: cwl-workflow
      publish: no
      primaryDescriptorPath: /Dockstore.cwl
      testParameterFiles:

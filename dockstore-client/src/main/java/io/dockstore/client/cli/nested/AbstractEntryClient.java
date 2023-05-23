@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.MissingCommandException;
 import com.beust.jcommander.ParameterException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -120,10 +121,30 @@ import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.Client.COMMAND_ERROR;
 import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
 import static io.dockstore.client.cli.Client.GENERIC_ERROR;
+import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.VERSION;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.Client.getGeneralFlags;
+import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
+import static io.dockstore.client.cli.JCommanderUtility.getUnknownParameter;
+import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParameter;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static io.dockstore.client.cli.nested.WesCommandParser.ATTACH;
+import static io.dockstore.client.cli.nested.WesCommandParser.COUNT;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.ID;
+import static io.dockstore.client.cli.nested.WesCommandParser.INLINE_WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.client.cli.nested.WesCommandParser.PAGE_TOKEN;
+import static io.dockstore.client.cli.nested.WesCommandParser.VERBOSE;
+import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.NEXTFLOW;
 import static io.dockstore.common.DescriptorLanguage.WDL;
+import static io.github.collaboratory.cwl.CWLClient.WES;
+import static java.lang.String.join;
 
 /**
  * Handles the commands for a particular type of entry. (e.g. Workflows, Tools) Not a great abstraction, but enforces some structure for
@@ -133,7 +154,7 @@ import static io.dockstore.common.DescriptorLanguage.WDL;
  * implementing classes that do not need to reference to the command line arguments directly.
  * <p>
  * Note that many of these methods depend on a unique identifier for an entry called a path for workflows and tools.
- * For example, a tool path looks like quay.io/collaboratory/bwa-tool:develop wheras a workflow path looks like
+ * For example, a tool path looks like quay.io/collaboratory/bwa-tool:develop whereas a workflow path looks like
  * collaboratory/bwa-workflow:develop
  *
  * @author dyuen
@@ -144,9 +165,26 @@ public abstract class AbstractEntryClient<T> {
     public static final String CHECKSUM_VALIDATED_MESSAGE = "Checksums validated.";
     public static final String MULTIPLE_TEST_FILE_ERROR_MESSAGE = "If specifying a test parameter file, use either --json or --yaml, but not both.";
 
-    private static final String WORKFLOW = "workflow";
+    public static final String INFO = "info";
+    public static final String LIST = "list";
+    public static final String SEARCH = "search";
+    public static final String PUBLISH = "publish";
+    public static final String STAR = "star";
+    public static final String REFRESH = "refresh";
+    public static final String LABEL = "label";
+    public static final String MANUAL_PUBLISH = "manual_publish";
+    public static final String VERIFY = "verify";
+    public static final String TEST_PARAMETER = "test_parameter";
+    public static final String NFL = "nfl";
+    public static final String CWL_2_JSON = "cwl2json";
+    public static final String CWL_2_YAML = "cwl2yaml";
+    public static final String WDL_2_JSON = "wdl2json";
+    public static final String ENTRY_2_JSON = "entry2json";
+    public static final String STATUS = "status";
+    public static final String LOGS = "logs";
+    public static final String CANCEL = "cancel";
+    public static final String SERVICE_INFO = "service-info";
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEntryClient.class);
-
     protected boolean isAdmin = false;
 
     boolean isLocalEntry = false;
@@ -201,39 +239,39 @@ public abstract class AbstractEntryClient<T> {
         printUsageHelp(getEntryType().toLowerCase());
         out("Commands:");
         out("");
-        out("  " + CONVERT + "          :  utilities that allow you to convert file types");
+        out("  " + CONVERT + "          :  utilities that allow you to " + CONVERT + " file types");
         out("");
-        out("  " + CWL.toString() + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
+        out("  " + CWL + "              :  returns the Common Workflow Language " + getEntryType() + " definition for this entry");
         out("                      which enables integration with Global Alliance compliant systems");
         out("");
-        out("  " + DOWNLOAD + "         :  download " + getEntryType() + "s to the local directory");
+        out("  " + DOWNLOAD + "         :  " + DOWNLOAD + " " + getEntryType() + "s to the local directory");
         out("");
-        out("  info             :  print detailed information about a particular published " + getEntryType());
+        out("  " + INFO + "             :  print detailed information about a particular published " + getEntryType());
         out("");
-        out("  label            :  updates labels for an individual " + getEntryType() + "");
+        out("  " + LABEL + "            :  updates labels for an individual " + getEntryType() + "");
         out("");
         out("  " + LAUNCH + "           :  launch " + getEntryType() + "s (locally)");
         out("");
-        out("  list             :  lists all the " + getEntryType() + "s published by the user");
+        out("  " + LIST + "             :  lists all the " + getEntryType() + "s published by the user");
         out("");
         if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
-            out("  nfl              :  returns the Nextflow " + getEntryType() + " defintion for this entry");
+            out("  " + NFL + "              :  returns the Nextflow " + getEntryType() + " definition for this entry");
             out("");
         }
-        out("  publish          :  publish/unpublish a " + getEntryType() + " in Dockstore");
+        out("  " + PUBLISH + "          :  publish/unpublish a " + getEntryType() + " in Dockstore");
         out("");
-        out("  refresh          :  updates your list of " + getEntryType() + "s stored on Dockstore or an individual " + getEntryType());
+        out("  " + REFRESH + "          :  updates your list of " + getEntryType() + "s stored on Dockstore or an individual " + getEntryType());
         out("");
-        out("  search           :  allows a user to search for all published " + getEntryType() + "s that match the criteria");
+        out("  " + SEARCH + "           :  allows a user to search for all published " + getEntryType() + "s that match the criteria");
         out("");
-        out("  star             :  star/unstar a " + getEntryType() + " in Dockstore");
+        out("  " + STAR + "             :  " + STAR + "/unstar a " + getEntryType() + " in Dockstore");
         out("");
-        out("  test_parameter   :  updates test parameter files for a version of a " + getEntryType() + "");
+        out("  " + TEST_PARAMETER + "   :  updates test parameter files for a version of a " + getEntryType() + "");
         out("");
-        out("  " + WDL.toString() + "              :  returns the Workflow Descriptor Language definition for this entry");
+        out("  " + WDL + "              :  returns the Workflow Descriptor Language definition for this entry");
         if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
             out("");
-            out("  wes              :  calls a Workflow Execution Schema API (WES) for a version of a " + getEntryType() + "");
+            out("  " + WES + "              :  calls a Workflow Execution Schema API (WES) for a version of a " + getEntryType() + "");
         }
 
         printClientSpecificHelp();
@@ -249,6 +287,8 @@ public abstract class AbstractEntryClient<T> {
      * Print help for commands specific to this client type.
      */
     protected abstract void printClientSpecificHelp();
+
+    protected abstract List<String> getClientSpecificCommands();
 
     /**
      * A friendly description for the type of entry that this handles. Damn you type erasure.
@@ -281,31 +321,31 @@ public abstract class AbstractEntryClient<T> {
             }
 
             switch (activeCommand) {
-            case "info":
+            case INFO:
                 info(args);
                 break;
-            case "list":
+            case LIST:
                 list(args);
                 break;
-            case "search":
+            case SEARCH:
                 search(args);
                 break;
-            case "publish":
+            case PUBLISH:
                 publish(args);
                 break;
-            case "star":
+            case STAR:
                 star(args);
                 break;
-            case "refresh":
+            case REFRESH:
                 refresh(args);
                 break;
-            case "label":
+            case LABEL:
                 label(args);
                 break;
-            case "manual_publish":
+            case MANUAL_PUBLISH:
                 manualPublish(args);
                 break;
-            case "convert":
+            case CONVERT:
                 convert(args);
                 break;
             case LAUNCH:
@@ -314,13 +354,13 @@ public abstract class AbstractEntryClient<T> {
             case DOWNLOAD:
                 download(args);
                 break;
-            case "verify":
+            case VERIFY:
                 verify(args);
                 break;
-            case "test_parameter":
+            case TEST_PARAMETER:
                 testParameter(args);
                 break;
-            case "wes":
+            case WES:
                 isWesCommand = true;
                 if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
                     processWesCommands(args);
@@ -329,7 +369,17 @@ public abstract class AbstractEntryClient<T> {
                 }
                 break;
             default:
-                return false;
+                List<String> possibleCommands = new ArrayList<>();
+                possibleCommands.addAll(Arrays.asList(INFO, LIST, SEARCH, PUBLISH, STAR, REFRESH, LABEL, MANUAL_PUBLISH,
+                        CONVERT, LAUNCH, DOWNLOAD, VERIFY, TEST_PARAMETER, WDL.toString(), CWL.toString()));
+
+                if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
+                    possibleCommands.addAll(Arrays.asList(WES, NFL));
+                }
+                possibleCommands.addAll(getClientSpecificCommands());
+                possibleCommands.addAll(getGeneralFlags());
+                invalid(getEntryType().toLowerCase(), activeCommand, possibleCommands);
+                return true;
             }
             return true;
         }
@@ -339,7 +389,7 @@ public abstract class AbstractEntryClient<T> {
     /**
      * Handle search for an entry
      *
-     * @param pattern a pattern, currently a subtring for searching
+     * @param pattern a pattern, currently a substring for searching
      */
     protected abstract void handleSearch(String pattern);
 
@@ -489,7 +539,7 @@ public abstract class AbstractEntryClient<T> {
         } else if (containsHelpRequest(args)) {
             publishHelp();
         } else {
-            String first = reqVal(args, "--entry");
+            String first = reqVal(args, ENTRY);
             final boolean unpublishRequest = args.contains("--unpub");
 
             // --new-entry-name is the desired parameter flag, but maintaining backwards compatibility for --entryname
@@ -502,7 +552,7 @@ public abstract class AbstractEntryClient<T> {
             // prevent specifying --unpub and --entryname together
             if (unpublishRequest && newEntryName != null) {
                 errorMessage("Unable to specify both --unpub and --new-entry-name together. If trying to unpublish an entry,"
-                    + " provide the entire entry path under the --entry parameter.", COMMAND_ERROR);
+                    + " provide the entire entry path under the " + ENTRY + " parameter.", COMMAND_ERROR);
             } else {
                 handlePublishUnpublish(first, newEntryName, unpublishRequest);
             }
@@ -515,7 +565,7 @@ public abstract class AbstractEntryClient<T> {
         } else if (containsHelpRequest(args)) {
             starHelp();
         } else {
-            String first = reqVal(args, "--entry");
+            String first = reqVal(args, ENTRY);
             final boolean toStar = !args.contains("--unstar");
             handleStarUnstar(first, toStar);
         }
@@ -533,7 +583,7 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             descriptorHelp(descriptorType);
         } else {
-            final String entry = reqVal(args, "--entry");
+            final String entry = reqVal(args, ENTRY);
             handleDescriptor(descriptorType, entry);
         }
     }
@@ -542,7 +592,7 @@ public abstract class AbstractEntryClient<T> {
         if (containsHelpRequest(args)) {
             refreshHelp();
         } else if (!args.isEmpty()) {
-            final String toolpath = reqVal(args, "--entry");
+            final String toolpath = reqVal(args, ENTRY);
             refreshTargetEntry(toolpath);
         } else {
             // check user info after usage so that users can get usage without live webservice
@@ -554,7 +604,7 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             infoHelp();
         } else {
-            String path = reqVal(args, "--entry");
+            String path = reqVal(args, ENTRY);
             handleInfo(path);
         }
     }
@@ -563,7 +613,7 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             labelHelp();
         } else {
-            final String toolpath = reqVal(args, "--entry");
+            final String toolpath = reqVal(args, ENTRY);
             final List<String> adds = optVals(args, "--add");
             final Set<String> addsSet = adds.isEmpty() ? new HashSet<>() : new HashSet<>(adds);
             final List<String> removes = optVals(args, "--remove");
@@ -574,15 +624,15 @@ public abstract class AbstractEntryClient<T> {
 
             for (String add : addsSet) {
                 if (!add.matches(labelStringPattern)) {
-                    errorMessage("The following label does not match the proper label format : " + add, CLIENT_ERROR);
+                    errorMessage("The following " + LABEL + " does not match the proper " + LABEL + " format : " + add, CLIENT_ERROR);
                 } else if (removesSet.contains(add)) {
-                    errorMessage("The following label is present in both add and remove : " + add, CLIENT_ERROR);
+                    errorMessage("The following " + LABEL + " is present in both add and remove : " + add, CLIENT_ERROR);
                 }
             }
 
             for (String remove : removesSet) {
                 if (!remove.matches(labelStringPattern)) {
-                    errorMessage("The following label does not match the proper label format : " + remove, CLIENT_ERROR);
+                    errorMessage("The following " + LABEL + " does not match the proper " + LABEL + " format : " + remove, CLIENT_ERROR);
                 }
             }
             handleLabels(toolpath, addsSet, removesSet);
@@ -624,27 +674,30 @@ public abstract class AbstractEntryClient<T> {
     }
 
     private void convert(final List<String> args) throws ApiException, IOException {
-        if (args.isEmpty() || (containsHelpRequest(args) && !args.contains("cwl2json") && !args.contains("wdl2json") && !args
-                .contains("entry2json"))) {
+        if (args.isEmpty() || (containsHelpRequest(args) && !args.contains(CWL_2_JSON) && !args.contains(WDL_2_JSON) && !args
+                .contains(ENTRY_2_JSON))) {
             convertHelp(); // Display general help
         } else {
             final String cmd = args.remove(0);
             if (null != cmd) {
                 switch (cmd) {
-                case "cwl2json":
+                case CWL_2_JSON:
                     cwl2json(args, true);
                     break;
-                case "cwl2yaml":
+                case CWL_2_YAML:
                     cwl2json(args, false);
                     break;
-                case "wdl2json":
+                case WDL_2_JSON:
                     wdl2json(args);
                     break;
-                case "entry2json":
+                case ENTRY_2_JSON:
                     handleEntry2json(args);
                     break;
                 default:
-                    invalid(cmd);
+                    List<String> possibleCommands = new ArrayList<>();
+                    possibleCommands.addAll(Arrays.asList(CWL_2_JSON, CWL_2_YAML, WDL_2_JSON, ENTRY_2_JSON));
+                    possibleCommands.addAll(getGeneralFlags());
+                    invalid(getEntryType().toLowerCase()  + " convert", cmd, possibleCommands);
                     break;
                 }
             }
@@ -693,7 +746,7 @@ public abstract class AbstractEntryClient<T> {
             final String wdlPath = reqVal(args, "--wdl");
             File wdlFile = new File(wdlPath);
             final List<String> wdlDocuments = Lists.newArrayList(wdlFile.getAbsolutePath());
-            final scala.collection.immutable.List<String> wdlList = scala.collection.JavaConversions.asScalaBuffer(wdlDocuments).toList();
+            final scala.collection.immutable.List<String> wdlList = scala.jdk.javaapi.CollectionConverters.asScala(wdlDocuments).toList();
             WdlBridge wdlBridge = new WdlBridge();
             try {
                 String inputs = wdlBridge.getParameterFile(wdlFile.getAbsolutePath());
@@ -735,10 +788,10 @@ public abstract class AbstractEntryClient<T> {
 
     private void verify(List<String> args) {
         if (isAdmin) {
-            args.add(0, "verify");
+            args.add(0, VERIFY);
             String[] argsArray = new String[args.size()];
             argsArray = args.toArray(argsArray);
-            Verify.handleVerifyCommand(argsArray);
+            Verify.handleVerifyCommand(argsArray, getEntryType().toLowerCase());
         } else {
             out("This command is only accessible to Admins.");
         }
@@ -748,15 +801,15 @@ public abstract class AbstractEntryClient<T> {
         if (containsHelpRequest(args) || args.isEmpty()) {
             testParameterHelp();
         } else {
-            String entry = reqVal(args, "--entry");
-            String version = reqVal(args, "--version");
+            String entry = reqVal(args, ENTRY);
+            String version = reqVal(args, VERSION);
             String descriptorType = null;
             final List<String> adds = optVals(args, "--add");
             final List<String> removes = optVals(args, "--remove");
 
             String parentEntry = optVal(args, "--parent-entry", entry);
 
-            if (getEntryType().equalsIgnoreCase("tool")) {
+            if (getEntryType().equalsIgnoreCase(TOOL)) {
                 descriptorType = reqVal(args, "--descriptor-type").toUpperCase();
                 boolean validType = false;
                 for (DescriptorLanguage type : DescriptorLanguage.values()) {
@@ -816,7 +869,7 @@ public abstract class AbstractEntryClient<T> {
 
         // get all the tool files and filter out anything not a descriptor
         try {
-            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(type, entryPath, versionID).stream()
+            return ga4ghv20api.toolsIdVersionsVersionIdTypeFilesGet(entryPath, type, versionID, null).stream()
                 .filter(toolFile -> ToolFile.FileTypeEnum.SECONDARY_DESCRIPTOR.equals(toolFile.getFileType()) || ToolFile.FileTypeEnum.PRIMARY_DESCRIPTOR.equals(toolFile.getFileType()))
                 .collect(Collectors.toList());
         } catch (io.dockstore.openapi.client.ApiException ex) {
@@ -835,7 +888,7 @@ public abstract class AbstractEntryClient<T> {
      * Type.NONE if file extension is neither WDL nor CWL, could be no extension or some other random extension(e.g .txt)
      */
     Optional<DescriptorLanguage> checkFileExtension(String path) {
-        if (FilenameUtils.getExtension(path).equalsIgnoreCase(CWL.toString()) || FilenameUtils.getExtension(path).equalsIgnoreCase("yaml") || FilenameUtils.getExtension(path).equalsIgnoreCase("yml")) {
+        if (FilenameUtils.getExtension(path).equalsIgnoreCase(CWL.toString()) || FilenameUtils.getExtension(path).equalsIgnoreCase(YAML) || FilenameUtils.getExtension(path).equalsIgnoreCase("yml")) {
             return Optional.of(CWL);
         } else if (FilenameUtils.getExtension(path).equalsIgnoreCase(WDL.toString())) {
             return Optional.of(WDL);
@@ -860,11 +913,11 @@ public abstract class AbstractEntryClient<T> {
         Optional<DescriptorLanguage> optExt = checkFileExtension(file.getPath());     //file extension could be cwl,wdl or ""
 
         if (!file.exists() || file.isDirectory()) {
-            if (getEntryType().equalsIgnoreCase("tool")) {
-                errorMessage("The tool file " + file.getPath() + " does not exist. Did you mean to launch a remote tool or a workflow?",
+            if (getEntryType().equalsIgnoreCase(TOOL)) {
+                errorMessage("The tool file " + file.getPath() + " does not exist. Did you mean to " + LAUNCH + " a remote " + TOOL + " or a " + WORKFLOW + "?",
                     ENTRY_NOT_FOUND);
             } else {
-                errorMessage("The workflow file " + file.getPath() + " does not exist. Did you mean to launch a remote workflow or a tool?",
+                errorMessage("The workflow file " + file.getPath() + " does not exist. Did you mean to " + LAUNCH + " a remote " + WORKFLOW + " or a " + TOOL + "?",
                     ENTRY_NOT_FOUND);
             }
         }
@@ -987,10 +1040,10 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             downloadHelp();
         } else {
-            if (!args.contains("--entry")) {
-                errorMessage("dockstore: missing required flag --entry", CLIENT_ERROR);
+            if (!args.contains(ENTRY)) {
+                errorMessage("dockstore: missing required flag " + ENTRY, CLIENT_ERROR);
             }
-            final String entry = reqVal(args, "--entry");
+            final String entry = reqVal(args, ENTRY);
             final boolean unzip = !args.contains("--zip");
             try {
                 downloadTargetEntry(entry, null, unzip);
@@ -1014,7 +1067,7 @@ public abstract class AbstractEntryClient<T> {
     void preValidateLaunchArguments(List<String> args) {
         // Create a copy of args for prevalidation since optVals removes args from list
         List<String> argsCopy = new ArrayList<>(args);
-        String jsonFile = optVal(argsCopy, "--json", null);
+        String jsonFile = optVal(argsCopy, JSON, null);
         String yamlFile = optVal(argsCopy, "--yaml", null);
         conditionalErrorMessage((jsonFile != null) && (yamlFile != null),
                                 MULTIPLE_TEST_FILE_ERROR_MESSAGE,
@@ -1079,7 +1132,7 @@ public abstract class AbstractEntryClient<T> {
     /**
      * Attempts to launch a workflow (tools not currently supported) on a WES server
      * @param clientWorkflowExecutionServiceApi The WES API client
-     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworfklow:version1
+     * @param entry The path to the desired entry (i.e. github.com/myrepo/myworkflow:version1
      * @param inlineWorkflow Indicates that the workflow files will be inlined directly into the WES HTTP request
      * @param paramsPath Path to the parameter JSON file
      * @param filePaths Paths to any other required files for the WES execution
@@ -1103,9 +1156,9 @@ public abstract class AbstractEntryClient<T> {
             ObjectMapper mapper = new ObjectMapper();
             out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         } catch (io.openapi.wes.client.ApiException e) {
-            LOG.error("Error getting brief WES run status", e);
+            LOG.error("Error getting brief WES run " + STATUS, e);
         } catch (JsonProcessingException e) {
-            LOG.error("Unable to convert WES response object to JSON", e);
+            LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
     }
 
@@ -1120,9 +1173,9 @@ public abstract class AbstractEntryClient<T> {
             ObjectMapper mapper = new ObjectMapper();
             out(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         } catch (io.openapi.wes.client.ApiException e) {
-            LOG.error("Error getting WES run logs", e);
+            LOG.error("Error getting WES run " + LOGS, e);
         } catch (JsonProcessingException e) {
-            LOG.error("Unable to convert WES response object to JSON", e);
+            LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
     }
 
@@ -1152,7 +1205,7 @@ public abstract class AbstractEntryClient<T> {
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES server info", e);
         } catch (JsonProcessingException e) {
-            LOG.error("Unable to convert WES response object to JSON", e);
+            LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
     }
 
@@ -1173,7 +1226,7 @@ public abstract class AbstractEntryClient<T> {
         } catch (io.openapi.wes.client.ApiException e) {
             LOG.error("Error getting WES Run List", e);
         } catch (JsonProcessingException e) {
-            LOG.error("Unable to convert WES response object to JSON", e);
+            LOG.error("Unable to " + CONVERT + " WES response object to JSON", e);
         }
     }
 
@@ -1217,11 +1270,23 @@ public abstract class AbstractEntryClient<T> {
      */
     private void processWesCommands(final List<String> args) {
         WesCommandParser wesCommandParser = new WesCommandParser();
-
-        // JCommander throws a parameter exception for invalid parameters. Catch this an print the error cleanly.
+        // JCommander throws a parameter exception for invalid parameters. Catch this and print the error cleanly.
         try {
             wesCommandParser.jCommander.parse(args.toArray(new String[0]));
+        } catch (MissingCommandException e) {
+            // This catch is called when JCommander parse doesn't understand any command. This is for incorrect commands of the form:
+            // dockstore workflow INCORRECT_COMMAND
+            displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), args.get(0), WORKFLOW + " " + WES);
+            return;
         } catch (ParameterException e) {
+            if (wasErrorDueToUnknownParameter(e.getMessage())) {
+                // This is for when JCommander parse understands part of the command. This is for incorrect commands of the form:
+                // dockstore workflow CORRECT_COMMAND INCORRECT_COMMAND
+                String incorrectCommand = getUnknownParameter(e.getMessage());
+                // get command after the commands that were successfully read
+                displayJCommanderSuggestions(wesCommandParser.jCommander, e.getJCommander().getParsedCommand(), incorrectCommand, join(" ", WORKFLOW, WES, e.getJCommander().getParsedCommand()));
+                return;
+            }
             errorMessage(e.getMessage(), CLIENT_ERROR);
         }
 
@@ -1247,7 +1312,7 @@ public abstract class AbstractEntryClient<T> {
 
             // Depending on the desired WES request, parse input parameters from the command line
             switch (wesCommandParser.jCommander.getParsedCommand()) {
-            case "launch":
+            case LAUNCH:
                 wesLaunch(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandLaunch.getEntry(),
                     wesCommandParser.commandLaunch.getInlineWorkflow(),
@@ -1255,23 +1320,23 @@ public abstract class AbstractEntryClient<T> {
                     wesCommandParser.commandLaunch.getAttachments(),
                     wesCommandParser.commandLaunch.isVerbose());
                 break;
-            case "status":
+            case STATUS:
                 wesStatus(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandStatus.getId());
                 break;
-            case "logs":
+            case LOGS:
                 wesRunLogs(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandRunLogs.getId());
                 break;
-            case "cancel":
+            case CANCEL:
                 wesCancel(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandCancel.getId(),
                     wesCommandParser.commandCancel.isVerbose());
                 break;
-            case "service-info":
+            case SERVICE_INFO:
                 wesServiceInfo(clientWorkflowExecutionServiceApi);
                 break;
-            case "list":
+            case LIST:
                 wesListRuns(clientWorkflowExecutionServiceApi,
                     wesCommandParser.commandRunList.getPageSize(),
                     wesCommandParser.commandRunList.getPageToken(),
@@ -1352,7 +1417,7 @@ public abstract class AbstractEntryClient<T> {
             InfoCmd infoCmd = instance.infoCmd(); // attempt to get information about docker
             infoCmd.exec();
         } catch (Exception e) {  // couldn't access docker, this library is wonderfully non-specific about exceptions
-            String type = this.getEntryType().toLowerCase(); // "tool" or "workflow"
+            String type = this.getEntryType().toLowerCase(); // TOOL or WORKFLOW
             out("WARNING: Docker is not running. If this " + type + " uses Docker, it will fail.");
         }
     }
@@ -1366,8 +1431,8 @@ public abstract class AbstractEntryClient<T> {
         if (args.isEmpty() || containsHelpRequest(args)) {
             launchHelp();
         } else {
-            if (args.contains("--local-entry") && args.contains("--entry")) {
-                errorMessage("You can only use one of --local-entry and --entry at a time. Please use --help for more information.",
+            if (args.contains("--local-entry") && args.contains(ENTRY)) {
+                errorMessage("You can only use one of --local-entry and " + ENTRY + " at a time. Please use " + HELP + " for more information.",
                         CLIENT_ERROR);
             } else if (args.contains("--local-entry")) {
                 final String descriptor = optVal(args, "--descriptor", null);
@@ -1377,8 +1442,8 @@ public abstract class AbstractEntryClient<T> {
                 checkIfDockerRunning();
                 checkEntryFile(localFilePath, args, descriptor);
             } else {
-                if (!args.contains("--entry")) {
-                    errorMessage("dockstore: missing required flag --entry", CLIENT_ERROR);
+                if (!args.contains(ENTRY)) {
+                    errorMessage("dockstore: missing required flag " + ENTRY, CLIENT_ERROR);
                 }
                 this.isLocalEntry = false;
                 this.ignoreChecksums = args.contains("--ignore-checksums");
@@ -1389,7 +1454,7 @@ public abstract class AbstractEntryClient<T> {
                 final String descriptor = optVal(args, "--descriptor", CWL.toString()).toUpperCase();
                 if (CWL.toString().equals(descriptor)) {
                     try {
-                        String entry = reqVal(args, "--entry");
+                        String entry = reqVal(args, ENTRY);
                         launchCwl(entry, args, false);
                     } catch (ApiException e) {
                         exceptionMessage(e, "API error launching workflow. Did you mean to use --local-entry instead of --entry?",
@@ -1423,7 +1488,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void launchCwl(String entry, final List<String> args, boolean isALocalEntry) throws ApiException, IOException {
         final String yamlRun = optVal(args, "--yaml", null);
-        String jsonRun = optVal(args, "--json", null);
+        String jsonRun = optVal(args, JSON, null);
         final String uuid = optVal(args, "--uuid", null);
         CWLClient client = new CWLClient(this);
         client.launch(entry, isALocalEntry, yamlRun, jsonRun, null, uuid);
@@ -1457,13 +1522,13 @@ public abstract class AbstractEntryClient<T> {
     }
 
     private void launchWdl(final List<String> args, boolean isALocalEntry) throws IOException, ApiException {
-        final String entry = reqVal(args, "--entry");
+        final String entry = reqVal(args, ENTRY);
         launchWdl(entry, args, isALocalEntry);
     }
 
     private void launchWdl(String entry, final List<String> args, boolean isALocalEntry) throws ApiException {
         final String yamlRun = optVal(args, "--yaml", null);
-        String jsonRun = optVal(args, "--json", null);
+        String jsonRun = optVal(args, JSON, null);
         final String wdlOutputTarget = optVal(args, "--wdl-output-target", null);
         final String uuid = optVal(args, "--uuid", null);
         WDLClient client = new WDLClient(this);
@@ -1471,14 +1536,14 @@ public abstract class AbstractEntryClient<T> {
     }
 
     private void launchNextflow(String entry, final List<String> args, boolean isALocalEntry) throws ApiException {
-        final String json = reqVal(args, "--json");
+        final String json = reqVal(args, JSON);
         final String uuid = optVal(args, "--uuid", null);
         NextflowClient client = new NextflowClient(this);
         client.launch(entry, isALocalEntry, null, json, null, uuid);
     }
 
     private String convertEntry2Json(List<String> args, final boolean json) throws ApiException, IOException {
-        final String entry = reqVal(args, "--entry");
+        final String entry = reqVal(args, ENTRY);
         final String descriptor = optVal(args, "--descriptor", CWL.toString()).toUpperCase();
         LanguageClientInterface languageCLient = convertCLIStringToEnum(descriptor);
         return languageCLient.generateInputJson(entry, json);
@@ -1532,13 +1597,13 @@ public abstract class AbstractEntryClient<T> {
         printHelpHeader();
         out("Commands:");
         out("");
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes service-info [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes list [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, LAUNCH, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, STATUS, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, LOGS, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, CANCEL, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, SERVICE_INFO, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, "list [parameters]"));
         out("");
         out("Description:");
         out(" Sends a request to a Workflow Execution Service (WES) endpoint.");
@@ -1552,19 +1617,19 @@ public abstract class AbstractEntryClient<T> {
         out("  Launch an entry on a WES endpoint.");
         out("");
         out("Required parameters:");
-        out("  --entry <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
+        out("  " + ENTRY + " <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         out("");
         out("Optional parameters:");
-        out("  --json <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
-        out("  --attach <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
-        out("  --inline-workflow                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
+        out("  " + JSON + " <json file>                  JSON parameter file for the WES run. This may be reference an attached file");
+        out("  " + ATTACH + " <path>, -a <path>          A list of paths to files that should be included in the WES request. (ex. -a <path1> <path2> OR -a <path1> -a <path2>)");
+        out("  " + INLINE_WORKFLOW + "                   Inlines workflow files contents directly into the WES HTTP request. This is required for some WES server implementations.");
         out("");
     }
 
     private void wesLaunchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes launch --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes launch [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, LAUNCH, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, LAUNCH, "[parameters]"));
         printWesLaunchHelpBody();
         printWesHelpFooter();
         printHelpFooter();
@@ -1572,13 +1637,13 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesStatusHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes status --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes status [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, STATUS, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, STATUS, "[parameters]"));
         out("");
         out("Description:");
-        out("  Status, gets the status of a " + getEntryType() + ".");
+        out("  Status, gets the " + STATUS + " of a " + getEntryType() + ".");
         out("Required Parameters:");
-        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
+        out("  " + ID + " <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1586,13 +1651,13 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesRunLogsHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes logs --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes logs [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, LOGS, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, LOGS, "[parameters]"));
         out("");
         out("Description:");
-        out("  Logs, gets the verbose run logs of a " + getEntryType() + ".");
+        out("  Logs, gets the " + VERBOSE + " run " + LOGS + " of a " + getEntryType() + ".");
         out("Required Parameters:");
-        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
+        out("  " + ID + " <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1600,13 +1665,13 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesCancelHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes cancel --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes cancel [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, CANCEL, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, CANCEL, "[parameters]"));
         out("");
         out("Description:");
         out("  Cancels a " + getEntryType() + ".");
         out("Required Parameters:");
-        out("  --id <id>                           Id of a run at the WES endpoint, e.g. id returned from the launch command");
+        out("  " + ID + " <id>                           Id of a run at the WES endpoint, e.g. id returned from the " + LAUNCH + " command");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1614,8 +1679,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesServiceInfoHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes service-info --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes service-info");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, SERVICE_INFO, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, SERVICE_INFO));
         out("");
         out("Description:");
         out("  Returns descriptive information of the provided WES server. ");
@@ -1625,14 +1690,14 @@ public abstract class AbstractEntryClient<T> {
 
     private void wesRunListHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " wes list --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " wes list");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), WES, "list", HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), WES, "list"));
         out("");
         out("Description:");
         out("  Returns information about past runs. ");
         out("Optional Parameters:");
-        out("  --count                           The number of runs to list.");
-        out("  --page-token                      A page token provided from a previous list of runs.");
+        out("  " + COUNT + "                           The number of runs to list.");
+        out("  " + PAGE_TOKEN + "                      A page token provided from a previous list of runs.");
         out("");
         printWesHelpFooter();
         printHelpFooter();
@@ -1640,7 +1705,7 @@ public abstract class AbstractEntryClient<T> {
 
     private void printWesHelpFooter() {
         out("Global Optional Parameters:");
-        out("  --wes-url <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
+        out("  " + WES_URL + " <WES URL>                 URL where the WES request should be sent, e.g. 'http://localhost:8080/ga4gh/wes/v1'");
         out("");
         out("NOTE: Currently only WDL workflows are supported for WES requests. Further language support is under development.");
     }
@@ -1649,23 +1714,23 @@ public abstract class AbstractEntryClient<T> {
 
     private void starHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " star --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " star");
-        out("       dockstore " + getEntryType().toLowerCase() + " star [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " star --unstar [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), STAR, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), STAR));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), STAR, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), STAR, "--unstar [parameters]"));
         out("");
         out("Description:");
         out("  Star/unstar a registered " + getEntryType() + ".");
         out("  No arguments will list the current and potential " + getEntryType() + "s to share.");
         out("Required Parameters:");
-        out("  --entry <" + getEntryType() + ">             Complete " + getEntryType()
+        out("  " + ENTRY + " <" + getEntryType() + ">             Complete " + getEntryType()
                 + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         printHelpFooter();
     }
 
     private void listHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " list --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " list " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " list");
         out("");
         out("Description:");
@@ -1675,14 +1740,14 @@ public abstract class AbstractEntryClient<T> {
 
     private void labelHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " label --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " label [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), LABEL, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), LABEL, "[parameters]"));
         out("");
         out("Description:");
         out("  Add or remove labels from a given Dockstore " + getEntryType());
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                             Complete " + getEntryType() + " path in Dockstore");
+        out("  " + ENTRY + " <entry>                             Complete " + getEntryType() + " path in Dockstore");
         out("");
         out("Optional Parameters:");
         out("  --add <label> (--add <label>)               Add given label(s)");
@@ -1692,18 +1757,18 @@ public abstract class AbstractEntryClient<T> {
 
     protected void testParameterHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " test_parameter --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " test_parameter [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), TEST_PARAMETER, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), TEST_PARAMETER, "[parameters]"));
         out("");
         out("Description:");
         out("  Add or remove test parameter files from a given Dockstore " + getEntryType() + " version");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>                                                          Complete " + getEntryType()
+        out("  " + ENTRY + " <entry>                                                          Complete " + getEntryType()
                 + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("  --version <version>                                                      " + getEntryType() + " version name");
-        if (getEntryType().equalsIgnoreCase("tool")) {
-            out("  --descriptor-type <descriptor-type>                                      " + DescriptorLanguage.CWL.toString() + "/" + DescriptorLanguage.WDL.toString());
+        out("  " + VERSION + " <version>                                                      " + getEntryType() + " version name");
+        if (getEntryType().equalsIgnoreCase(TOOL)) {
+            out("  --descriptor-type <descriptor-type>                                      " + CWL + "/" + WDL);
         }
         out("");
         out("Optional Parameters:");
@@ -1714,63 +1779,63 @@ public abstract class AbstractEntryClient<T> {
 
     private void infoHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " info --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " info " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " info [parameters]");
         out("");
         out("Description:");
         out("  Get information related to a published " + getEntryType() + ".");
         out("");
         out("Required Parameters:");
-        out("  --entry <entry>     The complete " + getEntryType()
+        out("  " + ENTRY + " <entry>     The complete " + getEntryType()
                 + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         printHelpFooter();
     }
 
     private void descriptorHelp(DescriptorLanguage descriptorType) {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + descriptorType + " --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + descriptorType + " " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " " + descriptorType + " [parameters]");
         out("");
         out("Description:");
         out("  Grab a " + descriptorType.toString().toUpperCase() + " document for a particular entry.");
         out("");
         out("Required parameters:");
-        out("  --entry <entry>              Complete " + getEntryType()
+        out("  " + ENTRY + " <entry>              Complete " + getEntryType()
                 + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         printHelpFooter();
     }
 
     private void refreshHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " refresh --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " refresh");
-        out("       dockstore " + getEntryType().toLowerCase() + " refresh [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), REFRESH, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), REFRESH));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), REFRESH, "[parameters]"));
         out("");
         out("Description:");
         out("  Refresh an individual " + getEntryType() + " or all your " + getEntryType() + ".");
         out("");
         out("Optional Parameters:");
-        out("  --entry <entry>         Complete tool path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + ENTRY + " <entry>         Complete tool path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
         printHelpFooter();
     }
 
     private void searchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " search --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " search [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), SEARCH, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), SEARCH, "[parameters]"));
         out("");
         out("Description:");
         out("  Search for published " + getEntryType() + " on Dockstore.");
         out("");
         out("Required Parameters:");
-        out("  --pattern <pattern>         Pattern to search Dockstore with");
+        out("  --pattern <pattern>         Pattern to " + SEARCH + " Dockstore with");
         printHelpFooter();
     }
 
     private void cwl2yamlHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2yaml [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, CWL_2_YAML, "[parameters]"));
         out("");
         out("Description:");
         out("  Spit out a yaml run file for a given cwl document.");
@@ -1782,8 +1847,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void cwl2jsonHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2json [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, CWL_2_JSON, "[parameters]"));
         out("");
         out("Description:");
         out("  Spit out a json run file for a given cwl document.");
@@ -1795,8 +1860,8 @@ public abstract class AbstractEntryClient<T> {
 
     private void wdl2jsonHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " wdl2json [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, WDL_2_JSON, "[parameters]"));
         out("");
         out("Description:");
         out("  Spit out a json run file for a given wdl document.");
@@ -1808,27 +1873,27 @@ public abstract class AbstractEntryClient<T> {
 
     private void convertHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2json [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " cwl2yaml [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " wdl2json [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, CWL_2_JSON, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, CWL_2_YAML, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, WDL_2_JSON, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, "entry2json [parameters]"));
         out("");
         out("Description:");
-        out("  They allow you to convert between file representations.");
+        out("  They allow you to " + CONVERT + " between file representations.");
         printHelpFooter();
     }
 
     private void entry2jsonHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " " + CONVERT + " entry2json [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), CONVERT, ENTRY_2_JSON, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), CONVERT, ENTRY_2_JSON, "[parameters]"));
         out("");
         out("Description:");
         out("  Spit out a json run file for a given cwl document.");
         out("");
         out("Required parameters:");
-        out("  --entry <entry>                Complete " + getEntryType().toLowerCase()
+        out("  " + ENTRY + " <entry>                Complete " + getEntryType().toLowerCase()
                 + " path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         out("  --descriptor <descriptor>      Type of descriptor language used. Defaults to cwl");
         printHelpFooter();
@@ -1836,14 +1901,14 @@ public abstract class AbstractEntryClient<T> {
 
     private void downloadHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " download --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " download [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), DOWNLOAD, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), DOWNLOAD, "[parameters]"));
         out("");
         out("Description:");
         out("  Download an entry to the working directory.");
         out("");
         out("Required parameters:");
-        out("  --entry <entry>          Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
+        out("  " + ENTRY + " <entry>          Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         out("");
         out("Optional parameters:");
         out("  --zip               Keep the zip file rather than uncompress the files within");
@@ -1856,18 +1921,18 @@ public abstract class AbstractEntryClient<T> {
         out("  Launch an entry locally.");
         out("");
         out("Required parameters:");
-        out("  --entry <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
+        out("  " + ENTRY + " <entry>                     Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow:develop)");
         if (!(this instanceof CheckerClient)) {
             out("   OR");
             out("  --local-entry <local-entry>         Allows you to specify a full path to a local descriptor instead of an entry path");
         }
         out("");
         out("Optional parameters:");
-        out("  --json <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
+        out("  " + JSON + " <json file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
         out("  --yaml <yaml file>                  Parameters to the entry in Dockstore, one map for one run, an array of maps for multiple runs");
-        out("  --descriptor <descriptor type>      Descriptor type used to launch workflow. Defaults to " + CWL.toString());
+        out("  --descriptor <descriptor type>      Descriptor type used to " + LAUNCH + " " + WORKFLOW + ". Defaults to " + CWL.toString());
         if (!(this instanceof CheckerClient)) {
-            out("  --local-entry                       Allows you to specify a full path to a local descriptor for --entry instead of an entry path");
+            out("  --local-entry                       Allows you to specify a full path to a local descriptor for " + ENTRY + " instead of an entry path");
         }
         out("  --wdl-output-target                 Allows you to specify a remote path to provision output files to ex: s3://oicr.temp/testing-launcher/");
         out("  --uuid                              Allows you to specify a uuid for 3rd party notifications");
@@ -1877,7 +1942,7 @@ public abstract class AbstractEntryClient<T> {
 
     protected void launchHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " launch --help");
+        out("Usage: dockstore " + getEntryType().toLowerCase() + " launch " + HELP);
         out("       dockstore " + getEntryType().toLowerCase() + " launch [parameters]");
         printLaunchHelpBody();
         printHelpFooter();
@@ -1885,26 +1950,26 @@ public abstract class AbstractEntryClient<T> {
 
     private void verifyHelp() {
         printHelpHeader();
-        out("Usage: dockstore " + getEntryType().toLowerCase() + " verify --help");
-        out("       dockstore " + getEntryType().toLowerCase() + " verify [parameters]");
-        out("       dockstore " + getEntryType().toLowerCase() + " verify --unverify [parameters]");
+        out(join(" ", "Usage: dockstore", getEntryType().toLowerCase(), VERIFY, HELP));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), VERIFY, "[parameters]"));
+        out(join(" ", "       dockstore", getEntryType().toLowerCase(), VERIFY, "--unverify [parameters]"));
         out("");
         out("Description:");
         out("  Verify/unverify a version.");
         out("");
         out("Required parameters:");
-        out("  --entry <entry>                              Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("  --version <version>                          Version name");
+        out("  " + ENTRY + " <entry>                              Complete entry path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
+        out("  " + VERSION + " <version>                          Version name");
         out("");
         out("Optional Parameters:");
-        out("  --verified-source <verified-source>          Source of verification (Required to verify).");
+        out("  --verified-source <verified-source>          Source of verification (Required to " + VERIFY + ").");
         printHelpFooter();
     }
 
     protected void printAdminHelp() {
         out("Admin Only Commands:");
         out("");
-        out("  verify           :  Verify/unverify a version");
+        out("  " + VERIFY + "           :  " + VERIFY + "/unverify a version");
         out("");
     }
 

@@ -1,0 +1,25 @@
+version: 1.2
+service:
+  subclass: DOCKER_COMPOSE
+  authors:
+    - name: Test
+      email: test@test.net
+  description: This is a test
+  publish: true
+  files:
+    - /dockstore.wdl.json
+    - /dockstore.cwl.json
+    - /Dockstore.cwl
+    - /Dockstore2.wdl
+  scripts:
+    start: start.sh
+  environment:
+    TEST-1:
+      default: testing
+      description: testing testing testing
+  data:
+    test-2:
+      targetDirectory: test/directory
+      files:
+        test.txt:
+          description: test

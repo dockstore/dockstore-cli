@@ -27,6 +27,7 @@ import java.util.List;
 import io.dockstore.common.yaml.DockstoreYaml12;
 import io.dockstore.common.yaml.DockstoreYamlHelper;
 import io.dockstore.common.yaml.Service12;
+import io.dockstore.common.yaml.YamlTool;
 import io.dockstore.common.yaml.YamlWorkflow;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
@@ -35,7 +36,7 @@ import static io.dockstore.client.cli.ArgumentUtility.out;
 
 /*
     GENERAL STEPS:
-    1. Verfiy that YAML syntax is valid
+    1. Verify that YAML syntax is valid
     2. Verify that all fields are named correctly
     3. Verify that all required fields are present
     4. Verify that all files exist
@@ -54,7 +55,8 @@ public final class YamlVerifyUtility {
     public static final String CONTAINS_ERRORS = " has the following errors:" + System.lineSeparator();
     public static final String EMPTY_FILE = " is empty";
     public static final String FILE_DOES_NOT_EXIST = " does not exist";
-    public static final String INVALID_FILE_STRUCTURE = "Your file structure has the following errors:" + System.lineSeparator();
+    public static final String SERVICE_DOES_NOT_HAVE_FILES = "The service does not have any files";
+    public static final String MISSING_FILE_ERROR = "Your " + DOCKSTOREYML + CONTAINS_ERRORS;
 
     public static final String INVALID_YAML = " is not a valid " + YAML + " file:" + System.lineSeparator();
     // This message is displayed when it is determined that DOCKSTOREYML is a valid yaml file,
@@ -69,42 +71,58 @@ public final class YamlVerifyUtility {
     private static List<String> filesExist(List<String> paths, String base) {
         List<String> missingFiles = new ArrayList<>();
         for (String path : paths) {
+            if (path == null) {
+                missingFiles.add("primaryDescriptorPath" + FILE_DOES_NOT_EXIST);
+                continue;
+            }
             Path pathToFile = Paths.get(base, path);
             if (!Files.exists(pathToFile)) {
-                missingFiles.add(pathToFile.toString() + FILE_DOES_NOT_EXIST);
+                missingFiles.add(pathToFile + FILE_DOES_NOT_EXIST);
             }
         }
         return missingFiles;
     }
 
+    private static void addFilesPathsToCheckToList(List<String> testParameterFiles, String primaryDescriptorPath,
+                                                             List<String> listOfPathsToCheck) {
+        if (testParameterFiles != null) {
+            listOfPathsToCheck.addAll(testParameterFiles);
+        }
+        listOfPathsToCheck.add(primaryDescriptorPath);
+    }
+
     // Determines if all the files in dockstoreYaml12 exist
     private static void allFilesExist(DockstoreYaml12 dockstoreYaml12, String basePath) throws ValidateYamlException {
+        List<String> filePathsToCheck = new ArrayList<>();
         List<String> missingFiles = new ArrayList<>();
 
         // Check Workflows
         List<YamlWorkflow> workflows = dockstoreYaml12.getWorkflows();
         if (!workflows.isEmpty()) {
             for (YamlWorkflow workflow : workflows) {
-                List<String> filePaths = workflow.getTestParameterFiles();
-                filePaths.add(workflow.getPrimaryDescriptorPath());
-                missingFiles.addAll(filesExist(filePaths, basePath));
+                addFilesPathsToCheckToList(workflow.getTestParameterFiles(), workflow.getPrimaryDescriptorPath(), filePathsToCheck);
             }
         }
         // Check Tools
-        List<YamlWorkflow> tools = dockstoreYaml12.getTools();
+        List<YamlTool> tools = dockstoreYaml12.getTools();
         if (!tools.isEmpty()) {
             for (YamlWorkflow tool : tools) {
-                List<String> filePaths = tool.getTestParameterFiles();
-                filePaths.add(tool.getPrimaryDescriptorPath());
-                missingFiles.addAll(filesExist(filePaths, basePath));
+                addFilesPathsToCheckToList(tool.getTestParameterFiles(), tool.getPrimaryDescriptorPath(), filePathsToCheck);
             }
         }
 
         // Check service
         Service12 service = dockstoreYaml12.getService();
         if (service != null) {
-            missingFiles.addAll(filesExist(service.getFiles(), basePath));
+            List<String> files = service.getFiles();
+            if (files != null) {
+                filePathsToCheck.addAll(files);
+            } else {
+                missingFiles.add(SERVICE_DOES_NOT_HAVE_FILES);
+            }
         }
+
+        missingFiles.addAll(filesExist(filePathsToCheck, basePath));
         if (!missingFiles.isEmpty()) {
             StringBuilder errorMsgBuild = new StringBuilder();
             for (String missingFile: missingFiles) {
@@ -114,7 +132,7 @@ public final class YamlVerifyUtility {
                 errorMsgBuild.append(missingFile);
             }
             String errorMsg = errorMsgBuild.toString();
-            throw new ValidateYamlException(INVALID_FILE_STRUCTURE + errorMsg);
+            throw new ValidateYamlException(MISSING_FILE_ERROR + errorMsg);
         }
     }
 
