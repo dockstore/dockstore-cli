@@ -408,7 +408,16 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
     public String generateInputJson(String entry, final boolean json) throws ApiException, IOException {
         final File tempDir = Files.createTempDir();
         final File primaryFile = abstractEntryClient.downloadTargetEntry(entry, ToolDescriptor.TypeEnum.CWL, true, tempDir);
+        try {
+            return createInputJson(primaryFile, json);
+        } catch (ClassCastException ex) {
+            errorMessage("Cannot generate a JSON for this workflow.\n"
+                    + "The structure of its input is currently not supported. Please provide type and items as a string.", GENERIC_ERROR);
+        }
+        return null;
+    }
 
+    private String createInputJson(File primaryFile, final boolean json) throws ApiException, IOException {
         // need to suppress output
         final ImmutablePair<String, String> output = abstractEntryClient.getCwlUtil().parseCWL(primaryFile.getAbsolutePath());
         final Map<String, Object> stringObjectMap = abstractEntryClient.getCwlUtil().extractRunJson(output.getLeft());
