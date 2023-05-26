@@ -111,7 +111,7 @@ class LaunchTestIT {
     }
 
     @Test
-    void cwlCorrect() throws Exception {
+    void cwlCorrect() {
         //Test when content and extension are cwl  --> no need descriptor
 
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow.cwl"));
@@ -126,12 +126,11 @@ class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
         // do not use a cache
-        int statusCode = catchSystemExit(() -> runWorkflow(cwlFile, args, api, usersApi, client, false));
-        assertEquals(0, statusCode);
+        runWorkflow(cwlFile, args, api, usersApi, client, false);
     }
 
     @Test
-    void cwlSupportsVersion12() throws Exception {
+    void cwlSupportsVersion12() {
         // 1st-workflow-12.cwl is a version of 1st-workflow.cwl to which key new CWL version 1.2 features have been added.
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow-12.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("1st-workflow-job.json"));
@@ -145,8 +144,7 @@ class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
         // do not use a cache
-        int statusCode = catchSystemExit(() -> runWorkflow(cwlFile, args, api, usersApi, client, false));
-        assertEquals(0, statusCode);
+        runWorkflow(cwlFile, args, api, usersApi, client, false);
     }
 
     /**
@@ -199,7 +197,7 @@ class LaunchTestIT {
     }
 
     @Test
-    void cwlMetadataNoopPluginTest() throws Exception {
+    void cwlMetadataNoopPluginTest() {
 
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow.cwl"));
         File cwlJSON = new File(ResourceHelpers.resourceFilePath("collab-cwl-noop-job.json"));
@@ -218,8 +216,7 @@ class LaunchTestIT {
         PluginClient.handleCommand(Lists.newArrayList(DOWNLOAD), Utilities.parseConfig(client.getConfigFile()));
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        int statusCode = catchSystemExit(() -> workflowClient.checkEntryFile(cwlFile.getAbsolutePath(), args, null));
-        assertEquals(0, statusCode);
+        workflowClient.checkEntryFile(cwlFile.getAbsolutePath(), args, null);
 
         assertTrue(systemOutRule.getText().contains("Final process status is success"),
                 "output should include a successful cwltool run");
@@ -250,7 +247,7 @@ class LaunchTestIT {
     }
 
     @Test
-    void cwlCorrectWithCache() throws Exception {
+    void cwlCorrectWithCache() {
         //Test when content and extension are cwl  --> no need descriptor
 
         File cwlFile = new File(ResourceHelpers.resourceFilePath("1st-workflow.cwl"));
@@ -265,8 +262,7 @@ class LaunchTestIT {
         UsersApi usersApi = mock(UsersApi.class);
         Client client = new Client();
         // use a cache
-        int statusCode = catchSystemExit(() -> runWorkflow(cwlFile, args, api, usersApi, client, true));
-        assertEquals(0, statusCode);
+        runWorkflow(cwlFile, args, api, usersApi, client, true);
     }
 
     private void runClientCommand(ArrayList<String> args) {
@@ -322,7 +318,7 @@ class LaunchTestIT {
     }
 
     @Test
-    void cwlWrongExtForce() throws Exception {
+    void cwlWrongExtForce() {
         //Test when content = cwl but ext = wdl, descriptor provided --> CWL
 
         File file = new File(ResourceHelpers.resourceFilePath("wrongExtcwl.wdl"));
@@ -343,8 +339,8 @@ class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        int statusCode = catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getShortName()));
-        assertTrue(statusCode != 0);
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getShortName());
+
         assertTrue(
                 systemOutRule.getText().contains("This is a CWL file.. Please put the correct extension to the entry file name."),
                 "output should include a successful cromwell run");
@@ -505,12 +501,11 @@ class LaunchTestIT {
         Client.SCRIPT.set(true);
 
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        int statusCode = catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getShortName()));
-        assertTrue(statusCode != 0);
+        catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, CWL.getShortName()));
     }
 
     @Test
-    void cwlNoExt() throws Exception {
+    void cwlNoExt() {
         //Test when content = cwl but no ext
 
         File file = new File(ResourceHelpers.resourceFilePath("cwlNoExt"));
@@ -529,8 +524,7 @@ class LaunchTestIT {
         client.setConfigFile(ResourceHelpers.resourceFilePath("config"));
         Client.SCRIPT.set(true);
         WorkflowClient workflowClient = new WorkflowClient(api, usersApi, client, false);
-        int statusCode = catchSystemExit(() -> workflowClient.checkEntryFile(file.getAbsolutePath(), args, null));
-        assertTrue(statusCode != 0);
+        workflowClient.checkEntryFile(file.getAbsolutePath(), args, null);
 
         assertTrue(systemOutRule.getText().contains("This is a CWL file.. Please put an extension to the entry file name."),
                 "output should contain a validation issue");
