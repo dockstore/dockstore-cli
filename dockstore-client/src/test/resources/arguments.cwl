@@ -3,7 +3,7 @@ class: CommandLineTool
 baseCommand: javac
 hints:
   - class: DockerRequirement
-    dockerPull: java:7
+    dockerPull: adoptopenjdk/openjdk11:alpine
 arguments:
   - prefix: "-d"
     valueFrom: $(runtime.outdir)
