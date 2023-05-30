@@ -499,7 +499,7 @@
                             <artifacts>
                                 <artifact>
                                     <file>target/dockstore</file>
-                                    <type>.</type>
+                                    <type>dockstore</type>
                                     <classifier>dist</classifier>
                                 </artifact>
                             </artifacts>
