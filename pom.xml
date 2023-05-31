@@ -50,7 +50,7 @@
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <!-- this is not an aggregated path -->
         <sonar.coverage.jacoco.xmlReportPaths>
-            ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../reports/target/site/jacoco-aggregate/jacoco.xml
+            ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../dockstore-cli-reports/target/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         <!-- end sonarcloud properties -->
         <cwlavro.version>2.0.4.7</cwlavro.version>
@@ -123,7 +123,7 @@
         <module>dockstore-client</module>
         <module>dockstore-cli-integration-testing</module>
         <module>support</module>
-        <module>reports</module>
+        <module>dockstore-cli-reports</module>
         <module>openapi-java-wes-client</module>
     </modules>
 

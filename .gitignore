@@ -39,7 +39,7 @@ dockstore-cli-integration-testing/target/
 dockstore-cli-integration-testing/cromwell-executions/
 dockstore-cli-integration-testing/cromwell-input/
 dockstore-cli-integration-testing/datastore/
-reports/target/
+dockstore-cli-reports/target/
 target
 
 # confidential testing files
