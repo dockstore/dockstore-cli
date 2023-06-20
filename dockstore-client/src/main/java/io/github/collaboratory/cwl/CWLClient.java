@@ -114,14 +114,9 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         super(abstractEntryClient, null);
 
         fileProvisioning = new FileProvisioning(abstractEntryClient.getConfigFile());
-
-        if (!abstractEntryClient.isWesCommand()) {
-            // Set the launcher
-            INIConfiguration config = Utilities.parseConfig(abstractEntryClient.getConfigFile());
-            cwlLauncherType = config.getString(CWL_RUNNER, DEFAULT_LAUNCHER);
-        } else {
-            cwlLauncherType = WES;
-        }
+        // Set the launcher
+        INIConfiguration config = Utilities.parseConfig(abstractEntryClient.getConfigFile());
+        cwlLauncherType = config.getString(CWL_RUNNER, DEFAULT_LAUNCHER);
 
         BaseLauncher launcher;
         switch (cwlLauncherType) {
