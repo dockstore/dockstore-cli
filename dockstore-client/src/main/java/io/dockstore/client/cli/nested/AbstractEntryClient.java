@@ -191,7 +191,6 @@ public abstract class AbstractEntryClient<T> {
     boolean isLocalEntry = false;
     boolean ignoreChecksums = false;
 
-    private boolean isWesCommand = false;
     private WesRequestData wesRequestData = null;
 
     static String getCleanedDescription(String description) {
@@ -210,10 +209,6 @@ public abstract class AbstractEntryClient<T> {
 
     public void setWesRequestData(WesRequestData wrd) {
         this.wesRequestData = wrd;
-    }
-
-    public boolean isWesCommand() {
-        return isWesCommand;
     }
 
     boolean isLocalEntry() {
@@ -362,7 +357,6 @@ public abstract class AbstractEntryClient<T> {
                 testParameter(args);
                 break;
             case WES:
-                isWesCommand = true;
                 if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
                     processWesCommands(args);
                 } else {
