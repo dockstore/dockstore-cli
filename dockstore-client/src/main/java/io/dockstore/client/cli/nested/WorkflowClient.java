@@ -251,7 +251,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             String combinedLabelString = generateLabelString(addsSet, removesSet, existingLabels);
 
-            Workflow updatedWorkflow = workflowsApi.updateLabels1(workflowId, combinedLabelString, "");
+            Workflow updatedWorkflow = workflowsApi.updateLabels1(workflowId, "", combinedLabelString);
 
             List<Label> newLabels = updatedWorkflow.getLabels();
             if (!newLabels.isEmpty()) {

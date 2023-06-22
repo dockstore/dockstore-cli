@@ -639,7 +639,7 @@ class GeneralWorkflowIT extends BaseIT {
         // Create a hosted workflow
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         HostedApi hostedApi = new HostedApi(webClient);
-        Workflow hostedWorkflow = hostedApi.createHostedWorkflow("testHosted", null, CWL.toString(), null, null);
+        Workflow hostedWorkflow = hostedApi.createHostedWorkflow(null, "testHosted", CWL.toString(), null, null);
         SourceFile source = new SourceFile();
         source.setPath("/Dockstore.cwl");
         source.setAbsolutePath("/Dockstore.cwl");

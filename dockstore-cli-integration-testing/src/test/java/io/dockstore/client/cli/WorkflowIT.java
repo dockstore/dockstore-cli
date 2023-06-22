@@ -94,7 +94,7 @@ class WorkflowIT extends BaseIT {
 
     @Test
     void testWorkflowLaunchOrNotLaunchBasedOnCredentials() throws Exception {
-        String toolpath = SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test";
+        String toolpath = SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test";
 
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
@@ -124,7 +124,7 @@ class WorkflowIT extends BaseIT {
      */
     @Test
     void downloadZipFile() throws IOException {
-        String toolpath = SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test";
+        String toolpath = SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test";
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
 
@@ -193,7 +193,7 @@ class WorkflowIT extends BaseIT {
 
     @Test
     void testCheckerWorkflowDownloadBasedOnCredentials() throws Exception {
-        String toolpath = SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test";
+        String toolpath = SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test";
 
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
 
@@ -205,7 +205,7 @@ class WorkflowIT extends BaseIT {
                 "test", CWL.toString(), null);
         Workflow refresh = workflowApi.refresh1(workflow.getId(), true);
         assertFalse(refresh.isIsPublished());
-        workflowApi.registerCheckerWorkflow(workflow.getId(), "checker-workflow-wrapping-workflow.cwl", CWL.toString(), "checker-input-cwl.json");
+        workflowApi.registerCheckerWorkflow(workflow.getId(), CWL.toString(), "checker-workflow-wrapping-workflow.cwl", "checker-input-cwl.json");
         workflowApi.refresh1(workflow.getId(), true);
 
         final String fileWithIncorrectCredentials = ResourceHelpers.resourceFilePath("config_file.txt");
@@ -238,7 +238,7 @@ class WorkflowIT extends BaseIT {
 
     @Test
     void testCheckerWorkflowLaunchBasedOnCredentials() throws Exception {
-        String toolpath = SourceControl.GITHUB.toString() + "/DockstoreTestUser2/md5sum-checker/test";
+        String toolpath = SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test";
 
         testingPostgres.runUpdateStatement("update enduser set isadmin = 't' where username = 'DockstoreTestUser2';");
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
@@ -249,7 +249,7 @@ class WorkflowIT extends BaseIT {
         Workflow refresh = workflowApi.refresh1(workflow.getId(), true);
         assertFalse(refresh.isIsPublished());
 
-        workflowApi.registerCheckerWorkflow(workflow.getId(), "/checker-workflow-wrapping-workflow.cwl", CWL.toString(), "checker-input-cwl.json");
+        workflowApi.registerCheckerWorkflow(workflow.getId(), CWL.toString(), "/checker-workflow-wrapping-workflow.cwl", "checker-input-cwl.json");
 
         workflowApi.refresh1(workflow.getId(), true);
 
@@ -281,7 +281,7 @@ class WorkflowIT extends BaseIT {
     void testHostedWorkflowMetadataAndLaunch() throws IOException {
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         HostedApi hostedApi = new HostedApi(webClient);
-        Workflow hostedWorkflow = hostedApi.createHostedWorkflow("name", null, CWL.toString(), null, null);
+        Workflow hostedWorkflow = hostedApi.createHostedWorkflow(null, "name", CWL.toString(), null, null);
         assertNotNull(hostedWorkflow.getLastModifiedDate());
         assertNotNull(hostedWorkflow.getLastUpdated());
 

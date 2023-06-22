@@ -147,7 +147,7 @@ class WDLWorkflowIT extends BaseIT {
         workflowApi.publish1(refresh.getId(), publishRequest);
         // register checker workflow
         Entry checkerWorkflow = workflowApi.registerCheckerWorkflow(workflow.getId(),
-                "/test/smartseq2_single_sample/pr/test_smartseq2_single_sample_PR.wdl", WDL.toString(),
+                WDL.toString(), "/test/smartseq2_single_sample/pr/test_smartseq2_single_sample_PR.wdl",
                 "/test/smartseq2_single_sample/pr/dockstore_test_inputs.json");
         workflowApi.refresh1(checkerWorkflow.getId(), true);
         checkOnConvert(SKYLAB_WORKFLOW_CHECKER, "feature/upperThingy", "TestSmartSeq2SingleCellPR");

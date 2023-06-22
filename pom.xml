@@ -473,7 +473,7 @@
                     <thirdPartyFilename>THIRD-PARTY-LICENSES.txt</thirdPartyFilename>
                     <sortArtifactByName>true</sortArtifactByName>
                     <failOnMissing>true</failOnMissing>
-                    <!-- not sure why I needed this after excluding swagger client for core webservice -->
+                    <!-- not sure why I needed this after excluding swagger client for core webservice, arguably not third party anyway -->
                     <excludedGroups>io.dockstore</excludedGroups>
                 </configuration>
                 <executions>

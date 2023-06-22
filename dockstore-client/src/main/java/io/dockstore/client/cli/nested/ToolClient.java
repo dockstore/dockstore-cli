@@ -772,7 +772,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
             String combinedLabelString = generateLabelString(addsSet, removesSet, existingLabels);
 
-            DockstoreTool updatedContainer = containersApi.updateLabels(containerId, combinedLabelString, "");
+            DockstoreTool updatedContainer = containersApi.updateLabels(containerId,  "", combinedLabelString);
 
             List<Label> newLabels = updatedContainer.getLabels();
             if (!newLabels.isEmpty()) {
