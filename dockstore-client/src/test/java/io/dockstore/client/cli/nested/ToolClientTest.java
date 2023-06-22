@@ -17,12 +17,12 @@ package io.dockstore.client.cli.nested;
 
 import io.dockstore.client.cli.Client;
 import io.dockstore.common.DescriptorLanguage;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.ContainersApi;
-import io.swagger.client.api.ContainertagsApi;
-import io.swagger.client.api.UsersApi;
-import io.swagger.client.model.DockstoreTool;
-import io.swagger.client.model.SourceFile;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.ContainersApi;
+import io.dockstore.openapi.client.api.ContainertagsApi;
+import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.model.DockstoreTool;
+import io.dockstore.openapi.client.model.SourceFile;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

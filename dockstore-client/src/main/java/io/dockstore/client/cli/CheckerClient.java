@@ -7,11 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.dockstore.client.cli.nested.WorkflowClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.UsersApi;
-import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.model.Entry;
-import io.swagger.client.model.Workflow;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.Entry;
+import io.dockstore.openapi.client.model.Workflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,7 +159,7 @@ public class CheckerClient extends WorkflowClient {
             // Register the checker workflow
             if (entry != null) {
                 try {
-                    workflowsApi.registerCheckerWorkflow(descriptorPath, entry.getId(), descriptorType, inputParameterPath);
+                    workflowsApi.registerCheckerWorkflow(entry.getId(), descriptorPath, descriptorType, inputParameterPath);
                     out(join(" ", "A", CHECKER, WORKFLOW, "has been successfully added to entry with path", entryPath));
                 } catch (ApiException ex) {
                     exceptionMessage(ex, join(" ", "There was a problem registering the", CHECKER, WORKFLOW + "."), Client.API_ERROR);
@@ -225,7 +225,7 @@ public class CheckerClient extends WorkflowClient {
                     workflowsApi.updateWorkflow(checkerWorkflow.getId(), checkerWorkflow);
 
                     // Refresh the checker workflow
-                    workflowsApi.refresh(checkerWorkflow.getId(), true);
+                    workflowsApi.refresh1(checkerWorkflow.getId(), true);
                     out(join(" ", "The", CHECKER, WORKFLOW, "has been updated."));
                 } catch (ApiException ex) {
                     exceptionMessage(ex, join(" ", "There was a problem updating the", CHECKER, WORKFLOW + "."), Client.API_ERROR);

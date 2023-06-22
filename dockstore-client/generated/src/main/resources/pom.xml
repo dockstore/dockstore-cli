@@ -77,12 +77,6 @@
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
-      <artifactId>swagger-java-client</artifactId>
-      <version>1.15.0-alpha.1</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
       <version>1.15.0-alpha.1</version>
       <scope>compile</scope>

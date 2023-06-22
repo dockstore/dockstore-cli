@@ -39,6 +39,12 @@
       <version>1.15.0-alpha.1</version>
       <classifier>tests</classifier>
       <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>io.dockstore</groupId>
+          <artifactId>swagger-java-client</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>

@@ -18,7 +18,7 @@ package io.github.collaboratory.cwl.cwlrunner;
 import java.util.List;
 import java.util.Optional;
 
-import io.swagger.client.api.MetadataApi;
+import io.dockstore.openapi.client.api.MetadataApi;
 
 /**
  * Abstracts out the interaction with cwlrunners (for example, cwltool or toil)

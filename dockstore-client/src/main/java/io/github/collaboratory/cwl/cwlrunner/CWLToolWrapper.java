@@ -24,8 +24,8 @@ import java.util.Optional;
 import com.google.common.base.Joiner;
 import io.dockstore.client.cli.ArgumentUtility;
 import io.dockstore.client.cli.Client;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.MetadataApi;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.MetadataApi;
 import jakarta.ws.rs.ProcessingException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 

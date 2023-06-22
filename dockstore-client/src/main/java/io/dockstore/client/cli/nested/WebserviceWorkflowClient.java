@@ -6,10 +6,10 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import io.dockstore.client.cli.Client;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.Workflow;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.model.Workflow;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 
@@ -81,7 +81,7 @@ public class WebserviceWorkflowClient {
             final String basePath = paths[0];
             final String versionName = paths.length > 1 ? paths[1] : null;
 
-            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(basePath, workflowSubClass.toString(), include, versionName);
+            Workflow workflow = workflowsApi.getPublishedWorkflowByPath(basePath, workflowSubClass, include, versionName);
             if (workflowSubClass.equals(WorkflowSubClass.APPTOOL)) {
                 this.setFoundAppTool(true);
             }
@@ -93,7 +93,7 @@ public class WebserviceWorkflowClient {
 
     private Workflow getAuthenticatedDockstoreWorkflowByPath(WorkflowSubClass workflowSubClass, String entryPath) {
         try {
-            Workflow workflow = workflowsApi.getWorkflowByPath(entryPath, workflowSubClass.toString(), include);
+            Workflow workflow = workflowsApi.getWorkflowByPath(entryPath, workflowSubClass, include);
             if (workflowSubClass.equals(WorkflowSubClass.APPTOOL)) {
                 this.setFoundAppTool(true);
             }

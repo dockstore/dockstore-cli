@@ -1,5 +1,5 @@
 
-Lists of 393 third-party dependencies.
+Lists of 392 third-party dependencies.
      (Apache License, Version 2.0) akka-actor (com.typesafe.akka:akka-actor_2.13:2.5.32 - https://akka.io/)
      (Apache License, Version 2.0) akka-protobuf (com.typesafe.akka:akka-protobuf_2.13:2.5.32 - https://akka.io/)
      (Apache License, Version 2.0) akka-slf4j (com.typesafe.akka:akka-slf4j_2.13:2.5.32 - https://akka.io/)
@@ -373,7 +373,6 @@ Lists of 393 third-party dependencies.
      (Apache License 2.0) swagger-core-jakarta (io.swagger.core.v3:swagger-core-jakarta:2.2.9 - https://github.com/swagger-api/swagger-core/modules/swagger-core-jakarta)
      (Apache License 2.0) swagger-integration-jakarta (io.swagger.core.v3:swagger-integration-jakarta:2.2.9 - https://github.com/swagger-api/swagger-core/modules/swagger-integration-jakarta)
      (Apache Software License, Version 2.0) swagger-java-bitbucket-client (io.dockstore:swagger-java-bitbucket-client:2.0.3 - no url defined)
-     (Apache Software License, Version 2.0) swagger-java-client (io.dockstore:swagger-java-client:1.15.0-alpha.1 - no url defined)
      (Apache Software License, Version 2.0) swagger-java-discourse-client (io.dockstore:swagger-java-discourse-client:2.0.1 - no url defined)
      (Apache Software License, Version 2.0) swagger-java-quay-client (io.dockstore:swagger-java-quay-client:2.0.2 - no url defined)
      (Apache Software License, Version 2.0) swagger-java-sam-client (io.dockstore:swagger-java-sam-client:2.0.2 - no url defined)

@@ -60,6 +60,12 @@
             <artifactId>dockstore-integration-testing</artifactId>
             <version>${dockstore-core.version}</version>
             <classifier>tests</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.dockstore</groupId>
+                    <artifactId>swagger-java-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
