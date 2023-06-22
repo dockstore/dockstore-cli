@@ -487,8 +487,8 @@ class BasicIT extends BaseIT {
         assertEquals(0, count, "there should be no sourcefiles that are test parameter files, there are " + count);
 
         containersApi
-            .addTestParameterFiles(containerByToolPath.getId(), "", Collections.singletonList("/test.json"), CWL.toString(),
-                "master");
+            .addTestParameterFiles(containerByToolPath.getId(), "", Collections.singletonList("/test.json"),
+                "master", CWL.toString());
 
         boolean shouldFail = false;
         try {
@@ -501,8 +501,8 @@ class BasicIT extends BaseIT {
         assertTrue(shouldFail);
 
         containersApi
-            .addTestParameterFiles(containerByToolPath.getId(), "", Collections.singletonList("/test2.cwl.json"), CWL.toString(),
-                 "master");
+            .addTestParameterFiles(containerByToolPath.getId(), "", Collections.singletonList("/test2.cwl.json"),
+                 "master",  CWL.toString());
 
         final long count3 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals(2, count3, "there should be one sourcefile that is a test parameter file, there are " + count3);
@@ -518,10 +518,10 @@ class BasicIT extends BaseIT {
         }
         assertTrue(shouldFail);
         containersApi
-            .deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"), CWL.toString(),
-                "master");
+            .deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test.json"),
+                "master", CWL.toString());
         containersApi.deleteTestParameterFiles(containerByToolPath.getId(), Collections.singletonList("/test2.cwl.json"),
-            CWL.toString(), "master");
+            "master", CWL.toString());
 
         final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
         assertEquals(0, count4, "there should be one sourcefile that is a test parameter file, there are " + count4);
@@ -855,7 +855,7 @@ class BasicIT extends BaseIT {
         // Create a hosted tool
         final ApiClient webClient = getWebClient(BaseIT.USER_1_USERNAME, testingPostgres);
         HostedApi hostedApi = new HostedApi(webClient);
-        hostedApi.createHostedTool("testHosted", Registry.QUAY_IO.getDockerPath().toLowerCase(),
+        hostedApi.createHostedTool(Registry.QUAY_IO.getDockerPath().toLowerCase(), "testHosted",
                 CWL.getShortName(), "hostedToolNamespace", null);
 
         // verify there is an unpublished hosted tool

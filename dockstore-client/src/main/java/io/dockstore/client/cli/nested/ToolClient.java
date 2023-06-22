@@ -334,7 +334,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             }
 
             if (removes.size() > 0) {
-                containersApi.deleteTestParameterFiles(containerId, removes, descriptorType, versionName);
+                containersApi.deleteTestParameterFiles(containerId, removes, versionName, descriptorType);
             }
 
             if (adds.size() > 0 || removes.size() > 0) {
