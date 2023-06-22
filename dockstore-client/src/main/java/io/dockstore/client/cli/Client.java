@@ -833,7 +833,7 @@ public class Client {
         defaultApiClient.setUserAgent(userAgent);
 
         OAuth bearer = (OAuth)defaultApiClient.getAuthentication("BEARER");
-        bearer.setAccessToken("BEARER " + token);
+        bearer.setAccessToken(token);
         defaultApiClient.setBasePath(serverUrl);
 
         ContainersApi containersApi = new ContainersApi(defaultApiClient);

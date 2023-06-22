@@ -70,7 +70,7 @@ class GitHubAppToolIT extends BaseIT {
         systemOutRule.clear();
 
         // the following change the DB state
-        workflowApi.handleGitHubRelease(WORKFLOW_REPO, USER_2_USERNAME, "refs/heads/main", INSTALLATION_ID);
+        workflowApi.handleGitHubRelease("refs/heads/main", INSTALLATION_ID, WORKFLOW_REPO, USER_2_USERNAME);
         publishWorkflow();
     }
 
