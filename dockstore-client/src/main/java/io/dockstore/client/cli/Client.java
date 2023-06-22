@@ -60,7 +60,7 @@ import io.dockstore.openapi.client.api.Ga4Ghv20Api;
 import io.dockstore.openapi.client.api.MetadataApi;
 import io.dockstore.openapi.client.api.UsersApi;
 import io.dockstore.openapi.client.api.WorkflowsApi;
-import io.dockstore.openapi.client.auth.ApiKeyAuth;
+import io.dockstore.openapi.client.auth.OAuth;
 import io.dockstore.openapi.client.model.TRSService;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerInterface;
@@ -832,9 +832,8 @@ public class Client {
         final String userAgent = "Dockstore-CLI/" + cliVersion + "/java";
         defaultApiClient.setUserAgent(userAgent);
 
-        ApiKeyAuth bearer = (ApiKeyAuth)defaultApiClient.getAuthentication("BEARER");
-        bearer.setApiKeyPrefix("BEARER");
-        bearer.setApiKey(token);
+        OAuth bearer = (OAuth)defaultApiClient.getAuthentication("BEARER");
+        bearer.setAccessToken("BEARER " + token);
         defaultApiClient.setBasePath(serverUrl);
 
         ContainersApi containersApi = new ContainersApi(defaultApiClient);

@@ -10,6 +10,7 @@ import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.MuteForSuccessfulTests;
 import io.dockstore.openapi.client.api.WorkflowsApi;
 import io.dockstore.openapi.client.model.Workflow;
+import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.dockstore.openapi.client.model.WorkflowVersion;
 import io.dropwizard.testing.ResourceHelpers;
 import io.openapi.wes.client.ApiException;
@@ -83,7 +84,7 @@ class WesLauncherTest {
         // WorkflowsApi Function mocks
         when(workflowApi.getPublishedWorkflowByPath(
             any(String.class),
-            any(io.dockstore.openapi.client.model.WorkflowSubClass.class),
+            any(WorkflowSubClass.class),
             ArgumentMatchers.isNull(),
             any(String.class)
         )).thenReturn(fakeWorkflow);
