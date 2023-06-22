@@ -135,7 +135,7 @@ class CromwellIT {
     }
 
     /**
-     * This tests compatibility with Cromwell 30.2 by running a workflow (https://github.com/dockstore/dockstore/issues/1211)
+     * This tests compatibility with Cromwell 30.2 by running a workflow (<a href="https://github.com/dockstore/dockstore/issues/1211">...</a>)
      */
     @Test
     void testRunWorkflow() throws IOException, ApiException {
