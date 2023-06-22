@@ -8,9 +8,9 @@ import com.beust.jcommander.Parameters;
 import io.dockstore.client.cli.ArgumentUtility;
 import io.dockstore.client.cli.Client;
 import io.dockstore.client.cli.JCommanderUtility;
-import io.swagger.client.ApiClient;
-import io.swagger.client.Configuration;
-import io.swagger.client.api.MetadataApi;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.Configuration;
+import io.dockstore.openapi.client.api.MetadataApi;
 
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.Client.API_ERROR;

@@ -25,14 +25,14 @@ import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.ToilCompatibleTest;
 import io.dockstore.common.WorkflowTest;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.HostedApi;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.SourceFile;
+import io.dockstore.openapi.client.model.Workflow;
+import io.dockstore.openapi.client.model.WorkflowVersion;
 import io.dropwizard.testing.ResourceHelpers;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.HostedApi;
-import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.model.SourceFile;
-import io.swagger.client.model.Workflow;
-import io.swagger.client.model.WorkflowVersion;
 import org.elasticsearch.common.collect.Set;
 import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,10 +56,10 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.TEST_PARAMETER;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
+import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
 import static io.dockstore.webservice.resources.WorkflowResource.FROZEN_VERSION_REQUIRED;
 import static io.dockstore.webservice.resources.WorkflowResource.NO_ZENDO_USER_TOKEN;
-import static io.swagger.client.model.ToolDescriptor.TypeEnum.CWL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -601,7 +601,7 @@ class GeneralWorkflowIT extends BaseIT {
         Workflow githubWorkflow = workflowApi
             .manualRegister("github", "DockstoreTestUser2/test_lastmodified", "/hello.wdl", "test-update-workflow", WDL.toString(), "/test.json");
 
-        Workflow workflowBeforeFreezing = workflowApi.refresh(githubWorkflow.getId(), true);
+        Workflow workflowBeforeFreezing = workflowApi.refresh1(githubWorkflow.getId(), true);
         WorkflowVersion master = workflowBeforeFreezing.getWorkflowVersions().stream().filter(v -> v.getName().equals("master")).findFirst()
             .get();
 
@@ -645,7 +645,7 @@ class GeneralWorkflowIT extends BaseIT {
         source.setAbsolutePath("/Dockstore.cwl");
         source.setContent("cwlVersion: v1.0\nclass: Workflow");
         source.setType(SourceFile.TypeEnum.DOCKSTORE_CWL);
-        hostedApi.editHostedWorkflow(hostedWorkflow.getId(), Lists.newArrayList(source));
+        hostedApi.editHostedWorkflow(Lists.newArrayList(source), hostedWorkflow.getId());
 
         // Verify the user has 1 unpublished, hosted workflow
         final long initialUnpublishedHostedCount = testingPostgres

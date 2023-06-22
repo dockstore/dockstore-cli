@@ -1,7 +1,5 @@
 package io.dockstore.client.cli.nested;
 
-import java.util.Map;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -9,9 +7,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.dockstore.client.cli.ArgumentUtility;
 import io.dockstore.client.cli.JCommanderUtility;
-import io.swagger.client.ApiClient;
-import io.swagger.client.Configuration;
-import io.swagger.client.api.ExtendedGa4GhApi;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.Configuration;
+import io.dockstore.openapi.client.api.ExtendedGa4GhApi;
 
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.HELP;
@@ -42,10 +40,9 @@ final class Verify {
             ApiClient defaultApiClient;
             defaultApiClient = Configuration.getDefaultApiClient();
             ExtendedGa4GhApi extendedGa4GhApi = new ExtendedGa4GhApi(defaultApiClient);
-            Map<String, Object> stringObjectMap = extendedGa4GhApi
-                    .toolsIdVersionsVersionIdTypeTestsPost(verifyCommand.descriptorType, verifyCommand.trsId, verifyCommand.versionId,
-                            verifyCommand.filePath, verifyCommand.platform, verifyCommand.platformVersion, verifyCommand.metadata,
-                            !verifyCommand.unverify);
+            final String stringObjectMap = extendedGa4GhApi.verifyTestParameterFilePost(verifyCommand.descriptorType, verifyCommand.trsId,
+                    verifyCommand.versionId, verifyCommand.filePath, verifyCommand.platform, verifyCommand.platformVersion,
+                    !verifyCommand.unverify, verifyCommand.metadata);
             if (stringObjectMap == null) {
                 ArgumentUtility.errorMessage(String.join(" ", "Could not", VERIFY, TOOL), API_ERROR);
             } else {

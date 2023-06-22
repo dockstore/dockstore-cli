@@ -27,14 +27,14 @@ import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.SourceControl;
 import io.dockstore.common.WorkflowTest;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.Entry;
+import io.dockstore.openapi.client.model.PublishRequest;
+import io.dockstore.openapi.client.model.SourceFile;
+import io.dockstore.openapi.client.model.Workflow;
+import io.dockstore.openapi.client.model.WorkflowVersion;
 import io.dropwizard.testing.ResourceHelpers;
-import io.swagger.client.ApiClient;
-import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.model.Entry;
-import io.swagger.client.model.PublishRequest;
-import io.swagger.client.model.SourceFile;
-import io.swagger.client.model.Workflow;
-import io.swagger.client.model.WorkflowVersion;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -93,9 +93,9 @@ class WDLWorkflowIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi
             .manualRegister(SourceControl.GITHUB.getFriendlyName(), UNIFIED_WORKFLOW_REPO, "/checker.wdl", "", WDL.toString(), "/md5sum.wdl.json");
-        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
+        Workflow refresh = workflowApi.refresh1(workflow.getId(), true);
         final PublishRequest publishRequest = SwaggerUtility.createPublishRequest(true);
-        workflowApi.publish(refresh.getId(), publishRequest);
+        workflowApi.publish1(refresh.getId(), publishRequest);
 
         // get test json
         String testVersion = "1.3.0";
@@ -104,7 +104,7 @@ class WDLWorkflowIT extends BaseIT {
         workflowVersions.stream().filter(v -> v.getName().equals(testVersion)).forEach(v -> v.setHidden(true));
 
         workflowApi.updateWorkflowVersion(refresh.getId(), workflowVersions);
-        List<SourceFile> testParameterFiles = workflowApi.getTestParameterFiles(refresh.getId(), testVersion);
+        List<SourceFile> testParameterFiles = workflowApi.getTestParameterFiles1(refresh.getId(), testVersion);
         assertEquals(1, testParameterFiles.size());
         Path tempFile = Files.createTempFile("test", "json");
 
@@ -126,9 +126,9 @@ class WDLWorkflowIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), SKYLAB_WORKFLOW_REPO,
             "/pipelines/smartseq2_single_sample/SmartSeq2SingleSample.wdl", "", WDL.toString(), null);
-        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
+        Workflow refresh = workflowApi.refresh1(workflow.getId(), true);
         final PublishRequest publishRequest = SwaggerUtility.createPublishRequest(true);
-        workflowApi.publish(refresh.getId(), publishRequest);
+        workflowApi.publish1(refresh.getId(), publishRequest);
         checkOnConvert(SKYLAB_WORKFLOW, "Dockstore_Testing", "SmartSeq2SingleCell");
     }
 
@@ -142,14 +142,14 @@ class WDLWorkflowIT extends BaseIT {
         // register underlying workflow
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), SKYLAB_WORKFLOW_REPO,
             "/pipelines/smartseq2_single_sample/SmartSeq2SingleSample.wdl", "", WDL.toString(), null);
-        Workflow refresh = workflowApi.refresh(workflow.getId(), true);
+        Workflow refresh = workflowApi.refresh1(workflow.getId(), true);
         final PublishRequest publishRequest = SwaggerUtility.createPublishRequest(true);
-        workflowApi.publish(refresh.getId(), publishRequest);
+        workflowApi.publish1(refresh.getId(), publishRequest);
         // register checker workflow
-        Entry checkerWorkflow = workflowApi
-            .registerCheckerWorkflow("/test/smartseq2_single_sample/pr/test_smartseq2_single_sample_PR.wdl", workflow.getId(), WDL.toString(),
+        Entry checkerWorkflow = workflowApi.registerCheckerWorkflow(workflow.getId(),
+                "/test/smartseq2_single_sample/pr/test_smartseq2_single_sample_PR.wdl", WDL.toString(),
                 "/test/smartseq2_single_sample/pr/dockstore_test_inputs.json");
-        workflowApi.refresh(checkerWorkflow.getId(), true);
+        workflowApi.refresh1(checkerWorkflow.getId(), true);
         checkOnConvert(SKYLAB_WORKFLOW_CHECKER, "feature/upperThingy", "TestSmartSeq2SingleCellPR");
     }
 

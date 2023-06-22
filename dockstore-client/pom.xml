@@ -82,11 +82,6 @@
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
-            <artifactId>swagger-java-client</artifactId>
-            <version>${dockstore-core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dockstore</groupId>
             <artifactId>openapi-java-client</artifactId>
             <version>${dockstore-core.version}</version>
         </dependency>
