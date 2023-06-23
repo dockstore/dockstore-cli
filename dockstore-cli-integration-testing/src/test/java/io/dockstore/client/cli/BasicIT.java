@@ -680,7 +680,7 @@ class BasicIT extends BaseIT {
 
         // Manual publish
         catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file.txt"), TOOL, MANUAL_PUBLISH, "--registry",
-            Registry.GITLAB.name(), Registry.GITLAB.toString(), "--namespace", "dockstore.test.user", "--name", "dockstore-whalesay",
+            Registry.GITLAB.name(), "--namespace", "dockstore.test.user", "--name", "dockstore-whalesay",
             "--git-url", "git@gitlab.com:dockstore.test.user/dockstore-whalesay.git", "--git-reference", "master", "--toolname",
             "alternate", "--private", "true", "--tool-maintainer-email", "duncan.andrew.g@gmail.com", SCRIPT_FLAG }));
 

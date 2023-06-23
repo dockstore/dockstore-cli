@@ -364,9 +364,9 @@ public abstract class AbstractEntryClient<T> {
                 }
                 break;
             default:
-                List<String> possibleCommands = new ArrayList<>();
-                possibleCommands.addAll(Arrays.asList(INFO, LIST, SEARCH, PUBLISH, STAR, REFRESH, LABEL, MANUAL_PUBLISH,
-                        CONVERT, LAUNCH, DOWNLOAD, VERIFY, TEST_PARAMETER, WDL.toString(), CWL.toString()));
+                List<String> possibleCommands = new ArrayList<>(
+                        Arrays.asList(INFO, LIST, SEARCH, PUBLISH, STAR, REFRESH, LABEL, MANUAL_PUBLISH, CONVERT, LAUNCH, DOWNLOAD, VERIFY,
+                                TEST_PARAMETER, WDL.toString(), CWL.toString()));
 
                 if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
                     possibleCommands.addAll(Arrays.asList(WES, NFL));

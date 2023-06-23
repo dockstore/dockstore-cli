@@ -91,6 +91,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     public static final String UPDATE_TOOL = "update_tool";
     public static final String VERSION_TAG = "version_tag";
     public static final String INVALID_TOOL_MODE_PUBLISH = "Custom entry names are not supported for " + DockstoreTool.ModeEnum.HOSTED + " tools.";
+    public static final String ALL_PUBLISHED_TOOLS = "ALL PUBLISHED TOOLS";
+
     private static final Logger LOG = LoggerFactory.getLogger(ToolClient.class);
     private final Client client;
     private ContainersApi containersApi;
@@ -371,7 +373,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     protected void handleListUnstarredEntries() {
         try {
             List<DockstoreTool> containers = containersApi.allPublishedContainers(null, null, null, null, null);
-            out("ALL PUBLISHED TOOLS");
+            out(ALL_PUBLISHED_TOOLS);
             printLineBreak();
             printPublishedList(containers);
         } catch (ApiException ex) {

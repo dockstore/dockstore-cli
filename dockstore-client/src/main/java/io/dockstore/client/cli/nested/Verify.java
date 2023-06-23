@@ -52,7 +52,7 @@ final class Verify {
         }
     }
 
-    @Parameters(commandDescription = "Print cwltool runner dependencies")
+    @Parameters(commandDescription = "Old-stype verification for tools, check out metrics!")
     private static class VerifyCommand {
         @Parameter(names = "--descriptor-type", description = "Descriptor Type (CWL, WDL, NFL)", required = true)
         private String descriptorType;
