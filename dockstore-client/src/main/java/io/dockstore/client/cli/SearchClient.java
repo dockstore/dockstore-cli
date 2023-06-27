@@ -25,9 +25,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import io.dockstore.common.ToolWorkflowDeserializer;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.ExtendedGa4GhApi;
-import io.swagger.client.model.ToolV1;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.ExtendedGa4GhApi;
+import io.dockstore.openapi.client.model.ToolV1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,7 +137,7 @@ public final class SearchClient {
 
     private static boolean index(ExtendedGa4GhApi api) {
         try {
-            api.toolsIndexGet();
+            api.updateTheWorkflowsAndToolsIndices();
         } catch (ApiException e) {
             exceptionMessage(e, "", Client.API_ERROR);
         }
@@ -162,7 +162,7 @@ public final class SearchClient {
         private boolean help = false;
     }
 
-    public class ElasticSearchObject {
+    public static class ElasticSearchObject {
 
         @SerializedName("hits")
         public HitsExternal hits;

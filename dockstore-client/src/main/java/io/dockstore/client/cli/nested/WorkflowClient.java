@@ -40,18 +40,19 @@ import io.dockstore.client.cli.JCommanderUtility;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.SourceControl;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.Label;
+import io.dockstore.openapi.client.model.PublishRequest;
+import io.dockstore.openapi.client.model.SourceFile;
+import io.dockstore.openapi.client.model.StarRequest;
+import io.dockstore.openapi.client.model.ToolDescriptor;
+import io.dockstore.openapi.client.model.User;
+import io.dockstore.openapi.client.model.Workflow;
+import io.dockstore.openapi.client.model.WorkflowSubClass;
+import io.dockstore.openapi.client.model.WorkflowVersion;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.UsersApi;
-import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.model.Label;
-import io.swagger.client.model.PublishRequest;
-import io.swagger.client.model.SourceFile;
-import io.swagger.client.model.StarRequest;
-import io.swagger.client.model.ToolDescriptor;
-import io.swagger.client.model.User;
-import io.swagger.client.model.Workflow;
-import io.swagger.client.model.WorkflowVersion;
 import jakarta.ws.rs.core.GenericType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -250,7 +251,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             String combinedLabelString = generateLabelString(addsSet, removesSet, existingLabels);
 
-            Workflow updatedWorkflow = workflowsApi.updateLabels(workflowId, combinedLabelString, "");
+            Workflow updatedWorkflow = workflowsApi.updateLabels1(workflowId, "", combinedLabelString);
 
             List<Label> newLabels = updatedWorkflow.getLabels();
             if (!newLabels.isEmpty()) {
@@ -680,7 +681,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 .map(workflow -> {
                     out(MessageFormat.format("Refreshing {0}", workflow.getFullWorkflowPath()));
                     try {
-                        return workflowsApi.refresh(workflow.getId(), true);
+                        return workflowsApi.refresh1(workflow.getId(), true);
                     } catch (ApiException ex) {
                         err(ex.getMessage());
                         return null;
@@ -707,7 +708,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             }
             final Long workflowId = workflow.getId();
             out("Refreshing workflow...");
-            Workflow updatedWorkflow = workflowsApi.refresh(workflowId, true);
+            Workflow updatedWorkflow = workflowsApi.refresh1(workflowId, true);
             List<Workflow> workflowList = new ArrayList<>();
             workflowList.add(updatedWorkflow);
             out("YOUR UPDATED WORKFLOW");
@@ -767,7 +768,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
                         err("Successfully registered " + completeEntryPath);
 
-                        workflowsApi.refresh(newWorkflow.getId(), true);
+                        workflowsApi.refresh1(newWorkflow.getId(), true);
                         publish(true, completeEntryPath);
                     } catch (ApiException ex) {
                         exceptionMessage(ex, "Unable to " + PUBLISH + " " + entryPath + "/" + newName, Client.API_ERROR);
@@ -781,7 +782,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     private boolean workflowExists(String entryPath) {
         try {
-            workflowsApi.getWorkflowByPath(entryPath, BIOWORKFLOW, null);
+            workflowsApi.getWorkflowByPath(entryPath, WorkflowSubClass.BIOWORKFLOW, null);
             return true;
         } catch (ApiException ex) {
             return false;
@@ -847,7 +848,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         try {
             Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, false, true);
             PublishRequest pub = SwaggerUtility.createPublishRequest(publish);
-            workflow = workflowsApi.publish(workflow.getId(), pub);
+            workflow = workflowsApi.publish1(workflow.getId(), pub);
 
             if (workflow != null) {
                 out("Successfully " + action + "ed  " + entry);
@@ -872,7 +873,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, true, true);
             StarRequest request = new StarRequest();
             request.setStar(star);
-            workflowsApi.starEntry(workflow.getId(), request);
+            workflowsApi.starEntry1(workflow.getId(), request);
             out("Successfully " + action + "red " + entry);
         } catch (ApiException ex) {
             exceptionMessage(ex, "Unable to " + action + " workflow " + entry, Client.API_ERROR);
@@ -979,7 +980,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     .manualRegister(gitVersionControl, organization + "/" + repository, workflowPath, workflowname, descriptorType,
                         testParameterFile);
                 if (workflow != null) {
-                    workflow = workflowsApi.refresh(workflow.getId(), true);
+                    workflow = workflowsApi.refresh1(workflow.getId(), true);
                 } else {
                     errorMessage("Unable to register " + path, COMMAND_ERROR);
                 }
@@ -1001,7 +1002,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     // Valid so try and publish
                     PublishRequest pub = SwaggerUtility.createPublishRequest(true);
                     try {
-                        workflowsApi.publish(workflow.getId(), pub);
+                        workflowsApi.publish1(workflow.getId(), pub);
                         out("Successfully registered and published the given workflow.");
                     } catch (ApiException ex) {
                         // Unable to publish but has registered
@@ -1033,7 +1034,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 String defaultVersion = optVal(args, "--default-version", workflow.getDefaultVersion());
                 String defaultTestJsonPath = optVal(args, "--default-test-parameter-path", workflow.getDefaultTestParameterFilePath());
 
-                if (workflow.getMode() == io.swagger.client.model.Workflow.ModeEnum.STUB) {
+                if (workflow.getMode() == Workflow.ModeEnum.STUB) {
 
                     // Check if valid input
                     if (!CWL.toString().equalsIgnoreCase(descriptorType) && !WDL.toString().equalsIgnoreCase(descriptorType)) {
@@ -1079,9 +1080,9 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
                 workflowsApi.updateWorkflow(workflowId, workflow);
                 if (newVersion) { // Update default version separately, see https://github.com/dockstore/dockstore/issues/3563
-                    workflowsApi.updateWorkflowDefaultVersion(workflowId, defaultVersion);
+                    workflowsApi.updateDefaultVersion1(workflowId, defaultVersion);
                 }
-                workflowsApi.refresh(workflowId, true);
+                workflowsApi.refresh1(workflowId, true);
                 out("The workflow has been updated.");
             } catch (ApiException ex) {
                 exceptionMessage(ex, "", Client.API_ERROR);
@@ -1101,15 +1102,15 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             long workflowId = workflow.getId();
 
             if (adds.size() > 0) {
-                workflowsApi.addTestParameterFiles(workflowId, adds, "", versionName);
+                workflowsApi.addTestParameterFiles1(workflowId, "", adds, versionName);
             }
 
             if (removes.size() > 0) {
-                workflowsApi.deleteTestParameterFiles(workflowId, removes, versionName);
+                workflowsApi.deleteTestParameterFiles1(workflowId, removes, versionName);
             }
 
             if (adds.size() > 0 || removes.size() > 0) {
-                workflowsApi.refresh(workflow.getId(), true);
+                workflowsApi.refresh1(workflow.getId(), true);
                 out(join(" ", "The test parameter files for version", versionName, "of",
                         getEntryType().toLowerCase(), parentEntry, "have been updated."));
             } else {
@@ -1154,7 +1155,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                         newVersions.add(workflowVersion);
 
                         workflowsApi.updateWorkflowVersion(workflow.getId(), newVersions);
-                        workflowsApi.refresh(workflow.getId(), true);
+                        workflowsApi.refresh1(workflow.getId(), true);
                         out("Workflow Version " + name + " has been updated.");
                         break;
                     }
@@ -1181,7 +1182,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     errorMessage("Cannot restub a published workflow. Please unpublish if you wish to restub.", Client.CLIENT_ERROR);
                 }
 
-                if (workflow.getMode() == io.swagger.client.model.Workflow.ModeEnum.STUB) {
+                if (workflow.getMode() == Workflow.ModeEnum.STUB) {
                     errorMessage("The given workflow is already a stub.", Client.CLIENT_ERROR);
                 }
 
@@ -1228,7 +1229,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
         if (valid) {
             try {
-                file = workflowsApi.primaryDescriptor(workflow.getId(), version, descriptorType.toString());
+                file = workflowsApi.primaryDescriptor1(workflow.getId(), version, descriptorType.toString());
             } catch (ApiException ex) {
                 if (ex.getCode() == HttpStatus.SC_BAD_REQUEST) {
                     // TODO: "No descriptor found" should not trigger the below

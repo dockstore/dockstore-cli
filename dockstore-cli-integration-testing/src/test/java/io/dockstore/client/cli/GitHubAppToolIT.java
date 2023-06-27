@@ -3,13 +3,13 @@ package io.dockstore.client.cli;
 import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.FlushingSystemErr;
 import io.dockstore.common.FlushingSystemOut;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.PublishRequest;
+import io.dockstore.openapi.client.model.Workflow;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.dropwizard.testing.ResourceHelpers;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.model.PublishRequest;
-import io.swagger.client.model.Workflow;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -70,7 +70,7 @@ class GitHubAppToolIT extends BaseIT {
         systemOutRule.clear();
 
         // the following change the DB state
-        workflowApi.handleGitHubRelease(WORKFLOW_REPO, USER_2_USERNAME, "refs/heads/main", INSTALLATION_ID);
+        workflowApi.handleGitHubRelease("refs/heads/main", INSTALLATION_ID, WORKFLOW_REPO, USER_2_USERNAME);
         publishWorkflow();
     }
 
@@ -200,9 +200,9 @@ class GitHubAppToolIT extends BaseIT {
     private void publishWorkflow() {
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         final WorkflowsApi workflowApi = new WorkflowsApi(webClient);
-        Workflow workflowByPath = workflowApi.getWorkflowByPath(ENTRY_PATH, WorkflowSubClass.APPTOOL.toString(), null);
+        Workflow workflowByPath = workflowApi.getWorkflowByPath(ENTRY_PATH, WorkflowSubClass.APPTOOL, null);
         final PublishRequest publishRequest = SwaggerUtility.createPublishRequest(true);
-        workflowApi.publish(workflowByPath.getId(), publishRequest);
+        workflowApi.publish1(workflowByPath.getId(), publishRequest);
     }
 
 }

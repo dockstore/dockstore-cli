@@ -8,13 +8,14 @@ import io.dockstore.client.cli.nested.WesLauncher;
 import io.dockstore.client.cli.nested.WesRequestData;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.MuteForSuccessfulTests;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.Workflow;
+import io.dockstore.openapi.client.model.WorkflowSubClass;
+import io.dockstore.openapi.client.model.WorkflowVersion;
 import io.dropwizard.testing.ResourceHelpers;
 import io.openapi.wes.client.ApiException;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
-import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.model.Workflow;
-import io.swagger.client.model.WorkflowVersion;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -83,7 +84,7 @@ class WesLauncherTest {
         // WorkflowsApi Function mocks
         when(workflowApi.getPublishedWorkflowByPath(
             any(String.class),
-            any(String.class),
+            any(WorkflowSubClass.class),
             ArgumentMatchers.isNull(),
             any(String.class)
         )).thenReturn(fakeWorkflow);

@@ -18,7 +18,7 @@ package io.dockstore.client.cli.nested;
 import java.io.File;
 import java.io.IOException;
 
-import io.swagger.client.ApiException;
+import io.dockstore.openapi.client.ApiException;
 
 /**
  * Documents similar methods between language clients
