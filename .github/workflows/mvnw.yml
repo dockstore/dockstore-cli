@@ -36,5 +36,9 @@ jobs:
           languages: java           
       - name: Build with mvnw
         run: ./mvnw clean install
+
+      - name: Check license file
+        uses: dockstore/workflow-actions/.github/actions/check-license@feature/seab-5634/checklicense
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2            
