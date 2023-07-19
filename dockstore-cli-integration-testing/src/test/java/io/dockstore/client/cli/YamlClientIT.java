@@ -23,6 +23,7 @@ import static io.dockstore.client.cli.YamlVerifyUtility.SERVICE_DOES_NOT_HAVE_FI
 import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Lists;
+import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.TestUtility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
