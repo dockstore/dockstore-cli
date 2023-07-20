@@ -16,9 +16,12 @@
 
 package io.dockstore.client.cli;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.YamlVerifyUtility.MISSING_FILE_ERROR;
+import static io.dockstore.client.cli.YamlVerifyUtility.SERVICE_DOES_NOT_HAVE_FILES;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Lists;
 import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.TestUtility;
@@ -27,13 +30,8 @@ import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.HELP;
-import static io.dockstore.client.cli.YamlVerifyUtility.MISSING_FILE_ERROR;
-import static io.dockstore.client.cli.YamlVerifyUtility.SERVICE_DOES_NOT_HAVE_FILES;
-import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.io.IOException;
+import java.util.ArrayList;
 
 class YamlClientIT extends BaseIT {
 
@@ -76,9 +74,12 @@ class YamlClientIT extends BaseIT {
 
     private void runYamlValidatorAndExpectSuccess(final String testDirectory) throws IOException {
         Client.main(new String[]{CONFIG, TestUtility.getConfigFileLocation(true), YAML, YamlVerifyUtility.COMMAND_NAME, "--path", testDirectory});
-        String successMsg = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator()
-                + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
-        assertTrue(systemOutRule.getText().contains(successMsg));
+        final String successMsg1 = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_YAML_ONLY + System.lineSeparator();
+        final String successMsg2 = testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML + YamlVerifyUtility.VALID_DOCKSTORE_YML + System.lineSeparator();
+        final String sysOut = systemOutRule.getText();
+        // A logging message may appear in between the output, see https://app.circleci.com/pipelines/github/dockstore/dockstore-cli/1618/workflows/b97784a1-cf4b-410b-851c-26942a7b9a6f/jobs/7891/tests#failed-test-1
+        assertTrue(sysOut.contains(successMsg1));
+        assertTrue(sysOut.contains(successMsg2));
         systemOutRule.clear();
     }
 

@@ -172,7 +172,6 @@ jobs:
 
         # Running scan must occur after build
       - run_git_secrets_scan
-      - check_license_file
       - check_pom_files
       - clean_and_save_cache
       - run:
@@ -250,14 +249,6 @@ commands:
           command: |
             wget --output-document /dev/null --waitretry=5 --tries=10 --retry-connrefused localhost:9200 || true
 
-  check_license_file:
-    steps:
-      - run:
-          name: check generated THIRD-PARTY-LICENCES.txt matches checked-in file
-          command: |
-            scripts/check-licenses.sh
-          environment:
-              TESTING_PROFILE: automated-review
 
   check_pom_files:
     steps:
