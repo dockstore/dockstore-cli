@@ -147,8 +147,7 @@ public class FileProvisioning {
     }
 
     private static void printSourceAndDestination(String sourcePath, Path destinationPath) {
-        System.out.println("Source path: " + sourcePath);
-        System.out.println("Destination path: " + destinationPath);
+        System.out.println("Saving " + sourcePath  + " to " + destinationPath);
     }
 
     /*
