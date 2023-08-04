@@ -16,12 +16,9 @@
 
 package io.dockstore.client.cli;
 
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.HELP;
-import static io.dockstore.client.cli.YamlVerifyUtility.MISSING_FILE_ERROR;
-import static io.dockstore.client.cli.YamlVerifyUtility.SERVICE_DOES_NOT_HAVE_FILES;
-import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import com.google.common.collect.Lists;
 import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.TestUtility;
@@ -30,8 +27,13 @@ import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-import java.io.IOException;
-import java.util.ArrayList;
+
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.YamlVerifyUtility.MISSING_FILE_ERROR;
+import static io.dockstore.client.cli.YamlVerifyUtility.SERVICE_DOES_NOT_HAVE_FILES;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class YamlClientIT extends BaseIT {
 
