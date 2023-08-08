@@ -146,6 +146,10 @@ public class FileProvisioning {
         return "true".equalsIgnoreCase(useCache) || "use".equalsIgnoreCase(useCache) || "T".equalsIgnoreCase(useCache);
     }
 
+    private static void printSourceAndDestination(String sourcePath, Path destinationPath) {
+        System.out.println("Saving " + sourcePath  + " to " + destinationPath);
+    }
+
     /*
      * Retrieves plugin name given object class name.
      * Splits outer plugin class name (which extends Plugin abstract class) and inner class name (which extends
@@ -661,6 +665,7 @@ public class FileProvisioning {
 
         @Override
         public boolean downloadFrom(String sourcePath, Path destination) {
+            printSourceAndDestination(sourcePath, destination);
             return FileProvisionUtil.downloadFromVFS2(sourcePath, destination, threads);
         }
 
