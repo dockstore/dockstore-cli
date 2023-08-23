@@ -91,7 +91,7 @@ class YamlValidatorTest {
             YamlVerifyUtility.dockstoreValidate(relativePathDockstoreYmlDirectory);
             fail("Invalid YAML not caught");
         } catch (YamlVerifyUtility.ValidateYamlException ex) {
-            Assertions.assertTrue(ex.getMessage().equals(YamlVerifyUtility.RELATIVE_PATH_ERROR));
+            assertEquals(YamlVerifyUtility.RELATIVE_PATH_ERROR, ex.getMessage());
         }
 
     }
