@@ -86,7 +86,7 @@ public final class YamlVerifyUtility {
         for (String path : paths) {
             Path pathToFile = Paths.get(base, path);
             if (!pathToFile.startsWith("/")) {
-               return false;
+                return false;
             }
         }
         return true;
@@ -144,7 +144,7 @@ public final class YamlVerifyUtility {
         }
         if (!checkAbsoluteFilePaths(filePathsToCheck, basePath)) {
             throw new ValidateYamlException(RELATIVE_PATH_ERROR);
-        };
+        }
     }
 
     public static void dockstoreValidate(String path) throws ValidateYamlException {
