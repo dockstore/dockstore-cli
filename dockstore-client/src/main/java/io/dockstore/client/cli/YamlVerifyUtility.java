@@ -82,8 +82,9 @@ public final class YamlVerifyUtility {
     }
 
     // Determines if all the file paths are absolute
-    private static boolean checkAbsoluteFilePaths(List<String> paths, String base) {
+    private static boolean checkAbsoluteFilePaths(List<String> paths) {
         for (String path : paths) {
+            System.out.println(path);
             if (path.length() != 0 && !path.startsWith("/")) {
                 return false;
             }
@@ -141,7 +142,7 @@ public final class YamlVerifyUtility {
             String errorMsg = errorMsgBuild.toString();
             throw new ValidateYamlException(MISSING_FILE_ERROR + errorMsg);
         }
-        if (!checkAbsoluteFilePaths(filePathsToCheck, basePath)) {
+        if (!checkAbsoluteFilePaths(filePathsToCheck)) {
             throw new ValidateYamlException(RELATIVE_PATH_ERROR);
         }
     }
