@@ -84,8 +84,7 @@ public final class YamlVerifyUtility {
     // Determines if all the file paths are absolute
     private static boolean checkAbsoluteFilePaths(List<String> paths, String base) {
         for (String path : paths) {
-            Path pathToFile = Paths.get(base, path);
-            if (!path.isEmpty() && !pathToFile.startsWith("/")) {
+            if (path.length() != 0 && !path.startsWith("/")) {
                 return false;
             }
         }
