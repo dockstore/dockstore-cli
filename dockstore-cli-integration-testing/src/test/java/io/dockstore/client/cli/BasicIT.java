@@ -848,6 +848,7 @@ class BasicIT extends BaseIT {
     }
 
     @Test
+    @Disabled("unintended change in webservice 1.15 seems to have broken this")
     void testPublishUnpublishHostedTool() {
 
         final String publishNameParameter = "--new-entry-name";
