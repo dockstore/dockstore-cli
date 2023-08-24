@@ -1,12 +1,18 @@
 package io.dockstore.client.cli;
 
+import java.util.UUID;
+
 import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.FlushingSystemErr;
 import io.dockstore.common.FlushingSystemOut;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.Installation;
 import io.dockstore.openapi.client.model.PublishRequest;
+import io.dockstore.openapi.client.model.PushPayload;
+import io.dockstore.openapi.client.model.Sender;
+import io.dockstore.openapi.client.model.WebhookRepository;
 import io.dockstore.openapi.client.model.Workflow;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
 import io.dropwizard.testing.ResourceHelpers;
@@ -70,7 +76,12 @@ class GitHubAppToolIT extends BaseIT {
         systemOutRule.clear();
 
         // the following change the DB state
-        workflowApi.handleGitHubRelease("refs/heads/main", INSTALLATION_ID, WORKFLOW_REPO, USER_2_USERNAME);
+
+        PushPayload pushPayload = new PushPayload().ref("refs/heads/main");
+        pushPayload.setInstallation(new Installation().id(Long.valueOf(INSTALLATION_ID)));
+        pushPayload.setRepository(new WebhookRepository().fullName(WORKFLOW_REPO));
+        pushPayload.setSender(new Sender().login(USER_2_USERNAME));
+        workflowApi.handleGitHubRelease(pushPayload, UUID.randomUUID().toString());
         publishWorkflow();
     }
 
