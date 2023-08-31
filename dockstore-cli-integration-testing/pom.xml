@@ -257,6 +257,7 @@
                     <!-- seems like some form of Jackson fork issue for this module with random order -->
                     <runOrder>filesystem</runOrder>
                     <!-- workaround for Java 17 module issues with powermock -->
+                    <!-- Disable assertions for Hibernate package: https://ucsc-cgl.atlassian.net/browse/SEAB-5854 -->
                     <argLine>
                         @{argLine}
                         --illegal-access=permit
@@ -267,6 +268,7 @@
                         --add-opens java.base/java.base=ALL-UNNAMED
                         --add-opens java.base/java.lang.reflect=ALL-UNNAMED
                         --add-opens java.base/sun.nio.fs=ALL-UNNAMED
+                        --da org.hibernate
                     </argLine>
                 </configuration>
             </plugin>
