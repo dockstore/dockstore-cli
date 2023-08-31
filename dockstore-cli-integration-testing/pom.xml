@@ -253,11 +253,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <!-- Disable JVM assertions for now. See SEAB-5854 -->
+                    <enableAssertions>false</enableAssertions>
                     <skipTests>${skipITs}</skipTests>
                     <!-- seems like some form of Jackson fork issue for this module with random order -->
                     <runOrder>filesystem</runOrder>
                     <!-- workaround for Java 17 module issues with powermock -->
-                    <!-- Disable assertions for Hibernate package: https://ucsc-cgl.atlassian.net/browse/SEAB-5854 -->
                     <argLine>
                         @{argLine}
                         --illegal-access=permit
@@ -268,8 +269,6 @@
                         --add-opens java.base/java.base=ALL-UNNAMED
                         --add-opens java.base/java.lang.reflect=ALL-UNNAMED
                         --add-opens java.base/sun.nio.fs=ALL-UNNAMED
-                        -ea
-                        -da org.hibernate
                     </argLine>
                 </configuration>
             </plugin>
