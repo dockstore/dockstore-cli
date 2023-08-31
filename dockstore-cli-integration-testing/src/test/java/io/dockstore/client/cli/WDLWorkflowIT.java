@@ -25,7 +25,6 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static io.dockstore.common.DescriptorLanguage.WDL;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
@@ -41,24 +40,11 @@ import io.dockstore.openapi.client.model.WorkflowVersion;
 import io.dropwizard.testing.ResourceHelpers;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-
-import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
-import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
-import static io.dockstore.client.cli.Client.WORKFLOW;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
-import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
-import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
-import static io.dockstore.common.DescriptorLanguage.WDL;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Gathers a few tests that focus on WDL workflows, testing things like generation of wdl test parameter files
