@@ -268,7 +268,8 @@
                         --add-opens java.base/java.base=ALL-UNNAMED
                         --add-opens java.base/java.lang.reflect=ALL-UNNAMED
                         --add-opens java.base/sun.nio.fs=ALL-UNNAMED
-                        --da org.hibernate
+                        -ea
+                        -da org.hibernate
                     </argLine>
                 </configuration>
             </plugin>
