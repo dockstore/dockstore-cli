@@ -16,17 +16,22 @@
 
 package io.dockstore.client.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.VERSION;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 import com.google.common.collect.Lists;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.CLICommonTestUtilities;
@@ -50,23 +55,16 @@ import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-
-import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
-import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
-import static io.dockstore.client.cli.Client.CHECKER;
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
-import static io.dockstore.client.cli.Client.VERSION;
-import static io.dockstore.client.cli.Client.WORKFLOW;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
-import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
-import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
-import static io.dockstore.common.DescriptorLanguage.CWL;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Extra confidential integration tests, focus on testing workflow interactions
@@ -222,11 +220,8 @@ class WorkflowIT extends BaseIT {
         Client.main(new String[] { CONFIG, fileWithCorrectCredentials, WORKFLOW, PUBLISH, ENTRY, toolpath, SCRIPT_FLAG });
 
         // should be able to download properly with incorrect credentials because the entry is published
-        catchSystemExit(() -> {
-            // TODO: this catch should not be necessary
-            Client.main(new String[] { CONFIG, fileWithIncorrectCredentials, CHECKER, DOWNLOAD, ENTRY, toolpath, VERSION, "master",
-                    SCRIPT_FLAG });
-        });
+        Client.main(new String[] { CONFIG, fileWithIncorrectCredentials, CHECKER, DOWNLOAD, ENTRY, toolpath, VERSION, "master",
+                SCRIPT_FLAG });
 
         // Unpublish the workflow
         Client.main(
