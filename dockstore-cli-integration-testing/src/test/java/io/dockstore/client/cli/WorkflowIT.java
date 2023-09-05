@@ -16,22 +16,17 @@
 
 package io.dockstore.client.cli;
 
-import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
-import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
-import static io.dockstore.client.cli.Client.CHECKER;
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
-import static io.dockstore.client.cli.Client.VERSION;
-import static io.dockstore.client.cli.Client.WORKFLOW;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
-import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
-import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
-import static io.dockstore.common.DescriptorLanguage.CWL;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 import com.google.common.collect.Lists;
 import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.CLICommonTestUtilities;
@@ -55,16 +50,23 @@ import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CHECKER;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.VERSION;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 /**
  * Extra confidential integration tests, focus on testing workflow interactions
