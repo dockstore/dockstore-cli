@@ -59,7 +59,6 @@ public final class YamlVerifyUtility {
     public static final String SERVICE_DOES_NOT_HAVE_FILES = "The service does not have any files";
     public static final String MISSING_FILE_ERROR = "Your " + DOCKSTOREYML + CONTAINS_ERRORS;
 
-    public static final String RELATIVE_PATH_ERROR = "You have provided relative paths for your files. Please provide absolute paths";
     public static final String INVALID_YAML = " is not a valid " + YAML + " file:" + System.lineSeparator();
     // This message is displayed when it is determined that DOCKSTOREYML is a valid yaml file,
     // but displaying this message does NOT mean DOCKSTOREYML is a valid dockstore yaml file
@@ -81,10 +80,6 @@ public final class YamlVerifyUtility {
         return missingFiles;
     }
 
-    // Determines if all the file paths are absolute
-    private static boolean checkAbsoluteFilePaths(List<String> paths) {
-        return paths.stream().noneMatch(path -> !path.isEmpty() && !path.startsWith("/"));
-    }
     private static void addFilesPathsToCheckToList(List<String> testParameterFiles, String primaryDescriptorPath,
                                                              List<String> listOfPathsToCheck) {
         if (testParameterFiles != null) {
@@ -135,9 +130,6 @@ public final class YamlVerifyUtility {
             }
             String errorMsg = errorMsgBuild.toString();
             throw new ValidateYamlException(MISSING_FILE_ERROR + errorMsg);
-        }
-        if (!checkAbsoluteFilePaths(filePathsToCheck)) {
-            throw new ValidateYamlException(RELATIVE_PATH_ERROR);
         }
     }
 
