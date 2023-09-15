@@ -486,7 +486,7 @@ class GeneralIT extends BaseIT {
         DockstoreTool tool = ownerContainersApi.registerManual(CLICommonTestUtilities.getContainer());
         DockstoreTool refresh = ownerContainersApi.refresh(tool.getId());
         Long toolId = refresh.getId();
-        Tag tag = refresh.getWorkflowVersions().get(0);
+        Tag tag = refresh.getTags().get(0);
         Long versionId = tag.getId();
 
         // Try downloading unpublished

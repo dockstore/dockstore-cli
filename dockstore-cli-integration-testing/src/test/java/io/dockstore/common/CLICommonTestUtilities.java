@@ -349,7 +349,7 @@ public final class CLICommonTestUtilities {
         tag.setWdlPath(c.getDefaultWdlPath());
         List<Tag> tags = new ArrayList<>();
         tags.add(tag);
-        c.setWorkflowVersions(tags);
+        c.setTags(tags);
         return c;
     }
 }

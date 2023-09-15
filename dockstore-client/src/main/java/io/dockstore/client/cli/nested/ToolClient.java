@@ -571,7 +571,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 tag.setName(versionName);
                 List<Tag> tagList = new ArrayList<>();
                 tagList.add(tag);
-                tool.setWorkflowVersions(tagList);
+                tool.setTags(tagList);
             }
 
             // Register new tool
@@ -707,7 +707,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
         final String fixTag = getVersionID(toolpath);
 
-        Optional<Tag> first = container.getWorkflowVersions().stream().filter(foo -> foo.getName().equalsIgnoreCase(fixTag)).findFirst();
+        Optional<Tag> first = container.getTags().stream().filter(foo -> foo.getName().equalsIgnoreCase(fixTag)).findFirst();
         if (first.isPresent()) {
             Long versionId = first.get().getId();
             // https://github.com/dockstore/dockstore/issues/1712 client seems to use jersey logging which is not controlled from logback
@@ -747,11 +747,11 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
         // if a version is specified in the path, use that, otherwise uses the default version
         final String versionID = parts.length > 1 ? parts[1] : defaultVersion;
 
-        Optional<Tag> firstTag = container.getWorkflowVersions().stream().filter(tag -> tag.getName().equalsIgnoreCase(versionID))
+        Optional<Tag> firstTag = container.getTags().stream().filter(tag -> tag.getName().equalsIgnoreCase(versionID))
             .findFirst();
 
         if (firstTag.isEmpty()) {
-            firstTag = container.getWorkflowVersions().stream().max(Comparator.comparing(Tag::getLastBuilt));
+            firstTag = container.getTags().stream().max(Comparator.comparing(Tag::getLastBuilt));
             firstTag.ifPresent(tag -> out(
                 "Could not locate tool with version '" + versionID + "'. Using last built version '" + tag.getName()
                     + "' instead."));
@@ -830,7 +830,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 }
                 out("TAGS");
 
-                List<Tag> tags = container.getWorkflowVersions();
+                List<Tag> tags = container.getTags();
                 int tagSize = tags.size();
                 StringBuilder builder = new StringBuilder();
                 if (tagSize > 0) {
@@ -925,7 +925,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                         versionTagUpdateHelp();
                     } else {
                         final String tagName = reqVal(args, "--name");
-                        List<Tag> tags = Optional.ofNullable(container.getWorkflowVersions()).orElse(new ArrayList<>());
+                        List<Tag> tags = Optional.ofNullable(container.getTags()).orElse(new ArrayList<>());
                         boolean updated = false;
 
                         for (Tag tag : tags) {
@@ -1093,7 +1093,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 // if valid version
                 boolean updateVersionSuccess = false;
 
-                for (Tag tag : Optional.ofNullable(tool.getWorkflowVersions()).orElse(new ArrayList<>())) {
+                for (Tag tag : Optional.ofNullable(tool.getTags()).orElse(new ArrayList<>())) {
                     if (tag.getName().equals(defaultTag)) {
                         tool.setDefaultVersion(defaultTag);
                         updateVersionSuccess = true;
@@ -1104,7 +1104,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 if (!updateVersionSuccess && defaultTag != null) {
                     out("Not a valid version.");
                     out("Valid versions include:");
-                    for (Tag tag : Optional.ofNullable(tool.getWorkflowVersions()).orElse(new ArrayList<>())) {
+                    for (Tag tag : Optional.ofNullable(tool.getTags()).orElse(new ArrayList<>())) {
                         out(tag.getReference());
                     }
                     errorMessage("Please enter a valid version.", Client.CLIENT_ERROR);
