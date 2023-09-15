@@ -830,7 +830,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 }
                 out("TAGS");
 
-                List<Tag> tags = container.getTags();
+                List<Tag> tags = container.getTags() == null ? new ArrayList<>() : container.getTags();
                 int tagSize = tags.size();
                 StringBuilder builder = new StringBuilder();
                 if (tagSize > 0) {
