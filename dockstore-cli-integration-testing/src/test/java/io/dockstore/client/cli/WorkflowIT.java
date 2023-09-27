@@ -222,11 +222,8 @@ class WorkflowIT extends BaseIT {
         Client.main(new String[] { CONFIG, fileWithCorrectCredentials, WORKFLOW, PUBLISH, ENTRY, toolpath, SCRIPT_FLAG });
 
         // should be able to download properly with incorrect credentials because the entry is published
-        catchSystemExit(() -> {
-            // TODO: this catch should not be necessary
-            Client.main(new String[] { CONFIG, fileWithIncorrectCredentials, CHECKER, DOWNLOAD, ENTRY, toolpath, VERSION, "master",
-                    SCRIPT_FLAG });
-        });
+        Client.main(new String[] { CONFIG, fileWithIncorrectCredentials, CHECKER, DOWNLOAD, ENTRY, toolpath, VERSION, "master",
+                SCRIPT_FLAG });
 
         // Unpublish the workflow
         Client.main(

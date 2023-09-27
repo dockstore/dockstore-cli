@@ -36,7 +36,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-integration-testing</artifactId>
-      <version>1.15.0-alpha.6</version>
+      <version>1.15.0-alpha.10</version>
       <classifier>tests</classifier>
       <scope>compile</scope>
       <exclusions>
@@ -49,13 +49,13 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.15.0-alpha.6</version>
+      <version>1.15.0-alpha.10</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-webservice</artifactId>
-      <version>1.15.0-alpha.6</version>
+      <version>1.15.0-alpha.10</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -67,7 +67,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.15.0-alpha.6</version>
+      <version>1.15.0-alpha.10</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -124,6 +124,11 @@
       <id>artifacts.oicr.on.ca</id>
       <name>artifacts.oicr.on.ca</name>
       <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
+    </repository>
+    <repository>
+      <id>broad-dependencies.oicr.on.ca</id>
+      <name>broad-dependencies.oicr.on.ca</name>
+      <url>https://artifacts.oicr.on.ca/artifactory/broad-dependencies</url>
     </repository>
     <repository>
       <id>apache-releases</id>
