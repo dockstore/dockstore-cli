@@ -83,6 +83,32 @@ class YamlValidatorTest {
         }
     }
 
+    //Verifies .dockstore.yml is invalid when provided relative primary descriptor paths
+    @Test
+    void relativePrimaryPathYml() {
+        final String relativePathDockstoreYmlDirectory = "src/test/resources/YamlVerifyTestDirectory/relative-primary-descriptor-path";
+        try {
+            YamlVerifyUtility.dockstoreValidate(relativePathDockstoreYmlDirectory);
+            fail("Invalid YAML not caught");
+        } catch (YamlVerifyUtility.ValidateYamlException ex) {
+            assertTrue(ex.getMessage().contains("the path must be an absolute path to be valid"));
+        }
+
+    }
+
+    //Verifies .dockstore.yml is invalid when provided relative test descriptor paths
+    @Test
+    void relativeTestDescriptorPathYml() {
+        final String relativePathDockstoreYmlDirectory = "src/test/resources/YamlVerifyTestDirectory/relative-test-files-path";
+        try {
+            YamlVerifyUtility.dockstoreValidate(relativePathDockstoreYmlDirectory);
+            fail("Invalid YAML not caught");
+        } catch (YamlVerifyUtility.ValidateYamlException ex) {
+            assertTrue(ex.getMessage().contains("the path must be an absolute path to be valid"));
+        }
+
+    }
+
     @Test
     void invalidYaml() {
         final String baseTestDirectory = "src/test/resources/InvalidYamlSyntax/test";
