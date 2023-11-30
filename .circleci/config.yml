@@ -3,6 +3,10 @@ parameters:
   java-tag:
     type: string
     default: "17.0.3"
+  run_nightly_against_develop:
+    type: boolean
+    default: true
+
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
@@ -33,6 +37,8 @@ common_filters: &common_filters
 workflows:
   version: 2
   everything:
+    # TODO: Temporary, RESTORE!
+    when: false
     jobs:
       - build:
           <<: *common_filters
@@ -76,8 +82,23 @@ workflows:
           context:
             - sonarcloud
 
+  nightly_against_develop:
+    when: << pipeline.parameters.run_nightly_against_develop >>
+    jobs:
+      - find-develop-snapshot
+
 
 jobs:
+  find-develop-snapshot:
+    docker: # run the steps with Docker
+      - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
+    steps:
+      - run:
+          name: findDevelopSnapshot
+          command: |
+            LATEST_DEVELOP_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
+            echo $LATEST_DEVELOP_VERSION
+
   unit-tests:
     executor: unit_tests_executor
     environment:
