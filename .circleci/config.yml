@@ -87,6 +87,12 @@ workflows:
     when: << pipeline.parameters.run_nightly_against_develop >>
     jobs:
       - find-develop-snapshot
+      - build:
+          requires:
+            - find-develop-snapshot
+      - unit-tests:
+          requires:
+            - build
 
 
 jobs:
@@ -101,7 +107,6 @@ jobs:
           name: createCoreVersionParam
           command: |
             echo 'export CORE_VERSION_OVERRIDE'="-Ddockstore-core.version=$LATEST_VERSION" >> $BASH_ENV
-      - unit-tests
 
   unit-tests:
     executor: unit_tests_executor
