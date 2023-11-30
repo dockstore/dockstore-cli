@@ -101,10 +101,7 @@ jobs:
           name: createCoreVersionParam
           command: |
             echo 'export CORE_VERSION_OVERRIDE'="-Ddockstore-core.version=$LATEST_VERSION" >> $BASH_ENV
-      - run:
-          name: echoIt
-          command: |
-            echo "$CORE_VERSION_OVERRIDE"
+      - unit-tests
 
   unit-tests:
     executor: unit_tests_executor
@@ -196,7 +193,7 @@ jobs:
       - install_confidential_test_data
       - run:
           name: build
-          command: ./mvnw -B clean install -DskipTests
+          command: ./mvnw -B clean install -DskipTests "$CORE_VERSION_OVERRIDE"
 
         # Running scan must occur after build
       - run_git_secrets_scan
