@@ -93,6 +93,12 @@ workflows:
       - unit-tests:
           requires:
             - build
+      - integration-tests:
+          requires:
+            - build
+          matrix:
+            parameters:
+              testing_profile: [ "singularity-tests", "bitbucket-tests" ]
 
 
 jobs:
@@ -269,6 +275,8 @@ commands:
           at: .
       - run: |
           cat bash.env >> $BASH_ENV || true
+      - run: |
+          echo "CORE_VERSION_OVERRIDE is $CORE_VERSION_OVERRIDE"
 
   send_coverage:
     steps:
@@ -523,6 +531,7 @@ commands:
   setup_and_run_integration_tests:
     steps:
       - setup_for_integration_tests
+      - restore_bash_env
       - run_tests
       - save_test_results
       - send_coverage
