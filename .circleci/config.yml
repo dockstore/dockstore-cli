@@ -107,6 +107,14 @@ jobs:
           name: createCoreVersionParam
           command: |
             echo 'export CORE_VERSION_OVERRIDE'="-Ddockstore-core.version=$LATEST_VERSION" >> $BASH_ENV
+      - run:
+          name: saveEnv
+          command: |
+            cp $BASH_ENV bash.env
+      - persist_to_workspace:
+          root: .
+          paths:
+            bash.env
 
   unit-tests:
     executor: unit_tests_executor
@@ -114,6 +122,7 @@ jobs:
       TESTING_PROFILE: unit-tests
       MAVEN_GOAL: test
     steps:
+      - restore_bash_env
       - setup_for_unit_tests
       - run_tests
       - save_test_results
@@ -196,6 +205,7 @@ jobs:
       - install_yq
       - install-git-secrets
       - install_confidential_test_data
+      - restore_bash_env
       - run:
           name: build
           command: |
@@ -252,6 +262,13 @@ commands:
           command: |
             sudo NEEDRESTART_MODE=a apt install openssl
             bash scripts/decrypt.sh
+
+  restore_bash_env:
+    steps:
+      - attach_workspace:
+          at: .
+      - run: |
+          cat bash.env >> $BASH_ENV || true
 
   send_coverage:
     steps:
