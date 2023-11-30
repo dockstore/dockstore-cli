@@ -199,7 +199,7 @@ jobs:
       - run:
           name: build
           command: |
-            ./mvnw -B clean install -DskipTests "$CORE_VERSION_OVERRIDE"
+            ./mvnw -B clean install -DskipTests $CORE_VERSION_OVERRIDE
 
         # Running scan must occur after build
       - run_git_secrets_scan
