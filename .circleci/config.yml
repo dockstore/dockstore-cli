@@ -198,7 +198,8 @@ jobs:
       - install_confidential_test_data
       - run:
           name: build
-          command: ./mvnw -B clean install -DskipTests "$CORE_VERSION_OVERRIDE"
+          command: |
+            ./mvnw -B clean install -DskipTests "$CORE_VERSION_OVERRIDE"
 
         # Running scan must occur after build
       - run_git_secrets_scan
