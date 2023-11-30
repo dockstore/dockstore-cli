@@ -5,6 +5,7 @@ parameters:
     default: "17.0.3"
   run_nightly_against_develop:
     type: boolean
+    ## Change this to FALSE!
     default: true
 
 orbs:
@@ -90,17 +91,20 @@ workflows:
 
 jobs:
   find-develop-snapshot:
-    docker: # run the steps with Docker
-      - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
+    executor: unit_tests_executor
     steps:
       - run:
           name: findDevelopSnapshot
           command: |
-            echo 'export LATEST_DEVELOP_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
+            echo 'export LATEST_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
+      - run:
+          name: createCoreVersionParam
+          command: |
+            echo 'export CORE_VERSION_OVERRIDE'="-Ddockstore-core.version=$LATEST_VERSION" >> $BASH_ENV
       - run:
           name: echoIt
           command: |
-            echo ${LATEST_DEVELOP_VERSION}
+            echo "$CORE_VERSION_OVERRIDE"
 
   unit-tests:
     executor: unit_tests_executor
