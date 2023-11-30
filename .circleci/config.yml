@@ -96,7 +96,7 @@ jobs:
       - run:
           name: findDevelopSnapshot
           command: |
-            echo 'LATEST_DEVELOP_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
+            echo 'export LATEST_DEVELOP_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
             echo $LATEST_DEVELOP_VERSION
 
   unit-tests:
