@@ -30,7 +30,9 @@ jobs:
           restore-keys: |
            ${{ runner.os }}-maven-
 
-      - name: Initialize CodeQL
+        
+      - if: "!contains(github.ref, 'dependabot')"
+        name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: java           
@@ -40,5 +42,6 @@ jobs:
       - name: Check license file
         uses: dockstore/workflow-actions/.github/actions/check-license@main
 
-      - name: Perform CodeQL Analysis
+      - if: "!contains(github.ref, 'dependabot')"
+        name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2            
