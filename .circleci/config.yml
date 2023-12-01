@@ -265,9 +265,9 @@ commands:
           name: Restore bash environment from bash.env
           command: !
             cat bash.env >> $BASH_ENV || true
-      - run: |
+      - run:
           name: Display value of CORE_VERSION_OVERRIDE
-          echo "CORE_VERSION_OVERRIDE is $CORE_VERSION_OVERRIDE"
+          command: echo "CORE_VERSION_OVERRIDE is $CORE_VERSION_OVERRIDE"
 
   send_coverage:
     steps:
