@@ -3,10 +3,9 @@ parameters:
   java-tag:
     type: string
     default: "17.0.3"
-  run_nightly_against_develop:
+  run_against_develop_core:
     type: boolean
-    ## Change this to FALSE!
-    default: true
+    default: false
 
 orbs:
   build-tools: circleci/build-tools@2.7.0
@@ -38,12 +37,12 @@ common_filters: &common_filters
 workflows:
   version: 2
   everything:
-    # TODO: Temporary, RESTORE!
-    when: false
     jobs:
+      - find-develop-snapshot
       - build:
           <<: *common_filters
-
+          requires:
+            - find-develop-snapshot
       - unit-tests:
           <<: *common_filters
           requires:
@@ -83,44 +82,33 @@ workflows:
           context:
             - sonarcloud
 
-  nightly_against_develop:
-    when: << pipeline.parameters.run_nightly_against_develop >>
-    jobs:
-      - find-develop-snapshot
-      - build:
-          requires:
-            - find-develop-snapshot
-      - unit-tests:
-          requires:
-            - build
-      - integration-tests:
-          requires:
-            - build
-          matrix:
-            parameters:
-              testing_profile: [ "singularity-tests", "bitbucket-tests" ]
-
-
 jobs:
+  # If the parameter "run_against_develop_core" is true, looks for the latest snapshot in dockstore/dockstore and
+  # and sets the environment variable CORE_VERSION_OVERRIDE, saving it to the workspace
   find-develop-snapshot:
     executor: unit_tests_executor
     steps:
-      - run:
-          name: findDevelopSnapshot
-          command: |
-            echo 'export LATEST_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
-      - run:
-          name: createCoreVersionParam
-          command: |
-            echo 'export CORE_VERSION_OVERRIDE'="-Ddockstore-core.version=$LATEST_VERSION" >> $BASH_ENV
-      - run:
-          name: saveEnv
-          command: |
-            cp $BASH_ENV bash.env
-      - persist_to_workspace:
-          root: .
-          paths:
-            bash.env
+      # Need to have at least one run step at the same level as the when, or config.yml schema validation fails
+      - run: echo "Checking whether to fetch latest core version"
+      - when:
+          condition: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - run:
+                name: findDevelopSnapshot
+                command: |
+                  echo 'export LATEST_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
+            - run:
+                name: createCoreVersionParam
+                command: |
+                  echo 'export CORE_VERSION_OVERRIDE'="-Ddockstore-core.version=$LATEST_VERSION" >> $BASH_ENV
+            - run:
+                name: saveEnv
+                command: |
+                  cp $BASH_ENV bash.env
+            - persist_to_workspace:
+                root: .
+                paths:
+                  bash.env
 
   unit-tests:
     executor: unit_tests_executor
@@ -273,9 +261,12 @@ commands:
     steps:
       - attach_workspace:
           at: .
+      - run:
+          name: Restore bash environment from bash.env
+          command: !
+            cat bash.env >> $BASH_ENV || true
       - run: |
-          cat bash.env >> $BASH_ENV || true
-      - run: |
+          name: Display value of CORE_VERSION_OVERRIDE
           echo "CORE_VERSION_OVERRIDE is $CORE_VERSION_OVERRIDE"
 
   send_coverage:
