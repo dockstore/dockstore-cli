@@ -34,53 +34,63 @@ common_filters: &common_filters
       ignore:
         - gh-pages
 
+common_jobs: &common_jobs
+    jobs:
+        - find-develop-snapshot
+        - build:
+            <<: *common_filters
+            requires:
+              - find-develop-snapshot
+        - unit-tests:
+            <<: *common_filters
+            requires:
+              - build
+        - integration-tests:
+            matrix:
+              parameters:
+                testing_profile: [ "singularity-tests", "bitbucket-tests" ]
+            <<: *common_filters
+            requires:
+              - build
+        - non-confidential-tests:
+            <<: *common_filters
+            requires:
+              - build
+        - confidential-workflow-tests:
+            <<: *common_filters
+            requires:
+              - build
+        - confidential-tool-tests:
+            <<: *common_filters
+            requires:
+              - build
+        - wes-toil-test:
+            <<: *common_filters
+            requires:
+              - build
+        - sonar-cloud:
+            <<: *common_filters
+            requires:
+              - unit-tests
+              - integration-tests
+              - non-confidential-tests
+              - confidential-workflow-tests
+              - confidential-tool-tests
+              - wes-toil-test
+            context:
+              - sonarcloud
+
 workflows:
   version: 2
+
   everything:
-    jobs:
-      - find-develop-snapshot
-      - build:
-          <<: *common_filters
-          requires:
-            - find-develop-snapshot
-      - unit-tests:
-          <<: *common_filters
-          requires:
-            - build
-      - integration-tests:
-          matrix:
-            parameters:
-              testing_profile: ["singularity-tests", "bitbucket-tests"]
-          <<: *common_filters
-          requires:
-            - build
-      - non-confidential-tests:
-          <<: *common_filters
-          requires:
-            - build
-      - confidential-workflow-tests:
-          <<: *common_filters
-          requires:
-            - build
-      - confidential-tool-tests:
-          <<: *common_filters
-          requires:
-            - build
-      - wes-toil-test:
-          <<: *common_filters
-          requires:
-            - build
-      - sonar-cloud:
-          <<: *common_filters
-          requires:
-            - unit-tests
-            - integration-tests
-            - non-confidential-tests
-            - confidential-workflow-tests
-            - confidential-tool-tests
-            - wes-toil-test
-          context:
-            - sonarcloud
+    when:
+      not: << pipeline.parameters.run_against_develop_core >>
+    <<: *common_jobs
+
+  nightly:
+    when: << pipeline.parameters.run_against_develop_core >>
+    <<: *common_jobs
 
 jobs:
   # If the parameter "run_against_develop_core" is true, looks for the latest snapshot in dockstore/dockstore and
