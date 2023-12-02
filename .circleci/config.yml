@@ -275,9 +275,6 @@ commands:
           name: Restore bash environment from bash.env
           command: !
             cat bash.env >> $BASH_ENV || true
-      - run:
-          name: Display value of CORE_VERSION_OVERRIDE
-          command: echo "CORE_VERSION_OVERRIDE is $CORE_VERSION_OVERRIDE"
 
   send_coverage:
     steps:
@@ -474,9 +471,9 @@ commands:
             if [ $CIRCLE_NODE_TOTAL != 1 ]
             then
               ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Dit.test=`cat /tmp/tests-to-run.txt` -DfailIfNoTests=false \
-              -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+              -P$TESTING_PROFILE,coverage $CORE_VERSION_OVERRIDE -ntp | grep  -v "^Running Changeset:"
             else
-              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage $CORE_VERSION_OVERRIDE -ntp | grep  -v "^Running Changeset:"
             fi
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:
@@ -523,10 +520,10 @@ commands:
     steps:
       - run:
           name: ensure artifacts are installed
-          command: ./mvnw clean install -DskipTests
+          command: ./mvnw clean install -DskipTests $CORE_VERSION_OVERRIDE
       - run:
           name: run toil tests
-          command: ./mvnw -P wes-integration-tests verify
+          command: ./mvnw -P wes-integration-tests verify $CORE_VERSION_OVERRIDE
 
 
   setup_and_run_integration_tests:
