@@ -12,6 +12,8 @@
 
 This branch explores running services locally with the CLI. Because services haven't taken off, it was put on hold.
 
+Adding a comment so it no longer shows up as stale.
+
 It would download the service locally, then start/stop the service per entries in the .dockstore.yml
 
 # Dockstore
