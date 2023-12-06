@@ -62,8 +62,10 @@ public final class DepCommand {
             ApiClient defaultApiClient;
             defaultApiClient = Configuration.getDefaultApiClient();
             MetadataApi metadataApi = new MetadataApi(defaultApiClient);
+            // todo: revert after real release
+            String trimmedVersionD = commandDep.clientVersion.split("-")[0];
             String runnerDependencies = metadataApi
-                    .getRunnerDependencies(commandDep.clientVersion, commandDep.pythonVersion, commandDep.runner, "text");
+                    .getRunnerDependencies(trimmedVersionD, commandDep.pythonVersion, commandDep.runner, "text");
             if (runnerDependencies == null) {
                 errorMessage("Could not get runner dependencies", API_ERROR);
             } else {
