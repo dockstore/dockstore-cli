@@ -394,7 +394,7 @@ class QuayGitHubBasicIT extends BaseIT {
         assertEquals(1, count, "the tool should have a default version set");
 
         final long count2 = testingPostgres.runSelectStatement("select count(*) from tool where registry = '" + Registry.QUAY_IO.getDockerPath()
-                + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and actualdefaultversion is not null and author = 'Dockstore Test User'",
+                + "' and namespace = 'dockstoretestuser' and name = 'quayandgithub' and actualdefaultversion is not null and actualdefaultversion in (select versionid from author where name = 'Dockstore Test User')",
             long.class);
         assertEquals(1, count2, "the tool should have any metadata set (author)");
 
