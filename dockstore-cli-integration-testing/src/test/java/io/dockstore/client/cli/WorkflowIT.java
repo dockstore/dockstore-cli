@@ -353,8 +353,8 @@ class WorkflowIT extends BaseIT {
         final Workflow workflow = userWorkflowsApi.refresh1(workflowByPathGithub.getId(), true);
         assertEquals("Print the contents of a file to stdout using 'cat' running in a docker container.",
                 workflow.getDescription());
-        assertEquals("Peter Amstutz", workflow.getAuthor());
-        assertEquals("peter.amstutz@curoverse.com", workflow.getEmail());
+        assertEquals("Peter Amstutz", workflow.getAuthors().get(0).getName());
+        assertEquals("peter.amstutz@curoverse.com", workflow.getAuthors().get(0).getEmail());
         assertTrue(workflow.getWorkflowVersions().stream().anyMatch(versions -> "master".equals(versions.getName())));
         Optional<WorkflowVersion> optionalWorkflowVersion = workflow.getWorkflowVersions().stream()
             .filter(version -> "master".equalsIgnoreCase(version.getName())).findFirst();
