@@ -36,6 +36,8 @@ common_filters: &common_filters
 
 common_jobs: &common_jobs
     jobs:
+        # find-develop-snapshot job is run for both "everything" and "nightly" builds even though it's only needed for nightly.
+        # See https://github.com/dockstore/dockstore-cli/pull/268#discussion_r1419429151
         - find-develop-snapshot
         - build:
             <<: *common_filters
