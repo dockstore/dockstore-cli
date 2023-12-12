@@ -3,6 +3,10 @@ parameters:
   java-tag:
     type: string
     default: "17.0.3"
+  run_against_develop_core:
+    type: boolean
+    default: false
+
 orbs:
   build-tools: circleci/build-tools@2.7.0
 executors:
@@ -30,60 +34,101 @@ common_filters: &common_filters
       ignore:
         - gh-pages
 
+common_jobs: &common_jobs
+    jobs:
+        # find-develop-snapshot job is run for both "everything" and "nightly" builds even though it's only needed for nightly.
+        # See https://github.com/dockstore/dockstore-cli/pull/268#discussion_r1419429151
+        - find-develop-snapshot
+        - build:
+            <<: *common_filters
+            requires:
+              - find-develop-snapshot
+        - unit-tests:
+            <<: *common_filters
+            requires:
+              - build
+        - integration-tests:
+            matrix:
+              parameters:
+                testing_profile: [ "singularity-tests", "bitbucket-tests" ]
+            <<: *common_filters
+            requires:
+              - build
+        - non-confidential-tests:
+            <<: *common_filters
+            requires:
+              - build
+        - confidential-workflow-tests:
+            <<: *common_filters
+            requires:
+              - build
+        - confidential-tool-tests:
+            <<: *common_filters
+            requires:
+              - build
+        - wes-toil-test:
+            <<: *common_filters
+            requires:
+              - build
+        - sonar-cloud:
+            <<: *common_filters
+            requires:
+              - unit-tests
+              - integration-tests
+              - non-confidential-tests
+              - confidential-workflow-tests
+              - confidential-tool-tests
+              - wes-toil-test
+            context:
+              - sonarcloud
+
 workflows:
   version: 2
+
   everything:
-    jobs:
-      - build:
-          <<: *common_filters
+    when:
+      not: << pipeline.parameters.run_against_develop_core >>
+    <<: *common_jobs
 
-      - unit-tests:
-          <<: *common_filters
-          requires:
-            - build
-      - integration-tests:
-          matrix:
-            parameters:
-              testing_profile: ["singularity-tests", "bitbucket-tests"]
-          <<: *common_filters
-          requires:
-            - build
-      - non-confidential-tests:
-          <<: *common_filters
-          requires:
-            - build
-      - confidential-workflow-tests:
-          <<: *common_filters
-          requires:
-            - build
-      - confidential-tool-tests:
-          <<: *common_filters
-          requires:
-            - build
-      - wes-toil-test:
-          <<: *common_filters
-          requires:
-            - build
-      - sonar-cloud:
-          <<: *common_filters
-          requires:
-            - unit-tests
-            - integration-tests
-            - non-confidential-tests
-            - confidential-workflow-tests
-            - confidential-tool-tests
-            - wes-toil-test
-          context:
-            - sonarcloud
-
+  nightly:
+    when: << pipeline.parameters.run_against_develop_core >>
+    <<: *common_jobs
 
 jobs:
+  # If the parameter "run_against_develop_core" is true, looks for the latest snapshot in dockstore/dockstore and
+  # and sets the environment variable CORE_VERSION_OVERRIDE, saving it to the workspace
+  find-develop-snapshot:
+    executor: unit_tests_executor
+    steps:
+      # Need to have at least one run step at the same level as the when, or config.yml schema validation fails
+      - run: echo "Checking whether to fetch latest core version"
+      - when:
+          condition: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - run:
+                name: findDevelopSnapshot
+                command: |
+                  echo 'export LATEST_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
+            - run:
+                name: createCoreVersionParam
+                command: |
+                  echo 'export CORE_VERSION_OVERRIDE'="-Ddockstore-core.version=$LATEST_VERSION" >> $BASH_ENV
+            - run:
+                name: saveEnv
+                command: |
+                  cp $BASH_ENV bash.env
+            - persist_to_workspace:
+                root: .
+                paths:
+                  bash.env
+
   unit-tests:
     executor: unit_tests_executor
     environment:
       TESTING_PROFILE: unit-tests
       MAVEN_GOAL: test
     steps:
+      - restore_bash_env
       - setup_for_unit_tests
       - run_tests
       - save_test_results
@@ -166,9 +211,11 @@ jobs:
       - install_yq
       - install-git-secrets
       - install_confidential_test_data
+      - restore_bash_env
       - run:
           name: build
-          command: ./mvnw -B clean install -DskipTests
+          command: |
+            ./mvnw -B clean install -DskipTests $CORE_VERSION_OVERRIDE
 
         # Running scan must occur after build
       - run_git_secrets_scan
@@ -221,6 +268,15 @@ commands:
           command: |
             sudo NEEDRESTART_MODE=a apt install openssl
             bash scripts/decrypt.sh
+
+  restore_bash_env:
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Restore bash environment from bash.env
+          command: !
+            cat bash.env >> $BASH_ENV || true
 
   send_coverage:
     steps:
@@ -417,9 +473,9 @@ commands:
             if [ $CIRCLE_NODE_TOTAL != 1 ]
             then
               ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Dit.test=`cat /tmp/tests-to-run.txt` -DfailIfNoTests=false \
-              -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+              -P$TESTING_PROFILE,coverage $CORE_VERSION_OVERRIDE -ntp | grep  -v "^Running Changeset:"
             else
-              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage $CORE_VERSION_OVERRIDE -ntp | grep  -v "^Running Changeset:"
             fi
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:
@@ -466,15 +522,16 @@ commands:
     steps:
       - run:
           name: ensure artifacts are installed
-          command: ./mvnw clean install -DskipTests
+          command: ./mvnw clean install -DskipTests $CORE_VERSION_OVERRIDE
       - run:
           name: run toil tests
-          command: ./mvnw -P wes-integration-tests verify
+          command: ./mvnw -P wes-integration-tests verify $CORE_VERSION_OVERRIDE
 
 
   setup_and_run_integration_tests:
     steps:
       - setup_for_integration_tests
+      - restore_bash_env
       - run_tests
       - save_test_results
       - send_coverage
