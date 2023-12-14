@@ -41,6 +41,7 @@ import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.api.ContainersApi;
 import io.dockstore.openapi.client.api.ContainertagsApi;
 import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.model.Author;
 import io.dockstore.openapi.client.model.DockstoreTool;
 import io.dockstore.openapi.client.model.Label;
 import io.dockstore.openapi.client.model.PublishRequest;
@@ -810,7 +811,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                     description = "";
                 }
 
-                String author = container.getAuthor();
+                String author = container.getAuthors().isEmpty() ? "" : container.getAuthors().get(0).getName();
                 if (author == null) {
                     author = "";
                 }
@@ -1047,11 +1048,15 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 tool.setDefaultWDLTestParameterFile(testWdlPath);
                 tool.setGitUrl(gitUrl);
 
+
                 // The following is only for manual tools as only they can be private tools
                 if (tool.getMode() == DockstoreTool.ModeEnum.MANUAL_IMAGE_PATH) {
+
+                    boolean toolHasNullOrEmptyEmail = tool.getAuthors().isEmpty() || tool.getAuthors().stream().map(Author::getEmail).allMatch(Strings::isNullOrEmpty);
+
                     // Can't set tool maintainer null for private, published repos unless tool author email exists
                     if (tool.isIsPublished() && tool.isPrivateAccess()) {
-                        if (Strings.isNullOrEmpty(toolMaintainerEmail) && Strings.isNullOrEmpty(tool.getEmail())) {
+                        if (Strings.isNullOrEmpty(toolMaintainerEmail) && toolHasNullOrEmptyEmail) {
                             errorMessage("A published, private tool must have either an tool author email or tool maintainer email set up.",
                                     Client.CLIENT_ERROR);
                         }
@@ -1064,7 +1069,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
                     // When changing public tool to private and the tool is published, either tool author email or tool maintainer email must be set up
                     if (setPrivateAccess && !tool.isPrivateAccess() && tool.isIsPublished()) {
-                        if (Strings.isNullOrEmpty(toolMaintainerEmail) && Strings.isNullOrEmpty(tool.getEmail())) {
+                        if (Strings.isNullOrEmpty(toolMaintainerEmail) && toolHasNullOrEmptyEmail) {
                             errorMessage("A published, private tool must have either an tool author email or tool maintainer email set up.",
                                     Client.CLIENT_ERROR);
                         }

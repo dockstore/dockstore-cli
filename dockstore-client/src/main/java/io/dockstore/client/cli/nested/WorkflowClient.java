@@ -625,10 +625,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     description = "";
                 }
 
-                String author = workflow.getAuthor();
-                if (author == null) {
-                    author = "";
-                }
+
+                String author = workflow.getAuthors().isEmpty() ? "" : workflow.getAuthors().get(0).getName();
 
                 String date = lastUpdated.toString();
 
