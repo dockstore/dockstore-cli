@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~    Copyright 2017 OICR
+  ~    Copyright 2022 OICR, UCSC
   ~
   ~    Licensed under the Apache License, Version 2.0 (the "License");
   ~    you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>reports</artifactId>
+    <artifactId>dockstore-cli-reports</artifactId>
     <!-- do not set packaging to pom, because otherwise we will receive "Not executing Javadoc as the project is not a Java classpath-capable package" -->
 
     <dependencies>

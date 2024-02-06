@@ -1,0 +1,17 @@
+name: Tagged release deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      changelist:
+        description: 'patch and pre-release metadata'
+        required: true
+        default: '.0-alpha.1'
+
+
+jobs:
+  call-reusable-tagged-release:
+    uses: dockstore/workflow-actions/.github/workflows/deploy_tagged.yaml@main
+    with:
+      changelist: ${{ inputs.changelist }}
+    secrets: inherit

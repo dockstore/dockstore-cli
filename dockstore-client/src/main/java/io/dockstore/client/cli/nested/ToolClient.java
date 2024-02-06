@@ -30,8 +30,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.GenericType;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
@@ -39,19 +37,21 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Registry;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.ContainersApi;
+import io.dockstore.openapi.client.api.ContainertagsApi;
+import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.model.Author;
+import io.dockstore.openapi.client.model.DockstoreTool;
+import io.dockstore.openapi.client.model.Label;
+import io.dockstore.openapi.client.model.PublishRequest;
+import io.dockstore.openapi.client.model.SourceFile;
+import io.dockstore.openapi.client.model.StarRequest;
+import io.dockstore.openapi.client.model.Tag;
+import io.dockstore.openapi.client.model.ToolDescriptor;
+import io.dockstore.openapi.client.model.User;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.ContainersApi;
-import io.swagger.client.api.ContainertagsApi;
-import io.swagger.client.api.UsersApi;
-import io.swagger.client.model.DockstoreTool;
-import io.swagger.client.model.Label;
-import io.swagger.client.model.PublishRequest;
-import io.swagger.client.model.SourceFile;
-import io.swagger.client.model.StarRequest;
-import io.swagger.client.model.Tag;
-import io.swagger.client.model.ToolDescriptor;
-import io.swagger.client.model.User;
+import jakarta.ws.rs.core.GenericType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -92,6 +92,8 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     public static final String UPDATE_TOOL = "update_tool";
     public static final String VERSION_TAG = "version_tag";
     public static final String INVALID_TOOL_MODE_PUBLISH = "Custom entry names are not supported for " + DockstoreTool.ModeEnum.HOSTED + " tools.";
+    public static final String ALL_PUBLISHED_TOOLS = "ALL PUBLISHED TOOLS";
+
     private static final Logger LOG = LoggerFactory.getLogger(ToolClient.class);
     private final Client client;
     private ContainersApi containersApi;
@@ -331,11 +333,11 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             long containerId = container.getId();
 
             if (adds.size() > 0) {
-                containersApi.addTestParameterFiles(containerId, adds, descriptorType, "", versionName);
+                containersApi.addTestParameterFiles(containerId, "", adds, versionName, descriptorType);
             }
 
             if (removes.size() > 0) {
-                containersApi.deleteTestParameterFiles(containerId, removes, descriptorType, versionName);
+                containersApi.deleteTestParameterFiles(containerId, removes, versionName, descriptorType);
             }
 
             if (adds.size() > 0 || removes.size() > 0) {
@@ -372,7 +374,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
     protected void handleListUnstarredEntries() {
         try {
             List<DockstoreTool> containers = containersApi.allPublishedContainers(null, null, null, null, null);
-            out("ALL PUBLISHED TOOLS");
+            out(ALL_PUBLISHED_TOOLS);
             printLineBreak();
             printPublishedList(containers);
         } catch (ApiException ex) {
@@ -414,7 +416,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
             DockstoreTool container = containersApi.getPublishedContainerByToolPath(entry, null);
             StarRequest request = new StarRequest();
             request.setStar(star);
-            containersApi.starEntry(container.getId(), request);
+            containersApi.starEntry(request, container.getId());
             out("Successfully " + action + "red  " + entry);
         } catch (ApiException ex) {
             exceptionMessage(ex, "Unable to " + action + " container " + entry, Client.API_ERROR);
@@ -773,7 +775,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
             String combinedLabelString = generateLabelString(addsSet, removesSet, existingLabels);
 
-            DockstoreTool updatedContainer = containersApi.updateLabels(containerId, combinedLabelString, "");
+            DockstoreTool updatedContainer = containersApi.updateLabels(containerId,  "", combinedLabelString);
 
             List<Label> newLabels = updatedContainer.getLabels();
             if (!newLabels.isEmpty()) {
@@ -798,11 +800,10 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 errorMessage("This container is not published.", Client.COMMAND_ERROR);
             } else {
 
-                final Long lastBuildLong = container.getLastBuild();
+                final Date lastBuildLong = container.getLastBuild();
                 Date dateUploaded = null;
                 if (lastBuildLong != null) {
-                    final Date lastBuild = new Date(lastBuildLong);
-                    dateUploaded = Date.from(lastBuild.toInstant());
+                    dateUploaded = Date.from(lastBuildLong.toInstant());
                 }
 
                 String description = container.getDescription();
@@ -810,7 +811,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                     description = "";
                 }
 
-                String author = container.getAuthor();
+                String author = container.getAuthors().isEmpty() ? "" : container.getAuthors().get(0).getName();
                 if (author == null) {
                     author = "";
                 }
@@ -1047,11 +1048,15 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
                 tool.setDefaultWDLTestParameterFile(testWdlPath);
                 tool.setGitUrl(gitUrl);
 
+
                 // The following is only for manual tools as only they can be private tools
                 if (tool.getMode() == DockstoreTool.ModeEnum.MANUAL_IMAGE_PATH) {
+
+                    boolean toolHasNullOrEmptyEmail = tool.getAuthors().isEmpty() || tool.getAuthors().stream().map(Author::getEmail).allMatch(Strings::isNullOrEmpty);
+
                     // Can't set tool maintainer null for private, published repos unless tool author email exists
                     if (tool.isIsPublished() && tool.isPrivateAccess()) {
-                        if (Strings.isNullOrEmpty(toolMaintainerEmail) && Strings.isNullOrEmpty(tool.getEmail())) {
+                        if (Strings.isNullOrEmpty(toolMaintainerEmail) && toolHasNullOrEmptyEmail) {
                             errorMessage("A published, private tool must have either an tool author email or tool maintainer email set up.",
                                     Client.CLIENT_ERROR);
                         }
@@ -1064,7 +1069,7 @@ public class ToolClient extends AbstractEntryClient<DockstoreTool> {
 
                     // When changing public tool to private and the tool is published, either tool author email or tool maintainer email must be set up
                     if (setPrivateAccess && !tool.isPrivateAccess() && tool.isIsPublished()) {
-                        if (Strings.isNullOrEmpty(toolMaintainerEmail) && Strings.isNullOrEmpty(tool.getEmail())) {
+                        if (Strings.isNullOrEmpty(toolMaintainerEmail) && toolHasNullOrEmptyEmail) {
                             errorMessage("A published, private tool must have either an tool author email or tool maintainer email set up.",
                                     Client.CLIENT_ERROR);
                         }

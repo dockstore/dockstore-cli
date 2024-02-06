@@ -33,12 +33,12 @@
     -->
     <properties>
         <!-- the following properties set sane defaults when no revision properties are set from the command-line -->
-        <revision>1.14</revision>
+        <revision>1.15</revision>
         <changelist>.0-SNAPSHOT</changelist>
 
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.14.0-alpha.9</dockstore-core.version>
+        <dockstore-core.version>1.15.0-rc.1</dockstore-core.version>
         <maven-failsafe.version>2.22.2</maven-failsafe.version>
         <maven-surefire.version>2.22.2</maven-surefire.version>
         <skipTests>false</skipTests>
@@ -50,10 +50,10 @@
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <!-- this is not an aggregated path -->
         <sonar.coverage.jacoco.xmlReportPaths>
-            ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../reports/target/site/jacoco-aggregate/jacoco.xml
+            ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../dockstore-cli-reports/target/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         <!-- end sonarcloud properties -->
-        <cwlavro.version>2.0.4.7</cwlavro.version>
+        <cwlavro.version>2.0.4.9</cwlavro.version>
     </properties>
 
     <organization>
@@ -84,6 +84,11 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+	<repository>
+            <id>broad-dependencies.oicr.on.ca</id>
+            <name>broad-dependencies.oicr.on.ca</name>
+            <url>https://artifacts.oicr.on.ca/artifactory/broad-dependencies</url>
+        </repository>
         <repository>
             <id>apache-releases</id>
             <name>Apache Releases repository</name>
@@ -93,7 +98,7 @@
         <repository>
             <id>artifactory.broadinstitute.org</id>
             <name>artifactory.broadinstitute.org</name>
-            <url>https://artifactory.broadinstitute.org/artifactory/libs-release</url>
+	    <url>https://broadinstitute.jfrog.io/artifactory/libs-release/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -106,7 +111,7 @@
     <licenses>
         <license>
             <name>Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
 
@@ -116,6 +121,11 @@
             <name>artifacts.oicr.on.ca-releases</name>
             <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>artifacts.oicr.on.ca-snapshots</name>
+            <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <modules>
@@ -123,7 +133,7 @@
         <module>dockstore-client</module>
         <module>dockstore-cli-integration-testing</module>
         <module>support</module>
-        <module>reports</module>
+        <module>dockstore-cli-reports</module>
         <module>openapi-java-wes-client</module>
     </modules>
 
@@ -195,6 +205,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-vfs2</artifactId>
                 <version>2.9.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.22</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -461,13 +476,15 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>2.0.0</version>
+                <version>2.1.0</version>
                 <configuration>
                     <outputDirectory>${project.basedir}</outputDirectory>
                     <missingFile>THIRD-PARTY-LICENSES.properties</missingFile>
                     <thirdPartyFilename>THIRD-PARTY-LICENSES.txt</thirdPartyFilename>
                     <sortArtifactByName>true</sortArtifactByName>
                     <failOnMissing>true</failOnMissing>
+                    <!-- not sure why I needed this after excluding swagger client for core webservice, arguably not third party anyway -->
+                    <excludedGroups>io.dockstore</excludedGroups>
                 </configuration>
                 <executions>
                     <execution>
@@ -532,12 +549,22 @@
                                         <exclude>javax.servlet:javax.servlet-api</exclude>
                                         <!-- Replaced with jakarta.validation:jakarta.validation-api -->
                                         <exclude>javax.validation:validation-api</exclude>
-                                        <!-- Replaced with jakarta.xml.bind:jakarta.xml.bind-api -->
-                                        <exclude>javax.xml.bind:jaxb-api</exclude>
+                                        <!-- Replaced with jakarta.xml.bind:jakarta.xml.bind-api, but need to keep around for old plugins -->
+                                        <!-- <exclude>javax.xml.bind:jaxb-api</exclude> -->
                                         <!-- should be using v2 api -->
                                         <exclude>com.amazonaws:*</exclude>
                                         <!-- we should be using jpa 2.2 -->
                                         <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.1-api</exclude>
+                                        <!-- more bans from the javax to jakarta merge -->
+                                        <exclude>com.fasterxml.jackson.datatype:jackson-datatype-hibernate5</exclude>
+                                        <exclude>javax.persistence:javax.persistence-api</exclude>
+                                        <exclude>javax.transaction:javax.transaction-api</exclude>
+                                        <exclude>org.eclipse.jetty.toolchain:jetty-servlet-api</exclude>
+                                        <exclude>io.dropwizard.metrics:metrics-servlets</exclude>
+                                        <exclude>io.swagger.core.v3:swagger-integration</exclude>
+                                        <exclude>io.swagger:swagger-jaxrs</exclude>
+                                        <exclude>io.swagger.core.v3:swagger-jaxrs2-servlet-initializer</exclude>
+                                        <exclude>io.swagger:swagger-jersey2-jaxrs</exclude>
                                     </excludes>
                                 </bannedDependencies>
                             </rules>

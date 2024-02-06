@@ -21,7 +21,6 @@ import java.util.List;
 
 import io.dockstore.common.MuteForSuccessfulTests;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
@@ -32,6 +31,7 @@ import uk.org.webcompere.systemstubs.stream.SystemOut;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(SystemStubsExtension.class)
@@ -83,6 +83,32 @@ class YamlValidatorTest {
         }
     }
 
+    //Verifies .dockstore.yml is invalid when provided relative primary descriptor paths
+    @Test
+    void relativePrimaryPathYml() {
+        final String relativePathDockstoreYmlDirectory = "src/test/resources/YamlVerifyTestDirectory/relative-primary-descriptor-path";
+        try {
+            YamlVerifyUtility.dockstoreValidate(relativePathDockstoreYmlDirectory);
+            fail("Invalid YAML not caught");
+        } catch (YamlVerifyUtility.ValidateYamlException ex) {
+            assertTrue(ex.getMessage().contains("the path must be an absolute path to be valid"));
+        }
+
+    }
+
+    //Verifies .dockstore.yml is invalid when provided relative test descriptor paths
+    @Test
+    void relativeTestDescriptorPathYml() {
+        final String relativePathDockstoreYmlDirectory = "src/test/resources/YamlVerifyTestDirectory/relative-test-files-path";
+        try {
+            YamlVerifyUtility.dockstoreValidate(relativePathDockstoreYmlDirectory);
+            fail("Invalid YAML not caught");
+        } catch (YamlVerifyUtility.ValidateYamlException ex) {
+            assertTrue(ex.getMessage().contains("the path must be an absolute path to be valid"));
+        }
+
+    }
+
     @Test
     void invalidYaml() {
         final String baseTestDirectory = "src/test/resources/InvalidYamlSyntax/test";
@@ -100,7 +126,6 @@ class YamlValidatorTest {
     }
 
     // Invalid Yaml test
-    @Disabled("This test case is failing due to errors in DockstoreYamlHelper.readAsDockstoreYaml12(contents) see GitHub issue 4985")
     @Test
     void yamlNotAcceptableForDockstore() {
         final String testDirectory1 = "src/test/resources/YamlVerifyTestDirectory/2ToolsWithNoName";
@@ -123,7 +148,7 @@ class YamlValidatorTest {
                 + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/dockstore.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
                 + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore2.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
+                + testDirectory + "/Dockstore2.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
             try {
                 YamlVerifyUtility.dockstoreValidate(testDirectory);
                 fail("non-present test files not caught");
@@ -135,36 +160,20 @@ class YamlValidatorTest {
         for (String directoryEnd : directoryEnds2) {
             String testDirectory = baseTestDirectory + directoryEnd;
             String errorMsg = YamlVerifyUtility.MISSING_FILE_ERROR
-                + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/dockstore.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore2.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/dockstore2.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/dockstore2.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore2.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore3.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
+                + testDirectory + "/test2.file" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
+                + testDirectory + "/test3.file" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
+                + testDirectory + "/test1.file" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
+                + testDirectory + "/test5.file" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
+                + testDirectory + "/test6.file" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
+                + testDirectory + "/test7.file" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
+                + testDirectory + "/test4.file" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
+                + testDirectory + "/test8.file" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
             try {
                 YamlVerifyUtility.dockstoreValidate(testDirectory);
                 fail("non-present test files not caught");
             } catch (YamlVerifyUtility.ValidateYamlException ex) {
                 assertEquals(errorMsg, ex.getMessage());
             }
-        }
-    }
-
-    @Test
-    void allFilesNotPresentService() {
-        final String testDirectory = "src/test/resources/YamlVerifyTestDirectory/no-files-present/service";
-        try {
-            YamlVerifyUtility.dockstoreValidate(testDirectory);
-            fail("non-present test files not caught");
-        } catch (YamlVerifyUtility.ValidateYamlException ex) {
-            String errorMsg = YamlVerifyUtility.MISSING_FILE_ERROR
-                + testDirectory + "/dockstore.wdl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/dockstore.cwl.json" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore.cwl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST + System.lineSeparator()
-                + testDirectory + "/Dockstore2.wdl" + YamlVerifyUtility.FILE_DOES_NOT_EXIST;
-            assertEquals(errorMsg, ex.getMessage());
         }
     }
 
@@ -248,6 +257,47 @@ class YamlValidatorTest {
             assertEquals(errorMsg, ex.getMessage());
         }
     }
+
+    @Test
+    void invalidSubclass() {
+        String testDirectory = "src/test/resources/YamlVerifyTestDirectory/invalid-subclass";
+        try {
+            YamlVerifyUtility.dockstoreValidate(testDirectory);
+            fail("A .dockstore.yml file that is invalid passed the dockstoreValidate method without throwing an error");
+        } catch (YamlVerifyUtility.ValidateYamlException ex) {
+            String errorMsg = YamlVerifyUtility.INVALID_DOCKSTORE_YML + testDirectory + "/" + YamlVerifyUtility.DOCKSTOREYML
+                    + YamlVerifyUtility.CONTAINS_ERRORS
+                    // The below part of the error message is generated by this line,
+                    // https://github.com/dockstore/dockstore-cli/blob/5aac6e6d221b7618bc9769a95834f73f37f75aaf/dockstore-client/src/main/java/io/dockstore/client/cli/YamlVerifyUtility.java#L188
+                    + "Property \"workflows[0].subclass\" must be a supported descriptor language (\"CWL\", \"WDL\", "
+                    + "\"GALAXY\", or \"NFL\") (current value: \"INVALID_SUBCLASS\")";
+            assertEquals(errorMsg, ex.getMessage());
+        }
+    }
+
+    private void missingOrEmptyPrimaryDescriptorPathTest(String baseTestDirectory, List<String> directoryEnds) {
+        for (String directoryEnd : directoryEnds) {
+            try {
+                String testDirectory = baseTestDirectory + directoryEnd;
+                YamlVerifyUtility.dockstoreValidate(testDirectory);
+                fail("A .dockstore.yml that does not contain as primary descriptor path passed");
+            } catch (YamlVerifyUtility.ValidateYamlException ex) {
+                assertTrue(ex.getMessage().contains("primaryDescriptorPath\" is missing but required"));
+            }
+        }
+    }
+
+    @Test
+    void noPrimaryDescriptorPath() {
+        missingOrEmptyPrimaryDescriptorPathTest("src/test/resources/YamlVerifyTestDirectory/no-primary-descriptor-path/", Arrays.asList(TOOL, WORKFLOW));
+    }
+
+    @Test
+    void emptyPrimaryDescriptorPath() {
+        missingOrEmptyPrimaryDescriptorPathTest("src/test/resources/YamlVerifyTestDirectory/empty-primary-descriptor-path/", Arrays.asList(TOOL, WORKFLOW));
+    }
+
+
 }
 
 

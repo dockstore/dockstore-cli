@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.swagger.client.model.DockstoreTool;
-import io.swagger.client.model.Workflow;
+import io.dockstore.openapi.client.model.DockstoreTool;
+import io.dockstore.openapi.client.model.Workflow;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;

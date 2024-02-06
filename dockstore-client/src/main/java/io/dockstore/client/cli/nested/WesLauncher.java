@@ -14,12 +14,12 @@ import java.util.Optional;
 import io.dockstore.client.cli.SwaggerUtility;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.model.ToolDescriptor;
+import io.dockstore.openapi.client.model.Workflow;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
+import io.dockstore.openapi.client.model.WorkflowVersion;
 import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
 import io.openapi.wes.client.model.RunId;
-import io.swagger.client.model.ToolDescriptor;
-import io.swagger.client.model.Workflow;
-import io.swagger.client.model.WorkflowVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,7 +151,7 @@ public final class WesLauncher {
         String[] parts = workflowEntry.split(":");
         String path = parts[0];
         String version = workflowClient.getVersionID(workflowEntry);
-        return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW.toString(), null, version);
+        return workflowClient.getWorkflowsApi().getPublishedWorkflowByPath(path, WorkflowSubClass.BIOWORKFLOW, null, version);
     }
 
     /**

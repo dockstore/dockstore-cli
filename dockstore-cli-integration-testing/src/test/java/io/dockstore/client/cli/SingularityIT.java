@@ -9,16 +9,17 @@ import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.FlushingSystemErr;
 import io.dockstore.common.FlushingSystemOut;
 import io.dockstore.common.SourceControl;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.Workflow;
 import io.dropwizard.testing.ResourceHelpers;
-import io.swagger.client.ApiClient;
-import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.model.Workflow;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.security.SystemExit;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
 
@@ -62,13 +63,14 @@ class SingularityIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
                 "/checker-workflow-wrapping-workflow.cwl", "test", CWL.toString(), null);
-        workflowApi.refresh(workflow.getId(), true);
+        workflowApi.refresh1(workflow.getId(), true);
 
-        // run the md5sum-checker workflow
-        Client.main(new String[] { CONFIG,  // this config file passes the --singularity option to cwltool
-                SINGULARITY_CONFIG_TEMPLATE, WORKFLOW, LAUNCH, ENTRY,
-                SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", JSON,
-                ResourceHelpers.resourceFilePath("md5sum_cwl.json") });
+        new SystemExit().execute(() -> {
+            // run the md5sum-checker workflow
+            Client.main(new String[] { CONFIG,  // this config file passes the --singularity option to cwltool
+                    SINGULARITY_CONFIG_TEMPLATE, WORKFLOW, LAUNCH, ENTRY, SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test",
+                    JSON, ResourceHelpers.resourceFilePath("md5sum_cwl.json") });
+        });
 
         // the message "Creating SIF file" will only be in the output if the Singularity command starts successfully
         assertTrue(systemOutRule.getText().contains("Creating SIF file"), "assert output does not contain singularity command: " + systemOutRule.getText());
@@ -85,16 +87,18 @@ class SingularityIT extends BaseIT {
         WorkflowsApi workflowApi = new WorkflowsApi(webClient);
         Workflow workflow = workflowApi.manualRegister(SourceControl.GITHUB.getFriendlyName(), "DockstoreTestUser2/md5sum-checker",
                 "/checker-workflow-wrapping-workflow.wdl", "test", WDL.toString(), null);
-        workflowApi.refresh(workflow.getId(), true);
+        workflowApi.refresh1(workflow.getId(), true);
 
         // make a tmp copy of the dockstore config and add the cromwell conf file option to it
         // this is done in the test because the path to the cromwell conf is different if it's running locally vs. on Travis
         File tmpConfig = generateCromwellConfig();
 
-        // run the md5sum-checker workflow
-        Client.main(new String[] { CONFIG, tmpConfig.getAbsolutePath(), WORKFLOW, LAUNCH, ENTRY,
-                SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", JSON,
-                ResourceHelpers.resourceFilePath("md5sum_wdl.json") });
+        new SystemExit().execute(() -> {
+            // run the md5sum-checker workflow
+            Client.main(new String[] { CONFIG, tmpConfig.getAbsolutePath(), WORKFLOW, LAUNCH, ENTRY,
+                    SourceControl.GITHUB + "/DockstoreTestUser2/md5sum-checker/test", JSON,
+                    ResourceHelpers.resourceFilePath("md5sum_wdl.json") });
+        });
 
         // the phrase "singularity exec" will only be in the output if Singularity is actually being used
         assertTrue(systemOutRule.getText().contains("singularity exec"), "assert output contains singularity command");

@@ -82,7 +82,7 @@ public class LaunchTestYamlIT {
         args.add("--yaml");
         args.add(yamlTestParameterFile.getAbsolutePath());
         exit.expectSystemExit();
-        exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains("could not determine a constructor for the tag")));
+        exit.checkAssertionAfterwards(() -> Assert.assertTrue(systemErrRule.getLog().contains("Global tag is not allowed: tag:yaml.org,2002:javax.script.ScriptEngineManager")));
         Client.main(args.toArray(new String[0]));
     }
 

@@ -36,8 +36,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.ws.rs.ProcessingException;
-
 import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -52,20 +50,21 @@ import io.dockstore.client.cli.nested.WorkflowClient;
 import io.dockstore.common.GeneratedConstants;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridgeShutDown;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.Configuration;
+import io.dockstore.openapi.client.api.ContainersApi;
+import io.dockstore.openapi.client.api.ContainertagsApi;
+import io.dockstore.openapi.client.api.ExtendedGa4GhApi;
 import io.dockstore.openapi.client.api.Ga4Ghv20Api;
+import io.dockstore.openapi.client.api.MetadataApi;
+import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.auth.OAuth;
 import io.dockstore.openapi.client.model.TRSService;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerInterface;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.Configuration;
-import io.swagger.client.api.ContainersApi;
-import io.swagger.client.api.ContainertagsApi;
-import io.swagger.client.api.ExtendedGa4GhApi;
-import io.swagger.client.api.MetadataApi;
-import io.swagger.client.api.UsersApi;
-import io.swagger.client.api.WorkflowsApi;
-import io.swagger.client.auth.ApiKeyAuth;
+import jakarta.ws.rs.ProcessingException;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -833,9 +832,8 @@ public class Client {
         final String userAgent = "Dockstore-CLI/" + cliVersion + "/java";
         defaultApiClient.setUserAgent(userAgent);
 
-        ApiKeyAuth bearer = (ApiKeyAuth)defaultApiClient.getAuthentication("BEARER");
-        bearer.setApiKeyPrefix("BEARER");
-        bearer.setApiKey(token);
+        OAuth bearer = (OAuth)defaultApiClient.getAuthentication("BEARER");
+        bearer.setAccessToken(token);
         defaultApiClient.setBasePath(serverUrl);
 
         ContainersApi containersApi = new ContainersApi(defaultApiClient);

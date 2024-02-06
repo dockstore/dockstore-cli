@@ -26,8 +26,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.dockstore.client.cli.SearchClient;
-import io.swagger.client.model.ToolV1;
-import io.swagger.client.model.Workflow;
+import io.dockstore.openapi.client.model.ToolV1;
+import io.dockstore.openapi.client.model.Workflow;
 
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.Client.WORKFLOW;

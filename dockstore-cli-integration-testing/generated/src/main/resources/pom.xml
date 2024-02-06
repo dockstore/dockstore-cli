@@ -19,37 +19,43 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.dockstore</groupId>
   <artifactId>dockstore-cli-integration-testing</artifactId>
-  <version>1.14.0-SNAPSHOT</version>
+  <version>1.15.0-SNAPSHOT</version>
   <licenses>
     <license>
       <name>Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
     </license>
   </licenses>
   <dependencies>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-client</artifactId>
-      <version>1.14.0-SNAPSHOT</version>
+      <version>1.15.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-integration-testing</artifactId>
-      <version>1.14.0-alpha.9</version>
+      <version>1.15.0-rc.1</version>
       <classifier>tests</classifier>
       <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>io.dockstore</groupId>
+          <artifactId>swagger-java-client</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.14.0-alpha.9</version>
+      <version>1.15.0-rc.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-webservice</artifactId>
-      <version>1.14.0-alpha.9</version>
+      <version>1.15.0-rc.1</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -61,13 +67,13 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.14.0-alpha.9</version>
+      <version>1.15.0-rc.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-jdbi3</artifactId>
-      <version>2.1.5</version>
+      <version>4.0.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -85,21 +91,21 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.11</version>
+      <version>1.4.12</version>
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
-      <version>1.2.11</version>
+      <version>1.4.12</version>
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-cbor</artifactId>
-      <version>2.13.5</version>
+      <version>2.15.2</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
@@ -120,6 +126,11 @@
       <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
     </repository>
     <repository>
+      <id>broad-dependencies.oicr.on.ca</id>
+      <name>broad-dependencies.oicr.on.ca</name>
+      <url>https://artifacts.oicr.on.ca/artifactory/broad-dependencies</url>
+    </repository>
+    <repository>
       <id>apache-releases</id>
       <name>Apache Releases repository</name>
       <url>https://repository.apache.org/content/repositories/releases/</url>
@@ -133,7 +144,7 @@
       </snapshots>
       <id>artifactory.broadinstitute.org</id>
       <name>artifactory.broadinstitute.org</name>
-      <url>https://artifactory.broadinstitute.org/artifactory/libs-release</url>
+      <url>https://broadinstitute.jfrog.io/artifactory/libs-release/</url>
     </repository>
   </repositories>
 </project>

@@ -1,0 +1,13 @@
+version: 1.2
+workflows:
+  -  subclass: INVALID_SUBCLASS
+     name: wdl-workflow
+     publish: true
+     primaryDescriptorPath: /Dockstore2.wdl
+     testParameterFiles:
+       - /dockstore.wdl.json
+     filters:
+       branches:
+         - develop
+       tags:
+         - gwas*

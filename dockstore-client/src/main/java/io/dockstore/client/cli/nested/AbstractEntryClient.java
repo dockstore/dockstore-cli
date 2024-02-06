@@ -62,7 +62,11 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.Utilities;
 import io.dockstore.common.WdlBridge;
+import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.api.Ga4Ghv20Api;
+import io.dockstore.openapi.client.model.Label;
+import io.dockstore.openapi.client.model.SourceFile;
+import io.dockstore.openapi.client.model.ToolDescriptor;
 import io.dockstore.openapi.client.model.ToolFile;
 import io.github.collaboratory.cwl.CWLClient;
 import io.github.collaboratory.nextflow.NextflowClient;
@@ -73,10 +77,6 @@ import io.openapi.wes.client.model.RunListResponse;
 import io.openapi.wes.client.model.RunLog;
 import io.openapi.wes.client.model.RunStatus;
 import io.openapi.wes.client.model.ServiceInfo;
-import io.swagger.client.ApiException;
-import io.swagger.client.model.Label;
-import io.swagger.client.model.SourceFile;
-import io.swagger.client.model.ToolDescriptor;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.SubnodeConfiguration;
 import org.apache.commons.io.FileUtils;
@@ -88,6 +88,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.parser.ParserException;
@@ -190,7 +191,6 @@ public abstract class AbstractEntryClient<T> {
     boolean isLocalEntry = false;
     boolean ignoreChecksums = false;
 
-    private boolean isWesCommand = false;
     private WesRequestData wesRequestData = null;
 
     static String getCleanedDescription(String description) {
@@ -209,10 +209,6 @@ public abstract class AbstractEntryClient<T> {
 
     public void setWesRequestData(WesRequestData wrd) {
         this.wesRequestData = wrd;
-    }
-
-    public boolean isWesCommand() {
-        return isWesCommand;
     }
 
     boolean isLocalEntry() {
@@ -361,7 +357,6 @@ public abstract class AbstractEntryClient<T> {
                 testParameter(args);
                 break;
             case WES:
-                isWesCommand = true;
                 if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
                     processWesCommands(args);
                 } else {
@@ -369,9 +364,9 @@ public abstract class AbstractEntryClient<T> {
                 }
                 break;
             default:
-                List<String> possibleCommands = new ArrayList<>();
-                possibleCommands.addAll(Arrays.asList(INFO, LIST, SEARCH, PUBLISH, STAR, REFRESH, LABEL, MANUAL_PUBLISH,
-                        CONVERT, LAUNCH, DOWNLOAD, VERIFY, TEST_PARAMETER, WDL.toString(), CWL.toString()));
+                List<String> possibleCommands = new ArrayList<>(
+                        Arrays.asList(INFO, LIST, SEARCH, PUBLISH, STAR, REFRESH, LABEL, MANUAL_PUBLISH, CONVERT, LAUNCH, DOWNLOAD, VERIFY,
+                                TEST_PARAMETER, WDL.toString(), CWL.toString()));
 
                 if (WORKFLOW.equalsIgnoreCase(getEntryType())) {
                     possibleCommands.addAll(Arrays.asList(WES, NFL));
@@ -1983,7 +1978,7 @@ public abstract class AbstractEntryClient<T> {
      * @return json string representation of the yaml content
      */
     public String fileToJSON(String yamlRun) throws IOException {
-        Yaml yaml = new Yaml(new SafeConstructor());
+        Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
         try (FileInputStream fileInputStream = FileUtils.openInputStream(new File(yamlRun))) {
             Map<String, Object> map = yaml.load(fileInputStream);
             JSONObject jsonObject = new JSONObject(map);

@@ -117,7 +117,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         assertEquals(1, count, "there should be 1 matching workflow, there is " + count);
 
         final long count2 = testingPostgres
-            .runSelectStatement("select count(*) from workflow w, workflowversion wv where wv.id = w.actualdefaultversion and wv.name = 'testWDL' and w.author is null and w.email is null",
+            .runSelectStatement("select count(*) from workflow w, workflowversion wv where wv.id = w.actualdefaultversion and wv.name = 'testWDL' and actualdefaultversion not in (select versionid from author) and actualdefaultversion not in (select versionid from version_orcidauthor)",
                 long.class);
         assertEquals(1, count2, "The given workflow shouldn't have any contact info");
 
@@ -133,7 +133,7 @@ class ManualPublishWorkflowIT extends BaseIT {
         assertEquals(1, count3, "there should be 1 matching workflow, there is " + count3);
 
         final long count4 = testingPostgres.runSelectStatement(
-            "select count(*) from workflow w, workflowversion wv where w.actualdefaultversion = wv.id and wv.name = 'testBoth' and w.author = 'testAuthor' and w.email = 'testEmail'",
+            "select count(*) from workflow w, workflowversion wv where w.actualdefaultversion = wv.id and wv.name = 'testBoth' and actualdefaultversion in (select versionid from author where name = 'testAuthor' and email = 'testEmail')",
             long.class);
         assertEquals(1, count4, "The given workflow should have contact info");
 

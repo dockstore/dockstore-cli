@@ -14,6 +14,7 @@ import io.github.collaboratory.cwl.cwlrunner.CWLRunnerInterface;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -63,7 +64,7 @@ public class CwltoolLauncher extends BaseLauncher {
     @Override
     public void provisionOutputFiles(String stdout, String stderr, String wdlOutputTarget) {
         outputIntegrationOutput(workingDirectory + "/outputs/", stdout, stderr, FilenameUtils.getName(command.get(0)));
-        Yaml yaml = new Yaml(new SafeConstructor());
+        Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
         Map<String, Object> outputObj = yaml.load(stdout);
         if (outputMap.size() > 0) {
             System.out.println("Provisioning your output files to their final destinations");
