@@ -35,7 +35,8 @@ jobs:
         name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: java           
+          languages: java
+          queries: security-and-quality
       - name: Build with mvnw
         run: ./mvnw clean install
 
