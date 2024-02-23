@@ -1,13 +1,15 @@
 #!/usr/bin/env nextflow
-echo true
-
-cheers = Channel.from 'Bonjour', 'Ciao', 'Hello', 'Hola'
+params.str = 'Hello'
 
 process sayHello {
   input:
-    val x from params.str
+  val x from params.str
   script:
-    """
-    echo '$x world!'
-    """
+  """
+  echo '$x world!'
+  """
+}
+
+workflow {
+    sayHello
 }

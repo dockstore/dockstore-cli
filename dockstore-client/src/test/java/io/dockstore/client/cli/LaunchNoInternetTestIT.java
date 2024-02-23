@@ -224,7 +224,7 @@ class LaunchNoInternetTestIT {
      * Everything correctly configured with NFL workflow
      */
     @Test
-    void correctNFL() throws IOException {
+    void correctNFL() throws Exception {
         copyNFLFiles();
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/NFL/nextflow.config"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("nextflow_rnatoy/test.json"));
@@ -252,7 +252,7 @@ class LaunchNoInternetTestIT {
      * Everything correctly configured with WDL workflow
      */
     @Test
-    void correctWDL() throws IOException {
+    void correctWDL() throws Exception {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/WDL/nonexistent_image.wdl"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/WDL/test.json"));
         String toWrite = "docker-images = " + dockerImageDirectory;
@@ -270,7 +270,7 @@ class LaunchNoInternetTestIT {
         args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
 
-        Client.main(args.toArray(new String[0]));
+        catchSystemExit(() -> Client.main(args.toArray(new String[0])));
         assertTrue(systemOutRule.getText().contains("Output files left in place"), "Final process status was not success");
     }
 
