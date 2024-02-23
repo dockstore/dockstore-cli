@@ -243,7 +243,7 @@ class LaunchNoInternetTestIT {
         args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
 
-        Client.main(args.toArray(new String[0]));
+        catchSystemExit(() -> Client.main(args.toArray(new String[0])));
         assertTrue(systemOutRule.getText().contains("Saving copy of Nextflow stdout to: "),
                 "Final process status was not success");
     }
@@ -252,7 +252,7 @@ class LaunchNoInternetTestIT {
      * Everything correctly configured with WDL workflow
      */
     @Test
-    void correctWDL() throws Exception {
+    void correctWDL() throws IOException {
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/WDL/nonexistent_image.wdl"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/WDL/test.json"));
         String toWrite = "docker-images = " + dockerImageDirectory;
@@ -270,7 +270,7 @@ class LaunchNoInternetTestIT {
         args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
 
-        catchSystemExit(() -> Client.main(args.toArray(new String[0])));
+        Client.main(args.toArray(new String[0]));
         assertTrue(systemOutRule.getText().contains("Output files left in place"), "Final process status was not success");
     }
 
