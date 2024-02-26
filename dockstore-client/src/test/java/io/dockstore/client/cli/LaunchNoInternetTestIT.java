@@ -1,5 +1,19 @@
 package io.dockstore.client.cli;
 
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import io.dockstore.common.MuteForSuccessfulTests;
+import io.dockstore.common.Utilities;
+import io.dropwizard.testing.ResourceHelpers;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -7,10 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.dockstore.common.MuteForSuccessfulTests;
-import io.dockstore.common.Utilities;
-import io.dropwizard.testing.ResourceHelpers;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,17 +32,6 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-
-import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
-import static io.dockstore.client.cli.Client.TOOL;
-import static io.dockstore.client.cli.Client.WORKFLOW;
-import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 /**
  * Tests CLI launching with image on filesystem instead of internet
@@ -224,7 +223,7 @@ class LaunchNoInternetTestIT {
      * Everything correctly configured with NFL workflow
      */
     @Test
-    void correctNFL() throws Exception {
+    void correctNFL() throws IOException {
         copyNFLFiles();
         File descriptorFile = new File(ResourceHelpers.resourceFilePath("nonexistent_image/NFL/nextflow.config"));
         File jsonFile = new File(ResourceHelpers.resourceFilePath("nextflow_rnatoy/test.json"));
@@ -243,7 +242,7 @@ class LaunchNoInternetTestIT {
         args.add(CONFIG);
         args.add(configPath.getAbsolutePath());
 
-        catchSystemExit(() -> Client.main(args.toArray(new String[0])));
+        Client.main(args.toArray(new String[0]));
         assertTrue(systemOutRule.getText().contains("Saving copy of Nextflow stdout to: "),
                 "Final process status was not success");
     }
