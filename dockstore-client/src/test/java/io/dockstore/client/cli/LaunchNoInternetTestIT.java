@@ -65,7 +65,7 @@ class LaunchNoInternetTestIT {
      */
     @BeforeAll
     public static void downloadCustomDockerImage() throws IOException {
-        Utilities.executeCommand("DOCKER_BUILDKIT=0 docker build -f " + DOCKERFILE + " . -t " + FAKE_IMAGE_NAME, System.out, System.err);
+        Utilities.executeCommand("docker build -f " + DOCKERFILE + " . -t " + FAKE_IMAGE_NAME, System.out, System.err);
         dockerImageDirectory = Files.createTempDirectory("docker_images").toAbsolutePath().toString();
         Utilities.executeCommand("docker save -o " + dockerImageDirectory + "/fakeImage " + FAKE_IMAGE_NAME, System.out, System.err);
     }
