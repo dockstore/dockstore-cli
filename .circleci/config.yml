@@ -141,7 +141,6 @@ jobs:
     environment:
       TESTING_PROFILE: non-confidential-tests
       MAVEN_GOAL: verify
-      DOCKER_BUILDKIT: 0
     steps:
     - setup_and_run_integration_tests
 
