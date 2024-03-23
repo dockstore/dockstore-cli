@@ -1,8 +1,13 @@
 package io.dockstore.client.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+import static io.dockstore.common.DescriptorLanguage.WDL;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.dockstore.client.cli.nested.SingularityTest;
 import io.dockstore.common.CLICommonTestUtilities;
@@ -13,6 +18,9 @@ import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.api.WorkflowsApi;
 import io.dockstore.openapi.client.model.Workflow;
 import io.dropwizard.testing.ResourceHelpers;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -22,15 +30,6 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.security.SystemExit;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-
-import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.WORKFLOW;
-import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
-import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
-import static io.dockstore.common.DescriptorLanguage.CWL;
-import static io.dockstore.common.DescriptorLanguage.WDL;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag(SingularityTest.NAME)
 class SingularityIT extends BaseIT {

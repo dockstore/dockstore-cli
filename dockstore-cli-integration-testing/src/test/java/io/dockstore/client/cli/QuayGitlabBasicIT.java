@@ -1,5 +1,14 @@
 package io.dockstore.client.cli;
 
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
 import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.ConfidentialTest;
 import io.dockstore.common.Registry;
@@ -13,15 +22,6 @@ import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
-import static io.dockstore.client.cli.Client.TOOL;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
-import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
 
 @Tag(ConfidentialTest.NAME)
 @Tag(ToolTest.NAME)

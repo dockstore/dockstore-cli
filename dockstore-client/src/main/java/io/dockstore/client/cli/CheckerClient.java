@@ -1,20 +1,5 @@
 package io.dockstore.client.cli;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.openapi.client.ApiException;
-import io.dockstore.openapi.client.api.UsersApi;
-import io.dockstore.openapi.client.api.WorkflowsApi;
-import io.dockstore.openapi.client.model.Entry;
-import io.dockstore.openapi.client.model.Workflow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.ArgumentUtility.containsHelpRequest;
@@ -39,6 +24,20 @@ import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.dockstore.common.DescriptorLanguage.WDL;
 import static java.lang.String.join;
+
+import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.Entry;
+import io.dockstore.openapi.client.model.Workflow;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This implements all operations on the CLI that are specific to checkers

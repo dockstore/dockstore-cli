@@ -1,7 +1,6 @@
 package io.dockstore.common;
 
 import java.io.OutputStream;
-
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 
 public class FlushingSystemErr extends SystemErr {

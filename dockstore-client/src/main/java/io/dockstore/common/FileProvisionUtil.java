@@ -15,6 +15,12 @@
  */
 package io.dockstore.common;
 
+import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
+import static io.dockstore.client.cli.Client.PLUGIN;
+
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import io.dockstore.provision.ProgressPrinter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,10 +39,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import io.dockstore.provision.ProgressPrinter;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.io.CopyStreamEvent;
@@ -60,9 +62,6 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.PluginManager;
-
-import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
-import static io.dockstore.client.cli.Client.PLUGIN;
 
 /**
  * @author dyuen

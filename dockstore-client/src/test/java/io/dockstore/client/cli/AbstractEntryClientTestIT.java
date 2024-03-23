@@ -1,21 +1,5 @@
 package io.dockstore.client.cli;
 
-import io.dockstore.client.cli.nested.AbstractEntryClient;
-import io.dockstore.client.cli.nested.WesCommandParser;
-import io.dockstore.client.cli.nested.WesRequestData;
-import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.MuteForSuccessfulTests;
-import io.dockstore.openapi.client.api.UsersApi;
-import io.dockstore.openapi.client.api.WorkflowsApi;
-import io.dropwizard.testing.ResourceHelpers;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.HELP;
@@ -35,6 +19,22 @@ import static org.mockito.Mockito.mock;
 import static software.amazon.awssdk.profiles.ProfileFileSystemSetting.AWS_CONFIG_FILE;
 import static software.amazon.awssdk.profiles.ProfileFileSystemSetting.AWS_SHARED_CREDENTIALS_FILE;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import io.dockstore.client.cli.nested.AbstractEntryClient;
+import io.dockstore.client.cli.nested.WesCommandParser;
+import io.dockstore.client.cli.nested.WesRequestData;
+import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.MuteForSuccessfulTests;
+import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dropwizard.testing.ResourceHelpers;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 @ExtendWith(SystemStubsExtension.class)
 @ExtendWith(MuteForSuccessfulTests.class)

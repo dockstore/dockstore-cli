@@ -16,41 +16,6 @@
 
 package io.dockstore.client.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import com.google.common.collect.Lists;
-import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.CLICommonTestUtilities;
-import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.SourceControl;
-import io.dockstore.common.WorkflowTest;
-import io.dockstore.openapi.client.ApiClient;
-import io.dockstore.openapi.client.api.HostedApi;
-import io.dockstore.openapi.client.api.WorkflowsApi;
-import io.dockstore.openapi.client.model.SourceFile;
-import io.dockstore.openapi.client.model.Workflow;
-import io.dockstore.openapi.client.model.WorkflowSubClass;
-import io.dockstore.openapi.client.model.WorkflowVersion;
-import io.dropwizard.testing.ResourceHelpers;
-import jakarta.ws.rs.core.GenericType;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CHECKER;
@@ -67,6 +32,40 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import com.google.common.collect.Lists;
+import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.CLICommonTestUtilities;
+import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.SourceControl;
+import io.dockstore.common.WorkflowTest;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.api.HostedApi;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.SourceFile;
+import io.dockstore.openapi.client.model.Workflow;
+import io.dockstore.openapi.client.model.WorkflowSubClass;
+import io.dockstore.openapi.client.model.WorkflowVersion;
+import io.dropwizard.testing.ResourceHelpers;
+import jakarta.ws.rs.core.GenericType;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 /**
  * Extra confidential integration tests, focus on testing workflow interactions

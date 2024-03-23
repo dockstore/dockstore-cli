@@ -15,18 +15,17 @@
  */
 package io.github.collaboratory.cwl.cwlrunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import static io.dockstore.client.cli.Client.VERSION;
 
 import com.google.common.base.Joiner;
 import io.dockstore.client.cli.ArgumentUtility;
 import io.dockstore.client.cli.Client;
 import io.dockstore.openapi.client.api.MetadataApi;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-
-import static io.dockstore.client.cli.Client.VERSION;
 
 public class GenericCWLRunnerWrapper implements CWLRunnerInterface {
     @Override

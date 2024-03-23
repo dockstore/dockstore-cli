@@ -1,12 +1,11 @@
 package io.dockstore.client.cli.nested;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.NextflowUtilities;
 import io.dockstore.common.Utilities;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.configuration2.INIConfiguration;
 
 public class NextflowLauncher extends BaseLauncher {

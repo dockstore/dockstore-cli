@@ -15,20 +15,6 @@
  */
 package io.dockstore.client.cli;
 
-import java.io.IOException;
-
-import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.TestUtility;
-import io.dockstore.common.ToolTest;
-import io.dropwizard.testing.ResourceHelpers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.security.SystemExit;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.TOOL;
@@ -37,6 +23,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.TestUtility;
+import io.dockstore.common.ToolTest;
+import io.dropwizard.testing.ResourceHelpers;
+import java.io.IOException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.security.SystemExit;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 /**
  * @author gluu

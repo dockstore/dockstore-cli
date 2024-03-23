@@ -15,15 +15,14 @@
  */
 package io.github.collaboratory.cwl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+import static io.dockstore.common.FileProvisioning.getCacheDirectory;
+import static org.junit.Assert.assertTrue;
 
 import com.google.gson.Gson;
 import io.dockstore.client.cli.Client;
@@ -36,6 +35,15 @@ import io.dockstore.openapi.client.Configuration;
 import io.dockstore.openapi.client.api.MetadataApi;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerInterface;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -45,15 +53,6 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.ExpectedException;
-
-import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
-import static io.dockstore.client.cli.Client.TOOL;
-import static io.dockstore.client.cli.Client.WORKFLOW;
-import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
-import static io.dockstore.common.FileProvisioning.getCacheDirectory;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author dyuen

@@ -16,32 +16,6 @@
 
 package io.dockstore.client.cli;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.MuteForSuccessfulTests;
-import io.dockstore.common.Utilities;
-import io.dockstore.openapi.client.api.UsersApi;
-import io.dockstore.openapi.client.api.WorkflowsApi;
-import io.dockstore.openapi.client.model.ToolDescriptor;
-import io.dockstore.openapi.client.model.Workflow;
-import io.dockstore.openapi.client.model.WorkflowSubClass;
-import io.dockstore.openapi.client.model.WorkflowVersion;
-import io.dropwizard.testing.ResourceHelpers;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.ERROR_MESSAGE_START;
@@ -71,6 +45,31 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.MuteForSuccessfulTests;
+import io.dockstore.common.Utilities;
+import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.ToolDescriptor;
+import io.dockstore.openapi.client.model.Workflow;
+import io.dockstore.openapi.client.model.WorkflowSubClass;
+import io.dockstore.openapi.client.model.WorkflowVersion;
+import io.dropwizard.testing.ResourceHelpers;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 @ExtendWith(SystemStubsExtension.class)
 @ExtendWith(MuteForSuccessfulTests.class)

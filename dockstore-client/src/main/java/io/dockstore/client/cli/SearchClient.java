@@ -15,7 +15,14 @@
  */
 package io.dockstore.client.cli;
 
-import java.util.List;
+import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.PLUGIN;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.SEARCH;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -28,17 +35,9 @@ import io.dockstore.common.ToolWorkflowDeserializer;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.api.ExtendedGa4GhApi;
 import io.dockstore.openapi.client.model.ToolV1;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
-import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.Client.HELP;
-import static io.dockstore.client.cli.Client.PLUGIN;
-import static io.dockstore.client.cli.Client.TOOL;
-import static io.dockstore.client.cli.Client.WORKFLOW;
-import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.SEARCH;
 
 /**
  * @author dyuen

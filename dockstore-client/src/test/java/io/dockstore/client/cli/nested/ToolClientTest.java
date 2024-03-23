@@ -15,6 +15,8 @@
  */
 package io.dockstore.client.cli.nested;
 
+import static org.mockito.Mockito.when;
+
 import io.dockstore.client.cli.Client;
 import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.openapi.client.ApiException;
@@ -28,8 +30,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import static org.mockito.Mockito.when;
 
 class ToolClientTest {
 

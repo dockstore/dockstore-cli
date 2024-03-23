@@ -16,23 +16,22 @@
 
 package io.dockstore.client.cli;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import io.dockstore.openapi.client.model.DockstoreTool;
-import io.dockstore.openapi.client.model.Workflow;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.DEBUG_FLAG;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static java.lang.Math.max;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
+import io.dockstore.openapi.client.model.DockstoreTool;
+import io.dockstore.openapi.client.model.Workflow;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Organizes all methods that have to do with parsing of input and creation of output.

@@ -15,18 +15,6 @@
  */
 package io.dockstore.client.cli;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import com.beust.jcommander.DefaultUsageFormatter;
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterDescription;
-import com.beust.jcommander.Strings;
-import com.beust.jcommander.WrappedParameter;
-
 import static io.dockstore.client.cli.ArgumentUtility.invalid;
 import static io.dockstore.client.cli.ArgumentUtility.out;
 import static io.dockstore.client.cli.ArgumentUtility.outFormatted;
@@ -36,6 +24,17 @@ import static io.dockstore.client.cli.Client.WORKFLOW;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 import static java.lang.String.join;
+
+import com.beust.jcommander.DefaultUsageFormatter;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterDescription;
+import com.beust.jcommander.Strings;
+import com.beust.jcommander.WrappedParameter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author gluu

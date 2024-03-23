@@ -15,25 +15,18 @@
  */
 package io.github.collaboratory.cwl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
+import static io.dockstore.client.cli.Client.GENERIC_ERROR;
+import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.Client.SCRIPT;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
@@ -61,6 +54,25 @@ import io.dockstore.common.FileProvisioning;
 import io.dockstore.common.Utilities;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.model.ToolDescriptor;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -77,19 +89,6 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
-
-import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
-import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
-import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
-import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.Client.API_ERROR;
-import static io.dockstore.client.cli.Client.CLIENT_ERROR;
-import static io.dockstore.client.cli.Client.ENTRY_NOT_FOUND;
-import static io.dockstore.client.cli.Client.GENERIC_ERROR;
-import static io.dockstore.client.cli.Client.IO_ERROR;
-import static io.dockstore.client.cli.Client.SCRIPT;
-import static io.dockstore.client.cli.Client.TOOL;
-import static io.dockstore.client.cli.Client.WORKFLOW;
 
 /**
  * Grouping code for launching CWL tools and workflows

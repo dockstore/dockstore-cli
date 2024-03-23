@@ -1,19 +1,5 @@
 package io.dockstore.client.cli;
 
-import io.dockstore.common.CLICommonTestUtilities;
-import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.ToilCompatibleTest;
-import io.dockstore.common.WorkflowTest;
-import io.dropwizard.testing.ResourceHelpers;
-import org.junit.experimental.categories.Category;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
@@ -28,6 +14,20 @@ import static io.dockstore.common.DescriptorLanguage.CWL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import io.dockstore.common.CLICommonTestUtilities;
+import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.ToilCompatibleTest;
+import io.dockstore.common.WorkflowTest;
+import io.dropwizard.testing.ResourceHelpers;
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 @Tag(ConfidentialTest.NAME)
 @Tag(WorkflowTest.NAME)

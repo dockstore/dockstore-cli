@@ -1,28 +1,5 @@
 package io.dockstore.client.cli.nested;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import io.dockstore.client.cli.SwaggerUtility;
-import io.dockstore.openapi.client.ApiClient;
-import io.dockstore.openapi.client.ApiException;
-import io.dockstore.openapi.client.model.ToolDescriptor;
-import io.dockstore.openapi.client.model.Workflow;
-import io.dockstore.openapi.client.model.WorkflowSubClass;
-import io.dockstore.openapi.client.model.WorkflowVersion;
-import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
-import io.openapi.wes.client.model.RunId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
@@ -33,6 +10,28 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
 import static io.dockstore.client.cli.nested.WesCommandParser.ID;
 import static io.dockstore.common.DescriptorLanguage.CWL;
 import static io.github.collaboratory.cwl.CWLClient.WES;
+
+import io.dockstore.client.cli.SwaggerUtility;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.model.ToolDescriptor;
+import io.dockstore.openapi.client.model.Workflow;
+import io.dockstore.openapi.client.model.WorkflowSubClass;
+import io.dockstore.openapi.client.model.WorkflowVersion;
+import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
+import io.openapi.wes.client.model.RunId;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class WesLauncher {
 

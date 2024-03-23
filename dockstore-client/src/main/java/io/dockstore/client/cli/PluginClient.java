@@ -15,25 +15,6 @@
  */
 package io.dockstore.client.cli;
 
-import java.util.Collections;
-import java.util.List;
-
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.MissingCommandException;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
-import com.beust.jcommander.Parameters;
-import com.google.common.base.Joiner;
-import io.dockstore.common.FileProvisionUtil;
-import io.dockstore.common.TabExpansionUtil;
-import io.dockstore.provision.PreProvisionInterface;
-import io.dockstore.provision.ProvisionInterface;
-import org.apache.commons.configuration2.INIConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ro.fortsoft.pf4j.PluginManager;
-import ro.fortsoft.pf4j.PluginWrapper;
-
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.ArgumentUtility.out;
@@ -46,6 +27,24 @@ import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
 import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParameter;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
 import static java.lang.String.join;
+
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.MissingCommandException;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.Parameters;
+import com.google.common.base.Joiner;
+import io.dockstore.common.FileProvisionUtil;
+import io.dockstore.common.TabExpansionUtil;
+import io.dockstore.provision.PreProvisionInterface;
+import io.dockstore.provision.ProvisionInterface;
+import java.util.Collections;
+import java.util.List;
+import org.apache.commons.configuration2.INIConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ro.fortsoft.pf4j.PluginManager;
+import ro.fortsoft.pf4j.PluginWrapper;
 
 /**
  *

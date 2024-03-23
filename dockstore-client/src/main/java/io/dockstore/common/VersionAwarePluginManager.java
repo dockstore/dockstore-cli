@@ -15,14 +15,15 @@
  */
 package io.dockstore.common;
 
+import static io.dockstore.client.cli.Client.PLUGIN;
+
+import com.github.zafarkhaja.semver.Version;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.github.zafarkhaja.semver.Version;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -34,8 +35,6 @@ import ro.fortsoft.pf4j.PluginException;
 import ro.fortsoft.pf4j.util.AndFileFilter;
 import ro.fortsoft.pf4j.util.DirectoryFileFilter;
 import ro.fortsoft.pf4j.util.NotFileFilter;
-
-import static io.dockstore.client.cli.Client.PLUGIN;
 
 /**
  * This extends the default plugin manager to be version-aware (take the latest version of a plugin)
