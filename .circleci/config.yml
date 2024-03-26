@@ -45,7 +45,7 @@ common_jobs: &common_jobs
             requires:
               - find-develop-snapshot
             context:
-              - oicr-slack-cli
+              - oicr-slack
         - unit-tests:
             <<: *common_filters
             requires:
@@ -235,9 +235,11 @@ jobs:
             - .
         # Remove nightly condition for now, testing app setup
       - slack/notify:
+          channel: $slack_id
           event: fail
           template: basic_fail_1
       - slack/notify:
+          channel: $slack_id
           event: pass
           template: basic_success_1
   sonar-cloud:
