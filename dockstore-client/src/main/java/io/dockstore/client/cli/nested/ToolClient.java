@@ -16,48 +16,6 @@
 
 package io.dockstore.client.cli.nested;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
-import io.dockstore.client.cli.Client;
-import io.dockstore.client.cli.SwaggerUtility;
-import io.dockstore.common.DescriptorLanguage;
-import io.dockstore.common.Registry;
-import io.dockstore.openapi.client.ApiException;
-import io.dockstore.openapi.client.api.ContainersApi;
-import io.dockstore.openapi.client.api.ContainertagsApi;
-import io.dockstore.openapi.client.api.UsersApi;
-import io.dockstore.openapi.client.model.Author;
-import io.dockstore.openapi.client.model.DockstoreTool;
-import io.dockstore.openapi.client.model.Label;
-import io.dockstore.openapi.client.model.PublishRequest;
-import io.dockstore.openapi.client.model.SourceFile;
-import io.dockstore.openapi.client.model.StarRequest;
-import io.dockstore.openapi.client.model.Tag;
-import io.dockstore.openapi.client.model.ToolDescriptor;
-import io.dockstore.openapi.client.model.User;
-import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
-import jakarta.ws.rs.core.GenericType;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.routines.EmailValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static io.dockstore.client.cli.ArgumentUtility.DESCRIPTION_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.GIT_HEADER;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
@@ -82,6 +40,47 @@ import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.TOOL;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static java.lang.String.join;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
+import io.dockstore.client.cli.Client;
+import io.dockstore.client.cli.SwaggerUtility;
+import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.Registry;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.ContainersApi;
+import io.dockstore.openapi.client.api.ContainertagsApi;
+import io.dockstore.openapi.client.api.UsersApi;
+import io.dockstore.openapi.client.model.Author;
+import io.dockstore.openapi.client.model.DockstoreTool;
+import io.dockstore.openapi.client.model.Label;
+import io.dockstore.openapi.client.model.PublishRequest;
+import io.dockstore.openapi.client.model.SourceFile;
+import io.dockstore.openapi.client.model.StarRequest;
+import io.dockstore.openapi.client.model.Tag;
+import io.dockstore.openapi.client.model.ToolDescriptor;
+import io.dockstore.openapi.client.model.User;
+import io.openapi.wes.client.api.WorkflowExecutionServiceApi;
+import jakarta.ws.rs.core.GenericType;
+import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implement all operations that have to do with tools.
