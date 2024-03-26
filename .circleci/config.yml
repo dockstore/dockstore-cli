@@ -43,6 +43,8 @@ common_jobs: &common_jobs
             <<: *common_filters
             requires:
               - find-develop-snapshot
+            context:
+              - oicr-slack-cli
         - unit-tests:
             <<: *common_filters
             requires:
@@ -230,6 +232,13 @@ jobs:
           root: .
           paths:
             - .
+        # Remove nightly condition for now, testing app setup
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+      - slack/notify:
+          event: pass
+          template: basic_success_1
   sonar-cloud:
     docker: # run the steps with Docker
       - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
