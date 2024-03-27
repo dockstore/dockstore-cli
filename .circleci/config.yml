@@ -233,15 +233,13 @@ jobs:
           root: .
           paths:
             - .
-        # Remove nightly condition for now, testing app setup
-      - slack/notify:
-          channel: $slack_id
-          event: fail
-          template: basic_fail_1
-      - slack/notify:
-          channel: $slack_id
-          event: pass
-          template: basic_success_1
+      - when:
+          condition: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - slack/notify:
+                channel: $slack_id
+                event: fail
+                template: basic_fail_1
   sonar-cloud:
     docker: # run the steps with Docker
       - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
