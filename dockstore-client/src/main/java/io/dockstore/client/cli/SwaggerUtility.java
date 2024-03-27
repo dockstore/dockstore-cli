@@ -15,6 +15,12 @@
  */
 package io.dockstore.client.cli;
 
+import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+
+import com.google.gson.Gson;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.model.PublishRequest;
+import jakarta.ws.rs.core.GenericType;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,14 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import com.google.gson.Gson;
-import io.dockstore.openapi.client.ApiClient;
-import io.dockstore.openapi.client.model.PublishRequest;
-import jakarta.ws.rs.core.GenericType;
 import org.apache.commons.io.FileUtils;
-
-import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
 
 public final class SwaggerUtility {
 

@@ -1,5 +1,19 @@
 package io.dockstore.client.cli;
 
+import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.REFRESH;
+import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
+import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
+import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import io.dockstore.common.BitBucketTest;
 import io.dockstore.common.CLICommonTestUtilities;
 import io.dockstore.common.CommonTestUtilities;
@@ -16,20 +30,6 @@ import org.junit.jupiter.api.Test;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-
-import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
-import static io.dockstore.client.cli.Client.WORKFLOW;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.ENTRY_2_JSON;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.MANUAL_PUBLISH;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.PUBLISH;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.REFRESH;
-import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
-import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
-import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag(BitBucketTest.NAME)
 class BitBucketWorkflowIT extends BaseIT {

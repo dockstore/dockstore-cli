@@ -1,15 +1,7 @@
 package io.dockstore.client.cli.nested;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
-import java.util.TreeMap;
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.ArgumentUtility.out;
 
 import io.dockstore.client.cli.Client;
 import io.openapi.wes.client.ApiClient;
@@ -24,6 +16,16 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.io.File;
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TimeZone;
+import java.util.TreeMap;
 import org.apache.http.HttpStatus;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -31,9 +33,6 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 import uk.co.lucasweb.aws.v4.signer.HttpRequest;
 import uk.co.lucasweb.aws.v4.signer.Signer;
 import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
-
-import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
-import static io.dockstore.client.cli.ArgumentUtility.out;
 
 public class ApiClientExtended extends ApiClient {
 

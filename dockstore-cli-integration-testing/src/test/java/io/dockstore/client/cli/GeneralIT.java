@@ -16,33 +16,6 @@
 
 package io.dockstore.client.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import io.dockstore.client.cli.nested.ToolClient;
-import io.dockstore.common.CLICommonTestUtilities;
-import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.Registry;
-import io.dockstore.common.ToilCompatibleTest;
-import io.dockstore.common.ToolTest;
-import io.dockstore.openapi.client.ApiClient;
-import io.dockstore.openapi.client.ApiException;
-import io.dockstore.openapi.client.api.ContainersApi;
-import io.dockstore.openapi.client.model.DockstoreTool;
-import io.dockstore.openapi.client.model.PublishRequest;
-import io.dockstore.openapi.client.model.Tag;
-import io.dropwizard.testing.ResourceHelpers;
-import org.junit.experimental.categories.Category;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
@@ -69,6 +42,32 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import io.dockstore.client.cli.nested.ToolClient;
+import io.dockstore.common.CLICommonTestUtilities;
+import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.Registry;
+import io.dockstore.common.ToilCompatibleTest;
+import io.dockstore.common.ToolTest;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.ContainersApi;
+import io.dockstore.openapi.client.model.DockstoreTool;
+import io.dockstore.openapi.client.model.PublishRequest;
+import io.dockstore.openapi.client.model.Tag;
+import io.dropwizard.testing.ResourceHelpers;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 /**
  * Extra confidential integration tests, don't rely on the type of repository used (Github, Dockerhub, Quay.io, Bitbucket)

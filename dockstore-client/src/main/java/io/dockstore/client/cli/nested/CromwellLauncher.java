@@ -1,5 +1,15 @@
 package io.dockstore.client.cli.nested;
 
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.common.DescriptorLanguage.CWL;
+
+import com.google.gson.Gson;
+import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.FileProvisioning;
+import io.dockstore.common.Utilities;
+import io.dockstore.common.WdlBridge;
+import io.github.collaboratory.cwl.CWLClient;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -14,20 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import com.google.gson.Gson;
-import io.dockstore.common.DescriptorLanguage;
-import io.dockstore.common.FileProvisioning;
-import io.dockstore.common.Utilities;
-import io.dockstore.common.WdlBridge;
-import io.github.collaboratory.cwl.CWLClient;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import wdl.draft3.parser.WdlParser;
-
-import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
-import static io.dockstore.client.cli.Client.IO_ERROR;
-import static io.dockstore.common.DescriptorLanguage.CWL;
 
 /**
  * This is a base class for clients that launch workflows with Cromwell

@@ -15,19 +15,18 @@
  */
 package io.dockstore.client.cli;
 
-import java.util.List;
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
+import static io.dockstore.client.cli.YamlVerifyUtility.DOCKSTOREYML;
+import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import io.dockstore.client.cli.YamlVerifyUtility.ValidateYamlException;
-
-import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.Client.HELP;
-import static io.dockstore.client.cli.JCommanderUtility.printJCommanderHelp;
-import static io.dockstore.client.cli.YamlVerifyUtility.DOCKSTOREYML;
-import static io.dockstore.client.cli.YamlVerifyUtility.YAML;
+import java.util.List;
 
 public final class YamlClient {
 

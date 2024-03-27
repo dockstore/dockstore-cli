@@ -16,33 +16,6 @@
 
 package io.dockstore.client.cli;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.CLICommonTestUtilities;
-import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.SourceControl;
-import io.dockstore.common.ToilCompatibleTest;
-import io.dockstore.common.WorkflowTest;
-import io.dockstore.openapi.client.ApiClient;
-import io.dockstore.openapi.client.ApiException;
-import io.dockstore.openapi.client.api.HostedApi;
-import io.dockstore.openapi.client.api.WorkflowsApi;
-import io.dockstore.openapi.client.model.SourceFile;
-import io.dockstore.openapi.client.model.Workflow;
-import io.dockstore.openapi.client.model.WorkflowVersion;
-import io.dropwizard.testing.ResourceHelpers;
-import org.elasticsearch.common.collect.Set;
-import org.junit.experimental.categories.Category;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
@@ -65,6 +38,32 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import com.google.common.collect.Lists;
+import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.CLICommonTestUtilities;
+import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.SourceControl;
+import io.dockstore.common.ToilCompatibleTest;
+import io.dockstore.common.WorkflowTest;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.ApiException;
+import io.dockstore.openapi.client.api.HostedApi;
+import io.dockstore.openapi.client.api.WorkflowsApi;
+import io.dockstore.openapi.client.model.SourceFile;
+import io.dockstore.openapi.client.model.Workflow;
+import io.dockstore.openapi.client.model.WorkflowVersion;
+import io.dropwizard.testing.ResourceHelpers;
+import java.util.List;
+import org.elasticsearch.common.collect.Set;
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 /**
  * This test suite will have tests for the workflow mode of the Dockstore Client.

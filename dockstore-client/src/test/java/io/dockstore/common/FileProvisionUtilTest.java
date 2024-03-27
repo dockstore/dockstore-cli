@@ -15,15 +15,14 @@
  */
 package io.dockstore.common;
 
-import java.io.File;
-
-import org.apache.commons.configuration2.INIConfiguration;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Test;
-
 import static io.dockstore.common.FileProvisionUtil.PLUGINS_JSON_FILENAME;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.File;
+import org.apache.commons.configuration2.INIConfiguration;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author gluu

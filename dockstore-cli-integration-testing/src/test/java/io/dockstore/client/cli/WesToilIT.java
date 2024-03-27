@@ -1,16 +1,5 @@
 package io.dockstore.client.cli;
 
-import io.dockstore.client.cli.nested.WesTests;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
-import io.dropwizard.testing.ResourceHelpers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.experimental.categories.Category;
-
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.WORKFLOW;
@@ -25,6 +14,17 @@ import static io.dockstore.client.cli.nested.WesCommandParser.VERBOSE;
 import static io.github.collaboratory.cwl.CWLClient.WES;
 import static java.lang.String.join;
 import static org.junit.Assert.assertTrue;
+
+import io.dockstore.client.cli.nested.WesTests;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
+import io.dropwizard.testing.ResourceHelpers;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.ExpectedSystemExit;
+import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.experimental.categories.Category;
 
 @Category(WesTests.class)
 public class WesToilIT {

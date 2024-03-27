@@ -15,12 +15,11 @@
  */
 package io.dockstore.client.cli.nested.notificationsclients;
 
+import com.google.gson.Gson;
+import io.dockstore.client.cli.Client;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
-
-import com.google.gson.Gson;
-import io.dockstore.client.cli.Client;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;

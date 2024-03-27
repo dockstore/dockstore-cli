@@ -15,9 +15,7 @@
  */
 package io.github.collaboratory.nextflow;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import static io.dockstore.client.cli.Client.SCRIPT;
 
 import io.dockstore.client.cli.nested.AbstractEntryClient;
 import io.dockstore.client.cli.nested.BaseLanguageClient;
@@ -28,12 +26,13 @@ import io.dockstore.common.DescriptorLanguage;
 import io.dockstore.common.NextflowUtilities;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.model.ToolDescriptor;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.exec.ExecuteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static io.dockstore.client.cli.Client.SCRIPT;
 
 /**
  * Grouping code for launching Nextflow tools and workflows

@@ -3,7 +3,6 @@ package io.dockstore.provision;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import ro.fortsoft.pf4j.ExtensionPoint;
 
 /**

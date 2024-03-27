@@ -1,15 +1,5 @@
 package io.dockstore.client.cli;
 
-import io.dockstore.client.cli.nested.ToolClient;
-import io.dockstore.common.CLICommonTestUtilities;
-import io.dockstore.common.Registry;
-import io.dropwizard.testing.ResourceHelpers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.Client.CONFIG;
 import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
 import static io.dockstore.client.cli.Client.TOOL;
@@ -19,6 +9,16 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.SEARCH;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STAR;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import io.dockstore.client.cli.nested.ToolClient;
+import io.dockstore.common.CLICommonTestUtilities;
+import io.dockstore.common.Registry;
+import io.dropwizard.testing.ResourceHelpers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 /**
  * @author gluu

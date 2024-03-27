@@ -15,8 +15,8 @@
  */
 package io.dockstore.common;
 
-import java.lang.reflect.Type;
-import java.util.Date;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.Client.WORKFLOW;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,9 +28,8 @@ import com.google.gson.JsonParseException;
 import io.dockstore.client.cli.SearchClient;
 import io.dockstore.openapi.client.model.ToolV1;
 import io.dockstore.openapi.client.model.Workflow;
-
-import static io.dockstore.client.cli.Client.TOOL;
-import static io.dockstore.client.cli.Client.WORKFLOW;
+import java.lang.reflect.Type;
+import java.util.Date;
 
 /**
  * Created by dyuen on 07/06/17.

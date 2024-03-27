@@ -1,12 +1,12 @@
 package io.dockstore.client.cli.nested;
 
-import io.dockstore.client.cli.Client;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
-import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
-
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
 import static io.dockstore.client.cli.nested.WesCommandParser.WES_URL;
+
+import io.dockstore.client.cli.Client;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 
 public class WesRequestData {
 

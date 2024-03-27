@@ -1,5 +1,14 @@
 package io.dockstore.client.cli.nested;
 
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.DEPS;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
+import static io.dockstore.client.cli.JCommanderUtility.getUnknownParameter;
+import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParameter;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.MissingCommandException;
 import com.beust.jcommander.Parameter;
@@ -11,15 +20,6 @@ import io.dockstore.client.cli.JCommanderUtility;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.Configuration;
 import io.dockstore.openapi.client.api.MetadataApi;
-
-import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
-import static io.dockstore.client.cli.Client.API_ERROR;
-import static io.dockstore.client.cli.Client.CLIENT_ERROR;
-import static io.dockstore.client.cli.Client.DEPS;
-import static io.dockstore.client.cli.Client.HELP;
-import static io.dockstore.client.cli.JCommanderUtility.displayJCommanderSuggestions;
-import static io.dockstore.client.cli.JCommanderUtility.getUnknownParameter;
-import static io.dockstore.client.cli.JCommanderUtility.wasErrorDueToUnknownParameter;
 
 /**
  * @author gluu

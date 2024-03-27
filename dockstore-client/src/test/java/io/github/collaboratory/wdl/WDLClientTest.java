@@ -15,12 +15,11 @@
 
 package io.github.collaboratory.wdl;
 
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.dropwizard.testing.ResourceHelpers;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author gluu

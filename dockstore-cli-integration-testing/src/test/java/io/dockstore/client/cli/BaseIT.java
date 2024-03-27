@@ -15,10 +15,7 @@
  */
 package io.dockstore.client.cli;
 
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.concurrent.TimeUnit;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.codahale.metrics.Gauge;
 import io.dockstore.common.CLICommonTestUtilities;
@@ -35,6 +32,10 @@ import io.dockstore.openapi.client.model.Repository;
 import io.dockstore.webservice.DockstoreWebserviceApplication;
 import io.dockstore.webservice.DockstoreWebserviceConfiguration;
 import io.dropwizard.testing.DropwizardTestSupport;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.concurrent.TimeUnit;
 import org.jline.utils.Log;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -44,8 +45,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Base integration test class

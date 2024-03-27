@@ -16,6 +16,14 @@
 
 package io.dockstore.common;
 
+import com.github.zafarkhaja.semver.UnexpectedCharacterException;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.net.UrlEscapers;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.dockstore.client.cli.Client;
+import io.dockstore.provision.PreProvisionInterface;
+import io.dockstore.provision.ProvisionInterface;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -36,15 +44,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.github.zafarkhaja.semver.UnexpectedCharacterException;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.net.UrlEscapers;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.dockstore.client.cli.Client;
-import io.dockstore.provision.PreProvisionInterface;
-import io.dockstore.provision.ProvisionInterface;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.SubnodeConfiguration;

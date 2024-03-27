@@ -1,8 +1,5 @@
 package io.dockstore.client.cli.nested;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.client.ClientRequestContext;
@@ -12,6 +9,8 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.Providers;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import org.apache.commons.codec.digest.DigestUtils;
 
 @Provider
