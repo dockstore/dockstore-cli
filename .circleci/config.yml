@@ -50,6 +50,8 @@ common_jobs: &common_jobs
             <<: *common_filters
             requires:
               - build
+            context:
+              - oicr-slack
         - integration-tests:
             matrix:
               parameters:
@@ -57,6 +59,8 @@ common_jobs: &common_jobs
             <<: *common_filters
             requires:
               - build
+            context:
+              - oicr-slack
         - non-confidential-tests:
             <<: *common_filters
             requires:
@@ -137,6 +141,10 @@ jobs:
       - save_test_results
       - send_coverage
       - persist_coverage
+      - when:
+          condition: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - notify-slack
 
   non-confidential-tests:
     executor: machine_integration_test_exec
@@ -181,6 +189,10 @@ jobs:
       MAVEN_GOAL: verify
     steps:
       - setup_and_run_integration_tests
+      - when:
+          condition: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - notify-slack
 
   wes-toil-test:
     executor: toil_wes_test_executor
@@ -236,10 +248,7 @@ jobs:
       - when:
           condition: << pipeline.parameters.run_against_develop_core >>
           steps:
-            - slack/notify:
-                channel: $slack_id
-                event: fail
-                template: basic_fail_1
+            - notify-slack
   sonar-cloud:
     docker: # run the steps with Docker
       - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
@@ -558,3 +567,10 @@ commands:
           root: .
           paths:
             - coverage
+
+  notify-slack:
+    steps:
+      - slack/notify:
+          channel: $slack_id
+          event: fail
+          template: basic_fail_1
