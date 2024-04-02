@@ -6,6 +6,9 @@ parameters:
   run_against_develop_core:
     type: boolean
     default: false
+  test_slack: # added temporarily for testing purposes
+    type: boolean
+    default: true
 
 orbs:
   build-tools: circleci/build-tools@2.7.0
@@ -35,6 +38,10 @@ common_filters: &common_filters
       ignore:
         - gh-pages
 
+slack_context: &slack_context
+  context:
+    - oicr-slack
+
 common_jobs: &common_jobs
     jobs:
         # find-develop-snapshot job is run for both "everything" and "nightly" builds even though it's only needed for nightly.
@@ -42,35 +49,35 @@ common_jobs: &common_jobs
         - find-develop-snapshot
         - build:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - find-develop-snapshot
-            context:
-              - oicr-slack
         - unit-tests:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
-            context:
-              - oicr-slack
         - integration-tests:
             matrix:
               parameters:
                 testing_profile: [ "singularity-tests", "bitbucket-tests" ]
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
-            context:
-              - oicr-slack
         - non-confidential-tests:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
         - confidential-workflow-tests:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
         - confidential-tool-tests:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
         - wes-toil-test:
@@ -141,10 +148,7 @@ jobs:
       - save_test_results
       - send_coverage
       - persist_coverage
-      - when:
-          condition: << pipeline.parameters.run_against_develop_core >>
-          steps:
-            - notify-slack
+      - notify-slack
 
   non-confidential-tests:
     executor: machine_integration_test_exec
@@ -189,10 +193,6 @@ jobs:
       MAVEN_GOAL: verify
     steps:
       - setup_and_run_integration_tests
-      - when:
-          condition: << pipeline.parameters.run_against_develop_core >>
-          steps:
-            - notify-slack
 
   wes-toil-test:
     executor: toil_wes_test_executor
@@ -245,10 +245,8 @@ jobs:
           root: .
           paths:
             - .
-      - when:
-          condition: << pipeline.parameters.run_against_develop_core >>
-          steps:
-            - notify-slack
+      - notify-slack
+
   sonar-cloud:
     docker: # run the steps with Docker
       - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
@@ -555,6 +553,7 @@ commands:
       - save_test_results
       - send_coverage
       - persist_coverage
+      - notify-slack
 
   persist_coverage:
     steps:
@@ -570,7 +569,14 @@ commands:
 
   notify-slack:
     steps:
-      - slack/notify:
-          channel: $slack_id
-          event: fail
-          template: basic_fail_1
+      - when:
+          condition: << pipeline.parameters.test_slack >>
+          steps:
+            - slack/notify:
+                channel: $slack_id
+                event: fail
+                template: basic_fail_1
+            - slack/notify: # added temporarily for testing purposes
+                channel: $slack_id
+                event: pass
+                template: basic_success_1
