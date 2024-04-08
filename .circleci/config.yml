@@ -6,9 +6,6 @@ parameters:
   run_against_develop_core:
     type: boolean
     default: false
-  test_slack: # added temporarily for testing purposes
-    type: boolean
-    default: true
 
 orbs:
   build-tools: circleci/build-tools@2.7.0
@@ -570,13 +567,9 @@ commands:
   notify-slack:
     steps:
       - when:
-          condition: << pipeline.parameters.test_slack >>
+          condition: << pipeline.parameters.run_against_develop_core >>
           steps:
             - slack/notify:
                 channel: $slack_id
                 event: fail
                 template: basic_fail_1
-            - slack/notify: # added temporarily for testing purposes
-                channel: $slack_id
-                event: pass
-                template: basic_success_1
