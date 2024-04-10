@@ -9,6 +9,7 @@ parameters:
 
 orbs:
   build-tools: circleci/build-tools@2.7.0
+  slack: circleci/slack@4.4.4
 executors:
   unit_tests_executor:
     docker: # run the steps with Docker
@@ -34,6 +35,10 @@ common_filters: &common_filters
       ignore:
         - gh-pages
 
+slack_context: &slack_context
+  context:
+    - oicr-slack
+
 common_jobs: &common_jobs
     jobs:
         # find-develop-snapshot job is run for both "everything" and "nightly" builds even though it's only needed for nightly.
@@ -41,10 +46,12 @@ common_jobs: &common_jobs
         - find-develop-snapshot
         - build:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - find-develop-snapshot
         - unit-tests:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
         - integration-tests:
@@ -52,18 +59,22 @@ common_jobs: &common_jobs
               parameters:
                 testing_profile: [ "singularity-tests", "bitbucket-tests" ]
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
         - non-confidential-tests:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
         - confidential-workflow-tests:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
         - confidential-tool-tests:
             <<: *common_filters
+            <<: *slack_context
             requires:
               - build
         - wes-toil-test:
@@ -134,6 +145,7 @@ jobs:
       - save_test_results
       - send_coverage
       - persist_coverage
+      - notify-slack
 
   non-confidential-tests:
     executor: machine_integration_test_exec
@@ -240,6 +252,8 @@ jobs:
           root: .
           paths:
             - .
+      - notify-slack
+
   sonar-cloud:
     docker: # run the steps with Docker
       - image: cimg/openjdk:<< pipeline.parameters.java-tag >>
@@ -546,6 +560,7 @@ commands:
       - save_test_results
       - send_coverage
       - persist_coverage
+      - notify-slack
 
   persist_coverage:
     steps:
@@ -558,3 +573,13 @@ commands:
           root: .
           paths:
             - coverage
+
+  notify-slack:
+    steps:
+      - when:
+          condition: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - slack/notify:
+                channel: $slack_id
+                event: fail
+                template: basic_fail_1
