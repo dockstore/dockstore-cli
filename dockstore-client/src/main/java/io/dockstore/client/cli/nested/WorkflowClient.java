@@ -1226,7 +1226,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
         if (valid) {
             try {
-                file = workflowsApi.primaryDescriptor1(workflow.getId(), version, descriptorType.toString());
+                file = workflowsApi.primaryDescriptor1(workflow.getId(), descriptorType.toString(), version);
             } catch (ApiException ex) {
                 if (ex.getCode() == HttpStatus.SC_BAD_REQUEST) {
                     // TODO: "No descriptor found" should not trigger the below
