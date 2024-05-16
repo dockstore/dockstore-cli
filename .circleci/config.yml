@@ -41,14 +41,9 @@ slack_context: &slack_context
 
 common_jobs: &common_jobs
     jobs:
-        # find-develop-snapshot job is run for both "everything" and "nightly" builds even though it's only needed for nightly.
-        # See https://github.com/dockstore/dockstore-cli/pull/268#discussion_r1419429151
-        - find-develop-snapshot
         - build:
             <<: *common_filters
             <<: *slack_context
-            requires:
-              - find-develop-snapshot
         - unit-tests:
             <<: *common_filters
             <<: *slack_context
@@ -211,11 +206,12 @@ jobs:
                   ./mvnw clean install -DskipTests -U
       - when:
           condition:
-            not: << pipeline.parameters.run_against_develop_core >>                  
-              - run:
-                  name: build
-                  command: |
-                    ./mvnw -B clean install -DskipTests
+            not: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - run:
+                name: build
+                command: |
+                  ./mvnw -B clean install -DskipTests
 
       - run:
           name: Check imports are sorted
