@@ -115,6 +115,15 @@ jobs:
       - when:
           condition: << pipeline.parameters.run_against_develop_core >>
           steps:
+            - checkout # check out source code to working directory
+            - restore_cache:
+                # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+                keys:
+                  # Find a cache corresponding to this specific licenses file checksum
+                  # when this file is changed, this key will fail
+                  - dockstore-cli-java-{{ checksum "THIRD-PARTY-LICENSES.txt" }}
+                  # Find the most recent cache used from any branch
+                  - dockstore-cli-java-
             - run:
                 name: findDevelopSnapshot
                 command: |
@@ -218,7 +227,7 @@ jobs:
       - run:
           name: build
           command: |
-            ./mvnw -B clean install -DskipTests $CORE_VERSION_OVERRIDE
+            ./mvnw -B clean install -DskipTests
 
       - run:
           name: Check imports are sorted
@@ -488,9 +497,9 @@ commands:
             if [ $CIRCLE_NODE_TOTAL != 1 ]
             then
               ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Dit.test=`cat /tmp/tests-to-run.txt` -DfailIfNoTests=false \
-              -P$TESTING_PROFILE,coverage $CORE_VERSION_OVERRIDE -ntp | grep  -v "^Running Changeset:"
+              -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
             else
-              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage $CORE_VERSION_OVERRIDE -ntp | grep  -v "^Running Changeset:"
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
             fi
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:
@@ -537,10 +546,10 @@ commands:
     steps:
       - run:
           name: ensure artifacts are installed
-          command: ./mvnw clean install -DskipTests $CORE_VERSION_OVERRIDE
+          command: ./mvnw clean install -DskipTests
       - run:
           name: run toil tests
-          command: ./mvnw -P wes-integration-tests verify $CORE_VERSION_OVERRIDE
+          command: ./mvnw -P wes-integration-tests verify
 
 
   setup_and_run_integration_tests:
