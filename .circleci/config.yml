@@ -195,7 +195,6 @@ jobs:
       - when:
           condition: << pipeline.parameters.run_against_develop_core >>
           steps:
-            - get_workspace_and_dependencies
             - run:
                 name: findDevelopSnapshot
                 command: |
