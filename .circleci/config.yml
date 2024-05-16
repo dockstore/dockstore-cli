@@ -198,7 +198,7 @@ jobs:
             - run:
                 name: findDevelopSnapshot
                 command: |
-                  ./mvnw versions:update-properties -Dincludes=io.dockstore:*
+                  ./mvnw versions:update-properties -Dincludes=io.dockstore:* -DallowSnapshots
             - run:
                 name: force update to latest snapshot versions, # review this step to see what versions were used, also see https://stackoverflow.com/questions/29020716/maven-what-does-u-update-snapshots-really-do
                 command: |
