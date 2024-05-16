@@ -106,33 +106,6 @@ workflows:
     <<: *common_jobs
 
 jobs:
-  # If the parameter "run_against_develop_core" is true, looks for the latest snapshot in dockstore/dockstore
-  find-develop-snapshot:
-    executor: unit_tests_executor
-    steps:
-      # Need to have at least one run step at the same level as the when, or config.yml schema validation fails
-      - run: echo "Overriding dockstore core with next snapshot version"
-      - when:
-          condition: << pipeline.parameters.run_against_develop_core >>
-          steps:
-            - checkout # check out source code to working directory
-            - restore_cache:
-                # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-                keys:
-                  # Find a cache corresponding to this specific licenses file checksum
-                  # when this file is changed, this key will fail
-                  - dockstore-cli-java-{{ checksum "THIRD-PARTY-LICENSES.txt" }}
-                  # Find the most recent cache used from any branch
-                  - dockstore-cli-java-
-            - run:
-                name: findDevelopSnapshot
-                command: |
-                  ./mvnw versions:update-properties -Dincludes=io.dockstore:*
-            - run:
-                name: force update to latest snapshot versions, # review this step to see what versions were used, also see https://stackoverflow.com/questions/29020716/maven-what-does-u-update-snapshots-really-do
-                command: |
-                  ./mvnw clean install -DskipTests -U
-
   unit-tests:
     executor: unit_tests_executor
     environment:
@@ -224,10 +197,25 @@ jobs:
       - install-git-secrets
       - install_confidential_test_data
       - restore_bash_env
-      - run:
-          name: build
-          command: |
-            ./mvnw -B clean install -DskipTests
+      - when:
+          condition: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - get_workspace_and_dependencies
+            - run:
+                name: findDevelopSnapshot
+                command: |
+                  ./mvnw versions:update-properties -Dincludes=io.dockstore:*
+            - run:
+                name: force update to latest snapshot versions, # review this step to see what versions were used, also see https://stackoverflow.com/questions/29020716/maven-what-does-u-update-snapshots-really-do
+                command: |
+                  ./mvnw clean install -DskipTests -U
+      - when:
+          condition:
+            not: << pipeline.parameters.run_against_develop_core >>                  
+              - run:
+                  name: build
+                  command: |
+                    ./mvnw -B clean install -DskipTests
 
       - run:
           name: Check imports are sorted
