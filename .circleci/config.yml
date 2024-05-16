@@ -106,32 +106,23 @@ workflows:
     <<: *common_jobs
 
 jobs:
-  # If the parameter "run_against_develop_core" is true, looks for the latest snapshot in dockstore/dockstore and
-  # and sets the environment variable CORE_VERSION_OVERRIDE, saving it to the workspace
+  # If the parameter "run_against_develop_core" is true, looks for the latest snapshot in dockstore/dockstore
   find-develop-snapshot:
     executor: unit_tests_executor
     steps:
       # Need to have at least one run step at the same level as the when, or config.yml schema validation fails
-      - run: echo "Checking whether to fetch latest core version"
+      - run: echo "Overriding dockstore core with next snapshot version"
       - when:
           condition: << pipeline.parameters.run_against_develop_core >>
           steps:
             - run:
                 name: findDevelopSnapshot
                 command: |
-                  echo 'export LATEST_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
+                  ./mvnw versions:update-properties -Dincludes=io.dockstore:*
             - run:
-                name: createCoreVersionParam
+                name: force update to latest snapshot versions, # review this step to see what versions were used, also see https://stackoverflow.com/questions/29020716/maven-what-does-u-update-snapshots-really-do
                 command: |
-                  echo 'export CORE_VERSION_OVERRIDE'="-Ddockstore-core.version=$LATEST_VERSION" >> $BASH_ENV
-            - run:
-                name: saveEnv
-                command: |
-                  cp $BASH_ENV bash.env
-            - persist_to_workspace:
-                root: .
-                paths:
-                  bash.env
+                  ./mvnw clean install -DskipTests -U
 
   unit-tests:
     executor: unit_tests_executor
