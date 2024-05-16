@@ -314,19 +314,20 @@ commands:
 
 
   check_pom_files:
-    - when:
-        condition:
-          not: << pipeline.parameters.run_against_develop_core >>
         steps:
-          - run:
-              name: check generated flattened POMs match checked-in files.
-              command: |
-                # need better solution, but leaving this as-is fouls up the release since the Maven release plugin doesn't know about the flattened poms
-                if [[ -z "${CIRCLE_TAG}" ]]; then
-                  scripts/check_poms.sh
-                fi
-              environment:
-                TESTING_PROFILE: automated-review
+          - when:
+              condition:
+                not: << pipeline.parameters.run_against_develop_core >>
+              steps:
+                - run:
+                    name: check generated flattened POMs match checked-in files.
+                    command: |
+                      # need better solution, but leaving this as-is fouls up the release since the Maven release plugin doesn't know about the flattened poms
+                      if [[ -z "${CIRCLE_TAG}" ]]; then
+                        scripts/check_poms.sh
+                      fi
+                    environment:
+                      TESTING_PROFILE: automated-review
 
   run_git_secrets_scan:
     steps:
