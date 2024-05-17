@@ -41,14 +41,9 @@ slack_context: &slack_context
 
 common_jobs: &common_jobs
     jobs:
-        # find-develop-snapshot job is run for both "everything" and "nightly" builds even though it's only needed for nightly.
-        # See https://github.com/dockstore/dockstore-cli/pull/268#discussion_r1419429151
-        - find-develop-snapshot
         - build:
             <<: *common_filters
             <<: *slack_context
-            requires:
-              - find-develop-snapshot
         - unit-tests:
             <<: *common_filters
             <<: *slack_context
@@ -106,33 +101,6 @@ workflows:
     <<: *common_jobs
 
 jobs:
-  # If the parameter "run_against_develop_core" is true, looks for the latest snapshot in dockstore/dockstore and
-  # and sets the environment variable CORE_VERSION_OVERRIDE, saving it to the workspace
-  find-develop-snapshot:
-    executor: unit_tests_executor
-    steps:
-      # Need to have at least one run step at the same level as the when, or config.yml schema validation fails
-      - run: echo "Checking whether to fetch latest core version"
-      - when:
-          condition: << pipeline.parameters.run_against_develop_core >>
-          steps:
-            - run:
-                name: findDevelopSnapshot
-                command: |
-                  echo 'export LATEST_VERSION='$(curl "https://artifacts.oicr.on.ca/artifactory/api/search/latestVersion?g=io.dockstore&a=dockstore&repos=collab-snapshot&v=*") >> $BASH_ENV
-            - run:
-                name: createCoreVersionParam
-                command: |
-                  echo 'export CORE_VERSION_OVERRIDE'="-Ddockstore-core.version=$LATEST_VERSION" >> $BASH_ENV
-            - run:
-                name: saveEnv
-                command: |
-                  cp $BASH_ENV bash.env
-            - persist_to_workspace:
-                root: .
-                paths:
-                  bash.env
-
   unit-tests:
     executor: unit_tests_executor
     environment:
@@ -224,10 +192,25 @@ jobs:
       - install-git-secrets
       - install_confidential_test_data
       - restore_bash_env
-      - run:
-          name: build
-          command: |
-            ./mvnw -B clean install -DskipTests $CORE_VERSION_OVERRIDE
+      - when:
+          condition: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - run:
+                name: findDevelopSnapshot
+                command: |
+                  ./mvnw versions:update-properties -Dincludes=io.dockstore:* -DallowSnapshots
+            - run:
+                name: force update to latest snapshot versions, # review this step to see what versions were used, also see https://stackoverflow.com/questions/29020716/maven-what-does-u-update-snapshots-really-do
+                command: |
+                  ./mvnw clean install -DskipTests -U
+      - when:
+          condition:
+            not: << pipeline.parameters.run_against_develop_core >>
+          steps:
+            - run:
+                name: build
+                command: |
+                  ./mvnw -B clean install -DskipTests
 
       - run:
           name: Check imports are sorted
@@ -331,16 +314,20 @@ commands:
 
 
   check_pom_files:
-    steps:
-      - run:
-          name: check generated flattened POMs match checked-in files.
-          command: |
-            # need better solution, but leaving this as-is fouls up the release since the Maven release plugin doesn't know about the flattened poms
-            if [[ -z "${CIRCLE_TAG}" ]]; then
-              scripts/check_poms.sh
-            fi
-          environment:
-            TESTING_PROFILE: automated-review
+        steps:
+          - when:
+              condition:
+                not: << pipeline.parameters.run_against_develop_core >>
+              steps:
+                - run:
+                    name: check generated flattened POMs match checked-in files.
+                    command: |
+                      # need better solution, but leaving this as-is fouls up the release since the Maven release plugin doesn't know about the flattened poms
+                      if [[ -z "${CIRCLE_TAG}" ]]; then
+                        scripts/check_poms.sh
+                      fi
+                    environment:
+                      TESTING_PROFILE: automated-review
 
   run_git_secrets_scan:
     steps:
@@ -497,9 +484,9 @@ commands:
             if [ $CIRCLE_NODE_TOTAL != 1 ]
             then
               ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -Dit.test=`cat /tmp/tests-to-run.txt` -DfailIfNoTests=false \
-              -P$TESTING_PROFILE,coverage $CORE_VERSION_OVERRIDE -ntp | grep  -v "^Running Changeset:"
+              -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
             else
-              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage $CORE_VERSION_OVERRIDE -ntp | grep  -v "^Running Changeset:"
+              ./mvnw -B org.jacoco:jacoco-maven-plugin:report org.jacoco:jacoco-maven-plugin:report-aggregate clean install -P$TESTING_PROFILE,coverage -ntp | grep  -v "^Running Changeset:"
             fi
           # The piping grep command is a temporary fix to this issue https://github.com/liquibase/liquibase/issues/2396
   save_test_results:
@@ -546,10 +533,10 @@ commands:
     steps:
       - run:
           name: ensure artifacts are installed
-          command: ./mvnw clean install -DskipTests $CORE_VERSION_OVERRIDE
+          command: ./mvnw clean install -DskipTests
       - run:
           name: run toil tests
-          command: ./mvnw -P wes-integration-tests verify $CORE_VERSION_OVERRIDE
+          command: ./mvnw -P wes-integration-tests verify
 
 
   setup_and_run_integration_tests:
