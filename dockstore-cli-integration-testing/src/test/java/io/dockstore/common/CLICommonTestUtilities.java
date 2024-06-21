@@ -201,7 +201,7 @@ public final class CLICommonTestUtilities {
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential1_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0", "1.15.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0", "1.15.0", "1.16.0");
         CommonTestUtilities.runMigration(migrationList, application, configPath);
     }
 
@@ -311,7 +311,7 @@ public final class CLICommonTestUtilities {
                 new File("../dockstore-webservice/src/main/resources/migrations.test.confidential2_1.5.0.xml").getAbsolutePath());
         runExternalMigration(migrationList, application, configPath);
 
-        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0", "1.15.0");
+        migrationList = Arrays.asList("1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0", "1.15.0", "1.16.0");
         CommonTestUtilities.runMigration(migrationList, application, configPath);
     }
 
