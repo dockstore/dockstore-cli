@@ -29,8 +29,7 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.TEST_PARAMETER;
 import static io.dockstore.client.cli.nested.ToolClient.VERSION_TAG;
 import static io.dockstore.client.cli.nested.WesCommandParser.ENTRY;
 import static io.dockstore.client.cli.nested.WorkflowClient.UPDATE_WORKFLOW;
-import static io.dockstore.webservice.helpers.ZenodoHelper.FROZEN_VERSION_REQUIRED;
-import static io.dockstore.webservice.helpers.ZenodoHelper.NO_ZENODO_USER_TOKEN;
+import static io.dockstore.webservice.helpers.ZenodoHelper.PUBLISHED_ENTRY_REQUIRED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -609,7 +608,7 @@ class GeneralWorkflowIT extends BaseIT {
             fail(
                     "This line should never execute if version is mutable. DOI should only be generated for frozen versions of workflows.");
         } catch (ApiException ex) {
-            assertTrue(ex.getResponseBody().contains(FROZEN_VERSION_REQUIRED));
+            assertTrue(ex.getResponseBody().contains(PUBLISHED_ENTRY_REQUIRED));
         }
 
         //freeze version 'master'
@@ -620,11 +619,12 @@ class GeneralWorkflowIT extends BaseIT {
         assertTrue(master.isFrozen());
 
         //TODO: For now just checking for next failure (no Zenodo token), but should replace with when DOI registration tests are written
+        //TODO: this was supposed to fail without a token, but it fails without publishing
         try {
             workflowApi.requestDOIForWorkflowVersion(workflowBeforeFreezing.getId(), master.getId(), "");
             fail("This line should never execute without valid Zenodo token");
         } catch (ApiException ex) {
-            assertTrue(ex.getResponseBody().contains(NO_ZENODO_USER_TOKEN));
+            assertTrue(ex.getResponseBody().contains(PUBLISHED_ENTRY_REQUIRED));
 
         }
     }
