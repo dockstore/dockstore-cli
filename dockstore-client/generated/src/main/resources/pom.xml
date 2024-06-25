@@ -36,25 +36,25 @@
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-transport-httpclient5</artifactId>
-      <version>3.3.0</version>
+      <version>3.3.6</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-core</artifactId>
-      <version>3.3.0</version>
+      <version>3.3.6</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-transport</artifactId>
-      <version>3.3.0</version>
+      <version>3.3.6</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-api</artifactId>
-      <version>3.3.0</version>
+      <version>3.3.6</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.16.0-alpha.4</version>
+      <version>1.16.0-alpha.11</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -78,7 +78,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.16.0-alpha.4</version>
+      <version>1.16.0-alpha.11</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

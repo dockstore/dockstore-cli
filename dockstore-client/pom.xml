@@ -28,7 +28,6 @@
     <name>dockstore-client</name>
 
     <properties>
-        <docker-client.version>3.3.0</docker-client.version>
         <argLine></argLine>
     </properties>
 
@@ -42,22 +41,18 @@
         <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java-transport-httpclient5</artifactId>
-            <version>${docker-client.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java-core</artifactId>
-            <version>${docker-client.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java-transport</artifactId>
-            <version>${docker-client.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java-api</artifactId>
-            <version>${docker-client.version}</version>
         </dependency>
 
         <dependency>
