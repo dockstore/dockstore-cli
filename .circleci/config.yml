@@ -12,14 +12,14 @@ executors:
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2204:2023.10.1
+      image: ubuntu-2204:2022.10.1
     environment:
       PGHOST: 127.0.0.1
     resource_class: medium
 
   toil_wes_test_executor:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2204:2023.10.1
+      image: ubuntu-2204:2022.10.1
     resource_class: medium
 
 common_filters: &common_filters
