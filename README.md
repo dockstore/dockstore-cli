@@ -67,9 +67,6 @@ cache-dir = /home/<user>/.dockstore/cache   #set this to determine where input f
 
 [dockstore-file-s3-plugin]
 endpoint = #set this to point at a non AWS S3 endpoint
-
-[dockstore-file-icgc-storage-client-plugin]
-client = /media/large_volume/icgc-storage-client-1.0.23/bin/icgc-storage-client
 ```
 
 Additional plugins can be created by taking one of the repos in [plugins](https://github.com/dockstore) as a model and 
