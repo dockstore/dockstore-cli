@@ -19,6 +19,7 @@ else
     # https://stackoverflow.com/questions/44331836/apt-get-install-tzdata-noninteractive needed by cwltool
     DEBIAN_FRONTEND=noninteractive sudo apt-get -qq --yes --force-yes install tzdata
     sudo apt-get -qq --yes --force-yes install cwltool=3.1.20220224085855-1
+fi
 
 if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
     # Install singularity from source
