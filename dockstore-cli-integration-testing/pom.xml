@@ -259,6 +259,8 @@
                     <!-- workaround for Java 17 module issues with powermock -->
                     <!-- And Disable org.hibernate assertions for now. See SEAB-5854 -->
                     <argLine>
+                        <!-- for  Java 21, see   -->
+                        -Djava.security.manager=allow
                         @{argLine}
                         --illegal-access=permit
                         --add-opens java.base/java.lang=ALL-UNNAMED
