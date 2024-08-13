@@ -366,6 +366,10 @@
                         <runOrder>random</runOrder>
                         <!-- re-run flaky tests once -->
                         <rerunFailingTestsCount>1</rerunFailingTestsCount>
+                        <argLine>
+                            -Djava.security.manager=allow
+                            @{argLine}
+                        </argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -378,6 +382,10 @@
                         <runOrder>random</runOrder>
                         <!-- re-run flaky tests once -->
                         <rerunFailingTestsCount>1</rerunFailingTestsCount>
+                        <argLine>
+                            -Djava.security.manager=allow
+                            @{argLine}
+                        </argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -391,7 +399,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.6.0.0</version>
+                    <version>4.8.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -424,11 +432,13 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.3.2</version>
                 </plugin>
-                <!-- https://mvnrepository.com/artifact/org.scala-tools/maven-scala-plugin -->
                 <plugin>
-                    <groupId>org.scala-tools</groupId>
-                    <artifactId>maven-scala-plugin</artifactId>
-                    <version>2.15.2</version>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>4.8.1</version>
+                    <configuration>
+                        <release>17</release>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -542,7 +552,7 @@
                                     <version>3.8.1</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[11.0.11,18.0)</version>
+                                    <version>[17.0.11,22.0)</version>
                                 </requireJavaVersion>
                                 <banDuplicatePomDependencyVersions />
                                 <bannedDependencies>
