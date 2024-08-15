@@ -45,7 +45,7 @@ server-url = https://www.dockstore.org/api
 
 By default, cwltool reads input files from the local filesystem. Dockstore also adds support for additional file systems
 such as http, https, and ftp. Through a plug-in system, Dockstore also supports 
-the Amazon S3 and [Synapse](https://help.synapse.org/docs/Downloading-Data-Programmatically.2003796248.html), and via [plugins](https://github.com/dockstore).
+Amazon S3 and [Synapse](https://help.synapse.org/docs/Downloading-Data-Programmatically.2003796248.html) via [plugins](https://github.com/dockstore).
 
 Download the above set of default plugins via: 
 ```
