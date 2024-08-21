@@ -30,7 +30,7 @@ The following section is useful for users of Dockstore (e.g. those that want to 
 launch tools). 
 
 After registering at [dockstore.org](https://dockstore.org), you will be able to download the Dockstore 
-CLI at [https://dockstore.org/onboarding](onboarding). The Dockstore command line script should be installed in a location in your path.
+CLI at [onboarding](https://dockstore.org/onboarding). The Dockstore command line script should be installed in a location in your path.
 
 ### Configuration File
 
