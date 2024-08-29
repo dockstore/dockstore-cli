@@ -30,13 +30,13 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-webservice</artifactId>
-      <version>1.16.0-alpha.11</version>
+      <version>1.16.0-alpha.15</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.16.0-alpha.11</version>
+      <version>1.16.0-alpha.15</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
