@@ -15,17 +15,16 @@
  */
 package io.github.collaboratory.cwl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.gson.Gson;
 import io.cwl.avro.CWL;
 import io.cwl.avro.Workflow;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author gluu

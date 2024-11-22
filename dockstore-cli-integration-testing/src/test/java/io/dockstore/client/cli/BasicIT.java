@@ -16,28 +16,6 @@
 
 package io.dockstore.client.cli;
 
-import java.util.Collections;
-import java.util.List;
-
-import io.dockstore.client.cli.nested.ToolClient;
-import io.dockstore.common.CLICommonTestUtilities;
-import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.Registry;
-import io.dockstore.common.SlowTest;
-import io.dockstore.common.ToolTest;
-import io.dockstore.openapi.client.ApiClient;
-import io.dockstore.openapi.client.api.ContainersApi;
-import io.dockstore.openapi.client.api.HostedApi;
-import io.dockstore.openapi.client.model.DockstoreTool;
-import io.dropwizard.testing.ResourceHelpers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.CheckerClient.ADD;
 import static io.dockstore.client.cli.CheckerClient.UPDATE;
@@ -61,6 +39,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import io.dockstore.client.cli.nested.ToolClient;
+import io.dockstore.common.CLICommonTestUtilities;
+import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.Registry;
+import io.dockstore.common.SlowTest;
+import io.dockstore.common.ToolTest;
+import io.dockstore.openapi.client.ApiClient;
+import io.dockstore.openapi.client.api.ContainersApi;
+import io.dockstore.openapi.client.api.HostedApi;
+import io.dockstore.openapi.client.model.DockstoreTool;
+import io.dropwizard.testing.ResourceHelpers;
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 /**
  * Basic confidential integration tests, focusing on publishing/unpublishing both automatic and manually added tools

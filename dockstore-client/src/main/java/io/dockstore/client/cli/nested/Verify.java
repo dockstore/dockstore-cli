@@ -1,5 +1,10 @@
 package io.dockstore.client.cli.nested;
 
+import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.Client.HELP;
+import static io.dockstore.client.cli.Client.TOOL;
+import static io.dockstore.client.cli.nested.AbstractEntryClient.VERIFY;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -10,11 +15,6 @@ import io.dockstore.client.cli.JCommanderUtility;
 import io.dockstore.openapi.client.ApiClient;
 import io.dockstore.openapi.client.Configuration;
 import io.dockstore.openapi.client.api.ExtendedGa4GhApi;
-
-import static io.dockstore.client.cli.Client.API_ERROR;
-import static io.dockstore.client.cli.Client.HELP;
-import static io.dockstore.client.cli.Client.TOOL;
-import static io.dockstore.client.cli.nested.AbstractEntryClient.VERIFY;
 
 /**
  * @author gluu

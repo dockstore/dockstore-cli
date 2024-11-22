@@ -15,11 +15,9 @@
  */
 package io.github.collaboratory.cwl.cwlrunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
+import static io.dockstore.client.cli.Client.VERSION;
+import static io.dockstore.common.PipHelper.convertPipRequirementsStringToMap;
 
 import com.google.common.base.Joiner;
 import io.dockstore.client.cli.ArgumentUtility;
@@ -27,11 +25,12 @@ import io.dockstore.client.cli.Client;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.api.MetadataApi;
 import jakarta.ws.rs.ProcessingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-
-import static io.dockstore.client.cli.Client.SCRIPT_FLAG;
-import static io.dockstore.client.cli.Client.VERSION;
-import static io.dockstore.common.PipHelper.convertPipRequirementsStringToMap;
 
 public class CWLToolWrapper implements CWLRunnerInterface {
     @Override

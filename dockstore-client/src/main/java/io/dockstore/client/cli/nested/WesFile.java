@@ -1,12 +1,12 @@
 package io.dockstore.client.cli.nested;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.text.MessageFormat;
-
 import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 import static io.dockstore.client.cli.Client.API_ERROR;
 import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.text.MessageFormat;
 
 // This class adds additional functionality to the base File class allowing the WES API to correctly attach files to HTTP requests.
 public class WesFile extends File {

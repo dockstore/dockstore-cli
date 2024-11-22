@@ -23,7 +23,7 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
       # Step that does that actual cache save and restore
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -33,9 +33,10 @@ jobs:
         
       - if: "!contains(github.ref, 'dependabot')"
         name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
-          languages: java           
+          languages: java
+          queries: security-and-quality
       - name: Build with mvnw
         run: ./mvnw clean install
 
@@ -44,4 +45,4 @@ jobs:
 
       - if: "!contains(github.ref, 'dependabot')"
         name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2            
+        uses: github/codeql-action/analyze@v3            

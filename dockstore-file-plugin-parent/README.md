@@ -21,7 +21,7 @@ Use the following command to list currently installed plugins
 dockstore plugin list
 ```
 
-This will list the plugins along with their versions, their install locations, and the schemes that they handle (ex: `s3:\\test.txt` , `icgc:\\123-456` , `syn:\\syn12345` ). 
+This will list the plugins along with their versions, their install locations, and the schemes that they handle (ex: `s3:\\test.txt`, `syn:\\syn12345` ). 
 
 Note that dockstore will automatically delete old versions of plugins when you install new plugins. 
 
@@ -34,9 +34,6 @@ synapse-api-key = dummy-key
 synapse-user-name = my.user.name 
 
 [dockstore-file-s3-plugin]
-
-[dockstore-file-icgc-storage-client-plugin]
-client = /media/large_volume/icgc-storage-client-1.0.23/bin/icgc-storage-client
 ```
 
 
@@ -44,7 +41,7 @@ client = /media/large_volume/icgc-storage-client-1.0.23/bin/icgc-storage-client
 
 When developing new plugins, we recommend using the [s3-plugin](https://github.com/dockstore/s3-plugin) as a model for 
 plugins where [a Java library is available](https://aws.amazon.com/sdk-for-java/).
-We recommend using the [icgc-storage-client-plugin](https://github.com/dockstore/icgc-storage-client-plugin) as a model for 
+Although it is no longer directly supported, we recommend using the [icgc-storage-client-plugin](https://github.com/dockstore/icgc-storage-client-plugin) as a model for 
 plugins where a Java library is not available and the plugin needs to call out to an external binary. 
 
 This was developed in an environment with Java 8 and Maven 3.3.9. 

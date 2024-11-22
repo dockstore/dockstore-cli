@@ -16,28 +16,6 @@
 
 package io.dockstore.client.cli;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.common.collect.Lists;
-import io.dockstore.common.CLICommonTestUtilities;
-import io.dockstore.common.ConfidentialTest;
-import io.dockstore.common.Registry;
-import io.dockstore.common.TestUtility;
-import io.dockstore.common.ToilCompatibleTest;
-import io.dockstore.common.ToolTest;
-import io.dockstore.openapi.client.ApiException;
-import io.dropwizard.testing.ResourceHelpers;
-import org.junit.experimental.categories.Category;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.stream.SystemErr;
-import uk.org.webcompere.systemstubs.stream.SystemOut;
-
 import static io.dockstore.client.cli.ArgumentUtility.CONVERT;
 import static io.dockstore.client.cli.ArgumentUtility.DOWNLOAD;
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
@@ -94,6 +72,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.webcompere.systemstubs.SystemStubs.catchSystemExit;
+
+import com.google.common.collect.Lists;
+import io.dockstore.common.CLICommonTestUtilities;
+import io.dockstore.common.ConfidentialTest;
+import io.dockstore.common.Registry;
+import io.dockstore.common.TestUtility;
+import io.dockstore.common.ToilCompatibleTest;
+import io.dockstore.common.ToolTest;
+import io.dockstore.openapi.client.ApiException;
+import io.dropwizard.testing.ResourceHelpers;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.stream.SystemErr;
+import uk.org.webcompere.systemstubs.stream.SystemOut;
 
 /**
  * @author dyuen
@@ -159,7 +158,6 @@ class ClientIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), PLUGIN, LIST });
         assertTrue(systemOutRule.getText().contains("dockstore-file-synapse-plugin"));
         assertTrue(systemOutRule.getText().contains("dockstore-file-s3-plugin"));
-        assertFalse(systemOutRule.getText().contains("dockstore-icgc-storage-client-plugin"));
     }
 
     @Test
@@ -169,7 +167,6 @@ class ClientIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), PLUGIN, LIST });
         assertFalse(systemOutRule.getText().contains("dockstore-file-synapse-plugin"));
         assertFalse(systemOutRule.getText().contains("dockstore-file-s3-plugin"));
-        assertTrue(systemOutRule.getText().contains("dockstore-file-icgc-storage-client-plugin"));
     }
 
     @Disabled("seems to have been disabled for ages")

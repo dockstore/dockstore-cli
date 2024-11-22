@@ -16,6 +16,13 @@
 
 package io.dockstore.client.cli;
 
+import static io.dockstore.client.cli.ArgumentUtility.out;
+
+import io.dockstore.common.yaml.DockstoreYaml12;
+import io.dockstore.common.yaml.DockstoreYamlHelper;
+import io.dockstore.common.yaml.Service12;
+import io.dockstore.common.yaml.YamlTool;
+import io.dockstore.common.yaml.YamlWorkflow;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,17 +30,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.dockstore.common.yaml.DockstoreYaml12;
-import io.dockstore.common.yaml.DockstoreYamlHelper;
-import io.dockstore.common.yaml.Service12;
-import io.dockstore.common.yaml.YamlTool;
-import io.dockstore.common.yaml.YamlWorkflow;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
-
-import static io.dockstore.client.cli.ArgumentUtility.out;
 
 /*
     GENERAL STEPS:

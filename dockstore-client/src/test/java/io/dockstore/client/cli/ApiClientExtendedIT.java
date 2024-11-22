@@ -1,16 +1,15 @@
 package io.dockstore.client.cli;
 
-import java.util.Map;
-import java.util.TreeMap;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.dockstore.client.cli.nested.ApiClientExtended;
 import io.dockstore.client.cli.nested.WesRequestData;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.HttpHeaders;
+import java.util.Map;
+import java.util.TreeMap;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ApiClientExtendedIT {
 

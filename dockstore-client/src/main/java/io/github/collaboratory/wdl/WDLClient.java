@@ -15,17 +15,15 @@
  */
 package io.github.collaboratory.wdl;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.API_ERROR;
+import static io.dockstore.client.cli.Client.CLIENT_ERROR;
+import static io.dockstore.client.cli.Client.IO_ERROR;
+import static io.dockstore.client.cli.Client.SCRIPT;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+import static java.lang.String.join;
 
 import com.google.common.io.Files;
 import com.google.gson.Gson;
@@ -41,20 +39,21 @@ import io.dockstore.common.WDLFileProvisioning;
 import io.dockstore.common.WdlBridge;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.model.ToolDescriptor;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.exec.ExecuteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wdl.draft3.parser.WdlParser;
-
-import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
-import static io.dockstore.client.cli.ArgumentUtility.exceptionMessage;
-import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.Client.API_ERROR;
-import static io.dockstore.client.cli.Client.CLIENT_ERROR;
-import static io.dockstore.client.cli.Client.IO_ERROR;
-import static io.dockstore.client.cli.Client.SCRIPT;
-import static io.dockstore.client.cli.Client.WORKFLOW;
-import static java.lang.String.join;
 
 /**
  * Grouping code for launching WDL tools and workflows

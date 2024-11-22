@@ -15,6 +15,12 @@
  */
 package io.dockstore.client.cli;
 
+import static io.dockstore.client.cli.Client.CONFIG;
+import static io.dockstore.client.cli.Client.DEPRECATED_PORT_MESSAGE;
+import static io.dockstore.client.cli.Client.HELP;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import io.dockstore.common.MuteForSuccessfulTests;
 import io.dockstore.common.Utilities;
 import io.dropwizard.testing.ResourceHelpers;
@@ -25,12 +31,6 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 import uk.org.webcompere.systemstubs.stream.SystemErr;
 import uk.org.webcompere.systemstubs.stream.SystemOut;
-
-import static io.dockstore.client.cli.Client.CONFIG;
-import static io.dockstore.client.cli.Client.DEPRECATED_PORT_MESSAGE;
-import static io.dockstore.client.cli.Client.HELP;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by dyuen on 2/23/17.

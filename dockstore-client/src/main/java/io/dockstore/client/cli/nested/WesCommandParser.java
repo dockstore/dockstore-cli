@@ -1,11 +1,5 @@
 package io.dockstore.client.cli.nested;
 
-import java.util.List;
-
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.Client.WORKFLOW;
@@ -14,6 +8,11 @@ import static io.dockstore.client.cli.nested.AbstractEntryClient.LIST;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.LOGS;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.SERVICE_INFO;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.STATUS;
+
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import java.util.List;
 
 public class WesCommandParser {
 

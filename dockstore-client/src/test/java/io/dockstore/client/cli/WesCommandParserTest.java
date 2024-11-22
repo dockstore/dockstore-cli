@@ -1,10 +1,5 @@
 package io.dockstore.client.cli;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
-import io.dockstore.client.cli.nested.WesCommandParser;
-import org.junit.jupiter.api.Test;
-
 import static io.dockstore.client.cli.ArgumentUtility.LAUNCH;
 import static io.dockstore.client.cli.Client.HELP;
 import static io.dockstore.client.cli.nested.AbstractEntryClient.CANCEL;
@@ -22,6 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import io.dockstore.client.cli.nested.WesCommandParser;
+import org.junit.jupiter.api.Test;
 
 class WesCommandParserTest {
 

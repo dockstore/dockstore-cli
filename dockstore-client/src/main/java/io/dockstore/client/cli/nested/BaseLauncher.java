@@ -1,5 +1,11 @@
 package io.dockstore.client.cli.nested;
 
+import static io.dockstore.client.cli.ArgumentUtility.out;
+import static io.dockstore.client.cli.Client.WORKFLOW;
+
+import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.FileProvisioning;
+import io.dockstore.common.Utilities;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -8,15 +14,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.dockstore.common.DescriptorLanguage;
-import io.dockstore.common.FileProvisioning;
-import io.dockstore.common.Utilities;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-
-import static io.dockstore.client.cli.ArgumentUtility.out;
-import static io.dockstore.client.cli.Client.WORKFLOW;
 
 /**
  * This class is the base class for launchers used by the Dockstore CLI.

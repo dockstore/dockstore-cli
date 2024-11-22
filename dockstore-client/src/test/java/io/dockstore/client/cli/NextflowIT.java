@@ -15,17 +15,18 @@
  */
 package io.dockstore.client.cli;
 
+import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
+
+import io.dockstore.client.cli.nested.WorkflowClient;
+import io.dockstore.common.FlushingSystemErrRule;
+import io.dockstore.common.FlushingSystemOutRule;
+import io.dropwizard.testing.ResourceHelpers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-
-import io.dockstore.client.cli.nested.WorkflowClient;
-import io.dockstore.common.FlushingSystemErrRule;
-import io.dockstore.common.FlushingSystemOutRule;
-import io.dropwizard.testing.ResourceHelpers;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
@@ -33,8 +34,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-
-import static io.dockstore.client.cli.nested.WesCommandParser.JSON;
 
 public class NextflowIT {
     @Rule

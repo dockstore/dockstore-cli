@@ -1,17 +1,16 @@
 package io.dockstore.client.cli.nested;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Supplier;
+import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
 
 import io.dockstore.client.cli.Client;
 import io.dockstore.openapi.client.ApiException;
 import io.dockstore.openapi.client.api.WorkflowsApi;
 import io.dockstore.openapi.client.model.Workflow;
 import io.dockstore.openapi.client.model.WorkflowSubClass;
-
-import static io.dockstore.client.cli.ArgumentUtility.errorMessage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * This is used to interact with the Dockstore webservice to get Dockstore workflows (which can include Bioworkflows, AppTools, etc)

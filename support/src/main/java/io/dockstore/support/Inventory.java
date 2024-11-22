@@ -1,9 +1,8 @@
 package io.dockstore.support;
 
-import java.util.Map;
-
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
+import java.util.Map;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudformation.CloudFormationClient;
 import software.amazon.awssdk.services.cloudformation.model.DescribeStackInstanceResponse;
