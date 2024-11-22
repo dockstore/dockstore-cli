@@ -7,6 +7,8 @@ on:
       - 'release/**'
       - 'hotfix/**'
       - 'dependabot/**'
+
+  workflow_dispatch:
   
 jobs:
   build:
