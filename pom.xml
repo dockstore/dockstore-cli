@@ -33,12 +33,12 @@
     -->
     <properties>
         <!-- the following properties set sane defaults when no revision properties are set from the command-line -->
-        <revision>1.16</revision>
+        <revision>1.17</revision>
         <changelist>.0-SNAPSHOT</changelist>
 
         <github.url>scm:git:git@github.com:dockstore/dockstore-cli.git</github.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockstore-core.version>1.16.0</dockstore-core.version>
+        <dockstore-core.version>1.17.0-alpha.0</dockstore-core.version>
         <maven-failsafe.version>2.22.2</maven-failsafe.version>
         <maven-surefire.version>2.22.2</maven-surefire.version>
         <skipTests>false</skipTests>
@@ -53,7 +53,7 @@
             ${project.basedir}/target/jacoco.xml,${project.basedir}/target/jacoco-it.xml,${project.basedir}/../dockstore-cli-reports/target/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         <!-- end sonarcloud properties -->
-        <cwlavro.version>2.0.4.9</cwlavro.version>
+        <cwlavro.version>2.1.0</cwlavro.version>
     </properties>
 
     <organization>
@@ -200,28 +200,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- remove after bom is updated with Dockstore or above 1.14.0 -->
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-compress</artifactId>
-                <version>1.26.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-text</artifactId>
-                <version>1.11.0</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.15.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.14.0</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
