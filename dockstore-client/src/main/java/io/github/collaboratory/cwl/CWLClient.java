@@ -177,7 +177,7 @@ public class CWLClient extends BaseLanguageClient implements LanguageClientInter
         Class cwlClassTarget = getCWLClassTarget();
 
         // Load CWL from JSON to object
-        CWL cwlUtil = new CWL(false, config);
+        CWL cwlUtil = new CWL(config);
         // This won't work since I am using zip files, it is expecting files to be unzipped
         final String imageDescriptorContent = cwlUtil.parseCWL(localPrimaryDescriptorFile.getAbsolutePath()).getLeft();
         Object cwlObject = null;
