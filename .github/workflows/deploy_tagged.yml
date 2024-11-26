@@ -7,5 +7,5 @@ on:
 
 jobs:
   call-reusable-tagged-release:
-    uses: dockstore/workflow-actions/.github/workflows/deploy_tagged.yaml@seab-6771/reusable-image-deploy
+    uses: dockstore/workflow-actions/.github/workflows/deploy_artifacts.yaml@seab-6771/reusable-image-deploy
     secrets: inherit
