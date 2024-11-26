@@ -52,7 +52,7 @@ common_jobs: &common_jobs
         - integration-tests:
             matrix:
               parameters:
-                testing_profile: [ "singularity-tests", "bitbucket-tests" ]
+                testing_profile: [ "singularity-tests", "bitbucket-tests", "toil-integration-tests" ]
             <<: *common_filters
             <<: *slack_context
             requires:
