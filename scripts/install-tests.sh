@@ -12,7 +12,7 @@ if [ "${TESTING_PROFILE}" = "unit-tests" ] || [ "${TESTING_PROFILE}" == "automat
 fi
 
 if [ "${TESTING_PROFILE}" = "toil-integration-tests" ]; then
-    pip3 install --user toil[cwl]==3.15.0
+    pip3 install --user toil[cwl]==7.0.0
 else
     pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.15.0/requirements3.txt
 fi
