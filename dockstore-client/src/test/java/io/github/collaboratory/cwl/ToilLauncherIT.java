@@ -15,7 +15,7 @@
  */
 package io.github.collaboratory.cwl;
 
-import io.dockstore.client.cli.nested.ToilOnlyTest;
+import io.dockstore.common.ToilOnlyTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Tag;
 
