@@ -37,9 +37,9 @@ public class ToilWrapper implements CWLRunnerInterface {
         final ImmutablePair<String, String> pair1 = io.cwl.avro.Utilities
                 .executeCommand(Joiner.on(" ").join(Arrays.asList(s1)), false, com.google.common.base.Optional.absent(),
                         com.google.common.base.Optional.absent());
-        final String toilVersion = pair1.getValue().trim();
+        final String toilVersion = pair1.getKey().trim();
 
-        final String expectedToilVersion = "3.15.0";
+        final String expectedToilVersion = "7.0.0";
         if (!toilVersion.equals(expectedToilVersion)) {
             ArgumentUtility.errorMessage("toil version is " + toilVersion + " , Dockstore is tested with " + expectedToilVersion
                     + "\nOverride and run with `" + SCRIPT_FLAG + "`", Client.COMMAND_ERROR);
