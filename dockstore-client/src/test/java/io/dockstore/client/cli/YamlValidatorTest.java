@@ -90,7 +90,7 @@ class YamlValidatorTest {
             YamlVerifyUtility.dockstoreValidate(relativePathDockstoreYmlDirectory);
             fail("Invalid YAML not caught");
         } catch (YamlVerifyUtility.ValidateYamlException ex) {
-            assertTrue(ex.getMessage().contains("the path must be an absolute path to be valid"));
+            assertTrue(ex.getMessage().contains("must be an absolute path to be valid"));
         }
 
     }
@@ -103,7 +103,7 @@ class YamlValidatorTest {
             YamlVerifyUtility.dockstoreValidate(relativePathDockstoreYmlDirectory);
             fail("Invalid YAML not caught");
         } catch (YamlVerifyUtility.ValidateYamlException ex) {
-            assertTrue(ex.getMessage().contains("the path must be an absolute path to be valid"));
+            assertTrue(ex.getMessage().contains("must be an absolute path to be valid"));
         }
 
     }

@@ -221,7 +221,7 @@ public abstract class AbstractEntryClient<T> {
     public CWL getCwlUtil() {
         // TODO: may be reactivated if we find a different way to read CWL into Java
         // String cwlrunner = CWLRunnerFactory.getCWLRunner();
-        return new CWL(false, Utilities.parseConfig(getConfigFile()));
+        return new CWL(Utilities.parseConfig(getConfigFile()));
     }
 
     public abstract String getConfigFile();
