@@ -1,7 +1,9 @@
-name: Deploy develop snapshot
+name: Deploy artifacts
 
 on:
   push:
+    tags: 
+      - '**'
     branches-ignore:
       - 'master'
       - 'release/**'
