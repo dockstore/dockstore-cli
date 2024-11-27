@@ -22,6 +22,8 @@ import com.google.common.base.Joiner;
 import io.dockstore.client.cli.ArgumentUtility;
 import io.dockstore.client.cli.Client;
 import io.dockstore.openapi.client.api.MetadataApi;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,8 +51,14 @@ public class ToilWrapper implements CWLRunnerInterface {
         //TODO: this doesn't quite work yet, seeing "toil.batchSystems.abstractBatchSystem.InsufficientSystemResources: Requesting more disk
         // than either physically available, or enforced by --maxDisk. Requested: 537944653824, Available: 134853001216" on trivial
         // workflows like md5sum
+
+        //try normalizing paths
+        Path currentRelativePath = Paths.get("");
+        Path tmpPath = Paths.get(currentRelativePath.toAbsolutePath().toString(), tmpDir);
+        tmpPath = tmpPath.normalize();
+
         ArrayList<String> command = new ArrayList<>(
-            Arrays.asList("toil-cwl-runner", "--jobStore " + workingDir + "/jobStore", "--bypass-file-store", "--logError", "--outdir", outputDir, "--tmpdir-prefix", tmpDir, "--tmp-outdir-prefix",
+            Arrays.asList("toil-cwl-runner", "--bypass-file-store", "--logError", "--outdir", outputDir, "--tmpdir-prefix", tmpPath.toString(), "--tmp-outdir-prefix",
                 workingDir, cwlFile));
         jsonSettings.ifPresent(command::add);
         return command;
