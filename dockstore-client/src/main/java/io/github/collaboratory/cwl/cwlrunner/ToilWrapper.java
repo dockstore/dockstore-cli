@@ -50,7 +50,7 @@ public class ToilWrapper implements CWLRunnerInterface {
         // than either physically available, or enforced by --maxDisk. Requested: 537944653824, Available: 134853001216" on trivial
         // workflows like md5sum
         ArrayList<String> command = new ArrayList<>(
-                Arrays.asList("toil-cwl-runner", "--logError", "--outdir", outputDir, "--tmpdir-prefix", tmpDir, "--tmp-outdir-prefix",
+                Arrays.asList("toil-cwl-runner", "--jobStore ./jobStore", "--logError", "--outdir", outputDir, "--tmpdir-prefix", tmpDir, "--tmp-outdir-prefix",
                         workingDir, cwlFile));
         jsonSettings.ifPresent(command::add);
         return command;
