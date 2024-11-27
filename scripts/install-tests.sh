@@ -13,7 +13,6 @@ fi
 
 if [ "${TESTING_PROFILE}" = "toil-integration-tests" ]; then
     sudo apt-get update && sudo NEEDRESTART_MODE=a apt install \
-      python-dev \
       libffi-dev
     pip3 install --user toil[all]==7.0.0
 else
