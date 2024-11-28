@@ -53,7 +53,7 @@ public class ToilWrapper implements CWLRunnerInterface {
         // workflows like md5sum
 
         //try normalizing paths
-        Path currentRelativePath = Paths.get("");
+        Path currentRelativePath = Path.of("");
         Path tmpPath = Paths.get(currentRelativePath.toAbsolutePath().toString(), tmpDir);
         tmpPath = tmpPath.normalize();
 
