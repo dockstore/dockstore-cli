@@ -15,14 +15,16 @@
  */
 package io.github.collaboratory.cwl;
 
+import io.dockstore.common.ToilOnlyTest;
 import org.apache.commons.io.FileUtils;
-import org.junit.Ignore;
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
 
 /**
  * @author dyuen
  */
-@Ignore
-// @Category(ToilOnlyTest.class)
+@Tag(ToilOnlyTest.NAME)
+@Category(ToilOnlyTest.class)
 public class ToilLauncherIT extends LauncherIT {
 
     public String getConfigFile() {
