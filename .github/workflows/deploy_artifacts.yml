@@ -12,5 +12,5 @@ on:
   
 jobs:
   build:
-    uses: dockstore/workflow-actions/.github/workflows/deploy_artifacts.yaml@seab-6771/reusable-image-deploy
+    uses: dockstore/workflow-actions/.github/workflows/deploy_artifacts.yaml@main
     secrets: inherit
