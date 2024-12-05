@@ -14,7 +14,7 @@ fi
 if [ "${TESTING_PROFILE}" = "toil-integration-tests" ]; then
     pip3 install --user toil[cwl]==7.0.0
 else
-    pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.15.0/requirements3.txt
+    # depending on https://github.com/dockstore/dockstore/pull/5958 we may want to match where we go with the cwltool install, for now apt seems to work well
     sudo apt-get update
     # https://stackoverflow.com/questions/44331836/apt-get-install-tzdata-noninteractive needed by cwltool
     DEBIAN_FRONTEND=noninteractive sudo apt-get -qq --yes --force-yes install tzdata
