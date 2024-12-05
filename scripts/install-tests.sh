@@ -17,8 +17,9 @@ else
     # depending on https://github.com/dockstore/dockstore/pull/5958 we may want to match where we go with the cwltool install, for now apt seems to work well
     sudo apt-get update
     # https://stackoverflow.com/questions/44331836/apt-get-install-tzdata-noninteractive needed by cwltool
-    DEBIAN_FRONTEND=noninteractive sudo apt-get -qq --yes --force-yes install tzdata
-    sudo apt-get -qq --yes --force-yes install cwltool=3.1.20240112164112-2
+    DEBIAN_FRONTEND=noninteractive sudo apt-get -qq --yes --force-yes install tzdata pipx
+    pipx install cwltool==3.1.20240708091337
+    pipx install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.15.0/requirements3.txt
 fi
 
 if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then
