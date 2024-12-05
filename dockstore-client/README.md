@@ -30,7 +30,7 @@ This takes a CWL-based descriptor along with a JSON file that specifies paramete
 0. pulls over 0 or more files that were associated with this workflow order to `/datastore/launcher-<uuid>/configs`, these will be used by the workflow itself. These will come from a web service endpoint in Consonance rather than external sources like inputs below. This is how we get a SeqWare INI file for example. For this demo launcher this functionality will be skipped since it lacks a queue/web service to talk to. 
 0. make `/datastore/launcher-<uuid>/working` to be used as the working directory for the command, `/datastore/launcher-<uuid>/inputs` for all the file inputs, and `/datastore/launcher-<uuid>/logs` for logs
 0. start services referenced in the descriptor, this functionality does not yet exist
-0. download all the inputs, these will come from S3, HTTP/S, SFTP, FTP, ICGCObjectStore, etc, put them in locations within `/datastore/launcher-<uuid>/inputs`
+0. download all the inputs, these will come from S3, HTTP/S, SFTP, FTP, etc, put them in locations within `/datastore/launcher-<uuid>/inputs`
 0. produces a new JSON parameterization document that has the URLs replaced with file paths that are local to the container host
 0. hands the updated JSON parameterization document and CWL descriptor to the CWL runner tool, this causes the command to be constructed, docker containers to be pulled and the command to be run correctly
 0. collect and provision output files to their destination referenced in `~/.consonance/launcher.config`
@@ -43,10 +43,6 @@ working-directory=./datastore/
 [s3]
 # optional: the S3 endpoint can be overridden to use custom implementations of the S3 API rather than AWS S3
 # endpoint = https://www.cancercollaboratory.org:9080
-
-[dcc_storage]
-# optional: the location of the DCC storage client can be customized 
-# client = /icgc/dcc-storage/bin/dcc-storage-client
 ```
 
 This tells the system what the local working directory should be.  Files will be written here.

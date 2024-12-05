@@ -158,7 +158,6 @@ class ClientIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("pluginsTest1/configWithPlugins"), PLUGIN, LIST });
         assertTrue(systemOutRule.getText().contains("dockstore-file-synapse-plugin"));
         assertTrue(systemOutRule.getText().contains("dockstore-file-s3-plugin"));
-        assertFalse(systemOutRule.getText().contains("dockstore-icgc-storage-client-plugin"));
     }
 
     @Test
@@ -168,7 +167,6 @@ class ClientIT extends BaseIT {
         Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("pluginsTest2/configWithPlugins"), PLUGIN, LIST });
         assertFalse(systemOutRule.getText().contains("dockstore-file-synapse-plugin"));
         assertFalse(systemOutRule.getText().contains("dockstore-file-s3-plugin"));
-        assertTrue(systemOutRule.getText().contains("dockstore-file-icgc-storage-client-plugin"));
     }
 
     @Disabled("seems to have been disabled for ages")

@@ -1,0 +1,16 @@
+name: Deploy artifacts
+
+on:
+  push:
+    tags: 
+      - '**'
+    branches-ignore:
+      - 'master'
+      - 'release/**'
+      - 'hotfix/**'
+      - 'dependabot/**'
+  
+jobs:
+  build:
+    uses: dockstore/workflow-actions/.github/workflows/deploy_artifacts.yaml@main
+    secrets: inherit

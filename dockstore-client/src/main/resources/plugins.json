@@ -1,7 +1,4 @@
   [{
-    "name": "dockstore-file-icgc-storage-client-plugin",
-    "version": "0.0.6"
-  },{
     "name": "dockstore-file-s3-plugin",
     "version": "0.0.3"
   },{
