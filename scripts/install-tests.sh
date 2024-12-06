@@ -20,6 +20,7 @@ else
     DEBIAN_FRONTEND=noninteractive sudo apt-get -qq --yes --force-yes install tzdata pipx curl
     curl -o requirements.txt "https://dockstore.org/api/metadata/runner_dependencies?client_version=1.16.0&python_version=3"
     pipx install cwltool==3.1.20240708091337
+    pipx install schema_salad
     pipx runpip cwltool install -r requirements.txt # this ensures that your version of cwltool and its dependencies matches what we test with
     pipx ensurepath
 fi
