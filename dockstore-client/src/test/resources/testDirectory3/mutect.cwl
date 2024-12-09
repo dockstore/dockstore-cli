@@ -10,7 +10,7 @@ doc: "Mutect 1.1.5"
 
 hints:
   - class: DockerRequirement
-    dockerPull: quay.io/jeltje/mutect
+    dockerPull: quay.io/dockstore-testing/mutect
 
 requirements:
   - class: InlineJavascriptRequirement
