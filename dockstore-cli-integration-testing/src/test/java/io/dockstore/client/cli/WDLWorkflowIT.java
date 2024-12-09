@@ -97,7 +97,7 @@ class WDLWorkflowIT extends BaseIT {
         workflowApi.publish1(refresh.getId(), publishRequest);
 
         // get test json
-        String testVersion = "1.3.0";
+        String testVersion = "1.4.0";
         // Also test that files can be gotten by owner even though it's hidden
         List<WorkflowVersion> workflowVersions = refresh.getWorkflowVersions();
         workflowVersions.stream().filter(v -> v.getName().equals(testVersion)).forEach(v -> v.setHidden(true));
