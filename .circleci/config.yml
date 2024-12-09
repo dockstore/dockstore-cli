@@ -2,7 +2,7 @@ version: 2.1
 parameters:
   java-tag:
     type: string
-    default: "21.0.2"
+    default: "21.0.5"
   run_against_develop_core:
     type: boolean
     default: false
