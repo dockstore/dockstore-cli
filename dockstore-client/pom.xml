@@ -529,7 +529,7 @@
                         --add-opens java.base/java.io=ALL-UNNAMED
                         --add-opens java.base/java.util=ALL-UNNAMED
                         --add-opens java.base/java.base=ALL-UNNAMED
-                        <!-- for  Java 21, see   -->
+                        <!-- for  Java 21, needed for system stubs catchSystemExit, not to be confused with system rules or system lambda   -->
                         -Djava.security.manager=allow
                     </argLine>
                     <skipTests>${skipITs}</skipTests>
