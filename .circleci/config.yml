@@ -2,7 +2,7 @@ version: 2.1
 parameters:
   java-tag:
     type: string
-    default: "17.0.3"
+    default: "21.0.5"
   run_against_develop_core:
     type: boolean
     default: false
@@ -17,14 +17,14 @@ executors:
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2204:2023.10.1
+      image: ubuntu-2204:2024.04.4
     environment:
       PGHOST: 127.0.0.1
     resource_class: medium
 
   toil_wes_test_executor:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2204:2023.10.1
+      image: ubuntu-2204:2024.11.1
     resource_class: medium
 
 common_filters: &common_filters
