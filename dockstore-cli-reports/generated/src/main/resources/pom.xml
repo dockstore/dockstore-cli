@@ -38,6 +38,12 @@
       <artifactId>dockstore-common</artifactId>
       <version>1.17.0-alpha.2</version>
       <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.auth0</groupId>
+          <artifactId>java-jwt</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
