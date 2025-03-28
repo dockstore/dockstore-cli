@@ -135,6 +135,8 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+            <!-- remove after dockstore-bom is updated https://github.com/dockstore/dockstore/pull/6091 -->
+            <version>2.18.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
