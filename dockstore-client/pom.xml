@@ -135,6 +135,8 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+            <!-- remove after dockstore-bom is updated https://github.com/dockstore/dockstore/pull/6091 -->
+            <version>2.18.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -275,7 +277,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-vfs2</artifactId>
             <!-- remove after bom is updated with Dockstore or above 1.14.0 -->
-            <version>2.9.0</version>
+            <version>2.10.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-httpclient</groupId>
