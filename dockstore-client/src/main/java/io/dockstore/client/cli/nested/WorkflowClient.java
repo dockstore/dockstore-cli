@@ -922,9 +922,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
             case VERSION_TAG:
                 versionTag(args);
                 break;
-            case RESTUB:
-                restub(args);
-                break;
             default:
                 return false;
             }
@@ -1160,33 +1157,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
             } catch (ApiException ex) {
                 exceptionMessage(ex, "Could not find workflow", Client.API_ERROR);
-            }
-        }
-    }
-
-    private void restub(List<String> args) {
-        if (args.isEmpty() || args.contains(HELP) || args.contains("-h")) {
-            restubHelp();
-        } else {
-            try {
-                final String entry = reqVal(args, ENTRY);
-                Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, false, true);
-                if (this.isAppTool) {
-                    errorMessage(GITHUB_APP_COMMAND_ERROR, COMMAND_ERROR);
-                }
-
-                if (workflow.isIsPublished()) {
-                    errorMessage("Cannot restub a published workflow. Please unpublish if you wish to restub.", Client.CLIENT_ERROR);
-                }
-
-                if (workflow.getMode() == Workflow.ModeEnum.STUB) {
-                    errorMessage("The given workflow is already a stub.", Client.CLIENT_ERROR);
-                }
-
-                workflowsApi.restub(workflow.getId());
-                out("The workflow " + workflow.getPath() + " has been converted back to a stub.");
-            } catch (ApiException ex) {
-                exceptionMessage(ex, "", Client.API_ERROR);
             }
         }
     }
