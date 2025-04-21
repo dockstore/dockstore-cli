@@ -185,38 +185,7 @@ class GeneralWorkflowIT extends BaseIT {
 
 
 
-    /**
-     * This tests that a restub will work on an unpublished, full workflow
-     */
-    @Test
-    void testRestub() {
-        // Refresh and then restub
-        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow"));
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
-            SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", ENTRY,
-            SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
 
-        final long count = testingPostgres.runSelectStatement("select count(*) from workflowversion", long.class);
-        assertEquals(0, count, "there should be 0 workflow versions, there are " + count);
-    }
-
-    /**
-     * This tests that a restub will not work on an published, full workflow
-     */
-    @Test
-    void testRestubError() throws Exception {
-        // Refresh and then restub
-        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow"));
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, REFRESH, ENTRY,
-            SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, ENTRY,
-            SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
-
-        int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", ENTRY,
-                SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG }));
-        assertEquals(Client.CLIENT_ERROR, exitCode);
-    }
 
     /**
      * Tests updating workflow descriptor type when a workflow is FULL and when it is a STUB

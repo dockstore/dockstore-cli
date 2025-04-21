@@ -110,7 +110,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     public static final String LAUNCH_COMMAND_NAME = LAUNCH;
     public static final String GITHUB_APP_COMMAND_ERROR = "Command not supported for GitHub App entries";
     public static final String UPDATE_WORKFLOW = "update_workflow";
-    public static final String RESTUB = "restub";
+
+
     protected static final Logger LOG = LoggerFactory.getLogger(WorkflowClient.class);
     protected final WorkflowsApi workflowsApi;
     protected final UsersApi usersApi;
@@ -907,7 +908,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     protected List<String> getClientSpecificCommands() {
         List<String> possibleCommands = new ArrayList<>();
-        possibleCommands.addAll(Arrays.asList(UPDATE_WORKFLOW, VERSION_TAG, RESTUB));
+        possibleCommands.addAll(Arrays.asList(UPDATE_WORKFLOW, VERSION_TAG));
         return possibleCommands;
     }
 
@@ -1159,20 +1160,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 exceptionMessage(ex, "Could not find workflow", Client.API_ERROR);
             }
         }
-    }
-
-    private void restubHelp() {
-        printHelpHeader();
-        out("Usage: dockstore workflow restub " + HELP);
-        out("       dockstore workflow restub [parameters]");
-        out("");
-        out("Description:");
-        out("  Converts a full, unpublished workflow back to a stub.");
-        out("");
-        out("Required Parameters:");
-        out("  " + ENTRY + " <entry>                       Complete workflow path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("");
-        printHelpFooter();
     }
 
     public SourceFile getDescriptorFromServer(String entry, DescriptorLanguage descriptorType) throws ApiException {
