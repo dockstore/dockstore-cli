@@ -405,7 +405,6 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { WORKFLOW, LAUNCH }, false);
         checkCommandForHelp(new String[] { WORKFLOW, VERSION_TAG }, false);
         checkCommandForHelp(new String[] { WORKFLOW, UPDATE_WORKFLOW }, false);
-        checkCommandForHelp(new String[] { WORKFLOW, "restub" }, false);
 
         checkCommandForHelp(new String[] { WORKFLOW, DOWNLOAD }, true);
         checkCommandForHelp(new String[] { WORKFLOW, LIST }, true);
@@ -425,7 +424,6 @@ class ClientIT extends BaseIT {
         checkCommandForHelp(new String[] { WORKFLOW, VERSION_TAG }, true);
         checkCommandForHelp(new String[] { WORKFLOW, UPDATE_WORKFLOW }, true);
         checkCommandForHelp(new String[] { WORKFLOW, MANUAL_PUBLISH }, true);
-        checkCommandForHelp(new String[] { WORKFLOW, "restub" }, true);
         checkCommandForHelp(new String[] { WORKFLOW, STAR }, true);
         checkCommandForHelp(new String[] { WORKFLOW, TEST_PARAMETER }, true);
         checkCommandForHelp(new String[] { WORKFLOW, VERIFY }, true);

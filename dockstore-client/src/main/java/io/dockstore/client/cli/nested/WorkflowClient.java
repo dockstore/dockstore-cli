@@ -110,7 +110,8 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
     public static final String LAUNCH_COMMAND_NAME = LAUNCH;
     public static final String GITHUB_APP_COMMAND_ERROR = "Command not supported for GitHub App entries";
     public static final String UPDATE_WORKFLOW = "update_workflow";
-    public static final String RESTUB = "restub";
+
+
     protected static final Logger LOG = LoggerFactory.getLogger(WorkflowClient.class);
     protected final WorkflowsApi workflowsApi;
     protected final UsersApi usersApi;
@@ -280,8 +281,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("  " + UPDATE_WORKFLOW + "  :  updates certain fields of a workflow");
         out("");
         out("  " + VERSION_TAG + "      :  updates an existing version tag of a workflow");
-        out("");
-        out("  restub           :  converts a full, unpublished workflow back to a stub");
         out("");
     }
 
@@ -907,7 +906,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
 
     protected List<String> getClientSpecificCommands() {
         List<String> possibleCommands = new ArrayList<>();
-        possibleCommands.addAll(Arrays.asList(UPDATE_WORKFLOW, VERSION_TAG, RESTUB));
+        possibleCommands.addAll(Arrays.asList(UPDATE_WORKFLOW, VERSION_TAG));
         return possibleCommands;
     }
 
@@ -921,9 +920,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 break;
             case VERSION_TAG:
                 versionTag(args);
-                break;
-            case RESTUB:
-                restub(args);
                 break;
             default:
                 return false;
@@ -1041,7 +1037,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     workflow.setDescriptorType(Workflow.DescriptorTypeEnum.fromValue(descriptorType.toUpperCase()));
                 } else if (!descriptorType.equalsIgnoreCase(workflow.getDescriptorType().getValue())) {
                     errorMessage(
-                        "You cannot change the descriptor type of a FULL workflow. Revert it to a STUB if you wish to change descriptor type.",
+                        "You cannot change the descriptor type of a FULL workflow.",
                         Client.CLIENT_ERROR);
                 }
 
@@ -1162,47 +1158,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                 exceptionMessage(ex, "Could not find workflow", Client.API_ERROR);
             }
         }
-    }
-
-    private void restub(List<String> args) {
-        if (args.isEmpty() || args.contains(HELP) || args.contains("-h")) {
-            restubHelp();
-        } else {
-            try {
-                final String entry = reqVal(args, ENTRY);
-                Workflow workflow = findAndGetDockstoreWorkflowByPath(entry, null, false, true);
-                if (this.isAppTool) {
-                    errorMessage(GITHUB_APP_COMMAND_ERROR, COMMAND_ERROR);
-                }
-
-                if (workflow.isIsPublished()) {
-                    errorMessage("Cannot restub a published workflow. Please unpublish if you wish to restub.", Client.CLIENT_ERROR);
-                }
-
-                if (workflow.getMode() == Workflow.ModeEnum.STUB) {
-                    errorMessage("The given workflow is already a stub.", Client.CLIENT_ERROR);
-                }
-
-                workflowsApi.restub(workflow.getId());
-                out("The workflow " + workflow.getPath() + " has been converted back to a stub.");
-            } catch (ApiException ex) {
-                exceptionMessage(ex, "", Client.API_ERROR);
-            }
-        }
-    }
-
-    private void restubHelp() {
-        printHelpHeader();
-        out("Usage: dockstore workflow restub " + HELP);
-        out("       dockstore workflow restub [parameters]");
-        out("");
-        out("Description:");
-        out("  Converts a full, unpublished workflow back to a stub.");
-        out("");
-        out("Required Parameters:");
-        out("  " + ENTRY + " <entry>                       Complete workflow path in Dockstore (ex. quay.io/collaboratory/seqware-bwa-workflow)");
-        out("");
-        printHelpFooter();
     }
 
     public SourceFile getDescriptorFromServer(String entry, DescriptorLanguage descriptorType) throws ApiException {
