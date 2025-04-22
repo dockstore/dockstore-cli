@@ -22,6 +22,8 @@ import com.google.common.base.Joiner;
 import io.dockstore.client.cli.ArgumentUtility;
 import io.dockstore.client.cli.Client;
 import io.dockstore.openapi.client.api.MetadataApi;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,9 +37,9 @@ public class ToilWrapper implements CWLRunnerInterface {
         final ImmutablePair<String, String> pair1 = io.cwl.avro.Utilities
                 .executeCommand(Joiner.on(" ").join(Arrays.asList(s1)), false, com.google.common.base.Optional.absent(),
                         com.google.common.base.Optional.absent());
-        final String toilVersion = pair1.getValue().trim();
+        final String toilVersion = pair1.getKey().trim();
 
-        final String expectedToilVersion = "3.15.0";
+        final String expectedToilVersion = "7.0.0";
         if (!toilVersion.equals(expectedToilVersion)) {
             ArgumentUtility.errorMessage("toil version is " + toilVersion + " , Dockstore is tested with " + expectedToilVersion
                     + "\nOverride and run with `" + SCRIPT_FLAG + "`", Client.COMMAND_ERROR);
@@ -49,9 +51,15 @@ public class ToilWrapper implements CWLRunnerInterface {
         //TODO: this doesn't quite work yet, seeing "toil.batchSystems.abstractBatchSystem.InsufficientSystemResources: Requesting more disk
         // than either physically available, or enforced by --maxDisk. Requested: 537944653824, Available: 134853001216" on trivial
         // workflows like md5sum
+
+        //try normalizing paths
+        Path currentRelativePath = Path.of("");
+        Path tmpPath = Paths.get(currentRelativePath.toAbsolutePath().toString(), tmpDir);
+        tmpPath = tmpPath.normalize();
+
         ArrayList<String> command = new ArrayList<>(
-                Arrays.asList("toil-cwl-runner", "--logError", "--outdir", outputDir, "--tmpdir-prefix", tmpDir, "--tmp-outdir-prefix",
-                        workingDir, cwlFile));
+            Arrays.asList("toil-cwl-runner", "--bypass-file-store", "--logError", "--outdir", outputDir, "--tmpdir-prefix", tmpPath.toString(), "--tmp-outdir-prefix",
+                workingDir, cwlFile));
         jsonSettings.ifPresent(command::add);
         return command;
     }

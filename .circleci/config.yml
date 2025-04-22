@@ -2,7 +2,7 @@ version: 2.1
 parameters:
   java-tag:
     type: string
-    default: "17.0.3"
+    default: "21.0.5"
   run_against_develop_core:
     type: boolean
     default: false
@@ -17,14 +17,14 @@ executors:
 
   machine_integration_test_exec:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2204:2023.10.1
+      image: ubuntu-2204:2024.04.4
     environment:
       PGHOST: 127.0.0.1
     resource_class: medium
 
   toil_wes_test_executor:
     machine: # run the steps with Ubuntu VM
-      image: ubuntu-2204:2023.10.1
+      image: ubuntu-2204:2024.11.1
     resource_class: medium
 
 common_filters: &common_filters
@@ -52,7 +52,7 @@ common_jobs: &common_jobs
         - integration-tests:
             matrix:
               parameters:
-                testing_profile: [ "singularity-tests", "bitbucket-tests" ]
+                testing_profile: [ "singularity-tests", "bitbucket-tests", "toil-integration-tests" ]
             <<: *common_filters
             <<: *slack_context
             requires:
@@ -198,7 +198,8 @@ jobs:
             - run:
                 name: findDevelopSnapshot
                 command: |
-                  ./mvnw versions:update-properties -Dincludes=io.dockstore:* -DallowSnapshots
+                  # grab the latest snapshot version that doesn't seem to correspond to a feature branch or similar
+                  ./mvnw versions:update-properties -Dincludes="io.dockstore:*" -Dmaven.version.ignore=\.*-\.*-SNAPSHOT -DallowSnapshots
             - run:
                 name: force update to latest snapshot versions, # review this step to see what versions were used, also see https://stackoverflow.com/questions/29020716/maven-what-does-u-update-snapshots-really-do
                 command: |

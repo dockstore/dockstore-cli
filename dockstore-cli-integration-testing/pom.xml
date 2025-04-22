@@ -71,6 +71,12 @@
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-common</artifactId>
             <version>${dockstore-core.version}</version>
+	    <exclusions>
+               <exclusion>
+                 <groupId>com.auth0</groupId>
+                 <artifactId>java-jwt</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dockstore</groupId>
@@ -268,6 +274,8 @@
                         --add-opens java.base/java.base=ALL-UNNAMED
                         --add-opens java.base/java.lang.reflect=ALL-UNNAMED
                         --add-opens java.base/sun.nio.fs=ALL-UNNAMED
+                        <!-- for  Java 21, needed for system stubs catchSystemExit, not to be confused with system rules or system lambda   -->
+                        -Djava.security.manager=allow
                         -da:org.hibernate...
                     </argLine>
                 </configuration>

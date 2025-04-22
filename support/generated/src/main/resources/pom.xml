@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.dockstore</groupId>
   <artifactId>support</artifactId>
-  <version>1.16.0-SNAPSHOT</version>
+  <version>1.17.0-SNAPSHOT</version>
   <licenses>
     <license>
       <name>Apache Software License, Version 2.0</name>
@@ -72,7 +72,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>32.1.2-jre</version>
+      <version>33.4.0-jre</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

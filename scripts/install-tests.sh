@@ -12,9 +12,17 @@ if [ "${TESTING_PROFILE}" = "unit-tests" ] || [ "${TESTING_PROFILE}" == "automat
 fi
 
 if [ "${TESTING_PROFILE}" = "toil-integration-tests" ]; then
-    pip3 install --user toil[cwl]==3.15.0
+    pip3 install --user toil[cwl]==7.0.0
 else
-    pip3 install --user -r https://raw.githubusercontent.com/dockstore/dockstore/develop/dockstore-webservice/src/main/resources/requirements/1.15.0/requirements3.txt
+    sudo apt-get update
+    # https://stackoverflow.com/questions/44331836/apt-get-install-tzdata-noninteractive needed by cwltool
+    DEBIAN_FRONTEND=noninteractive sudo apt-get -qq --yes --force-yes install tzdata pipx curl
+    curl -o requirements.txt "https://dockstore.org/api/metadata/runner_dependencies?client_version=1.16.0&python_version=3"
+    pipx install cwltool==3.1.20240708091337
+    pipx install schema_salad==8.7.20240718183047
+    pipx install cwlref-runner
+    pipx runpip cwltool install -r requirements.txt # this ensures that your version of cwltool and its dependencies matches what we test with
+    pipx ensurepath
 fi
 
 if [ "${TESTING_PROFILE}" = "singularity-tests" ]; then

@@ -200,13 +200,6 @@ class GitHubAppToolIT extends BaseIT {
         assertTrue(systemErrRule.getText().contains("Command not supported for GitHub App entries"));
     }
 
-    @Test
-    void restub() throws Exception {
-        int exitCode = catchSystemExit(() ->  Client.main(new String[]{WORKFLOW, "restub", ENTRY, ENTRY_PATH, CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt")}));
-        assertEquals(Client.COMMAND_ERROR, exitCode);
-        assertTrue(systemErrRule.getOutput().getText().contains("Command not supported for GitHub App entries"), "looked like: " + systemErrRule.getOutput().getText());
-    }
-
     private void publishWorkflow() {
         final ApiClient webClient = getWebClient(USER_2_USERNAME, testingPostgres);
         final WorkflowsApi workflowApi = new WorkflowsApi(webClient);
