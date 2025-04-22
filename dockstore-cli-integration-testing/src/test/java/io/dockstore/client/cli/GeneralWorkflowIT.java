@@ -283,10 +283,16 @@ class GeneralWorkflowIT extends BaseIT {
         // check that invalid
         final long count4 = testingPostgres.runSelectStatement("select count(*) from workflowversion where valid='f'", long.class);
         assertTrue(4 <= count4, "there should be at least 4 invalid versions, there are " + count4);
+    }
 
-        // Restub
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", ENTRY,
-            SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG });
+    /**
+     * This test tests a bunch of different assumptions for how refresh should work for workflows
+     */
+    @Test
+    void testRefreshRelatedConceptsWdl() throws Exception {
+        // refresh all
+        refreshByOrganizationReplacement(USER_2_USERNAME, Set.of(SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow"));
+
 
         // Update workflow to WDL
         Client.main(
@@ -313,7 +319,7 @@ class GeneralWorkflowIT extends BaseIT {
 
         // should now not be able to publish
         int exitCode = catchSystemExit(() -> Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, PUBLISH, ENTRY,
-                SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG }));
+            SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/hello-dockstore-workflow", SCRIPT_FLAG }));
         assertEquals(Client.API_ERROR, exitCode);
     }
 
@@ -427,25 +433,6 @@ class GeneralWorkflowIT extends BaseIT {
             "select count(*) from workflow where actualdefaultversion = 'test' and author is null and email is null and description is null",
             long.class);
         assertEquals(0, count7, "The given workflow should now have contact info and description");
-
-        // restub
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", ENTRY,
-            SourceControlEnum.GITLAB_COM + "/dockstore.test.user2/dockstore-workflow-example", SCRIPT_FLAG });
-        final long count8 = testingPostgres.runSelectStatement(
-            "select count(*) from workflow where mode='STUB' and sourcecontrol = '" + SourceControlEnum.GITLAB_COM
-                + "' and organization = 'dockstore.test.user2' and repository = 'dockstore-workflow-example'", long.class);
-        assertEquals(1, count8, "The workflow should now be a stub");
-
-        // Convert to WDL workflow
-        Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
-                SourceControlEnum.GITLAB_COM + "/dockstore.test.user2/dockstore-workflow-example", "--descriptor-type", DescriptorTypeEnum.WDL.toString(),
-                SCRIPT_FLAG });
-
-        // Should now be a WDL workflow
-        final long count9 = testingPostgres.runSelectStatement("select count(*) from workflow where descriptortype='wdl'", long.class);
-        assertEquals(1, count9, "there should be no 1 wdl workflow" + count9);
-
     }
 
 
@@ -512,28 +499,6 @@ class GeneralWorkflowIT extends BaseIT {
                 "test.wdl.json", SCRIPT_FLAG });
         final long count4 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='CWL_TEST_JSON'", long.class);
         assertEquals(2, count4, "there should be two sourcefiles that are cwl test parameter files, there are " + count4);
-
-        // Restub
-        Client.main(new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, "restub", ENTRY,
-            SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/parameter_test_workflow", SCRIPT_FLAG });
-
-        // Change to WDL
-        Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, UPDATE_WORKFLOW, ENTRY,
-                SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/parameter_test_workflow", "--descriptor-type", DescriptorTypeEnum.WDL.toString(),
-                "--workflow-path", "Dockstore.wdl", SCRIPT_FLAG });
-
-        // Should be no sourcefiles
-        final long count5 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type like '%_TEST_JSON'", long.class);
-        assertEquals(0, count5, "there should be no source files that are test parameter files, there are " + count5);
-
-        // Update version wdltest with test parameters
-        Client.main(
-            new String[] { CONFIG, ResourceHelpers.resourceFilePath("config_file2.txt"), WORKFLOW, TEST_PARAMETER, ENTRY,
-                SourceControlEnum.GITHUB_COM + "/DockstoreTestUser2/parameter_test_workflow", VERSION, "wdltest", "--add",
-                "test.wdl.json", SCRIPT_FLAG });
-        final long count6 = testingPostgres.runSelectStatement("select count(*) from sourcefile where type='WDL_TEST_JSON'", long.class);
-        assertEquals(1, count6, "there should be one sourcefile that is a wdl test parameter file, there are " + count6);
     }
 
 

@@ -282,8 +282,6 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
         out("");
         out("  " + VERSION_TAG + "      :  updates an existing version tag of a workflow");
         out("");
-        out("  restub           :  converts a full, unpublished workflow back to a stub");
-        out("");
     }
 
     @Override
@@ -1039,7 +1037,7 @@ public class WorkflowClient extends AbstractEntryClient<Workflow> {
                     workflow.setDescriptorType(Workflow.DescriptorTypeEnum.fromValue(descriptorType.toUpperCase()));
                 } else if (!descriptorType.equalsIgnoreCase(workflow.getDescriptorType().getValue())) {
                     errorMessage(
-                        "You cannot change the descriptor type of a FULL workflow. Revert it to a STUB if you wish to change descriptor type.",
+                        "You cannot change the descriptor type of a FULL workflow.",
                         Client.CLIENT_ERROR);
                 }
 
