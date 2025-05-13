@@ -36,7 +36,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-integration-testing</artifactId>
-      <version>1.17.0-beta.0</version>
+      <version>1.17.0</version>
       <classifier>tests</classifier>
       <scope>compile</scope>
       <exclusions>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.17.0-beta.0</version>
+      <version>1.17.0</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -61,7 +61,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-webservice</artifactId>
-      <version>1.17.0-beta.0</version>
+      <version>1.17.0</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -73,7 +73,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.17.0-beta.0</version>
+      <version>1.17.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
