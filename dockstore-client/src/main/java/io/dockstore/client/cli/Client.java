@@ -61,10 +61,12 @@ import io.dockstore.openapi.client.model.TRSService;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerFactory;
 import io.github.collaboratory.cwl.cwlrunner.CWLRunnerInterface;
 import jakarta.ws.rs.ProcessingException;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.text.ParseException;
@@ -806,8 +808,7 @@ public class Client {
     }
 
     public static List<String> getGeneralFlags() {
-        List<String> generalFlags = new ArrayList<>();
-        generalFlags.addAll(Arrays.asList(DEBUG_FLAG, HELP, CONFIG, SCRIPT_FLAG));
+        List<String> generalFlags = new ArrayList<>(Arrays.asList(DEBUG_FLAG, HELP, CONFIG, SCRIPT_FLAG));
         return generalFlags;
     }
 
@@ -821,6 +822,14 @@ public class Client {
         INIConfiguration config = getIniConfiguration(args);
         // pull out the variables from the config
         String token = config.getString("token", "");
+        if (token.isEmpty()) {
+            String tokenCommand = config.getString("tokenCommand", "");
+            if (!tokenCommand.isEmpty()) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                Utilities.executeCommand(tokenCommand, output, new ByteArrayOutputStream());
+                token = output.toString(StandardCharsets.UTF_8).trim();
+            }
+        }
         serverUrl = config.getString("server-url", "https://dockstore.org/api");
         if (serverUrl.contains(":8443")) {
             err(DEPRECATED_PORT_MESSAGE);
