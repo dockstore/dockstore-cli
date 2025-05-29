@@ -270,7 +270,7 @@ class ClientIT extends BaseIT {
 
     @Test
     void testTokenCommand() {
-        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("clientConfig.withTokenCommand"), "--debug", "--script" });
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("clientConfig.withTokenCommand"), "--debug", "deps" });
         assertTrue(systemOutRule.getText().contains("Hello World!"));
         systemOutRule.clear();
     }
