@@ -69,6 +69,13 @@
     </scm>
 
     <repositories>
+	<repository>
+            <id>artifacts.oicr.on.ca.ca-snapshots</id>
+            <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
         <repository>
             <id>artifacts.oicr.on.ca</id>
             <name>artifacts.oicr.on.ca</name>
