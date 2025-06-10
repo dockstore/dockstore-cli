@@ -70,35 +70,20 @@
 
     <repositories>
         <repository>
-            <id>artifacts.oicr.on.ca.ca-snapshots</id>
-            <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>artifacts.oicr.on.ca</id>
             <name>artifacts.oicr.on.ca</name>
             <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
         </repository>
         <repository>
             <id>broad-dependencies.oicr.on.ca</id>
             <name>broad-dependencies.oicr.on.ca</name>
             <url>https://artifacts.oicr.on.ca/artifactory/broad-dependencies</url>
         </repository>
-        <repository>
-            <id>apache-releases</id>
-            <name>Apache Releases repository</name>
-            <url>https://repository.apache.org/content/repositories/releases/</url>
-        </repository>
         <!-- broad -->
         <repository>
             <id>artifactory.broadinstitute.org</id>
             <name>artifactory.broadinstitute.org</name>
-	    <url>https://broadinstitute.jfrog.io/artifactory/libs-release/</url>
+            <url>https://broadinstitute.jfrog.io/artifactory/libs-release/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -106,6 +91,12 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <!-- might be useful someday in a pinch if oicr goes down again
+        <repository>
+            <id>gitlab-maven</id>
+            <url>https://gitlab.com/api/v4/projects/17865731/packages/maven</url>
+        </repository>
+        -->
     </repositories>
 
     <licenses>
