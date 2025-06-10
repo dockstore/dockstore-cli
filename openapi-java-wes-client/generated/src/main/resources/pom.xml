@@ -96,16 +96,6 @@
   </dependencies>
   <repositories>
     <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>artifacts.oicr.on.ca.ca-snapshots</id>
-      <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
-    </repository>
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
       <id>artifacts.oicr.on.ca</id>
       <name>artifacts.oicr.on.ca</name>
       <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
@@ -114,11 +104,6 @@
       <id>broad-dependencies.oicr.on.ca</id>
       <name>broad-dependencies.oicr.on.ca</name>
       <url>https://artifacts.oicr.on.ca/artifactory/broad-dependencies</url>
-    </repository>
-    <repository>
-      <id>apache-releases</id>
-      <name>Apache Releases repository</name>
-      <url>https://repository.apache.org/content/repositories/releases/</url>
     </repository>
     <repository>
       <releases>
