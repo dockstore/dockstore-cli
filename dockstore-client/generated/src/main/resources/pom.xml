@@ -281,10 +281,6 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <groupId>commons-httpclient</groupId>
-          <artifactId>commons-httpclient</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-hdfs-client</artifactId>
         </exclusion>
