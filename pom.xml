@@ -199,18 +199,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <!-- remove after dockstore-bom is updated https://github.com/dockstore/dockstore/pull/6091 -->
-                <version>2.19.0</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <!-- remove after dockstore-bom is updated https://github.com/dockstore/dockstore/pull/6091 -->
-                <version>1.3.5</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-vfs2</artifactId>
             </dependency>
