@@ -46,7 +46,7 @@ For developers, if you are working with a custom-built or updated Dockstore clie
 As an option for additional safety, you can also store your token in an encrypted password manager or similar. In this case, you can replace `token` with `tokenCommand`. For example
 
 ```
-token = cat /home/my-user/dockstoreTokenVault.txt
+tokenCommand = cat /home/my-user/dockstoreTokenVault.txt
 server-url = https://www.dockstore.org/api
 ```
 
