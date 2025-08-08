@@ -43,6 +43,13 @@ server-url = https://www.dockstore.org/api
 
 For developers, if you are working with a custom-built or updated Dockstore client you will need to update the jar in: `~/.dockstore/config/self-installs`.
 
+As an option for additional safety, you can also store your token in an encrypted password manager or similar. In this case, you can replace `token` with `tokenCommand`. For example
+
+```
+tokenCommand = cat /home/my-user/dockstoreTokenVault.txt
+server-url = https://www.dockstore.org/api
+```
+
 ### File Provisioning
 
 By default, cwltool reads input files from the local filesystem. Dockstore also adds support for additional file systems
