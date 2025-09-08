@@ -269,6 +269,13 @@ class ClientIT extends BaseIT {
     }
 
     @Test
+    void testTokenCommand() {
+        Client.main(new String[] { "--config", ResourceHelpers.resourceFilePath("clientConfig.withTokenCommand"), "--debug", "deps" });
+        assertTrue(systemOutRule.getText().contains("Hello World!"));
+        systemOutRule.clear();
+    }
+
+    @Test
     void testCacheCleaning() throws IOException {
         Client.main(new String[] { CONFIG, TestUtility.getConfigFileLocation(true), CLEAN_CACHE });
         systemOutRule.clear();

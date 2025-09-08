@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.dockstore</groupId>
   <artifactId>dockstore-client</artifactId>
-  <version>1.17.0-SNAPSHOT</version>
+  <version>1.18.0-SNAPSHOT</version>
   <licenses>
     <license>
       <name>Apache Software License, Version 2.0</name>
@@ -30,31 +30,31 @@
     <dependency>
       <groupId>org.glassfish.jersey.inject</groupId>
       <artifactId>jersey-hk2</artifactId>
-      <version>3.0.17</version>
+      <version>3.0.18</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-transport-httpclient5</artifactId>
-      <version>3.3.6</version>
+      <version>3.5.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-core</artifactId>
-      <version>3.3.6</version>
+      <version>3.5.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-transport</artifactId>
-      <version>3.3.6</version>
+      <version>3.5.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-api</artifactId>
-      <version>3.3.6</version>
+      <version>3.5.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-common</artifactId>
-      <version>1.17.0</version>
+      <version>1.18.0-rc.0</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -82,19 +82,19 @@
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-client</artifactId>
-      <version>1.17.0</version>
+      <version>1.18.0-rc.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>openapi-java-wes-client</artifactId>
-      <version>1.17.0-SNAPSHOT</version>
+      <version>1.18.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.dockstore</groupId>
       <artifactId>dockstore-file-plugin-parent</artifactId>
-      <version>1.17.0-SNAPSHOT</version>
+      <version>1.18.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -106,7 +106,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.17.0</version>
+      <version>3.18.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -118,7 +118,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>33.4.0-jre</version>
+      <version>33.4.8-jre</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -130,7 +130,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.18.0</version>
+      <version>2.19.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -142,25 +142,25 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-text</artifactId>
-      <version>1.13.0</version>
+      <version>1.13.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.18.2</version>
+      <version>2.19.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-base</artifactId>
-      <version>2.18.2</version>
+      <version>2.19.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.18.2</version>
+      <version>2.19.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -222,20 +222,20 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>2.0.16</version>
+      <version>2.0.17</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.16</version>
+      <version>1.5.18</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
-      <version>2.3</version>
+      <version>2.4</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -281,10 +281,6 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <groupId>commons-httpclient</groupId>
-          <artifactId>commons-httpclient</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-hdfs-client</artifactId>
         </exclusion>
@@ -305,37 +301,37 @@
     <dependency>
       <groupId>org.apache.httpcomponents.client5</groupId>
       <artifactId>httpclient5</artifactId>
-      <version>5.4.1</version>
+      <version>5.5</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
-      <version>4.8.6</version>
+      <version>4.9.3</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>regions</artifactId>
-      <version>2.28.7</version>
+      <version>2.31.56</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>sdk-core</artifactId>
-      <version>2.28.7</version>
+      <version>2.31.56</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>auth</artifactId>
-      <version>2.28.7</version>
+      <version>2.31.56</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>profiles</artifactId>
-      <version>2.28.7</version>
+      <version>2.31.56</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -347,7 +343,7 @@
     <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
-      <version>2.1.1</version>
+      <version>3.0.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -359,7 +355,7 @@
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-multipart</artifactId>
-      <version>3.0.17</version>
+      <version>3.0.18</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -384,9 +380,6 @@
       <url>https://artifacts.oicr.on.ca/artifactory/collab-snapshot</url>
     </repository>
     <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
       <id>artifacts.oicr.on.ca</id>
       <name>artifacts.oicr.on.ca</name>
       <url>https://artifacts.oicr.on.ca/artifactory/collab-release</url>
@@ -397,11 +390,6 @@
       <url>https://artifacts.oicr.on.ca/artifactory/broad-dependencies</url>
     </repository>
     <repository>
-      <id>apache-releases</id>
-      <name>Apache Releases repository</name>
-      <url>https://repository.apache.org/content/repositories/releases/</url>
-    </repository>
-    <repository>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -410,7 +398,7 @@
       </snapshots>
       <id>artifactory.broadinstitute.org</id>
       <name>artifactory.broadinstitute.org</name>
-      <url>https://broadinstitute.jfrog.io/artifactory/libs-release/</url>
+      <url>https://us-central1-maven.pkg.dev/dsp-artifact-registry/libs-release/</url>
     </repository>
   </repositories>
 </project>
