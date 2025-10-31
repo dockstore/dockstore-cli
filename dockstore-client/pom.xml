@@ -337,15 +337,11 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>7.0.5.Final</version>
+            <version>8.0.3.Final</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
         </dependency>
         <!-- can we keep this for backwards compatibility with file provisioning plugins? -->
         <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
@@ -439,7 +435,6 @@
                                 <usedDependency>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</usedDependency>
                                 <usedDependency>io.spray:spray-json_2.13</usedDependency>
                                 <usedDependency>org.hibernate.validator:hibernate-validator</usedDependency>
-                                <usedDependency>org.glassfish:jakarta.el</usedDependency>
                                 <usedDependency>org.apache.httpcomponents.client5:httpclient5</usedDependency>
                                 <usedDependency>javax.xml.bind:jaxb-api</usedDependency>
                             </usedDependencies>
