@@ -226,7 +226,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
                     <configuration>
-                        <release>17</release>
+                        <release>21</release>
                         <showDeprecation>true</showDeprecation>
                     </configuration>
                 </plugin>
@@ -529,7 +529,7 @@
                                     <version>3.8.1</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[17.0,22.0)</version>
+                                    <version>[21.0,22.0)</version>
                                 </requireJavaVersion>
                                 <banDuplicatePomDependencyVersions />
                                 <bannedDependencies>
@@ -599,7 +599,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>17</release>
+                    <release>21</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -683,7 +683,7 @@
                 <artifactId>impsort-maven-plugin</artifactId>
                 <version>1.8.0</version>
                 <configuration>
-                    <compliance>17</compliance>
+                    <compliance>21</compliance>
                 </configuration>
                 <executions>
                     <execution>
