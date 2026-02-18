@@ -157,6 +157,11 @@
             <artifactId>rds</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>aws-core</artifactId>
+        </dependency>
+
         <!-- uncomment if describing waf
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
