@@ -143,24 +143,13 @@ public final class CLICommonTestUtilities {
      *
      * @param support reference to testing instance of the dockstore web service
      * @param testingPostgres reference to the testing instance of Postgres
-     * @param needBitBucketToken if false the bitbucket token will be deleted
      * @throws Exception
      */
     public static void cleanStatePrivate1(DropwizardTestSupport<DockstoreWebserviceConfiguration> support,
-        TestingPostgres testingPostgres, Boolean needBitBucketToken) throws Exception {
+        TestingPostgres testingPostgres) throws Exception {
         LOG.info("Dropping and Recreating the database with confidential 1 test data");
         cleanStatePrivate1(support, CONFIDENTIAL_CONFIG_PATH);
         handleBitBucketTokens(testingPostgres);
-    }
-    /**
-     * Wrapper for dropping and recreating database from migrations for test confidential 1
-     *
-     * @param support reference to testing instance of the dockstore web service
-     * @param testingPostgres reference to the testing instance of Postgres
-     * @throws Exception
-     */
-    public static void cleanStatePrivate1(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, TestingPostgres testingPostgres) throws Exception {
-        cleanStatePrivate1(support, testingPostgres, false);
     }
 
     /**
@@ -219,22 +208,10 @@ public final class CLICommonTestUtilities {
      * @throws Exception
      */
     public static void cleanStatePrivate2(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, boolean isNewApplication,
-        TestingPostgres testingPostgres, boolean needBitBucketToken) throws Exception {
+        TestingPostgres testingPostgres) throws Exception {
         LOG.info("Dropping and Recreating the database with confidential 2 test data");
         cleanStatePrivate2(support, CONFIDENTIAL_CONFIG_PATH, isNewApplication);
         handleBitBucketTokens(testingPostgres);
-    }
-
-    /**
-     * Wrapper for dropping and recreating database from migrations for test confidential 2
-     *
-     * @param support reference to testing instance of the dockstore web service
-     * @throws Exception
-     */
-    public static void cleanStatePrivate2(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, boolean isNewApplication, TestingPostgres testingPostgres)
-        throws Exception {
-        cleanStatePrivate2(support, isNewApplication, testingPostgres, false);
-        // TODO: You can uncomment the following line to disable GitLab tool and workflow discovery
         // getTestingPostgres(SUPPORT).runUpdateStatement("delete from token where tokensource = 'gitlab.com'");
     }
 
