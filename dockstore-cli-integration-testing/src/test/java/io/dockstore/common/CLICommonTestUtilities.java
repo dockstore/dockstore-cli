@@ -150,7 +150,7 @@ public final class CLICommonTestUtilities {
         TestingPostgres testingPostgres, Boolean needBitBucketToken) throws Exception {
         LOG.info("Dropping and Recreating the database with confidential 1 test data");
         cleanStatePrivate1(support, CONFIDENTIAL_CONFIG_PATH);
-        handleBitBucketTokens(support, testingPostgres);
+        handleBitBucketTokens(testingPostgres);
     }
     /**
      * Wrapper for dropping and recreating database from migrations for test confidential 1
@@ -195,10 +195,9 @@ public final class CLICommonTestUtilities {
 
     /**
      * TODO: do not modify, should be deleted with next webservice release if the method can be made public
-     * @param support
      * @param testingPostgres
      */
-    private static void handleBitBucketTokens(DropwizardTestSupport<DockstoreWebserviceConfiguration> support, TestingPostgres testingPostgres) {
+    private static void handleBitBucketTokens(TestingPostgres testingPostgres) {
         deleteBitBucketToken(testingPostgres);
     }
 
@@ -223,7 +222,7 @@ public final class CLICommonTestUtilities {
         TestingPostgres testingPostgres, boolean needBitBucketToken) throws Exception {
         LOG.info("Dropping and Recreating the database with confidential 2 test data");
         cleanStatePrivate2(support, CONFIDENTIAL_CONFIG_PATH, isNewApplication);
-        handleBitBucketTokens(support, testingPostgres);
+        handleBitBucketTokens(testingPostgres);
     }
 
     /**
