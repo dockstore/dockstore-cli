@@ -78,11 +78,6 @@ Setup your copy of Dockstore as a third-party application able to communicate wi
 3. Authorize via quay.io using the provided link
 4. Browse to [http://localhost:8080/container](http://localhost:8080/container) to list repos that we have tokens for at quay.io
 
-### Demo Integration with Bitbucket
- 
-1. Setup a new application as described in [Integrate another application through OAuth](https://confluence.atlassian.com/bitbucket/integrate-another-application-through-oauth-372605388.html). 
-2. Use the dockstore-ui to authorize Bitbucket access for your current logged in user. Use the UI refresh controls to refresh your tools. 
-
 ### Webservice Demo
 
 Demo the webservice and test communication with GitHub and quay.io
